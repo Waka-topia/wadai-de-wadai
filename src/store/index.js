@@ -1,25 +1,13 @@
 import { createStore } from "vuex";
 import authModule from "./modules/auth";
+import stampModule from "./modules/stamp"; // スタンプモジュールをインポート
 
 export default createStore({
   state: {
-    stamps: [],
+    // ストア全体の状態を記述（今回は空でも問題なし）
   },
   modules: {
     auth: authModule,
-  },
-  mutations: {
-    setStamps(state, stamps) {
-      state.stamps = stamps;
-    },
-  },
-  actions: {
-    async fetchStamps({ commit }, userId) {
-      const stamps = await getStamps(userId);
-      commit("setStamps", stamps);
-    },
-  },
-  getters: {
-    stamps: (state) => state.stamps,
+    stamp: stampModule, // スタンプモジュールを追加
   },
 });

@@ -1,28 +1,30 @@
 // src/services/firestoreService.js
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import { collection, addDoc, getDocs, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase/config";
 
-// スタンプデータをFirestoreに追加
-export const addStamp = async (userId, stampData) => {
+// スタンプをFirestoreに追加する関数、スタンプIDは返り値として返す
+export async function addStamp(userId, groupId) {
   try {
-    const docRef = await addDoc(collection(db, "stamps"), {
+    const docRef = await addDoc(collection(db, "userStamps"), {
       userId,
-      ...stampData,
+      groupId,
+      timestamp: serverTimestamp(),
     });
-    return docRef.id;
+    return docRef.id; // 作成されたスタンプIDを返す
   } catch (error) {
-    throw new Error(error.message);
+    console.error("Error adding stamp: ", error);
+    throw error;
   }
 };
 
-// Firestoreからスタンプデータを取得
-export const getStamps = async (userId) => {
+// Firestoreからユーザーのスタンプデータを取得
+export const getUserStamps = async (userId) => {
   try {
-    const querySnapshot = await getDocs(collection(db, "stamps"));
+    const querySnapshot = await getDocs(collection(db, "userStamps"));
     let stamps = [];
     querySnapshot.forEach((doc) => {
       if (doc.data().userId === userId) {
-        stamps.push(doc.data());
+        stamps.push({ id: doc.id, ...doc.data() });
       }
     });
     return stamps;
