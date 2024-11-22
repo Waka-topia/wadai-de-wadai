@@ -25,7 +25,14 @@ export default {
     // Vuexから取得したユーザー情報
     userFromVuex() {
       const user = this.$store.state.auth.user; // Vuexのユーザー情報
+      const userId = this.$store.state.auth.userId; // Vuexのユーザー情報
+      const uid = this.$store.state.auth.uid; // Vuexのユーザー情報
+
+
       console.log("Vuexから取得したユーザー情報:", user); // ログを追加
+      console.log("Vuexから取得したuserId:", userId); // ログを追加
+      console.log("Vuexから取得したuid(存在しなければ正解):", uid); // ログを追加
+
       return user;
     }
   },

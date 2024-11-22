@@ -45,40 +45,17 @@ export default {
     ...mapActions("auth", ["login", "initializeAuth"]), // auth モジュールのアクションをマップ
 
     async onSubmit() {
-      // try {
-      //   // Vuexのloginアクションを使用してログイン
-      //   await this.login({ email: this.email, password: this.password });
-
-      //   console.log("ログイン成功");
-
-      //   // ログイン後、VuexのinitializeAuthアクションを呼び出して、ユーザー情報をストアに保存
-      //   await this.$store.dispatch("auth/initializeAuth");
-
-      //   // user情報が設定されるのを確認してからセッションストレージに保存
-      //   const user = this.$store.state.auth.user;
-      //   if (user) {
-      //     sessionStorage.setItem('user', JSON.stringify(user));
-      //   } else {
-      //     console.error("ユーザー情報が見つかりません");
-      //   }
-
-      //   this.errorMessage = null;
-      //   // ログイン成功後のリダイレクトや処理をここに追加
-      //   this.$router.push("/"); // 例：ダッシュボードに遷移
-      // } catch (error) {
-      //   console.error("ログインエラー:", error.message);
-      //   this.errorMessage = "ログインに失敗しました。メールアドレスまたはパスワードをご確認ください。";
-      // }
       try {
         // Vuex の login アクションを使用してログイン
         await this.login({ email: this.email, password: this.password });
 
         console.log("ログイン成功");
 
-        // ログイン成功後にセッションストレージに保存
+        // ログイン後にセッションストレージに保存
         const user = this.$store.state.auth.user;
         if (user) {
-          sessionStorage.setItem('user', JSON.stringify(user));
+          // userIdをセッションストレージに保存
+          sessionStorage.setItem('userId', this.$store.state.auth.userId);
         } else {
           console.error("ユーザー情報が見つかりません");
         }

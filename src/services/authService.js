@@ -1,10 +1,18 @@
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth"; // signOut をインポート
-import { auth } from "../firebase/config"; // Firebase Authの設定をインポート
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, onAuthStateChanged, signOut } from "firebase/auth";
+import { auth } from "../firebase/config";
+import store from "@/store";
 
 export default {
   // ユーザー認証状態の監視
   onAuthStateChanged(callback) {
-    return onAuthStateChanged(auth, callback); // authの認証状態を監視する
+    return onAuthStateChanged(auth, (user) => {
+      if (user) {
+        store.dispatch('auth/setUserId', user.uid);  // VuexにuserIdを設定
+      } else {
+        store.dispatch('auth/setUserId', null);  // ユーザーがいない場合はnull
+      }
+      callback(user);
+    });
   },
 
   // ログイン処理
@@ -12,7 +20,7 @@ export default {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-      return user; // ユーザー情報を返す
+      return user;
     } catch (error) {
       console.error("Login failed:", error);
       throw error;
@@ -20,10 +28,16 @@ export default {
   },
 
   // サインアップ処理
-  async signup({ email, password }) {
+  async signup({ email, password, username }) {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
+
+      // ユーザー名の設定
+      await updateProfile(user, {
+        displayName: username,
+      });
+
       return user;
     } catch (error) {
       console.error("Sign-up failed:", error);
@@ -34,7 +48,7 @@ export default {
   // ログアウト処理
   async logout() {
     try {
-      await signOut(auth); // FirebaseのsignOutメソッドを呼び出す
+      await signOut(auth);
       console.log("Logged out successfully");
     } catch (error) {
       console.error("Logout failed:", error);

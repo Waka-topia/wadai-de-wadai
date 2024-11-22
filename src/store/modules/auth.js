@@ -1,12 +1,11 @@
-import authService from "../../services/authService";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../../firebase/config";
+import authService from "../../services/authService"; 
 
 export default {
   namespaced: true,
   state: {
     user: null,
     idToken: null,
+    userId: null,
   },
   mutations: {
     setUser(state, user) {
@@ -15,35 +14,45 @@ export default {
     setIdToken(state, token) {
       state.idToken = token;
     },
+    setUserId(state, uid) {
+      state.userId = uid;  // userIdをstateにセット
+    },
     clearAuthState(state) {
       state.user = null;
       state.idToken = null;
+      state.userId = null;
     },
   },
   actions: {
+    // 初期化処理
     initializeAuth({ commit }) {
       return new Promise((resolve, reject) => {
-        onAuthStateChanged(auth, async (user) => {
+        authService.onAuthStateChanged((user) => {
           if (user) {
-            const idToken = await user.getIdToken();
-            commit("setUser", user);
-            commit("setIdToken", idToken);
-            console.log("User logged in:", user);
+            user.getIdToken().then((idToken) => {
+              commit("setUser", user);
+              commit("setIdToken", idToken);
+              commit("setUserId", user.uid);
+              console.log("User logged in:", user);
+              resolve();
+            });
           } else {
             commit("clearAuthState");
             console.log("No user logged in");
+            resolve();
           }
-          resolve();
-        }, reject);
+        });
       });
     },
 
+    // ログイン処理
     async login({ commit }, { email, password }) {
       try {
         const user = await authService.login({ email, password });
         const idToken = await user.getIdToken();
         commit("setUser", user);
         commit("setIdToken", idToken);
+        commit("setUserId", user.uid);
         console.log("User logged in:", user);
       } catch (error) {
         console.error("Login failed:", error);
@@ -51,12 +60,14 @@ export default {
       }
     },
 
-    async signup({ commit }, { email, password }) {
+    // サインアップ処理
+    async signup({ commit }, { email, password, username }) {
       try {
-        const user = await authService.signup({ email, password });
+        const user = await authService.signup({ email, password, username });
         const idToken = await user.getIdToken();
         commit("setUser", user);
         commit("setIdToken", idToken);
+        commit("setUserId", user.uid);
         console.log("User signed up:", user);
       } catch (error) {
         console.error("Sign-up failed:", error);
@@ -68,7 +79,7 @@ export default {
     async logout({ commit }) {
       try {
         await authService.logout();
-        commit("clearAuthState"); // ストアの状態をクリア
+        commit("clearAuthState");
         console.log("User logged out");
       } catch (error) {
         console.error("Logout failed:", error);
@@ -80,5 +91,6 @@ export default {
     isAuthenticated: (state) => !!state.user,
     user: (state) => state.user,
     idToken: (state) => state.idToken,
+    userId: (state) => state.userId,
   },
 };
