@@ -1,7 +1,6 @@
-// store/modules/auth.js
-import authService from "../../services/authService"; // authServiceをインポート
-import { onAuthStateChanged } from "firebase/auth"; // authServiceからonAuthStateChangedをインポート
-import { auth } from "../../firebase/config"; // Firebase Authの設定をインポート
+import authService from "../../services/authService";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../../firebase/config";
 
 export default {
   namespaced: true,
@@ -22,67 +21,58 @@ export default {
     },
   },
   actions: {
-    // ユーザー認証状態の初期化
-    // initializeAuth({ commit }) {
-    //   return new Promise((resolve, reject) => {
-    //     onAuthStateChanged(auth, async (user) => {
-    //       if (user) {
-    //         const idToken = await user.getIdToken();
-    //         commit("setUser", user); // ユーザー情報をVuexストアに保存
-    //         commit("setIdToken", idToken); // トークンをVuexストアに保存
-    //         console.log("User logged in:", user);
-    //         resolve(); // 成功時にresolve
-    //       } else {
-    //         commit("clearAuthState"); // ログインしていない場合の処理
-    //         console.log("No user logged in");
-    //         resolve(); // 成功時にresolve
-    //       }
-    //     });
-    //   });
-    // },
-
     initializeAuth({ commit }) {
       return new Promise((resolve, reject) => {
         onAuthStateChanged(auth, async (user) => {
           if (user) {
             const idToken = await user.getIdToken();
-            commit("setUser", user); // ユーザー情報を Vuex に保存
-            commit("setIdToken", idToken); // トークンを Vuex に保存
+            commit("setUser", user);
+            commit("setIdToken", idToken);
             console.log("User logged in:", user);
           } else {
-            commit("clearAuthState"); // ログインしていない場合はクリア
+            commit("clearAuthState");
             console.log("No user logged in");
           }
-          resolve(); // 成功時は resolve を呼び出す
-        }, reject); // エラー時は reject を呼び出す
+          resolve();
+        }, reject);
       });
     },
 
-    // ログイン処理
     async login({ commit }, { email, password }) {
       try {
-        const user = await authService.login({ email, password }); // authServiceのloginメソッドを呼び出す
+        const user = await authService.login({ email, password });
         const idToken = await user.getIdToken();
-        commit("setUser", user); // ユーザー情報をVuexストアに保存
-        commit("setIdToken", idToken); // トークンをVuexストアに保存
+        commit("setUser", user);
+        commit("setIdToken", idToken);
         console.log("User logged in:", user);
       } catch (error) {
         console.error("Login failed:", error);
-        throw error; // エラーを投げて、呼び出し元でハンドリング
+        throw error;
       }
     },
 
-    // サインアップ処理
     async signup({ commit }, { email, password }) {
       try {
-        const user = await authService.signup({ email, password }); // authServiceのsignupメソッドを呼び出す
+        const user = await authService.signup({ email, password });
         const idToken = await user.getIdToken();
-        commit("setUser", user); // ユーザー情報をVuexストアに保存
-        commit("setIdToken", idToken); // トークンをVuexストアに保存
-        console.log("User signed up:", user); // ユーザー情報をログに表示
+        commit("setUser", user);
+        commit("setIdToken", idToken);
+        console.log("User signed up:", user);
       } catch (error) {
-        console.error("Sign-up failed:", error); // エラーメッセージをログに表示
-        throw error; // エラーを投げて、呼び出し元でハンドリング
+        console.error("Sign-up failed:", error);
+        throw error;
+      }
+    },
+
+    // ログアウト処理
+    async logout({ commit }) {
+      try {
+        await authService.logout();
+        commit("clearAuthState"); // ストアの状態をクリア
+        console.log("User logged out");
+      } catch (error) {
+        console.error("Logout failed:", error);
+        throw error;
       }
     },
   },
