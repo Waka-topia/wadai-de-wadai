@@ -1,8 +1,7 @@
-// src/store/index.js
 import { createStore } from 'vuex';
-import { login, signUp } from '../services/authService';
+import authService from '../services/authService';
 import { getStamps } from '../services/firestoreService';
-import auth from "./modules/auth"; // authモジュールをインポート
+import authModule from './modules/auth';
 
 export default createStore({
   state: {
@@ -10,7 +9,7 @@ export default createStore({
     stamps: [],
   },
   modules: {
-    auth, // authモジュールを登録
+    auth: authModule, // モジュールを名前空間付きで登録
   },
   mutations: {
     setUser(state, user) {
@@ -21,13 +20,20 @@ export default createStore({
     },
   },
   actions: {
-    async login({ commit }, { email, password }) {
-      const user = await login(email, password);
-      commit('setUser', user);
-    },
+    // async login({ commit }, { email, password }) {
+    //   try {
+    //     await authService.login({ commit }, { email, password });
+    //   } catch (error) {
+    //     console.error("Login action failed:", error);
+    //     throw error;
+    //   }
+    // },
     async signUp({ commit }, { email, password }) {
-      const user = await signUp(email, password);
-      commit('setUser', user);
+      try {
+        await authService.signup({ commit }, { email, password });
+      } catch (error) {
+        console.error("Sign-up action failed:", error);
+      }
     },
     async fetchStamps({ commit }, userId) {
       const stamps = await getStamps(userId);
