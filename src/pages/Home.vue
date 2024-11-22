@@ -24,7 +24,7 @@ export default {
   computed: {
     // Vuexから取得したユーザー情報
     userFromVuex() {
-      const user = this.$store.state.user; // Vuexのユーザー情報
+      const user = this.$store.state.auth.user; // Vuexのユーザー情報
       console.log("Vuexから取得したユーザー情報:", user); // ログを追加
       return user;
     }

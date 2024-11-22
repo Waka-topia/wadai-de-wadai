@@ -23,21 +23,38 @@ export default {
   },
   actions: {
     // ユーザー認証状態の初期化
+    // initializeAuth({ commit }) {
+    //   return new Promise((resolve, reject) => {
+    //     onAuthStateChanged(auth, async (user) => {
+    //       if (user) {
+    //         const idToken = await user.getIdToken();
+    //         commit("setUser", user); // ユーザー情報をVuexストアに保存
+    //         commit("setIdToken", idToken); // トークンをVuexストアに保存
+    //         console.log("User logged in:", user);
+    //         resolve(); // 成功時にresolve
+    //       } else {
+    //         commit("clearAuthState"); // ログインしていない場合の処理
+    //         console.log("No user logged in");
+    //         resolve(); // 成功時にresolve
+    //       }
+    //     });
+    //   });
+    // },
+
     initializeAuth({ commit }) {
       return new Promise((resolve, reject) => {
         onAuthStateChanged(auth, async (user) => {
           if (user) {
             const idToken = await user.getIdToken();
-            commit("setUser", user); // ユーザー情報をVuexストアに保存
-            commit("setIdToken", idToken); // トークンをVuexストアに保存
+            commit("setUser", user); // ユーザー情報を Vuex に保存
+            commit("setIdToken", idToken); // トークンを Vuex に保存
             console.log("User logged in:", user);
-            resolve(); // 成功時にresolve
           } else {
-            commit("clearAuthState"); // ログインしていない場合の処理
+            commit("clearAuthState"); // ログインしていない場合はクリア
             console.log("No user logged in");
-            resolve(); // 成功時にresolve
           }
-        });
+          resolve(); // 成功時は resolve を呼び出す
+        }, reject); // エラー時は reject を呼び出す
       });
     },
 

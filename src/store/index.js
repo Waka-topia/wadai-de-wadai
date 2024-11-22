@@ -1,3 +1,4 @@
+src/store/index.js
 import { createStore } from 'vuex';
 import authService from '../services/authService';
 import { getStamps } from '../services/firestoreService';
