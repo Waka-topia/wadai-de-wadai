@@ -3,7 +3,7 @@
     <h2>QRコードをスキャンしてください</h2>
     
     <!-- QRコードリーダー -->
-    <qrcode-stream @detect="onDecode" @init="onInit" />
+    <qrcode-stream @detect="onDetect" @init="onInit" />
 
     <!-- QRコードデータ表示 -->
     <p v-if="scannedData">読み取ったデータ: {{ scannedData }}</p>
@@ -31,19 +31,73 @@ export default {
     ...mapActions("stamp", ["addStamp"]), // Vuexアクションをマッピング
 
     // QRコードが正常に読み取られた時の処理
-    onDecode(decodedString) {
-      console.log("QRコードのデータ:", decodedString);
-      this.scannedData = decodedString;
+    onDetect(decodedResult) {
+      console.log("QRコードの検出結果:", decodedResult);
+      const result = Array.isArray(decodedResult) ? decodedResult[0] : decodedResult;
+      console.log("QRコードのresult:", result);
 
-      try {
-        // QRデータをオブジェクトに変換
-        const qrData = JSON.parse(decodedString);
-        console.log("パースされたQRデータ:", qrData);
-        this.addStampToFirestore(qrData);
-      } catch (error) {
-        console.error("QRデータのパースに失敗しました:", error);
-        alert("QRデータの解析に失敗しました。");
+      // QRコードの生データ（rawValue）を取得
+      const rawData = result?.rawValue;
+
+      console.log("rawValue:", result?.rawValue);
+
+      if (!rawData) {
+        console.error("QRコードの生データが取得できませんでした:", decodedResult);
+        alert("QRコードが正しく読み取れませんでした。もう一度お試しください。");
+        return;
       }
+
+      console.log("QRコードの生データ:", rawData);
+
+      let parsedData;
+      try {
+        // rawDataが文字列の場合はJSONとしてパース
+        if (typeof rawData === 'string') {
+          // 文字列データをJSONとしてパース
+          parsedData = JSON.parse(rawData);
+        } else if (typeof rawData === 'object') {
+          // JSONオブジェクトがそのまま渡された場合はそのまま使用
+          parsedData = rawData;
+        } else {
+          throw new Error("データ形式が不正です");
+        }
+      } catch (error) {
+        console.error("QRコードのデータ解析エラー:", error);
+        alert("QRコードのデータ解析に失敗しました。もう一度お試しください。");
+        return;
+      }
+
+      // 必要なデータを抽出
+      const extractedData = this.extractData(parsedData);
+
+      if (extractedData) {
+        this.scannedData = JSON.stringify(extractedData);
+        console.log("抽出されたデータ:", extractedData);
+
+        // Firestore に保存
+        this.addStampToFirestore(extractedData);
+      } else {
+        alert("必要なデータが見つかりませんでした。正しいQRコードを使用してください。");
+      }
+    },
+
+    // データの抽出
+    extractData(rawData) {
+      try {
+        // rawDataがオブジェクトの場合、そのまま利用
+        const groupId = rawData?.groupId;
+        const stampId = rawData?.stampId;
+
+        // データが存在する場合はオブジェクトを返す
+        if (groupId && stampId) {
+          return { groupId, stampId };
+        } else {
+          console.error("必要なデータが不足しています:", rawData);
+        }
+      } catch (error) {
+        console.error("データ抽出エラー:", error);
+      }
+      return null; // 必要なデータがない場合はnullを返す
     },
 
     // 初期化時のメッセージ
@@ -55,7 +109,7 @@ export default {
         })
         .catch((err) => {
           console.error("QRコードリーダーの初期化エラー:", err);
-          alert("カメラが使えません。設定を確認してください。");
+          alert("カメラが使えません。設定を確認してください。HTTPSでアクセスする必要があります。");
         });
     },
 
@@ -75,10 +129,11 @@ export default {
     async simulateQRCodeScan() {
       const qrData = {
         groupId: "group123",
-        stampId: "stamp1229", // QRコードから取得したスタンプID
+        stampId: "stamp456", // QRコードから取得したスタンプID
       };
 
       this.scannedData = JSON.stringify(qrData);
+      console.log("テスト用読み取ったデータ:", this.scannedData);
 
       try {
         const result = await this.addStamp(qrData);
