@@ -8,6 +8,13 @@ import authService from './services/authService';
 
 const app = createApp(App);
 
+// アプリケーションを先にマウント
+app.use(router);
+app.use(store);
+app.config.globalProperties.$authService = authService; // authServiceを登録（任意）
+app.mount('#app');
+
+// 認証状態を監視
 authService.onAuthStateChanged(async (user) => {
   if (user) {
     const idToken = await user.getIdToken();
@@ -19,10 +26,4 @@ authService.onAuthStateChanged(async (user) => {
     store.commit('auth/clearAuthState');
     console.log('No user authenticated');
   }
-
-  // アプリケーションをマウント
-  app.use(router);
-  app.use(store);
-  app.config.globalProperties.$authService = authService; // authServiceを登録（任意）
-  app.mount('#app');
 });
