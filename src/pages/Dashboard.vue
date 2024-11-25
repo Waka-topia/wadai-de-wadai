@@ -12,12 +12,18 @@
           <p>0</p>
         </div>
       </div>
+      <StampsList />
     </div>
   </template>
   
   <script>
+  import StampsList from '@/components/StampsList.vue';
+
   export default {
     name: "Dashboard",
+    components: {
+      StampsList,
+    },
   };
   </script>
   

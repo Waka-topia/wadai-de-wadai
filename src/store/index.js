@@ -8,6 +8,9 @@ export default createStore({
   },
   modules: {
     auth: authModule,
-    stamp: stampModule, // スタンプモジュールを追加
+    stamps: {
+      namespaced: true, // 名前空間を有効にする
+      ...stampModule,
+    },
   },
 });

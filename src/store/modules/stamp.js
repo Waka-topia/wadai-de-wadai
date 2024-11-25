@@ -1,7 +1,9 @@
-import { addStampToUser, getUserStamps } from "../../services/firestoreService";
+// import { addStampToUser, getUserStamps } from "../../services/firestoreService";
+import { addStampToUser, getUserStamps, getUserStampImages } from "../../services/firestoreService";
 
 const state = {
   stamps: [], // ユーザーが受け取ったスタンプ一覧
+  stampImages: [], // 表示用のスタンプ画像データ
 };
 
 const mutations = {
@@ -10,6 +12,9 @@ const mutations = {
   },
   SET_USER_STAMPS(state, stamps) {
     state.stamps = stamps; // ユーザーのスタンプ情報をセット
+  },
+  SET_USER_STAMP_IMAGES(state, stampImages) {
+    state.stampImages = stampImages; // 表示用のスタンプ画像データをセット
   },
 };
 
@@ -64,10 +69,21 @@ const actions = {
       console.error("Failed to fetch user stamps: ", error);
     }
   },
+  async fetchUserStampImages({ commit, rootState }) {
+    const userId = rootState.auth.userId; // ログイン中のユーザーID
+    if (!userId) throw new Error("User is not logged in.");
+    try {
+      const stampImages = await getUserStampImages(userId);
+      commit("SET_USER_STAMP_IMAGES", stampImages); // Vuex に画像データをセット
+    } catch (error) {
+      console.error("Failed to fetch user stamp images: ", error);
+    }
+  },
 };
 
 const getters = {
   userStamps: (state) => state.stamps, // 現在のスタンプ一覧を返す
+  userStampImages: (state) => state.stampImages, // スタンプ画像データを返す
 };
 
 export default {

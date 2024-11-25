@@ -52,3 +52,27 @@ export async function getUserStamps(userId) {
     throw new Error(`Failed to fetch stamps: ${error.message}`);
   }
 }
+
+export async function getUserStampImages(userId) {
+  try {
+    // ユーザーの stampsReceived コレクションを取得
+    const userStampsSnapshot = await getDocs(collection(db, `users/${userId}/stampsReceived`));
+    const userStamps = userStampsSnapshot.docs.map((doc) => doc.id); // stampId のリスト
+
+    // stamps コレクションから該当するスタンプのデータを取得
+    const stampImages = [];
+    for (const stampId of userStamps) {
+      const stampDoc = await getDoc(doc(db, "stamps", stampId));
+      if (stampDoc.exists()) {
+        stampImages.push({
+          stampId,
+          ...stampDoc.data(), // imageUrl, name, description などを展開
+        });
+      }
+    }
+    return stampImages;
+  } catch (error) {
+    console.error("Error fetching user stamp images: ", error);
+    throw error;
+  }
+}
