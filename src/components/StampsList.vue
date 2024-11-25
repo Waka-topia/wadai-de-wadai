@@ -48,6 +48,7 @@
         }
       },
       getImageUrl(relativePath) {
+        console.log("relativePath:", relativePath);
         return new URL(`../assets/${relativePath}`, import.meta.url).href;
       },
     },
