@@ -28,7 +28,7 @@ export default {
     };
   },
   methods: {
-    ...mapActions("stamp", ["addStamp"]), // Vuexアクションをマッピング
+    ...mapActions("stamps", ["addStamp"]), // Vuexアクションをマッピング
 
     // QRコードが正常に読み取られた時の処理
     onDetect(decodedResult) {
