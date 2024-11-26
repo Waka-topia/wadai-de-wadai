@@ -4,7 +4,7 @@ import Login from "../pages/Login.vue";
 import Logout from "../pages/Logout.vue";
 import SignUp from "../pages/SignUp.vue";
 import Dashboard from "../pages/Dashboard.vue";
-// import CampusMap from "@/pages/MapPage.vue";
+import CampusMap from "@/pages/MapPage.vue";
 
 const routes = [
   { path: "/", name: "Home", component: Home },
@@ -12,7 +12,7 @@ const routes = [
   { path: "/logout", name: "Logout",component: Logout},
   { path: "/signup", name: "SignUp", component: SignUp },
   { path: "/dashboard", name: "Dashboard", component: Dashboard },
-  // { path: "/campus-map", name: "CampusMap", component: CampusMap }
+  { path: "/campus-map", name: "CampusMap", component: CampusMap }
 ];
 
 const router = createRouter({
