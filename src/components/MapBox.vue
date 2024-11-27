@@ -21,11 +21,18 @@
         style: "mapbox://styles/wadaishinkan/cm3y0d9qw00hp01rd6u883qp5",
         center: [135.151645, 34.265574],
         zoom: 15,
-        // pitch: 45, // 初期ピッチを設定 (0〜60程度が適切)
+        maxBounds: [
+            [135.1483, 34.2605], // 西南の座標 (南西の角)
+            [135.1566, 34.2714], // 北東の座標 (北東の角)
+        ],
+        pitch: 75, // 初期ピッチを設定 (0〜60程度が適切)
         // bearing: 0, // 初期の方位角を設定
-        dragRotate: true, // ドラッグでの回転を有効化
-        pitchWithRotate: true, // ピッチ変更のジェスチャーを有効化
+        // dragRotate: true, // ドラッグでの回転を有効化
+        // pitchWithRotate: true, // ピッチ変更のジェスチャーを有効化
       });
+
+      this.map.dragRotate.enable({ pitchWithRotate: true }); // ピッチ変更を有効化
+
   
       // 不足している画像を検知
       this.map.on("styleimagemissing", (e) => {
@@ -48,6 +55,6 @@
   <style>
   #map-container {
     width: 100%;
-    height: 500px;
+    height: 100vh;
   }
   </style>

@@ -10,8 +10,8 @@ export default {
 };
 </script>
 
-<style>
-/* #app {
+<!-- <style>
+#app {
   font-family: 'Arial', sans-serif;
   margin: 0;
   padding: 0;
@@ -26,7 +26,7 @@ h1 {
 
 button {
   cursor: pointer;
-} */
+}
 body, main {
   margin: 0;
   padding: 0;
@@ -38,4 +38,4 @@ body, main {
   background-color: #f4f4f9; /* 背景色を調整 */
 }
 
-</style>
+</style> -->

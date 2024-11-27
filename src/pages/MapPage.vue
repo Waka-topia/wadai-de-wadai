@@ -31,6 +31,8 @@
   
   <style scoped>
   .campus-map {
+    width: auto;
+    height: auto;
     padding: 2rem;
     text-align: center;
     background-color: #f9fafb; /* 柔らかい背景色 */
