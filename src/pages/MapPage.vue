@@ -3,16 +3,19 @@
       <h1>キャンパスマップ </h1>
       <p>ここではあなたの進捗状況を確認できます。</p>
       <CampusMap />
+      <!-- <propColor></propColor> -->
     </div>
   </template>
   
   <script>
+  // import propColor from '@/components/prop-color.vue';
   import CampusMap from '@/components/CampusMap.vue';
 
   export default {
     name: "Dashboard",
     components: {
       StampsList,
+      // propColor,
     },
   };
   </script>

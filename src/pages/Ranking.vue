@@ -17,4 +17,16 @@
         </div>
         </div>
     </div>
+    <propColor></propColor>
 </template>
+
+<script>
+import propColor from "@/components/prop-color.vue";
+
+export default {
+    name: "Ranking",
+    components: {
+        propColor,
+    },
+};
+</script>

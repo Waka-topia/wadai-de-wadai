@@ -1,19 +1,13 @@
 <template>
   <div id="app">
     <router-view></router-view>
-    <propColor></propColor>
   </div>
 </template>
 
 <script>
-import propColor from "@/components/prop-color.vue";
-
-export default {
-  name: "App",
-  components: {
-    propColor,
-  },
-};
+  export default {
+    name: "App",
+  };
 </script>
 
 <!-- <style>
