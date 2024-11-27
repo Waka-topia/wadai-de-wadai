@@ -5,6 +5,8 @@ import App from './App.vue';
 import router from './router';
 import store from './store';
 import authService from './services/authService';
+import vuetify from "../src/plugins/vuetify";
+import "./assets/main.css";
 
 const app = createApp(App);
 
@@ -12,6 +14,7 @@ const app = createApp(App);
 app.use(router);
 app.use(store);
 app.config.globalProperties.$authService = authService; // authServiceを登録（任意）
+app.use(vuetify);
 app.mount('#app');
 
 // 認証状態を監視

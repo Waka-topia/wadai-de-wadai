@@ -11,6 +11,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@mdi/font": "^7.4.47",
     "firebase": "^11.0.2",
     "jsqr": "^1.4.0",
     "uuid": "^11.0.3",
@@ -18,6 +19,7 @@
     "vue-qr-reader": "^1.6.2",
     "vue-qrcode-reader": "^5.5.11",
     "vue-router": "^4.4.5",
+    "vuetify": "^3.7.4",
     "vuex": "^4.0.2"
   },
   "devDependencies": {
