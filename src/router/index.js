@@ -17,7 +17,7 @@ const routes = [
   { path: "/signup", name: "SignUp", component: SignUp },
   { path: "/reader", name: "Reader", component: Reader},
   { path: "/ranking", name: "Ranking", component: Ranking },
-  { path: "/mypage", name: "MyPage", component: MyPage }
+  { path: "/mypage", name: "MyPage", component: MyPage },
   //{ path: "/dashboard", name: "Dashboard", component: Dashboard },
   { path: "/campus-map", name: "CampusMap", component: CampusMap }
 ];
