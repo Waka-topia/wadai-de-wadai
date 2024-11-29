@@ -7,16 +7,19 @@ import SignUp from "../pages/SignUp.vue";
 import Reader from "@/pages/Reader.vue";
 import Ranking from "@/pages/Ranking.vue";
 import MyPage from "@/pages/MyPage.vue";
+//import Dashboard from "../pages/Dashboard.vue";
+import CampusMap from "@/pages/MapPage.vue";
 
 const routes = [
   { path: "/", name: "Home", component: Home },
   { path: "/login", name: "Login", component: Login },
   { path: "/logout", name: "Logout",component: Logout},
   { path: "/signup", name: "SignUp", component: SignUp },
-  // { path: "/campus-map", name: "CampusMap", component: CampusMap },
   { path: "/reader", name: "Reader", component: Reader},
   { path: "/ranking", name: "Ranking", component: Ranking },
   { path: "/mypage", name: "MyPage", component: MyPage }
+  //{ path: "/dashboard", name: "Dashboard", component: Dashboard },
+  { path: "/campus-map", name: "CampusMap", component: CampusMap }
 ];
 
 const router = createRouter({
