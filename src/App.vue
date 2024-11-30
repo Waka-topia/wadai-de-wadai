@@ -10,7 +10,7 @@
   };
 </script>
 
-<!-- <style>
+<style>
 #app {
   font-family: 'Arial', sans-serif;
   margin: 0;
@@ -38,4 +38,4 @@ body, main {
   background-color: #f4f4f9; /* 背景色を調整 */
 }
 
-</style> -->
+</style>
