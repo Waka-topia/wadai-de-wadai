@@ -8,18 +8,21 @@
     <p v-else>ログインしていないようです。ログインしてください。</p>
 
     <!-- QRScanner コンポーネントを表示 -->
-    <QRScanner />
+    <!-- <QRScanner /> -->
+     <PropColor/>
   </div>
 </template>
 
 <script>
 // QRScanner をインポート
-import QRScanner from "../components/QRScanner.vue";
+// import QRScanner from "../components/QRScanner.vue";
+import PropColor from "../layouts/prop-color.vue";
 
 export default {
   name: "Home",
   components: {
-    QRScanner, // コンポーネントを登録
+    // QRScanner, // コンポーネントを登録
+    PropColor,
   },
   computed: {
     // Vuexから取得したユーザー情報

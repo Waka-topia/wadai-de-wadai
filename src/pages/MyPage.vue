@@ -13,13 +13,13 @@
       </div>
     </div>
     <StampsList />
-    <propColor></propColor>
+    <propColor/>
   </div>
 </template>
 
 <script>
   import StampsList from '@/components/StampsList.vue';
-  import propColor from "@/components/prop-color.vue";
+  import propColor from "@/layouts/prop-color.vue";
 
   export default {
     name: "Dashboard",

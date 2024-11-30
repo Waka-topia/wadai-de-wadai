@@ -4,7 +4,7 @@
 </template>
 
 <script>
-import propColor from "@/components/prop-color.vue";
+import propColor from "@/layouts/prop-color.vue";
 import QRScanner from "@/components/QRScanner.vue";
 
 export default {

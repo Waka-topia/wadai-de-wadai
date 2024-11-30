@@ -3,7 +3,7 @@
       <h1 class="map-title">キャンパスマップ</h1>
       <p class="map-description">大学の開放状態を確認できます。</p>
       <CampusMap />
-      <!-- <propColor></propColor> -->
+      <propColor/>
       <div class="stats">
         <div class="stat-item">
           <h2>エリア開放</h2>
@@ -18,14 +18,14 @@
   </template>
   
   <script>
-  // import propColor from '@/components/prop-color.vue';
+  import propColor from '../layouts/prop-color.vue';
 //   import CampusMap from "@/components/CampusMap.vue";
   import CampusMap from "@/components/MapBox.vue";
 
   
   export default {
     components: {
-      // propColor,
+      propColor,
       CampusMap,
     },
     name: "MapPage",

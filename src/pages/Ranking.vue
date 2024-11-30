@@ -1,32 +1,35 @@
 <template>
-    <div class="ranking">
-        <h1>ランキング</h1>
-        <p>ここではスタンプの獲得数ランキングを確認できます。</p>
-        <div class="ranking-list">
-        <div class="ranking-item">
-            <h2>1位</h2>
-            <p>0</p>
-        </div>
-        <div class="ranking-item">
-            <h2>2位</h2>
-            <p>0</p>
-        </div>
-        <div class="ranking-item">
-            <h2>3位</h2>
-            <p>0</p>
-        </div>
-        </div>
+    <div>
+      <h1>ランキング</h1>
+      <ul v-if="!isLoading && rankings.length > 0">
+        <li v-for="(user, index) in rankings" :key="user.userId">
+          {{ index + 1 }}位: ユーザーID {{ user.userId }} - {{ user.count }} スタンプ
+        </li>
+      </ul>
+      <p v-if="isLoading">ランキングを読み込んでいます...</p>
+      <p v-if="error">エラーが発生しました: {{ error.message || error }}</p>
+        <propColor/>
     </div>
-    <propColor></propColor>
-</template>
-
-<script>
-import propColor from "@/components/prop-color.vue";
-
-export default {
+  </template>
+  
+  <script>
+  import { mapActions, mapGetters } from "vuex";
+  import PropColor from "@/layouts/prop-color.vue";
+  
+  export default {
     name: "Ranking",
     components: {
-        propColor,
+      PropColor,
     },
-};
-</script>
+    computed: {
+      ...mapGetters("ranking", ["rankings", "isLoading", "error"]),
+    },
+    methods: {
+      ...mapActions("ranking", ["fetchRankings"]),
+    },
+    mounted() {
+      this.fetchRankings();
+    },
+  };
+  </script>
+  
