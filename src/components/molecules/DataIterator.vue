@@ -17,7 +17,7 @@
 
 <script setup>
 import { ref, defineComponent } from 'vue'
-import ProfileSummary from './ProfileSummary.vue';
+import ProfileSummary from './ProfileCard.vue';
 
 const page = ref(1)
 const items = Array.from({ length: 15 }, (k, v) => ({

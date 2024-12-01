@@ -1,16 +1,16 @@
 <template>
     <QRScanner></QRScanner>
-    <propColor></propColor>
+    <BottomNavigation></BottomNavigation>
 </template>
 
 <script>
-import propColor from "@/components/prop-color.vue";
-import QRScanner from "@/components/QRScanner.vue";
+import BottomNavigation from "@/components/organisms/BottomNavigation.vue";
+import QRScanner from "@/components/templates/QRScanner.vue";
 
 export default {
-    name: "Reader",
+    name: "ReaderComponent",
     components: {
-        propColor,
+        BottomNavigation,
         QRScanner,
     },
 };

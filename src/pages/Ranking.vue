@@ -1,16 +1,16 @@
 <template>
   <TabsBar></TabsBar>
-  <propColor></propColor>
+  <BottomNavigation></BottomNavigation>
 </template>
 
 <script>
-import propColor from "@/components/prop-color.vue";
-import TabsBar from "@/components/TabsBar.vue";
+import BottomNavigation from "@/components/organisms/BottomNavigation.vue";
+import TabsBar from "@/components/organisms/TabsBar.vue";
 
 export default {
   name: "RankingPage",
   components: {
-    propColor,
+    BottomNavigation,
     TabsBar,
   },
 };

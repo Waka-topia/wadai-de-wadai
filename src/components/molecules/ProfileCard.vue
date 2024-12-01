@@ -28,7 +28,7 @@
 export default {
   methods: {
     navigateToProfile() {
-      this.$router.push('/users/wakayama-taro');
+      this.$router.push('/wakayama-taro');
     },
   },
 };
