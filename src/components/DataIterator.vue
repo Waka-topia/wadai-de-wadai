@@ -6,7 +6,7 @@
         :key="i"
       >
         <v-card v-bind="item.raw">
-        <AvatorsLists></AvatorsLists>
+        <ProfileSummary></ProfileSummary>
         </v-card>
 
         <br>
@@ -17,7 +17,7 @@
 
 <script setup>
 import { ref, defineComponent } from 'vue'
-import AvatorsLists from './AvatorsLists.vue';
+import ProfileSummary from './ProfileSummary.vue';
 
 const page = ref(1)
 const items = Array.from({ length: 15 }, (k, v) => ({
@@ -27,7 +27,7 @@ const items = Array.from({ length: 15 }, (k, v) => ({
 defineComponent({
   name: 'DataIterator',
   components: {
-    AvatorsLists
+    ProfileSummary,
   },
 })
 </script>

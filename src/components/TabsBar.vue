@@ -1,6 +1,6 @@
 <template>
   <v-card color="basil">
-    <v-card-title class="text-center justify-center py-6">
+    <v-card-title class="text-center justify-center py-6 mx-6">
       <h1 class="font-weight-bold text-h3 text-basil">
         ランキング
       </h1>
@@ -9,7 +9,7 @@
     <v-tabs
       v-model="tab"
       bg-color="transparent"
-      color="basil"
+      color="orange"
       grow
     >
       <v-tab
