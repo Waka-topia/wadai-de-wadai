@@ -32,9 +32,6 @@ body, main {
   padding: 0;
   width: 100%;
   min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   background-color: #f4f4f9; /* 背景色を調整 */
 }
 
