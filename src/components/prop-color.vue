@@ -2,7 +2,7 @@
   <v-layout class="overflow-visible" style="height: 56px;">
     <v-bottom-navigation
       v-model="value"
-      color="primary"
+      color="orange"
       active
     >
       <v-btn @click="navigateTo('/campus-map')">
@@ -27,7 +27,7 @@
     </v-bottom-navigation>
   </v-layout>
 </template>
-  
+
 <script setup>
 import { ref, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
@@ -64,4 +64,4 @@ watch(
   },
   { immediate: true } // 初期読み込み時も適用
 );
-</script>  
+</script>
