@@ -3,6 +3,7 @@
     <AppBar :title="title" :drawer="drawer" />
     <ProfileCard v-for="(user, index) in userInfo" :key="index" :name="user.name" :status="user.status"
       :image="user.image" />
+    <LogOutButton />
     <TabsBar :tabsName="tabsName" :tabsComponent="tabsComponent" />
     <BottomNavigation />
   </div>
@@ -10,6 +11,7 @@
 
 <script>
 import StampsList from '@/components/StampsList.vue';
+import LogOutButton from '@/components/atoms/LogOut.vue';
 import ProfileCard from '@/components/atoms/ProfileCard.vue';
 import AppBar from '@/components/organisms/AppBar.vue';
 import BottomNavigation from '@/components/organisms/BottomNavigation.vue';
@@ -38,6 +40,7 @@ export default {
     ProfileCard,
     TabsBar,
     AppBar,
+    LogOutButton,
   },
 };
 </script>
