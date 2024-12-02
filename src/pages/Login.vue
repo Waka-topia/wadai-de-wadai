@@ -38,6 +38,10 @@
         </v-btn>
         <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
       </v-form>
+      <v-divider class="mt-10"></v-divider>
+      <v-btn variant="text" @click="onSignUp">
+        アカウントをお持ちでない方はこちら
+      </v-btn>
     </v-card>
   </v-sheet>
 </template>
@@ -82,7 +86,10 @@ export default {
         console.error("ログインエラー:", error.message);
         this.errorMessage = "ログインに失敗しました。メールアドレスまたはパスワードをご確認ください。";
       }
-    }
+    },
+    onSignUp() {
+      this.$router.push("/signup");
+    },
   },
 };
 </script>

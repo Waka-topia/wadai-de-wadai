@@ -1,48 +1,56 @@
 <template>
-  <div class="signup">
-    <h1>アカウント作成</h1>
-    <form @submit.prevent="onSubmit">
-      <div class="form-group">
-        <label for="username">ユーザー名</label>
-        <input
-          type="text"
-          id="username"
-          v-model="username"
-          placeholder="Your Name"
-          required
-        />
-      </div>
-      <div class="form-group">
-        <label for="email">メールアドレス</label>
-        <input
-          type="email"
-          id="email"
+  <v-sheet class="bg-orange-lighten-5 pa-12" rounded>
+    <v-card class="mx-auto px-6 py-8" max-width="344">
+      <v-form
+        v-model="form"
+        @submit.prevent="onSubmit"
+      >
+        <v-text-field
           v-model="email"
-          placeholder="example@example.com"
-          required
-        />
-      </div>
-      <div class="form-group">
-        <label for="password">パスワード</label>
-        <input
-          type="password"
-          id="password"
+          :readonly="loading"
+          :rules="[required]"
+          class="mb-2"
+          label="Email"
+          clearable
+        ></v-text-field>
+
+        <v-text-field
           v-model="password"
-          placeholder="********"
-          required
-        />
-      </div>
-      <button type="submit">アカウント作成</button>
-      <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
-    </form>
-  </div>
+          :readonly="loading"
+          :rules="[required]"
+          label="Password"
+          placeholder="Enter your password"
+          clearable
+        ></v-text-field>
+
+        <br>
+
+        <v-btn
+          :disabled="!form"
+          :loading="loading"
+          color="primary"
+          size="large"
+          type="submit"
+          variant="elevated"
+          block
+        >
+          Sign Up
+        </v-btn>
+        <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
+      </v-form>
+      <v-divider class="mt-10"></v-divider>
+      <v-btn variant="text" @click="onLogIn">
+        アカウントをお持ちの方はこちら
+      </v-btn>
+    </v-card>
+  </v-sheet>
 </template>
 
 <script>
 import { mapActions } from "vuex";
 
 export default {
-  name: "Signup",
+  name: "UserSignup",
   data() {
     return {
       username: "",
@@ -52,7 +60,7 @@ export default {
     };
   },
   methods: {
-    ...mapActions("auth", ["signup"]), 
+    ...mapActions("auth", ["signup"]),
 
     async onSubmit() {
       try {
@@ -67,41 +75,9 @@ export default {
         this.errorMessage = "サインアップに失敗しました。メールアドレスまたはパスワードをご確認ください。";
       }
     },
+    onLogIn() {
+      this.$router.push("/login");
+    },
   },
 };
 </script>
-
-<style scoped>
-.signup {
-  max-width: 400px;
-  margin: 2rem auto;
-  padding: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-}
-
-.form-group {
-  margin-bottom: 1rem;
-}
-
-button {
-  display: block;
-  width: 100%;
-  padding: 0.5rem;
-  background-color: #28a745;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #218838;
-}
-
-.error {
-  margin-top: 1rem;
-  color: red;
-  text-align: center;
-}
-</style>
