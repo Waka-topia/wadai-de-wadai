@@ -1,30 +1,13 @@
 <template>
   <v-card color="basil">
-    <v-tabs
-      v-model="tab"
-      bg-color="transparent"
-      color="orange"
-      grow
-    >
-      <v-tab
-        v-for="item in items"
-        :key="item"
-        :text="item"
-        :value="item"
-      ></v-tab>
+    <v-tabs v-model="tab" bg-color="transparent" color="orange" grow>
+      <v-tab v-for="(tabName, index) in tabsName" :key="index">{{ tabName }}</v-tab>
     </v-tabs>
 
     <v-tabs-window v-model="tab">
-      <v-tabs-window-item
-        v-for="item in items"
-        :key="item"
-        :value="item"
-      >
-        <v-card
-          color="basil"
-          flat
-        >
-          <DataIterator></DataIterator>
+      <v-tabs-window-item v-for="tabName in tabsName" :key="tabName" :value="tabName">
+        <v-card color="basil" flat>
+          <component :is="tabsComponent[tabsName.indexOf(tabName)]" />
         </v-card>
       </v-tabs-window-item>
     </v-tabs-window>
@@ -32,19 +15,21 @@
 </template>
 
 <script>
-import DataIterator from '../molecules/DataIterator.vue';
-
-  export default {
-    data () {
-      return {
-        tab: 'Appetizers',
-        items: [
-          '日', '週', '月',
-        ],
-      }
+export default {
+  props: {
+    tabsName: {
+      type: Array,
+      required: true,
     },
-    components: {
-      DataIterator,
+    tabsComponent: {
+      type: Array,
+      required: true,
     },
-  }
+  },
+  data() {
+    return {
+      tab: this.tabsName[0],
+    }
+  },
+}
 </script>

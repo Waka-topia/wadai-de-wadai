@@ -2,7 +2,7 @@
   <div class="home">
     <h1>Home Page</h1>
     <p>ようこそ！このアプリで新歓スタンプラリーを楽しんでください。</p>
-    
+
     <!-- ユーザー名がセッションストレージまたはVuexに保存されている場合に表示 -->
     <p v-if="userFromSessionStorage || userFromVuex">こんにちは、{{ (userFromSessionStorage || userFromVuex).displayName }} さん！</p>
     <p v-else>ログインしていないようです。ログインしてください。</p>
@@ -14,7 +14,7 @@
 
 <script>
 // QRScanner をインポート
-import QRScanner from "../components/QRScanner.vue";
+import QRScanner from "../components/templates/QRScanner.vue";
 
 export default {
   name: "Home",
@@ -44,7 +44,7 @@ export default {
   mounted() {
     // セッションストレージからユーザー情報を取得
     const storedUser = sessionStorage.getItem('user');
-    
+
     // ユーザー情報が存在すれば、dataに設定
     if (storedUser) {
       this.userFromSessionStorage = JSON.parse(storedUser);
