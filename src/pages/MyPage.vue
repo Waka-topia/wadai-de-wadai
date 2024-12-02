@@ -13,6 +13,7 @@
 import StampsList from '@/components/StampsList.vue';
 import LogOutButton from '@/components/atoms/LogOut.vue';
 import ProfileCard from '@/components/atoms/ProfileCard.vue';
+import DegreesList from '@/components/molecules/DegreesList.vue';
 import AppBar from '@/components/organisms/AppBar.vue';
 import BottomNavigation from '@/components/organisms/BottomNavigation.vue';
 import TabsBar from '@/components/organisms/TabsBar.vue';
@@ -31,7 +32,7 @@ export default {
           image: 'https://via.placeholder.com/120',
         },
       ],
-      tabsComponent: [StampsList, StampsList],
+      tabsComponent: [StampsList, DegreesList],
     };
   },
   name: "UserDashboard",
