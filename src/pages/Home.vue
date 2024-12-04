@@ -4,7 +4,7 @@
     <p>ようこそ！このアプリで新歓スタンプラリーを楽しんでください。</p>
 
     <!-- ユーザー名がセッションストレージまたはVuexに保存されている場合に表示 -->
-    <p v-if="userFromSessionStorage || userFromVuex">こんにちは、{{ (userFromSessionStorage || userFromVuex).displayName }} さん！</p>
+    <p v-if="userFromSessionStorage || userFromVuex">こんにちは、{{ (userFromVuex).displayName }} さん！</p>
     <p v-else>ログインしていないようです。ログインしてください。</p>
 
     <!-- QRScanner コンポーネントを表示 -->

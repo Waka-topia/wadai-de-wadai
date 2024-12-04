@@ -1,4 +1,4 @@
-import { collection, doc, setDoc, getDocs, getDoc, serverTimestamp } from "firebase/firestore";
+import { collection, doc, setDoc, getDocs, getDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { db } from "../firebase/config";
 
 // スタンプをユーザーの stampsReceived に追加する
@@ -17,7 +17,29 @@ import { db } from "../firebase/config";
 //   }
 // }
 
-export async function addStampToUser(userId, groupId, stampId) {
+// export async function addStampToUser(userId, groupId, stampId) {
+//   try {
+//     const stampRef = doc(db, `users/${userId}/stampsReceived`, stampId);
+
+//     // すでに同じ stampId が存在するか確認
+//     const existingStamp = await getDoc(stampRef);
+//     if (existingStamp.exists()) {
+//       return { exists: true }; // 既に存在する場合のフラグを返す
+//     }
+
+//     const stampData = {
+//       groupId,
+//       timestamp: serverTimestamp(),
+//     };
+//     await setDoc(stampRef, stampData); // サブコレクションにスタンプデータを追加
+//     return { exists: false, stampId }; // 正常に追加された場合の情報を返す
+//   } catch (error) {
+//     console.error("Error adding stamp: ", error);
+//     throw error;
+//   }
+// }
+
+export async function addStampToUser(userId, displayName, groupId, stampId) {
   try {
     const stampRef = doc(db, `users/${userId}/stampsReceived`, stampId);
 
@@ -27,11 +49,24 @@ export async function addStampToUser(userId, groupId, stampId) {
       return { exists: true }; // 既に存在する場合のフラグを返す
     }
 
+    // stampsReceived サブコレクションにスタンプデータを追加
     const stampData = {
       groupId,
       timestamp: serverTimestamp(),
     };
-    await setDoc(stampRef, stampData); // サブコレクションにスタンプデータを追加
+    await setDoc(stampRef, stampData);
+
+    // ユーザードキュメントに displayName を保存
+    const userRef = doc(db, `users/${userId}`);
+    const userDoc = await getDoc(userRef);
+    if (!userDoc.exists()) {
+      // ユーザードキュメントが存在しない場合は作成
+      await setDoc(userRef, { displayName });
+    } else {
+      // 既存のユーザードキュメントがある場合は更新
+      await updateDoc(userRef, { displayName });
+    }
+
     return { exists: false, stampId }; // 正常に追加された場合の情報を返す
   } catch (error) {
     console.error("Error adding stamp: ", error);
