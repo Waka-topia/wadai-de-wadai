@@ -1,7 +1,7 @@
 <template>
-  <div>
-    <h2>QRコードをスキャンしてください</h2>
-    
+  <div class="bg-black">
+    <h2 class="text-center">QRコードをスキャンしてください</h2>
+
     <!-- QRコードリーダー -->
     <qrcode-stream @detect="onDetect" @init="onInit" />
 
@@ -152,14 +152,5 @@ export default {
 video {
   width: 100%;
   height: auto;
-}
-
-p {
-  font-size: 18px;
-  color: green;
-}
-
-button {
-  margin-top: 20px;
 }
 </style>

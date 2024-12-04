@@ -1,6 +1,6 @@
 <template>
+  <AppBar :title="title" :drawer="drawer" />
     <div class="campus-map">
-      <h1 class="map-title">キャンパスマップ</h1>
       <p class="map-description">大学の開放状態を確認できます。</p>
       <CampusMap />
       <propColor/>
@@ -15,23 +15,32 @@
         </div>
       </div>
     </div>
+  <BottomNavigation />
   </template>
-  
+
   <script>
-  import propColor from '../layouts/prop-color.vue';
 //   import CampusMap from "@/components/CampusMap.vue";
   import CampusMap from "@/components/MapBox.vue";
+  import AppBar from "@/components/organisms/AppBar.vue";
+  import BottomNavigation from "@/components/organisms/BottomNavigation.vue";
 
-  
+
   export default {
+    data() {
+      return {
+        drawer: false,
+        title: "キャンパスマップ",
+      };
+    },
     components: {
-      propColor,
+      BottomNavigation,
       CampusMap,
+      AppBar,
     },
     name: "MapPage",
   };
   </script>
-  
+
   <style scoped>
   .campus-map {
     width: auto;
@@ -42,26 +51,20 @@
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 軽いシャドウ */
   }
-  
-  .map-title {
-    font-size: 2rem;
-    color: #34495e; /* 落ち着いた見出し色 */
-    margin-bottom: 1rem;
-  }
-  
+
   .map-description {
     font-size: 1.2rem;
     color: #7f8c8d; /* 補足テキスト用の色 */
     margin-bottom: 2rem;
   }
-  
+
   .stats {
     display: flex;
     justify-content: center;
     gap: 1rem; /* 要素間のスペース */
     margin-top: 2rem;
   }
-  
+
   .stat-item {
     background-color: #ffffff; /* カードの背景色 */
     border: 1px solid #e0e0e0; /* カードのボーダー色 */
@@ -72,22 +75,21 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 軽いシャドウ */
     transition: transform 0.2s, box-shadow 0.2s; /* ホバーアニメーション */
   }
-  
+
   .stat-item:hover {
     transform: translateY(-5px); /* ホバーで少し上に */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* シャドウを強調 */
   }
-  
+
   .stat-item h2 {
     font-size: 1.5rem;
     color: #2c3e50; /* タイトル色 */
     margin-bottom: 0.5rem;
   }
-  
+
   .stat-item p {
     font-size: 1.2rem;
     color: #3498db; /* アクセントカラー */
     font-weight: bold;
   }
   </style>
-  

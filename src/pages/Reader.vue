@@ -1,17 +1,28 @@
 <template>
+  <div>
+    <AppBar :title="title" :drawer="drawer" />
     <QRScanner></QRScanner>
-    <propColor></propColor>
+    <BottomNavigation></BottomNavigation>
+  </div>
 </template>
 
 <script>
-import propColor from "@/layouts/prop-color.vue";
-import QRScanner from "@/components/QRScanner.vue";
+import AppBar from "@/components/organisms/AppBar.vue";
+import BottomNavigation from "@/components/organisms/BottomNavigation.vue";
+import QRScanner from "@/components/templates/QRScanner.vue";
 
 export default {
-    name: "Reader",
-    components: {
-        propColor,
-        QRScanner,
-    },
+  data() {
+    return {
+      drawer: false,
+      title: "スキャン",
+    };
+  },
+  name: "ReaderComponent",
+  components: {
+      BottomNavigation,
+      QRScanner,
+      AppBar,
+  },
 };
 </script>

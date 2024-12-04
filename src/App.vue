@@ -10,32 +10,22 @@
   };
 </script>
 
-<!-- <style>
+<style>
 #app {
   font-family: 'Arial', sans-serif;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  background-color: #f4f4f4;
+  background-color: #fff3e0;
   min-height: 100vh;
 }
 
-h1 {
-  color: #333;
-}
-
-button {
-  cursor: pointer;
-}
 body, main {
   margin: 0;
   padding: 0;
   width: 100%;
   min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #f4f4f9; /* 背景色を調整 */
+  background-color: #fff3e0; /* 背景色を調整 */
 }
 
-</style> -->
+</style>
