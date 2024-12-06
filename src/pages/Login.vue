@@ -40,7 +40,10 @@
       </v-form>
       <v-divider class="mt-10"></v-divider>
       <v-btn variant="text" @click="onSignUp">
-        アカウントをお持ちでない方はこちら
+        アカウントを作成する
+      </v-btn>
+      <v-btn variant="text" @click="onStart">
+        ログインせずに開始する
       </v-btn>
     </v-card>
   </v-sheet>
@@ -89,6 +92,9 @@ export default {
     },
     onSignUp() {
       this.$router.push("/signup");
+    },
+    onStart() {
+      this.$router.push("/campus-map");
     },
   },
 };
