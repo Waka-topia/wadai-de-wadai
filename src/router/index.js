@@ -7,6 +7,7 @@ import Ranking from "@/pages/Ranking.vue";
 import MyPage from "@/pages/MyPage.vue";
 //import Dashboard from "../pages/Dashboard.vue";
 import CampusMap from "@/pages/MapPage.vue";
+import testpage from "@/pages/Home.vue";
 
 const routes = [
   { path: "/", name: "Home", component: Login },
@@ -16,7 +17,8 @@ const routes = [
   { path: "/ranking", name: "Ranking", component: Ranking },
   { path: "/mypage", name: "MyPage", component: MyPage },
   //{ path: "/dashboard", name: "Dashboard", component: Dashboard },
-  { path: "/campus-map", name: "CampusMap", component: CampusMap }
+  { path: "/campus-map", name: "CampusMap", component: CampusMap },
+  { path: "/testpage", name: "testpage", component: testpage },
 ];
 
 const router = createRouter({

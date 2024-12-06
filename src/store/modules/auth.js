@@ -87,10 +87,24 @@ export default {
       }
     },
   },
+  // getters: {
+  //   isAuthenticated: (state) => !!state.user,
+  //   user: (state) => state.user,
+  //   idToken: (state) => state.idToken,
+  //   userId: (state) => state.userId,
+  // },
   getters: {
     isAuthenticated: (state) => !!state.user,
     user: (state) => state.user,
     idToken: (state) => state.idToken,
     userId: (state) => state.userId,
+    email: (state) => state.user.email, // emailを取得するGetter
+    providerData: (state) => state.user.providerData, // providerDataを取得するGetter
+    photoURL: (state) => state.user.photoURL, // photoURLを取得するGetter
+  
+    // displayNameを取得するGetter
+    displayName: (state) => {
+      return state.user?.displayName || "ゲスト"; // displayNameが無ければデフォルトで"ゲスト"を表示
+    },
   },
 };

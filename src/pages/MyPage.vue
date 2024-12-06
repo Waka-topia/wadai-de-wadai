@@ -43,5 +43,10 @@ export default {
     AppBar,
     LogOutButton,
   },
+  computed:{
+    displayName(){
+      return this.$store.getters["auth/displayName"];
+    },
+  }
 };
 </script>
