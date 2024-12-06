@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from "vue-router";
-import Home from "../pages/Home.vue";
 import Login from "../pages/Login.vue";
 import SignUp from "../pages/SignUp.vue";
 // import CampusMap from "@/pages/MapPage.vue";
@@ -10,7 +9,7 @@ import MyPage from "@/pages/MyPage.vue";
 import CampusMap from "@/pages/MapPage.vue";
 
 const routes = [
-  { path: "/", name: "Home", component: Home },
+  { path: "/", name: "Home", component: Login },
   { path: "/login", name: "Login", component: Login },
   { path: "/signup", name: "SignUp", component: SignUp },
   { path: "/reader", name: "Reader", component: Reader},
