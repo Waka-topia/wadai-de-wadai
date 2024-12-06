@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row class="mt-2" justify="space-between">
-      <v-col cols="4" v-for="degreeImage in degreeImages" :key="degreeImage">
+      <v-col align="center" cols="4" v-for="degreeImage in degreeImages" :key="degreeImage">
         <v-img :src=degreeImage alt="Example Image" class="rounded-circle" width="100" height="100"></v-img>
       </v-col>
     </v-row>
