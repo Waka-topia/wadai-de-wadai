@@ -22,6 +22,11 @@ export default {
       state.idToken = null;
       state.userId = null;
     },
+    setPhotoURL(state, photoURL) {
+      if (state.user) {
+        state.user.photoURL = photoURL; // Vuex の user に photoURL をセット
+      }
+    },
   },
   actions: {
     // 初期化処理
@@ -83,6 +88,17 @@ export default {
         console.log("User logged out");
       } catch (error) {
         console.error("Logout failed:", error);
+        throw error;
+      }
+    },
+    async updatePhotoURL({ commit, state }, photoURL) {
+      try {
+        // authServiceのupdatePhotoURLを呼び出す
+        await authService.updatePhotoURL(state.user, photoURL); // ここでauthService経由で更新
+        commit("setPhotoURL", photoURL); // Vuexに保存
+        console.log("Photo URL updated to:", photoURL);
+      } catch (error) {
+        console.error("Error updating photo URL:", error);
         throw error;
       }
     },

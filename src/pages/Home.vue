@@ -11,7 +11,7 @@
     <p>ユーザー情報: {{ user }}</p>
     <p>プロバイダ情報: {{ providerData }}</p>
     <p>プロフィール画像: <img :src="photoURL" alt="プロフィール画像" /></p>
-
+    <profileImage/>
     <!-- QRScanner コンポーネントを表示 -->
     <PropColor />
   </div>
@@ -19,11 +19,13 @@
 
 <script>
 import PropColor from "../layouts/prop-color.vue";
+import profileImage from "@/components/templates/profileImage.vue";
 
 export default {
   name: "Home",
   components: {
     PropColor,
+    profileImage,
   },
   computed: {
     // VuexのGetterを使用して認証状態を取得

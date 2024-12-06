@@ -47,4 +47,14 @@ export default {
       throw error;
     }
   },
+  
+  async updatePhotoURL(user, photoURL) {
+    try {
+      await updateProfile(user, { photoURL }); // Firebase ユーザーのプロファイル更新
+      console.log("Updated photo URL:", photoURL);
+    } catch (error) {
+      console.error("Error updating photo URL:", error);
+      throw error;
+    }
+  },
 };
