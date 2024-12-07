@@ -1,5 +1,7 @@
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../firebase/config";
+import { doc, setDoc } from "firebase/firestore"; // Firestore の関数をインポート
+import { db } from "../firebase/config"; // Firestore インスタンスをインポート
 import store from "@/store";
 
 export default {
@@ -47,11 +49,19 @@ export default {
       throw error;
     }
   },
-  
+
+  // 画像URLの更新処理
   async updatePhotoURL(user, photoURL) {
     try {
-      await updateProfile(user, { photoURL }); // Firebase ユーザーのプロファイル更新
-      console.log("Updated photo URL:", photoURL);
+      // Firebase Authentication のプロフィール情報を更新
+      await updateProfile(user, { photoURL });
+
+      // Firestore の参照先を定義
+      const docRef = doc(db, `users/${user.uid}`);
+      // Firestore に photoURL を保存
+      await setDoc(docRef, { photoURL }, { merge: true });
+
+      console.log("User photo URL updated in Firestore and Authentication:", photoURL);
     } catch (error) {
       console.error("Error updating photo URL:", error);
       throw error;

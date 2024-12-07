@@ -1,4 +1,6 @@
 import { saveNextShinkan } from "../../services/nextShinkanService";
+import { getNextShinkan } from "../../services/nextShinkanService"; // インポート追加
+
 
 export default {
   namespaced: true,
@@ -26,6 +28,18 @@ export default {
         console.error("Error in saveNextShinkan action: ", error);
         throw error;
       }
+    },
+    // 次の新歓情報を取得
+    async fetchNextShinkan({ commit }, userId) {
+        try {
+          const data = await getNextShinkan(userId); // Firestoreからデータ取得
+          if (data) {
+            commit("setNextShinkan", data);
+          }
+        } catch (error) {
+          console.error("Error in fetchNextShinkan action: ", error);
+          throw error;
+        }
     },
   },
   getters: {

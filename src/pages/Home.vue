@@ -13,6 +13,7 @@
     <p>プロフィール画像: <img :src="photoURL" alt="プロフィール画像" /></p>
     <profileImage/>
     <NextShinkan/>
+    <NextShinkanView/>
     <!-- QRScanner コンポーネントを表示 -->
     <PropColor />
     
@@ -23,6 +24,7 @@
 import PropColor from "../layouts/prop-color.vue";
 import profileImage from "@/components/templates/profileImage.vue";
 import NextShinkan from "@/components/templates/NextShinkan.vue";
+import NextShinkanView from "@/components/templates/NextShinkanView.vue";
 
 export default {
   name: "Home",
@@ -30,6 +32,7 @@ export default {
     PropColor,
     profileImage,
     NextShinkan,
+    NextShinkanView,
   },
   computed: {
     // VuexのGetterを使用して認証状態を取得

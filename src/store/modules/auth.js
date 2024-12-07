@@ -93,9 +93,9 @@ export default {
     },
     async updatePhotoURL({ commit, state }, photoURL) {
       try {
-        // authServiceのupdatePhotoURLを呼び出す
-        await authService.updatePhotoURL(state.user, photoURL); // ここでauthService経由で更新
-        commit("setPhotoURL", photoURL); // Vuexに保存
+        // authService経由で画像URLを更新
+        await authService.updatePhotoURL(state.user, photoURL);
+        commit("setPhotoURL", photoURL); // Vuex に保存
         console.log("Photo URL updated to:", photoURL);
       } catch (error) {
         console.error("Error updating photo URL:", error);
