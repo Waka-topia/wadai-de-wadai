@@ -2,6 +2,7 @@ import { createStore } from "vuex";
 import authModule from "./modules/auth";
 import stampModule from "./modules/stamp"; // スタンプモジュールをインポート
 import rankingModule from "./modules/ranking"; // ランキングモジュールをインポート
+import shinkanModule from "./modules/shinkan"; // 新歓モジュールをインポート
 
 export default createStore({
   state: {
@@ -14,5 +15,6 @@ export default createStore({
       ...stampModule,
     },
     ranking: rankingModule, // ランキングモジュールを登録
+    shinkan: shinkanModule, // 新歓モジュールを登録
   },
 });
