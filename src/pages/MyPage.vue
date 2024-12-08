@@ -1,26 +1,20 @@
 <template>
-  <div class="dashboard">
-    <AppBar :title="title" :drawer="drawer" />
-    <ProfileCard 
-      v-for="(user, index) in userInfo" 
-      :key="index" 
-      :name="user.displayName" 
-      :status="user.status" 
+  <div>
+    <ProfileCard
+      v-for="(user, index) in userInfo"
+      :key="index"
+      :name="user.displayName"
+      :status="user.status"
       :image="user.photoURL" />
-    <LogOutButton />
     <TabsBar :tabsName="tabsName" :tabsComponent="tabsComponent" />
-    <BottomNavigation />
   </div>
 </template>
 
 <script>
 import { mapState, mapActions } from "vuex"; // mapActionsをインポート
 import StampsList from '@/components/StampsList.vue';
-import LogOutButton from '@/components/atoms/LogOut.vue';
 import ProfileCard from '@/components/atoms/ProfileCard.vue';
 import DegreesList from '@/components/molecules/DegreesList.vue';
-import AppBar from '@/components/organisms/AppBar.vue';
-import BottomNavigation from '@/components/organisms/BottomNavigation.vue';
 import TabsBar from '@/components/organisms/TabsBar.vue';
 
 export default {
@@ -35,11 +29,8 @@ export default {
   },
   name: "UserDashboard",
   components: {
-    BottomNavigation,
     ProfileCard,
     TabsBar,
-    AppBar,
-    LogOutButton,
   },
   computed: {
     ...mapState("shinkan", ["nextShinkan"]),
@@ -79,11 +70,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.dashboard {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-</style>

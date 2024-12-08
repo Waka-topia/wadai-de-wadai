@@ -3,7 +3,6 @@
     <p v-if="isLoading">ランキングを読み込んでいます...</p>
     <p v-if="error">エラーが発生しました: {{ error.message || error }}</p>
     <div>
-      <AppBar :title="title" :drawer="drawer" />
       <TabsBar :tabsName="tabsName" :tabsComponent="tabsComponent" />
     </div>
     <ul v-if="!isLoading && rankings.length > 0">
@@ -11,7 +10,6 @@
         {{ index + 1 }}位: {{ user.displayName }} - {{ user.count }} スタンプ
       </li>
     </ul>
-    <BottomNavigation />
   </div>
 </template>
 
@@ -19,8 +17,6 @@
 import DailyRanking from "@/components/molecules/DailyRanking.vue";
 import MonthlyRanking from "@/components/molecules/MonthlyRanking.vue";
 import WeeklyRanking from "@/components/molecules/WeeklyRanking.vue";
-import AppBar from "@/components/organisms/AppBar.vue";
-import BottomNavigation from "@/components/organisms/BottomNavigation.vue";
 import TabsBar from "@/components/organisms/TabsBar.vue";
 import { mapActions, mapGetters } from "vuex";
 
@@ -35,9 +31,7 @@ export default {
   },
   name: "RankingPage",
   components: {
-    BottomNavigation,
     TabsBar,
-    AppBar,
   },
   computed: {
     ...mapGetters("ranking", ["rankings", "isLoading", "error"]),
