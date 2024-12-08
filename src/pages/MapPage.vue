@@ -1,5 +1,4 @@
 <template>
-  <AppBar :title="title" :drawer="drawer" />
     <div class="campus-map">
       <p class="map-description">大学の開放状態を確認できます。</p>
       <CampusMap />
@@ -15,27 +14,15 @@
         </div>
       </div>
     </div>
-  <BottomNavigation />
   </template>
 
   <script>
 //   import CampusMap from "@/components/CampusMap.vue";
   import CampusMap from "@/components/MapBox.vue";
-  import AppBar from "@/components/organisms/AppBar.vue";
-  import BottomNavigation from "@/components/organisms/BottomNavigation.vue";
-
 
   export default {
-    data() {
-      return {
-        drawer: false,
-        title: "キャンパスマップ",
-      };
-    },
     components: {
-      BottomNavigation,
       CampusMap,
-      AppBar,
     },
     name: "MapPage",
   };

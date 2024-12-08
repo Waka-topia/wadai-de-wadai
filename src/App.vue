@@ -1,13 +1,77 @@
 <template>
-  <div id="app">
-    <router-view></router-view>
-  </div>
+  <v-app>
+    <v-app-bar color="orange">
+
+      <v-app-bar-nav-icon
+        variant="text"
+        @click.stop="drawer = !drawer">
+      </v-app-bar-nav-icon>
+
+      <v-app-bar-title>
+        {{ title }}
+      </v-app-bar-title>
+    </v-app-bar>
+
+    <v-navigation-drawer
+      v-model="drawer"
+      class="bg-orange"
+      >
+      <v-list>
+        <v-list-item title="Home" value="home"></v-list-item>
+        <v-list-item title="About" value="about"></v-list-item>
+        <LogOutButton />
+      </v-list>
+    </v-navigation-drawer>
+
+    <v-main>
+      <router-view></router-view>
+    </v-main>
+  </v-app>
+  <BottomNavigation v-if="showBottomNavigation" />
 </template>
 
 <script>
-  export default {
-    name: "App",
-  };
+import BottomNavigation from '@/components/organisms/BottomNavigation.vue';
+import LogOutButton from '@/components/atoms/LogOut.vue';
+
+export default {
+  data: () => ({
+    drawer: null,
+    title: 'ホーム',
+    showBottomNavigation: true,
+  }),
+  name: "App",
+  components: {
+    BottomNavigation,
+    LogOutButton,
+  },
+  watch: {
+    $route(to) {
+      this.updateTitle(to);
+      this.updateBottomNavigationVisibility(to);
+    }
+  },
+  methods: {
+    updateTitle(route) {
+      const routeTitleMap = {
+        '/': 'ホーム',
+        '/login': 'ログイン',
+        '/signup': 'サインアップ',
+        '/campus-map': 'キャンパスマップ',
+        '/reader': 'スキャン',
+        '/ranking': 'ランキング',
+        '/mypage': 'マイページ',
+      };
+      this.title = routeTitleMap[route.path];
+    },
+    updateBottomNavigationVisibility(route) {
+      this.showBottomNavigation = !['/login', '/signup'].includes(route.path)
+    }
+  },
+  created() {
+    this.updateBottomNavigationVisibility(this.$route);
+  }
+};
 </script>
 
 <style>
@@ -36,7 +100,7 @@ body, main {
   padding: 0;
   width: 100%;
   min-height: 100vh;
-  background-color: #fff3e0; /* 背景色を調整 */
+  background-color: white; /* 背景色を調整 */
 }
 
 </style>
