@@ -1,9 +1,8 @@
 <template>
   <div>
     <TabsBar :tabsName="tabsName" :tabsComponent="tabsComponent" />
-    <v-skeleton-loader v-if="isLoading" :elevation="1" type="list-item-avatar">
-    </v-skeleton-loader>
-    <v-alert v-if="error" text={{ error.message || error }} title="エラーが発生しました" type="error"></v-alert>
+    <v-skeleton-loader v-if="isLoading" :elevation="1" type="list-item-avatar" />
+    <v-alert v-if="error" text={{ errorMessages }} title="エラー" type="error"></v-alert>
     <ul v-if="!isLoading && rankings.length > 0">
       <li v-for="(user, index) in rankings" :key="user.userId">
         {{ index + 1 }}位: {{ user.displayName }} - {{ user.count }} スタンプ
