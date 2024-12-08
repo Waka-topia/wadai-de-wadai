@@ -1,10 +1,16 @@
 <template>
   <div>
-    <p v-if="isLoading">ランキングを読み込んでいます...</p>
-    <p v-if="error">エラーが発生しました: {{ error.message || error }}</p>
     <div>
       <TabsBar :tabsName="tabsName" :tabsComponent="tabsComponent" />
     </div>
+    <v-skeleton-loader v-if="isLoading" :elevation="1" type="list-item-avatar">
+    </v-skeleton-loader>
+    <v-alert
+    v-if="error"
+    text={{ error.message || error }}
+    title="エラーが発生しました"
+    type="error"
+    ></v-alert>
     <ul v-if="!isLoading && rankings.length > 0">
       <li v-for="(user, index) in rankings" :key="user.userId">
         {{ index + 1 }}位: {{ user.displayName }} - {{ user.count }} スタンプ
