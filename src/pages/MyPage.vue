@@ -1,27 +1,21 @@
 <template>
   <div>
-    <ProfileCard
-      v-for="(user, index) in userInfo"
-      :key="index"
-      :name="user.displayName"
-      :status="user.status"
+    <ProfileCard v-for="(user, index) in userInfo" :key="index" :name="user.displayName" :status="user.status"
       :image="user.photoURL" />
     <TabsBar :tabsName="tabsName" :tabsComponent="tabsComponent" />
   </div>
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex"; // mapActionsをインポート
 import StampsList from '@/components/StampsList.vue';
 import ProfileCard from '@/components/atoms/ProfileCard.vue';
 import DegreesList from '@/components/molecules/DegreesList.vue';
 import TabsBar from '@/components/organisms/TabsBar.vue';
+import { mapActions, mapState } from "vuex"; // mapActionsをインポート
 
 export default {
   data() {
     return {
-      drawer: false,
-      title: 'マイページ',
       tabsName: ['スタンプ', '称号'],
       userInfo: [],
       tabsComponent: [StampsList, DegreesList],
@@ -40,7 +34,7 @@ export default {
       const nextShinkanDate = this.nextShinkan.nextDate ? this.nextShinkan.nextDate : '未設定';
       const status = `${nextShinkanGroupName} - ${nextShinkanDate}`;
 
-      console.log("status:",status);
+      console.log("status:", status);
 
       return [
         {

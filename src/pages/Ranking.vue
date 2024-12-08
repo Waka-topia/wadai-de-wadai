@@ -1,16 +1,9 @@
 <template>
   <div>
-    <div>
-      <TabsBar :tabsName="tabsName" :tabsComponent="tabsComponent" />
-    </div>
+    <TabsBar :tabsName="tabsName" :tabsComponent="tabsComponent" />
     <v-skeleton-loader v-if="isLoading" :elevation="1" type="list-item-avatar">
     </v-skeleton-loader>
-    <v-alert
-    v-if="error"
-    text={{ error.message || error }}
-    title="エラーが発生しました"
-    type="error"
-    ></v-alert>
+    <v-alert v-if="error" text={{ error.message || error }} title="エラーが発生しました" type="error"></v-alert>
     <ul v-if="!isLoading && rankings.length > 0">
       <li v-for="(user, index) in rankings" :key="user.userId">
         {{ index + 1 }}位: {{ user.displayName }} - {{ user.count }} スタンプ
@@ -29,8 +22,6 @@ import { mapActions, mapGetters } from "vuex";
 export default {
   data() {
     return {
-      drawer: false,
-      title: "ランキング",
       tabsName: ["日", "週", "月"],
       tabsComponent: [DailyRanking, WeeklyRanking, MonthlyRanking],
     }

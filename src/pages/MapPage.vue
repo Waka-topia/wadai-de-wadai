@@ -21,12 +21,6 @@
   import CampusMap from "@/components/MapBox.vue";
 
   export default {
-    data() {
-      return {
-        drawer: false,
-        title: "キャンパスマップ",
-      };
-    },
     components: {
       CampusMap,
     },
