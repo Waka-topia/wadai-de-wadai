@@ -4,7 +4,7 @@
       <p v-if="user">現在ログイン中: {{ user.email }}</p>
       <v-btn
         v-bind="activatorProps"
-        color="orange-lighten-4"
+        color="red"
         text="ログアウト"
         variant="flat"
         block
