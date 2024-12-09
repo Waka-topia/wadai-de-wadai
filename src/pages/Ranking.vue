@@ -5,7 +5,18 @@
     <v-alert v-if="error" text={{ errorMessages }} title="エラー" type="error"></v-alert>
     <ul v-if="!isLoading && rankings.length > 0">
       <li v-for="(user, index) in rankings" :key="user.userId">
-        {{ index + 1 }}位: {{ user.displayName }} - {{ user.count }} スタンプ
+        <div class="ranking-item">
+          <img
+            v-if="user.photoURL"
+            :src="user.photoURL"
+            alt="ユーザーのアイコン"
+            class="user-icon"
+          />
+          <span>{{ index + 1 }}位: {{ user.displayName }} - {{ user.count }} スタンプ</span>
+          <div v-if="user.nextShinkan">
+            <p>次の新歓: {{ user.nextShinkan.groupName }} - {{ user.nextShinkan.nextDate }}</p>
+          </div>
+        </div>
       </li>
     </ul>
   </div>
@@ -23,7 +34,7 @@ export default {
     return {
       tabsName: ["日", "週", "月"],
       tabsComponent: [DailyRanking, WeeklyRanking, MonthlyRanking],
-    }
+    };
   },
   name: "RankingPage",
   components: {
@@ -34,9 +45,41 @@ export default {
   },
   methods: {
     ...mapActions("ranking", ["fetchRankings"]),
+    async fetchAdditionalUserData(userId) {
+      try {
+        const photoURL = await this.$store.dispatch("users/getPhotoURL", userId);
+        const nextShinkan = await this.$store.dispatch("users/getNextShinkanDetails", userId);
+        return { photoURL, nextShinkan };
+      } catch (error) {
+        console.error(`Error fetching data for user ${userId}:`, error);
+        return { photoURL: null, nextShinkan: null };
+      }
+    },
   },
-  mounted() {
-    this.fetchRankings();
+  async mounted() {
+    await this.fetchRankings();
+    const updatedRankings = await Promise.all(
+      this.rankings.map(async (user) => {
+        const additionalData = await this.fetchAdditionalUserData(user.userId);
+        return { ...user, ...additionalData };
+      })
+    );
+    this.$store.commit("ranking/setRankings", updatedRankings);
   },
 };
 </script>
+
+<style scoped>
+.ranking-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.user-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-right: 1rem;
+}
+</style>

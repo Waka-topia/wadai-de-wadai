@@ -1,8 +1,30 @@
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../firebase/config";
-import { doc, setDoc } from "firebase/firestore"; // Firestore の関数をインポート
+import { doc, setDoc, getDoc } from "firebase/firestore"; // Firestore の関数をインポート
 import { db } from "../firebase/config"; // Firestore インスタンスをインポート
 import store from "@/store";
+
+// Firestore から photoURL を取得する関数
+export async function getPhotoURL(userId) {
+  try {
+    // Firestore の正しいドキュメント参照を作成
+    const docRef = doc(db, `users/${userId}`);
+
+    // ドキュメントを取得
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      return data.photoURL || null; // photoURL を返す（存在しない場合は null）
+    } else {
+      console.log("No such document!");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error getting photo URL: ", error);
+    throw error;
+  }
+}
 
 export default {
   onAuthStateChanged(callback) {

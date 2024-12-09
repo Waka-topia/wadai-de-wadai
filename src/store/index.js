@@ -3,6 +3,7 @@ import authModule from "./modules/auth";
 import stampModule from "./modules/stamp"; // スタンプモジュールをインポート
 import rankingModule from "./modules/ranking"; // ランキングモジュールをインポート
 import shinkanModule from "./modules/shinkan"; // 新歓モジュールをインポート
+import userModule from "./modules/user"; // ユーザーモジュールをインポート
 
 export default createStore({
   state: {
@@ -13,6 +14,10 @@ export default createStore({
     stamps: {
       namespaced: true, // 名前空間を有効にする
       ...stampModule,
+    },
+    users: {
+      namespaced: true, // 名前空間を有効にする
+      ...userModule,
     },
     ranking: rankingModule, // ランキングモジュールを登録
     shinkan: shinkanModule, // 新歓モジュールを登録
