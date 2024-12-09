@@ -1,37 +1,59 @@
 <template>
-  <ProfileCard v-for="(user, index) in userInfo" :key="index" :name="user.name" :status="user.status"
-    :image="user.image" />
+  <div>
+    <v-skeleton-loader v-if="isLoading" :elevation="1" type="list-item-avatar" />
+    <v-alert v-if="error" :text="errorMessages" title="エラー" type="error"></v-alert>
+    <div v-if="!isLoading && rankings.length > 0">
+      <ProfileCard
+        v-for="(user, index) in rankings"
+        :key="user.userId"
+        :name="user.displayName"
+        :status="user.nextShinkan ? `${user.nextShinkan.groupName} - ${user.nextShinkan.nextDate}` : '情報なし'"
+        :image="user.photoURL || 'https://via.placeholder.com/120'"
+        :rank="index + 1" 
+        :count="user.count"
+      />
+    </div>
+  </div>
 </template>
 
 <script>
-import ProfileCard from '../atoms/ProfileCard.vue';
+import ProfileCard from '@/components/atoms/ProfileCard.vue';
+import { mapActions, mapGetters } from "vuex";
 
 export default {
-  data() {
-    return {
-      // firebaseからランキング情報を取得
-      userInfo: [
-        {
-          name: '山本 月郎',
-          status: '吹奏楽部',
-          image: 'https://via.placeholder.com/120',
-        },
-        {
-          name: '鈴木 月',
-          status: '美術部',
-          image: 'https://via.placeholder.com/120',
-        },
-        {
-          name: '中村 月子',
-          status: 'パソコン部',
-          image: 'https://via.placeholder.com/120',
-        },
-      ],
-    };
-  },
-  name: 'DailyRanking',
+  name: "RankingPage",
   components: {
     ProfileCard,
   },
+  computed: {
+    ...mapGetters("ranking", ["rankings", "isLoading", "error"]),
+  },
+  methods: {
+    ...mapActions("ranking", ["fetchRankings"]),
+    async fetchAdditionalUserData(userId) {
+      try {
+        const photoURL = await this.$store.dispatch("users/getPhotoURL", userId);
+        const nextShinkan = await this.$store.dispatch("users/getNextShinkanDetails", userId);
+        return { photoURL, nextShinkan };
+      } catch (error) {
+        console.error(`Error fetching data for user ${userId}:`, error);
+        return { photoURL: null, nextShinkan: null };
+      }
+    },
+  },
+  async mounted() {
+    await this.fetchRankings();
+    const updatedRankings = await Promise.all(
+      this.rankings.map(async (user) => {
+        const additionalData = await this.fetchAdditionalUserData(user.userId);
+        return { ...user, ...additionalData };
+      })
+    );
+    this.$store.commit("ranking/setRankings", updatedRankings);
+  },
 };
 </script>
+
+<style scoped>
+/* スタイルの調整が必要ならここに記載 */
+</style>

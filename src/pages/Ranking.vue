@@ -2,23 +2,18 @@
   <div>
     <TabsBar :tabsName="tabsName" :tabsComponent="tabsComponent" />
     <v-skeleton-loader v-if="isLoading" :elevation="1" type="list-item-avatar" />
-    <v-alert v-if="error" text={{ errorMessages }} title="エラー" type="error"></v-alert>
-    <ul v-if="!isLoading && rankings.length > 0">
-      <li v-for="(user, index) in rankings" :key="user.userId">
-        <div class="ranking-item">
-          <img
-            v-if="user.photoURL"
-            :src="user.photoURL"
-            alt="ユーザーのアイコン"
-            class="user-icon"
-          />
-          <span>{{ index + 1 }}位: {{ user.displayName }} - {{ user.count }} スタンプ</span>
-          <div v-if="user.nextShinkan">
-            <p>次の新歓: {{ user.nextShinkan.groupName }} - {{ user.nextShinkan.nextDate }}</p>
-          </div>
-        </div>
-      </li>
-    </ul>
+    <v-alert v-if="error" :text="errorMessages" title="エラー" type="error"></v-alert>
+    <!-- <div v-if="!isLoading && rankings.length > 0">
+      <ProfileCard
+        v-for="(user, index) in rankings"
+        :key="user.userId"
+        :name="user.displayName"
+        :status="user.nextShinkan ? `${user.nextShinkan.groupName} - ${user.nextShinkan.nextDate}` : '情報なし'"
+        :image="user.photoURL || 'https://via.placeholder.com/120'"
+        :rank="index + 1" 
+        :count="user.count"
+      />
+    </div> -->
   </div>
 </template>
 
@@ -27,6 +22,7 @@ import DailyRanking from "@/components/molecules/DailyRanking.vue";
 import MonthlyRanking from "@/components/molecules/MonthlyRanking.vue";
 import WeeklyRanking from "@/components/molecules/WeeklyRanking.vue";
 import TabsBar from "@/components/organisms/TabsBar.vue";
+import ProfileCard from '@/components/atoms/ProfileCard.vue';
 import { mapActions, mapGetters } from "vuex";
 
 export default {
@@ -39,6 +35,7 @@ export default {
   name: "RankingPage",
   components: {
     TabsBar,
+    ProfileCard,
   },
   computed: {
     ...mapGetters("ranking", ["rankings", "isLoading", "error"]),
@@ -70,16 +67,5 @@ export default {
 </script>
 
 <style scoped>
-.ranking-item {
-  display: flex;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.user-icon {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  margin-right: 1rem;
-}
+/* スタイルの調整が必要ならここに記載 */
 </style>
