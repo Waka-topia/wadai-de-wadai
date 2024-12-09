@@ -7,7 +7,7 @@ export const allGroups = [
     { id: 5, name: "運動サークルE", mainCategory: "circle", subCategory: "sports" },
     { id: 6, name: "サッカー部", mainCategory: "club", subCategory: "sports" },
     { id: 7, name: "バスケットボール部", mainCategory: "club", subCategory: "sports" },
-    { id: 8, name: "合唱サークル", mainCategory: "circle", subCategory: "culture" },
+    { id: 8, name: "アカペラサークル", mainCategory: "circle", subCategory: "culture" },
     { id: 9, name: "吹奏楽団", mainCategory: "circle", subCategory: "culture" },
     { id: 10, name: "陸上部", mainCategory: "club", subCategory: "sports" },
     { id: 11, name: "写真サークル", mainCategory: "circle", subCategory: "culture" },
