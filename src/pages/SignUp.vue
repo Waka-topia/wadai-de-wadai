@@ -5,12 +5,23 @@
         v-model="form"
         @submit.prevent="onSubmit"
       >
+
+        <v-text-field
+          v-model="username"
+          :readonly="loading"
+          :rules="[required]"
+          class="mb-2"
+          label="Username"
+          placeholder="Enter your username"
+          clearable
+        />
         <v-text-field
           v-model="email"
           :readonly="loading"
           :rules="[required]"
           class="mb-2"
           label="Email"
+          placeholder="Enter your email"
           clearable
         ></v-text-field>
 
