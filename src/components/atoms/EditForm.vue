@@ -17,11 +17,11 @@
             </v-col>
           </v-row>
           <v-row dense>
-            <v-col cols="12" md="4" sm="6">
+            <v-col cols="12" md="6" sm="6">
               <v-text-field label="ユーザー名*" prepend-icon="mdi-rename" v-model="displayName" required></v-text-field>
             </v-col>
 
-            <v-col cols="12" md="4" sm="6">
+            <v-col cols="12" md="6" sm="6">
               <v-text-field label="Email*" prepend-icon="mdi-email-edit-outline" v-model="email"
                 required></v-text-field>
             </v-col>
@@ -31,6 +31,34 @@
               </v-date-input>
             </v-col>
 
+            <v-col cols="12" sm="6">
+              <v-select v-model="selectedMainCategory" @change="filterGroups" label="カテゴリーで絞り込み" :items="['全て', '部活', 'サークル', 'その他(委員会)']" >
+              </v-select>
+            </v-col>
+
+            <v-col cols="12" sm="6">
+              <v-select v-model="selectedSubCategory" @change="filterGroups" label="運動系または文化系" :items="['全て', '運動系', '文化系']">
+              </v-select>
+            </v-col>
+
+            <v-col cols="12" sm="6">
+              <label for="group">団体を選択:</label>
+              <select v-model="selectedGroup">
+                <option v-for="group in filteredGroups" :key="group.id" :value="group.name">
+                  {{ group.name }}
+                </option>
+              </select>
+              <v-select
+                v-model="nextShinkan.groupName"
+                :items="filteredGroups"
+                label="団体を選択"
+                item-text="name"
+                item-value="name"
+                prepend-icon="mdi-party-popper"
+                outlined
+              ></v-select>
+            </v-col>
+            <!-- 以下は仮 -->
             <v-col cols="12" sm="6">
               <v-autocomplete
                 v-model="nextShinkan.groupName"
@@ -52,7 +80,7 @@
 
           <v-btn text="Close" variant="plain" @click="dialog = false"></v-btn>
 
-          <v-btn color="orange" text="Save" variant="tonal" @click="dialog = false"></v-btn>
+          <v-btn color="orange" text="Save" variant="tonal" @click="saveShinkan"></v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -62,6 +90,7 @@
 <script>
 import { VDateInput } from 'vuetify/lib/labs/components.mjs';
 import { mapActions, mapState } from "vuex";
+import { allGroups } from "@/data/groups"; // データをインポート
 
 export default {
   data() {
@@ -71,6 +100,7 @@ export default {
       selectedSubCategory: "all",
       selectedGroup: "",
       selectedDate: "",
+      allGroups: allGroups, // インポートしたデータをセット
       filteredGroups: [],
     };
   },
@@ -125,6 +155,7 @@ export default {
     const userId = this.userId; // 認証済みのユーザーIDを取得
     const groupName = this.selectedGroup;
     const nextDate = this.selectedDate;
+    this.dialog = false;
 
     if (!userId) {
         alert("ユーザーがログインしていません。");
