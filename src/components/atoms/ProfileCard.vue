@@ -1,7 +1,20 @@
 <template>
-  <v-card @click="navigateToProfile" outlined hover>
+  <v-card @click="navigateToProfile" class="mt-2" outlined hover>
     <v-row justify="space-around" class="mx-2">
-      <v-col cols="6" class="my-3" align="center" :style="imageStyle">
+      <v-col cols="1">
+        <span class="font-weight-bold text-h6">{{ rank }}位</span>
+        <v-badge color="grey" :content="count">
+          <v-icon large>
+            mdi-postage-stamp
+          </v-icon>
+        </v-badge>
+        <v-badge color="grey" :content="count">
+          <v-icon large>
+            mdi-crown
+          </v-icon>
+        </v-badge>
+      </v-col>
+      <v-col cols="5" class="my-3" align="center" :style="imageStyle">
         <v-img :src="image" alt="ユーザーのアイコン" class="rounded-circle" width="120" height="120"></v-img>
       </v-col>
       <v-col cols="6" class="d-flex flex-column justify-center align-center" :style="columnStyle">
@@ -9,16 +22,15 @@
         <v-chip prepend-icon="$vuetify" color="orange" class="my-2">
           {{ status }}
         </v-chip>
-        <div class="ranking-info">
-          <span class="font-weight-bold text-h6">{{ rank }}位</span>
-          <span class="font-weight-bold text-h6">{{ count }} スタンプ</span>
-        </div>
       </v-col>
     </v-row>
   </v-card>
+  <EditForm />
 </template>
 
 <script>
+import EditForm from './EditForm.vue';
+
 export default {
   props: {
     name: {
@@ -57,24 +69,8 @@ export default {
       this.$router.push('/' + this.name);
     },
   },
+  components: {
+    EditForm,
+  }
 };
 </script>
-
-<style scoped>
-.ranking-info {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  margin-top: 8px;
-  border-top: 1px solid #ddd; /* Border between the status and ranking info */
-  padding-top: 8px;
-}
-
-.ranking-info span {
-  font-size: 1rem;
-}
-
-.v-chip {
-  border: 1px solid #ddd; /* Border around the status chip */
-}
-</style>

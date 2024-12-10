@@ -1,0 +1,183 @@
+<template>
+  <div class="pa-4 text-center">
+    <v-dialog v-model="dialog" max-width="600">
+      <template v-slot:activator="{ props: activatorProps }">
+        <v-btn class="text-none font-weight-regular" prepend-icon="mdi-account" text="Edit Profile" variant="tonal"
+          v-bind="activatorProps"></v-btn>
+      </template>
+
+      <v-card prepend-icon="mdi-account" title="User Profile">
+        <v-card-text>
+          <v-row>
+            <v-col>
+              <v-img :src="photoURL" alt="ユーザーのアイコン" class="rounded-circle" width="120" height="120"></v-img>
+            </v-col>
+            <v-col>
+              <v-file-input label="アイコン" prepend-icon="mdi-camera" variant="filled"></v-file-input>
+            </v-col>
+          </v-row>
+          <v-row dense>
+            <v-col cols="12" md="6" sm="6">
+              <v-text-field label="ユーザー名*" prepend-icon="mdi-rename" v-model="displayName" required></v-text-field>
+            </v-col>
+
+            <v-col cols="12" md="6" sm="6">
+              <v-text-field label="Email*" prepend-icon="mdi-email-edit-outline" v-model="email"
+                required></v-text-field>
+            </v-col>
+
+            <v-col cols="12" sm="6">
+              <v-date-input v-model="nextShinkan.nextDate" label="次の新歓日程" required>
+              </v-date-input>
+            </v-col>
+
+            <v-col cols="12" sm="6">
+              <v-select v-model="selectedMainCategory" @change="filterGroups" label="カテゴリーで絞り込み" :items="['全て', '部活', 'サークル', 'その他(委員会)']" >
+              </v-select>
+            </v-col>
+
+            <v-col cols="12" sm="6">
+              <v-select v-model="selectedSubCategory" @change="filterGroups" label="運動系または文化系" :items="['全て', '運動系', '文化系']">
+              </v-select>
+            </v-col>
+
+            <v-col cols="12" sm="6">
+              <label for="group">団体を選択:</label>
+              <select v-model="selectedGroup">
+                <option v-for="group in filteredGroups" :key="group.id" :value="group.name">
+                  {{ group.name }}
+                </option>
+              </select>
+              <v-select
+                v-model="nextShinkan.groupName"
+                :items="filteredGroups"
+                label="団体を選択"
+                item-text="name"
+                item-value="name"
+                prepend-icon="mdi-party-popper"
+                outlined
+              ></v-select>
+            </v-col>
+            <!-- 以下は仮 -->
+            <v-col cols="12" sm="6">
+              <v-autocomplete
+                v-model="nextShinkan.groupName"
+                :items="['Skiing', 'Ice hockey', 'Soccer', 'Basketball', 'Hockey', 'Reading', 'Writing', 'Coding', 'Basejump']"
+                prepend-icon="mdi-party-popper" label="次の新歓" auto-select-first multiple></v-autocomplete>
+            </v-col>
+          </v-row>
+
+          <small class="text-caption text-medium-emphasis">*indicates required field</small>
+          <small class="text-caption text-medium-emphasis">ユーザーID:{{ userId }}</small><br>
+          <small class="text-caption text-medium-emphasis">プロバイダデータ:{{ providerData }}</small>
+
+        </v-card-text>
+
+        <v-divider></v-divider>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn text="Close" variant="plain" @click="dialog = false"></v-btn>
+
+          <v-btn color="orange" text="Save" variant="tonal" @click="saveShinkan"></v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </div>
+</template>
+
+<script>
+import { VDateInput } from 'vuetify/lib/labs/components.mjs';
+import { mapActions, mapState } from "vuex";
+import { allGroups } from "@/data/groups"; // データをインポート
+
+export default {
+  data() {
+    return {
+      dialog: false,
+      selectedMainCategory: "all",
+      selectedSubCategory: "all",
+      selectedGroup: "",
+      selectedDate: "",
+      allGroups: allGroups, // インポートしたデータをセット
+      filteredGroups: [],
+    };
+  },
+  components: {
+    VDateInput,
+  },
+  computed: {
+    // VuexのGetterを使用して認証状態を取得
+    isAuthenticated() {
+      return this.$store.getters["auth/isAuthenticated"];
+    },
+    // VuexのGetterを使用して表示名を取得
+    displayName() {
+      return this.$store.getters["auth/displayName"];
+    },
+    userId() {
+      return this.$store.getters["auth/userId"];
+    },
+    email() {
+      return this.$store.getters["auth/email"];
+    },
+    user() {
+      return this.$store.getters["auth/user"];
+    },
+    providerData() {
+      return this.$store.getters["auth/providerData"];
+    },
+    photoURL() {
+      return this.$store.getters["auth/photoURL"];
+    },
+    // VuexのstateからnextShinkanを取得
+    ...mapState({
+      nextShinkan: (state) => state.shinkan.nextShinkan,
+    }),
+  },
+  methods: {
+    ...mapActions("shinkan", ["saveNextShinkan"]),
+    filterGroups() {
+    // 主カテゴリーでフィルタリング
+    let groups = this.selectedMainCategory === "all"
+        ? this.allGroups
+        : this.allGroups.filter(group => group.mainCategory === this.selectedMainCategory);
+
+    // 副カテゴリー（運動系・文化系）でフィルタリング
+    if (this.selectedSubCategory !== "all") {
+        groups = groups.filter(group => group.subCategory === this.selectedSubCategory);
+    }
+
+    this.filteredGroups = groups;
+    },
+    saveShinkan() {
+    const userId = this.userId; // 認証済みのユーザーIDを取得
+    const groupName = this.selectedGroup;
+    const nextDate = this.selectedDate;
+    this.dialog = false;
+
+    if (!userId) {
+        alert("ユーザーがログインしていません。");
+        return;
+    }
+
+    if (!groupName || !nextDate) {
+        alert("団体と日付を選択してください");
+        return;
+    }
+
+    // Vuex アクションを呼び出す
+    this.saveNextShinkan({ userId, groupName, nextDate });
+    },
+  },
+  mounted() {
+    this.filterGroups(); // 初期表示時にすべての団体を表示
+  },
+  created() {
+    // コンポーネントが作成されたときに、新歓情報を取得する
+    const userId = this.userId; // 認証済みのユーザーIDを取得
+    this.$store.dispatch("shinkan/fetchNextShinkan", userId);
+  },
+};
+</script>
