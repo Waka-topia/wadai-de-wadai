@@ -27,12 +27,13 @@
             </v-col>
 
             <v-col cols="12" sm="6">
-              <v-date-input v-model="selectedDate" label="次の新歓日程" required>
+              <v-date-input v-model="nextShinkan.nextDate" label="次の新歓日程" required>
               </v-date-input>
             </v-col>
 
             <v-col cols="12" sm="6">
               <v-autocomplete
+                v-model="nextShinkan.groupName"
                 :items="['Skiing', 'Ice hockey', 'Soccer', 'Basketball', 'Hockey', 'Reading', 'Writing', 'Coding', 'Basejump']"
                 prepend-icon="mdi-party-popper" label="次の新歓" auto-select-first multiple></v-autocomplete>
             </v-col>
@@ -60,7 +61,7 @@
 
 <script>
 import { VDateInput } from 'vuetify/lib/labs/components.mjs';
-import { mapActions } from "vuex";
+import { mapActions, mapState } from "vuex";
 
 export default {
   data() {
@@ -73,7 +74,6 @@ export default {
       filteredGroups: [],
     };
   },
-  name: "Home",
   components: {
     VDateInput,
   },
@@ -101,6 +101,10 @@ export default {
     photoURL() {
       return this.$store.getters["auth/photoURL"];
     },
+    // VuexのstateからnextShinkanを取得
+    ...mapState({
+      nextShinkan: (state) => state.shinkan.nextShinkan,
+    }),
   },
   methods: {
     ...mapActions("shinkan", ["saveNextShinkan"]),
@@ -138,6 +142,11 @@ export default {
   },
   mounted() {
     this.filterGroups(); // 初期表示時にすべての団体を表示
+  },
+  created() {
+    // コンポーネントが作成されたときに、新歓情報を取得する
+    const userId = this.userId; // 認証済みのユーザーIDを取得
+    this.$store.dispatch("shinkan/fetchNextShinkan", userId);
   },
 };
 </script>
