@@ -2,6 +2,7 @@
   <div>
     <ProfileCard v-for="(user, index) in userInfo" :key="index" :name="user.displayName" :status="user.status"
       :image="user.photoURL" :rank="user.rank" :count="user.count" />
+    <EditForm />
     <TabsBar :tabsName="tabsName" :tabsComponent="tabsComponent" />
   </div>
 </template>
@@ -11,6 +12,8 @@ import StampsList from '@/components/StampsList.vue';
 import ProfileCard from '@/components/atoms/ProfileCard.vue';
 import DegreesList from '@/components/molecules/DegreesList.vue';
 import TabsBar from '@/components/organisms/TabsBar.vue';
+import EditForm from '@/components/atoms/EditForm.vue';
+
 import { mapActions, mapState } from "vuex"; // mapActionsをインポート
 
 export default {
@@ -27,6 +30,7 @@ export default {
   components: {
     ProfileCard,
     TabsBar,
+    EditForm
   },
   computed: {
     ...mapState("shinkan", ["nextShinkan"]),

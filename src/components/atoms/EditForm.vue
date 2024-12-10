@@ -24,41 +24,79 @@
             <v-avatar size="120" class="mb-2">
               <v-img :src="photoURL" alt="ユーザーのアイコン" />
             </v-avatar>
-            <!-- <v-file-input label="アイコンを変更" prepend-icon="mdi-camera" variant="outlined"></v-file-input> -->
             <profileImage />
           </v-row>
 
-          <!-- 基本情報 -->
-          <v-divider />
-          <div class="py-2">
-            <h3 class="text-subtitle-1 font-weight-medium">基本情報</h3>
+          <v-divider class="my-4" />
+          <div class="py-4">
+            <v-row align="center">
+              <v-col cols="auto">
+                <v-icon color="primary" large>mdi-information</v-icon>
+              </v-col>
+              <v-col>
+                <h3 class="text-h5 font-weight-bold">基本情報</h3>
+              </v-col>
+            </v-row>
           </div>
           <v-row dense>
             <v-col cols="12" md="6">
-              <div>
-                <strong>ユーザー名:</strong> {{ displayName }}
-              </div>
+              <v-card class="pa-3 elevation-1" outlined>
+                <v-row align="center" justify="space-between">
+                  <v-col cols="auto">
+                    <v-icon color="primary">mdi-account-circle</v-icon>
+                  </v-col>
+                  <v-col>
+                    <div class="text-subtitle-1 font-weight-medium">ユーザー名</div>
+                    <div class="text-body-1">{{ displayName }}</div>
+                  </v-col>
+                </v-row>
+              </v-card>
             </v-col>
 
             <v-col cols="12" md="6">
-              <div>
-                <strong>メールアドレス:</strong> {{ email }}
-              </div>
+              <v-card class="pa-3 elevation-1" outlined>
+                <v-row align="center" justify="space-between">
+                  <v-col cols="auto">
+                    <v-icon color="primary">mdi-email</v-icon>
+                  </v-col>
+                  <v-col>
+                    <div class="text-subtitle-1 font-weight-medium">メールアドレス</div>
+                    <div class="text-body-1">{{ email }}</div>
+                  </v-col>
+                </v-row>
+              </v-card>
             </v-col>
           </v-row>
 
-          <!-- 新歓設定 -->
-          <v-divider />
-          <div class="py-2">
-            <h3 class="text-subtitle-1 font-weight-medium">新歓設定</h3>
+          <v-divider class="my-4" />
+          <div class="py-4">
+            <v-row align="center">
+              <v-col cols="auto">
+                <v-icon color="primary" large>mdi-map-marker</v-icon>
+              </v-col>
+              <v-col>
+                <h3 class="text-h5 font-weight-bold">次に行く新歓設定</h3>
+              </v-col>
+            </v-row>
           </div>
-          <NextShinkan />
+
+          <v-card class="elevation-2 pa-4" outlined>
+            <v-card-title class="font-weight-medium">
+              <v-icon class="mr-2" color="primary">mdi-check-circle-outline</v-icon>
+              新歓イベントの設定を行いましょう！
+            </v-card-title>
+
+            <v-card-text>
+              <NextShinkan />
+            </v-card-text>
+          </v-card>
+
 
           <!-- フッター情報 -->
           <div class="mt-3">
-            <small class="text-caption text-medium-emphasis">* 必須項目</small><br />
+            <!-- <small class="text-caption text-medium-emphasis">* 必須項目</small><br /> -->
             <small class="text-caption text-medium-emphasis">ユーザーID: {{ userId }}</small><br />
-            <small class="text-caption text-medium-emphasis">プロバイダ: {{ providerData }}</small>
+            <!-- <small class="text-caption text-medium-emphasis">プロバイダ: {{ providerData }}</small> -->
           </div>
         </v-card-text>
 

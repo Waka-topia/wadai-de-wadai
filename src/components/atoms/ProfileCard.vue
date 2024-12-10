@@ -25,11 +25,11 @@
       </v-col>
     </v-row>
   </v-card>
-  <EditForm />
+  <!-- <EditForm /> -->
 </template>
 
 <script>
-import EditForm from './EditForm.vue';
+// import EditForm from './EditForm.vue';
 
 export default {
   props: {
@@ -69,8 +69,8 @@ export default {
       this.$router.push('/' + this.name);
     },
   },
-  components: {
-    EditForm,
-  }
+  // components: {
+  //   EditForm,
+  // }
 };
 </script>
