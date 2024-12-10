@@ -19,7 +19,12 @@
       </v-col>
       <v-col cols="6" class="d-flex flex-column justify-center align-center" :style="columnStyle">
         <span class="font-weight-bold text-h5 my-2">{{ name }}</span>
-        <v-chip prepend-icon="$vuetify" color="orange" class="my-2">
+        <v-chip
+          prepend-icon="$vuetify"
+          color="orange"
+          class="my-2"
+          style="max-width: 100%; height: 50px; white-space: normal; word-wrap: break-word; word-break: break-word; line-height: 1.5; padding: 6px 12px;"
+        >
           {{ status }}
         </v-chip>
       </v-col>
