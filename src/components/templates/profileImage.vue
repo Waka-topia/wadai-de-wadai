@@ -54,7 +54,7 @@ export default {
     },
     saveIcon() {
       if (this.selectedIcon !== null) {
-        const iconURL = `/assets/userIcon/userIcon${this.selectedIcon + 1}.png`;
+        const iconURL = `userIcon/userIcon${this.selectedIcon + 1}.png`;
         this.updatePhotoURL(iconURL); // アイコンURLを更新
         this.isEditing = false; // 編集終了後、フォームを非表示にする
       } else {
