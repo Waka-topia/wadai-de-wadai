@@ -1,8 +1,9 @@
 <template>
   <div>
-    <TabsBar :tabsName="tabsName" :tabsComponent="tabsComponent" />
+    <!-- <TabsBar :tabsName="tabsName" :tabsComponent="tabsComponent" /> -->
     <v-skeleton-loader v-if="isLoading" :elevation="1" type="list-item-avatar" />
     <v-alert v-if="error" :text="errorMessages" title="エラー" type="error"></v-alert>
+    <MonthlyRanking/>
     <!-- <div v-if="!isLoading && rankings.length > 0">
       <ProfileCard
         v-for="(user, index) in rankings"
@@ -21,7 +22,7 @@
 import DailyRanking from "@/components/molecules/DailyRanking.vue";
 import MonthlyRanking from "@/components/molecules/MonthlyRanking.vue";
 import WeeklyRanking from "@/components/molecules/WeeklyRanking.vue";
-import TabsBar from "@/components/organisms/TabsBar.vue";
+// import TabsBar from "@/components/organisms/TabsBar.vue";
 import ProfileCard from '@/components/atoms/ProfileCard.vue';
 import { mapActions, mapGetters } from "vuex";
 
@@ -34,8 +35,8 @@ export default {
   },
   name: "RankingPage",
   components: {
-    TabsBar,
     ProfileCard,
+    MonthlyRanking
   },
   computed: {
     ...mapGetters("ranking", ["rankings", "isLoading", "error"]),

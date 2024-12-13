@@ -22,7 +22,7 @@
           <!-- アイコンとファイルアップロード -->
           <v-row align="center" justify="center" class="mb-4">
             <v-avatar size="120" class="mb-2">
-              <v-img :src="photoURL" alt="ユーザーのアイコン" />
+              <v-img :src="getImageUrl(photoURL)" alt="ユーザーのアイコン" />
             </v-avatar>
             <profileImage />
           </v-row>
@@ -91,12 +91,9 @@
             </v-card-text>
           </v-card>
 
-
           <!-- フッター情報 -->
           <div class="mt-3">
-            <!-- <small class="text-caption text-medium-emphasis">* 必須項目</small><br /> -->
             <small class="text-caption text-medium-emphasis">ユーザーID: {{ userId }}</small><br />
-            <!-- <small class="text-caption text-medium-emphasis">プロバイダ: {{ providerData }}</small> -->
           </div>
         </v-card-text>
 
@@ -115,8 +112,6 @@
 <script>
 import NextShinkan from "@/components/templates/NextShinkan.vue";
 import profileImage from "@/components/templates/profileImage.vue";
-
-
 
 export default {
   data() {
@@ -146,6 +141,15 @@ export default {
     },
   },
   methods: {
+    // 相対パスに基づいて画像URLを取得するメソッド
+    getImageUrl(relativePath) {
+      // 相対パスが指定されていれば、それをもとに画像を取得
+      if (relativePath) {
+        return new URL(`../../assets/${relativePath}`, import.meta.url).href;
+      }
+      // デフォルト画像が必要な場合
+      return 'https://via.placeholder.com/120';
+    },
     saveShinkan() {
       const userId = this.userId;
       this.dialog = false;

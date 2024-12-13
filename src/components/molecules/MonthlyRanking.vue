@@ -8,7 +8,7 @@
         :key="user.userId"
         :name="user.displayName"
         :status="user.nextShinkan ? `${user.nextShinkan.groupName} - ${user.nextShinkan.nextDate}` : '情報なし'"
-        :image="user.photoURL || 'https://via.placeholder.com/120'"
+        :image="getImageUrl(user.photoURL)" 
         :rank="index + 1" 
         :count="user.count"
       />
@@ -39,6 +39,15 @@ export default {
         console.error(`Error fetching data for user ${userId}:`, error);
         return { photoURL: null, nextShinkan: null };
       }
+    },
+    // 相対パスを画像 URL に変換するメソッド
+    getImageUrl(relativePath) {
+      // 相対パスが指定されていれば、それをもとに画像を取得
+      if (relativePath) {
+        return new URL(`../../assets/${relativePath}`, import.meta.url).href;
+      }
+      // デフォルト画像が必要な場合
+      return 'https://via.placeholder.com/120';
     },
   },
   async mounted() {
