@@ -12,7 +12,7 @@
     <p>プロバイダ情報: {{ providerData }}</p>
     <p>画像url: {{ photoURL }}</p>
     <p>プロフィール画像: <img :src="photoURL" alt="プロフィール画像" /></p>
-    <!-- <p>テスト画像: <img src="@/assets/userIcon/userIcon1.png" alt="プロフィール画像" /></p> -->
+    <p>テスト画像: <img src="@/assets/userIcon/userIcon1.png" alt="プロフィール画像" /></p>
     
     
     <profileImage/>

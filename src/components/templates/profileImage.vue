@@ -9,7 +9,7 @@
         <img
           v-for="(icon, index) in icons"
           :key="index"
-          :src="`src/assets/userIcon/userIcon${index + 1}.png`"
+          :src="getImageUrl(`userIcon/userIcon${index + 1}.png`)"
           alt="アイコン"
           :class="{'selected': selectedIcon === index}"
           @click="selectIcon(index)"
@@ -53,6 +53,9 @@ export default {
     },
     startEditing() {
       this.isEditing = true; // 編集モードを開始
+    },
+    getImageUrl(relativePath) {
+      return new URL(`../../assets/${relativePath}`, import.meta.url).href;
     },
     ...mapActions("auth", ["updatePhotoURL"]), // Vuex アクションの呼び出し
   },
