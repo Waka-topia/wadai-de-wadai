@@ -9,7 +9,7 @@
         <img
           v-for="(icon, index) in icons"
           :key="index"
-          :src="getIconUrl(index)"
+          :src="`src/assets/userIcon/userIcon${index + 1}.png`"
           alt="アイコン"
           :class="{'selected': selectedIcon === index}"
           @click="selectIcon(index)"
@@ -26,9 +26,6 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 
-// 画像パスを動的にインポートするために、`import.meta.glob`を使用
-const icons = import.meta.glob('@/assets/userIcon/userIcon*.png');
-
 export default {
   name: "ProfileImage",
   data() {
@@ -42,13 +39,6 @@ export default {
     ...mapGetters("auth", ["photoURL"]),
   },
   methods: {
-    // アイコンのパスを動的に生成するメソッド
-    getIconUrl(index) {
-      // `import.meta.glob`を使って画像URLを動的に取得
-      const icon = icons[`/assets/userIcon/userIcon${index + 1}.png`];
-      // `icon` がPromiseを返す場合、URLが解決されるのを待つ
-      return icon ? icon.default : '';
-    },
     selectIcon(index) {
       this.selectedIcon = index; // アイコンが選択されたとき、そのインデックスを設定
     },
