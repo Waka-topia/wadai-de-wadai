@@ -19,7 +19,9 @@
     <NextShinkan/>
     <NextShinkanView/>
     <!-- QRScanner コンポーネントを表示 -->
-    <PropColor />
+    <!-- <PropColor /> -->
+    <TitleList />
+    <eventList />
     
   </div>
 </template>
@@ -29,6 +31,8 @@ import PropColor from "../layouts/prop-color.vue";
 import profileImage from "@/components/templates/profileImage.vue";
 import NextShinkan from "@/components/templates/NextShinkan.vue";
 import NextShinkanView from "@/components/templates/NextShinkanView.vue";
+import TitleList from "@/components/TitleList.vue";
+import eventList from "@/components/eventList.vue";
 
 export default {
   name: "Home",
@@ -37,6 +41,8 @@ export default {
     profileImage,
     NextShinkan,
     NextShinkanView,
+    TitleList,
+    eventList,
   },
   computed: {
     // VuexのGetterを使用して認証状態を取得

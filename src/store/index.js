@@ -4,6 +4,8 @@ import stampModule from "./modules/stamp"; // スタンプモジュールをイ�
 import rankingModule from "./modules/ranking"; // ランキングモジュールをインポート
 import shinkanModule from "./modules/shinkan"; // 新歓モジュールをインポート
 import userModule from "./modules/user"; // ユーザーモジュールをインポート
+import titleModule from "./modules/title"; // タイトルモジュールをインポート
+import eventModule from "./modules/event"; // イベントモジュールをインポート
 
 export default createStore({
   state: {
@@ -21,5 +23,7 @@ export default createStore({
     },
     ranking: rankingModule, // ランキングモジュールを登録
     shinkan: shinkanModule, // 新歓モジュールを登録
+    title: titleModule, // タイトルモジュールを登録
+    event: eventModule, // イベントモジュールを登録
   },
 });
