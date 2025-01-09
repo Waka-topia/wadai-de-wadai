@@ -1,3 +1,4 @@
+//src/store/index.js
 import { createStore } from "vuex";
 import authModule from "./modules/auth";
 import stampModule from "./modules/stamp"; // スタンプモジュールをインポート
@@ -24,6 +25,9 @@ export default createStore({
     ranking: rankingModule, // ランキングモジュールを登録
     shinkan: shinkanModule, // 新歓モジュールを登録
     title: titleModule, // タイトルモジュールを登録
-    event: eventModule, // イベントモジュールを登録
+    event: {
+      namespaced: true, // 名前空間を有効にする
+      ...eventModule, // イベントモジュールを登録
+    },
   },
 });
