@@ -9,7 +9,7 @@
     <p v-if="scannedData">読み取ったデータ: {{ scannedData }}</p>
 
     <!-- テスト用ボタン -->
-    <button @click="simulateQRCodeScan">QRコードを読み取ったと仮定</button>
+    <!-- <button @click="simulateQRCodeScan">QRコードを読み取ったと仮定</button> -->
   </div>
 </template>
 
@@ -149,8 +149,4 @@ export default {
 </script>
 
 <style>
-video {
-  width: 100%;
-  height: auto;
-}
 </style>
