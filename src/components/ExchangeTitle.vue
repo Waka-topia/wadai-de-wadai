@@ -5,7 +5,7 @@
         <li v-for="title in titles" :key="title.id" class="title-card">
           <h2 class="title-name">{{ title.name }}</h2>
           <p class="title-description">{{ title.description }}</p>
-          <button class="claim-button" @click="claimTitle(title)">引き換える</button>
+          <button class="claim-button" @click="claimTitle(title)">獲得する</button>
         </li>
       </ul>
       <p v-else class="no-titles-message">称号がありません。</p>

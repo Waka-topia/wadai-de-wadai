@@ -8,17 +8,16 @@
       </v-app-bar-nav-icon>
 
       <v-app-bar-title>
-        {{ title }}
+        和大DE話題-{{ title }}-
       </v-app-bar-title>
     </v-app-bar>
 
     <v-navigation-drawer
       v-model="drawer"
-      class="bg-orange"
+      class="bg-white"
       >
       <v-list>
-        <v-list-item title="Home" value="home"></v-list-item>
-        <v-list-item title="About" value="about"></v-list-item>
+        <v-list-item title="称号を受け取る" value="TitleShop" @click="gotoshop"></v-list-item>
         <LogOutButton />
       </v-list>
     </v-navigation-drawer>
@@ -30,9 +29,13 @@
   <BottomNavigation v-if="showBottomNavigation" />
 </template>
 
+
+
 <script>
+
 import BottomNavigation from '@/components/organisms/BottomNavigation.vue';
 import LogOutButton from '@/components/atoms/LogOut.vue';
+
 
 export default {
   data: () => ({
@@ -67,6 +70,9 @@ export default {
     },
     updateBottomNavigationVisibility(route) {
       this.showBottomNavigation = !['/login', '/signup'].includes(route.path)
+    },
+    gotoshop() {
+      this.$router.push('/titleshop');  // ここでタイトルショップページに遷移
     }
   },
   created() {
@@ -76,13 +82,15 @@ export default {
 </script>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Kaisei+Tokumin&display=swap');
+
 #app {
   font-family: 'Arial', sans-serif;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   background-color: #fff3e0;
-  min-height: 100vh;
+  min-height: 50vh;
 }
 
 /* デフォルトで定義されているCSSをオーバーライド */
@@ -116,5 +124,12 @@ body, main {
     transition: box-shadow .3s, left .3s, width .3s;
     overflow: hidden;
   }
+
+  v-app-bar-title {
+  font-family: 'Kaisei Tokumin', sans-serif; /* Poppins フォントを指定 */
+  font-weight: 600; /* 太字 */
+  font-size: 2rem; /* フォントサイズを調整 */
+  color: #fff; /* テキストカラー */
+}
 
 </style>

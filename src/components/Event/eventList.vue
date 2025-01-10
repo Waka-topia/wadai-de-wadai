@@ -6,7 +6,6 @@
         :on-event-click="openEventModal"
         :disable-views="['years', 'year']"
         today-button
-        events-on-month-view="short"
         locale="ja"
         class="vuecal"
       ></vue-cal>
@@ -189,7 +188,9 @@
 
   <style scoped>
   /* ベースレイアウト */
-
+  .vuecal{
+    height: 600px
+  }
   /* ボタン */
   button {
     background-color: #4caf50;

@@ -16,5 +16,8 @@
   </script>
   
   <style scoped>
+  v-main{
+    overflow: hidden;
+  }
   </style>
   
