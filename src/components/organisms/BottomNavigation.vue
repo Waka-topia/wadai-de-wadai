@@ -5,9 +5,9 @@
       color="orange"
       active
     >
-      <v-btn @click="navigateTo('/campus-map')">
-        <v-icon>mdi-map</v-icon>
-        マップ
+      <v-btn @click="navigateTo('/eventcal')">
+        <v-icon>mdi-calendar-clock-outline</v-icon>
+        新歓日程
       </v-btn>
 
       <v-btn @click="navigateTo('/reader')">

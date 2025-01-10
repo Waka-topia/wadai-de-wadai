@@ -8,6 +8,7 @@ import Reader from "@/pages/Reader.vue";
 //import Dashboard from "../pages/Dashboard.vue";
 import { default as Home, default as testpage } from "@/pages/Home.vue";
 import CampusMap from "@/pages/MapPage.vue";
+import EventCal from "@/pages/EventCal.vue";
 
 const routes = [
   { path: "/", name: "Home", component: Home },
@@ -19,6 +20,7 @@ const routes = [
   //{ path: "/dashboard", name: "Dashboard", component: Dashboard },
   { path: "/campus-map", name: "CampusMap", component: CampusMap },
   { path: "/testpage", name: "testpage", component: testpage },
+  { path: "/eventcal", name: "EventCal", component: EventCal }
 ];
 
 const router = createRouter({

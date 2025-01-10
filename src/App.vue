@@ -61,6 +61,7 @@ export default {
         '/reader': 'スキャン',
         '/ranking': 'ランキング',
         '/mypage': 'マイページ',
+        '/eventcal': '新歓日程',
       };
       this.title = routeTitleMap[route.path];
     },
@@ -102,5 +103,18 @@ body, main {
   min-height: 100vh;
   background-color: white; /* 背景色を調整 */
 }
+
+.vuecal__event {
+    border: 1px solid #388e3c;
+    color: #666;
+    background-color: #f8f8f8cc;
+    position: relative;
+    box-sizing: border-box;
+    left: 0;
+    width: 100%;
+    z-index: 1;
+    transition: box-shadow .3s, left .3s, width .3s;
+    overflow: hidden;
+  }
 
 </style>

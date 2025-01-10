@@ -32,7 +32,7 @@ import profileImage from "@/components/templates/profileImage.vue";
 import NextShinkan from "@/components/templates/NextShinkan.vue";
 import NextShinkanView from "@/components/templates/NextShinkanView.vue";
 import TitleList from "@/components/TitleList.vue";
-import eventList from "@/components/eventList.vue";
+import eventList from "@/components/Event/eventList.vue";
 
 export default {
   name: "Home",
