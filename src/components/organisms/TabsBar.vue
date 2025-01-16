@@ -1,5 +1,5 @@
 <template>
-  <v-card color="basil">
+  <v-card color="basil" elevation="0">
     <v-tabs v-model="tab" bg-color="transparent" color="orange" class="text-grey-lighten-1" grow>
       <v-tab v-for="(tabName, index) in tabsName" :key="index">{{ tabName }}</v-tab>
     </v-tabs>
