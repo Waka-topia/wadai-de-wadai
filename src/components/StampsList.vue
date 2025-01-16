@@ -4,7 +4,7 @@
     <v-alert v-else-if="!isAuthenticated" text="ログインして下さい" title="warning" type="warning"></v-alert>
     <v-alert v-else-if="stampImages.length === 0" text="スタンプをまだ持っていません。" title="info" type="info"></v-alert>
     <v-alert v-else-if="isErrored" :text="errorMessages" title="エラー" type="error"></v-alert>
-    <v-row v-else>
+    <v-row class="mt-1" v-else>
       <v-col
         v-for="stamp in stampImages"
         :key="stamp.stampId"
