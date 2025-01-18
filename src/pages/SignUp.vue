@@ -19,6 +19,7 @@
           v-model="email"
           :readonly="loading"
           :rules="[required, emailDomainCheck]"
+          prepend-inner-icon="mdi-email-outline"
           class="mb-2"
           label="Email"
           placeholder="Enter your email"
@@ -29,9 +30,13 @@
           v-model="password"
           :readonly="loading"
           :rules="[required]"
+          :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
+          :type="visible ? 'text' : 'password'"
+          prepend-inner-icon="mdi-lock-outline"
           label="Password"
           placeholder="Enter your password"
           clearable
+          @click:append-inner="visible = !visible"
         ></v-text-field>
 
         <br>
@@ -68,6 +73,7 @@ export default {
       email: "",
       password: "",
       errorMessage: null,
+      visible: false,
     };
   },
   methods: {
