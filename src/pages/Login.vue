@@ -8,7 +8,7 @@
         <v-text-field
           v-model="email"
           :readonly="loading"
-          :rules="[required]"
+          :rules="[required, emailDomainCheck]"
           class="mb-2"
           label="Email"
           clearable
@@ -64,6 +64,14 @@ export default {
   },
   methods: {
     ...mapActions("auth", ["login", "initializeAuth"]), // auth モジュールのアクションをマップ
+
+    // メールアドレスのドメインをチェックするカスタムルール
+    emailDomainCheck(value) {
+      if (value && value.endsWith('@wakayama-u.ac.jp')) {
+        return 'このドメインは使用できません';
+      }
+      return true;
+    },
 
     async onSubmit() {
       try {
