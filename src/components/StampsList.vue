@@ -3,14 +3,20 @@
     <v-skelton-loader v-if="isLoading" :elevation="1" type="image" />
     <v-alert v-else-if="!isAuthenticated" text="ログインして下さい" title="warning" type="warning"></v-alert>
     <v-alert v-else-if="stampImages.length === 0" text="スタンプをまだ持っていません。" title="info" type="info"></v-alert>
-    <v-alert v-else-if="isErrored" text={{ errorMessages }} title="エラー" type="error"></v-alert>
-    <div v-else>
-      <div v-for="stamp in stampImages" :key="stamp.stampId" class="stamp-card">
-        <img :src="getImageUrl(stamp.imageUrl)" :alt="stamp.name" />
-        <h2>{{ stamp.name }}</h2>
-        <p>{{ stamp.description }}</p>
-      </div>
-    </div>
+    <v-alert v-else-if="isErrored" :text="errorMessages" title="エラー" type="error"></v-alert>
+    <v-row class="mt-1" v-else>
+      <v-col
+        v-for="stamp in stampImages"
+        :key="stamp.stampId"
+        cols="4" sm="4" md="3"
+      >
+        <v-card elevation="0">
+          <v-img :src="getImageUrl(stamp.imageUrl)" :alt="stamp.name" aspect-ratio="1"></v-img>
+          <v-card-title class="text-body-2">{{ stamp.name }}</v-card-title>
+          <v-card-subtitle>{{ stamp.description }}</v-card-subtitle>
+        </v-card>
+      </v-col>
+    </v-row>
   </div>
 </template>
 
@@ -45,7 +51,6 @@ export default {
       }
     },
     getImageUrl(relativePath) {
-      console.log("relativePath:", relativePath);
       return new URL(`../assets/${relativePath}`, import.meta.url).href;
     },
   },
@@ -68,19 +73,3 @@ export default {
   },
 };
 </script>
-
-<style>
-.stamp-card {
-  margin: 10px;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  text-align: center;
-}
-
-.stamp-card img {
-  max-width: 100px;
-  height: auto;
-  margin-bottom: 10px;
-}
-</style>

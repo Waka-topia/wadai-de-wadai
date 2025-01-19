@@ -8,7 +8,8 @@
         <v-text-field
           v-model="email"
           :readonly="loading"
-          :rules="[required]"
+          :rules="[required, emailDomainCheck]"
+          prepend-inner-icon="mdi-email-outline"
           class="mb-2"
           label="Email"
           clearable
@@ -18,9 +19,13 @@
           v-model="password"
           :readonly="loading"
           :rules="[required]"
+          :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
+          :type="visible ? 'text' : 'password'"
+          prepend-inner-icon="mdi-lock-outline"
           label="Password"
           placeholder="Enter your password"
           clearable
+          @click:append-inner="visible = !visible"
         ></v-text-field>
 
         <br>
@@ -60,10 +65,19 @@ export default {
       email: "",
       password: "",
       errorMessage: null,
+      visible: false,
     };
   },
   methods: {
     ...mapActions("auth", ["login", "initializeAuth"]), // auth モジュールのアクションをマップ
+
+    // メールアドレスのドメインをチェックするカスタムルール
+    emailDomainCheck(value) {
+      if (value && value.endsWith('@wakayama-u.ac.jp')) {
+        return 'このドメインは使用できません';
+      }
+      return true;
+    },
 
     async onSubmit() {
       try {

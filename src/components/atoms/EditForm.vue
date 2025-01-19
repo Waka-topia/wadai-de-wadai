@@ -68,8 +68,7 @@
             </v-col>
           </v-row>
 
-          <v-divider class="my-4" />
-          <div class="py-4">
+          <div class="py-4 mt-5">
             <v-row align="center">
               <v-col cols="auto">
                 <v-icon color="primary" large>mdi-map-marker</v-icon>
@@ -81,10 +80,6 @@
           </div>
 
           <v-card class="elevation-2 pa-4" outlined>
-            <v-card-title class="font-weight-medium">
-              <v-icon class="mr-2" color="primary">mdi-check-circle-outline</v-icon>
-              新歓イベントの設定を行いましょう！
-            </v-card-title>
 
             <v-card-text>
               <NextShinkan />
@@ -93,7 +88,7 @@
 
           <!-- フッター情報 -->
           <div class="mt-3">
-            <small class="text-caption text-medium-emphasis">ユーザーID: {{ userId }}</small><br />
+            <!-- <small class="text-caption text-medium-emphasis">ユーザーID: {{ userId }}</small><br /> -->
           </div>
         </v-card-text>
 
@@ -102,7 +97,7 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn text @click="dialog = false">キャンセル</v-btn>
-          <v-btn color="primary" @click="saveShinkan">保存</v-btn>
+          <!-- <v-btn color="primary" @click="saveShinkan">保存</v-btn> -->
         </v-card-actions>
       </v-card>
     </v-dialog>

@@ -2,13 +2,7 @@
   <v-dialog max-width="500">
     <template v-slot:activator="{ props: activatorProps }">
       <p v-if="user">現在ログイン中: {{ user.email }}</p>
-      <v-btn
-        v-bind="activatorProps"
-        color="red"
-        text="ログアウト"
-        variant="flat"
-        block
-      ></v-btn>
+      <v-btn size="large" v-bind="activatorProps" variant="flat" block>ログアウト</v-btn>
       <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
     </template>
 
@@ -21,15 +15,8 @@
         <v-card-actions>
           <v-spacer></v-spacer>
 
-          <v-btn
-            text="キャンセル"
-            @click="isActive.value = false"
-          ></v-btn>
-          <v-btn
-            text="ログアウト"
-            @click="onLogout"
-            color="red"
-          ></v-btn>
+          <v-btn text="キャンセル" @click="isActive.value = false"></v-btn>
+          <v-btn text="ログアウト" @click="onLogout(isActive)" color="red"></v-btn>
         </v-card-actions>
       </v-card>
     </template>
@@ -52,7 +39,7 @@ export default {
   methods: {
     ...mapActions("auth", ["logout", "initializeAuth"]), // Vuexのアクションをマッピング
 
-    async onLogout() {
+    async onLogout(isActive) {
       try {
         // Vuexのlogoutアクションを呼び出してログアウト処理
         await this.logout();
@@ -68,6 +55,8 @@ export default {
 
         // ログインページへリダイレクト
         this.$router.push("/login");
+
+        isActive.value = false;
       } catch (error) {
         console.error("ログアウトエラー:", error.message);
         this.errorMessage = "ログアウトに失敗しました。";
