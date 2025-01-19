@@ -188,6 +188,9 @@
 
   <style scoped>
   /* ベースレイアウト */
+  .event-list{
+    height: 100vh;
+  }
   .vuecal{
     height: 600px
   }
