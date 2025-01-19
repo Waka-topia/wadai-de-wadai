@@ -1,7 +1,6 @@
 <template>
-  <v-app>
+  <v-app :class="{'no-scroll': isEventCalPage}">
     <v-app-bar color="orange">
-
       <v-app-bar-nav-icon
         variant="text"
         @click.stop="drawer = !drawer">
@@ -14,8 +13,7 @@
 
     <v-navigation-drawer
       v-model="drawer"
-      class="bg-white"
-      >
+      class="bg-white">
       <v-list>
         <v-list-item title="称号を受け取る" value="TitleShop" @click="gotoshop"></v-list-item>
         <LogOutButton />
@@ -29,19 +27,16 @@
   <BottomNavigation v-if="showBottomNavigation" />
 </template>
 
-
-
 <script>
-
 import BottomNavigation from '@/components/organisms/BottomNavigation.vue';
 import LogOutButton from '@/components/atoms/LogOut.vue';
-
 
 export default {
   data: () => ({
     drawer: null,
     title: 'ホーム',
     showBottomNavigation: true,
+    isEventCalPage: false, // `/eventcal` ページ判定用
   }),
   name: "App",
   components: {
@@ -52,6 +47,7 @@ export default {
     $route(to) {
       this.updateTitle(to);
       this.updateBottomNavigationVisibility(to);
+      this.checkEventCalPage(to); // ページ判定を追加
     }
   },
   methods: {
@@ -69,17 +65,23 @@ export default {
       this.title = routeTitleMap[route.path];
     },
     updateBottomNavigationVisibility(route) {
-      this.showBottomNavigation = !['/login', '/signup'].includes(route.path)
+      this.showBottomNavigation = !['/login', '/signup'].includes(route.path);
+    },
+    checkEventCalPage(route) {
+      this.isEventCalPage = route.path === '/eventcal';
     },
     gotoshop() {
-      this.$router.push('/titleshop');  // ここでタイトルショップページに遷移
+      this.$router.push('/titleshop');
     }
   },
   created() {
     this.updateBottomNavigationVisibility(this.$route);
+    this.checkEventCalPage(this.$route); // 初期ロード時に判定
+    console.log(`isEventCalPage: ${this.isEventCalPage}`); // 判定結果をログ出力
   }
 };
 </script>
+
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Kaisei+Tokumin&display=swap');
@@ -130,6 +132,13 @@ body, main {
   font-weight: 600; /* 太字 */
   font-size: 2rem; /* フォントサイズを調整 */
   color: #fff; /* テキストカラー */
+}
+
+/* App.vue またはグローバルスタイルシートに追加 */
+.no-scroll {
+  overflow: hidden; /* スクロールを無効化 */
+  height: 100vh;    /* ページ全体の高さを固定 */
+  width: 100vw;     /* ページ全体の幅を固定 */
 }
 
 </style>
