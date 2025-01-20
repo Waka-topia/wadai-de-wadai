@@ -7,6 +7,7 @@ import store from './store';
 import authService from './services/authService';
 import vuetify from "../src/plugins/vuetify";
 import "./assets/main.css";
+import './registerServiceWorker'
 
 const app = createApp(App);
 
