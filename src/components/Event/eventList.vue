@@ -10,6 +10,24 @@
       class="vuecal"
     ></vue-cal>
 
+    <!-- 編集・削除フォーム -->
+    <div v-if="isEditDeleteFormVisible" class="edit-delete-form">
+      <div class="form-group">
+        <label for="organizer-id">団体ID:</label>
+        <input type="text" v-model="organizerId" required />
+      </div>
+
+      <div class="form-group">
+        <label for="password">パスワード:</label>
+        <input type="password" v-model="password" required />
+      </div>
+
+      <!-- <button @click="handleUpdateEvent">更新</button> -->
+      <button @click="handleDeleteEvent">削除</button>
+
+      <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+    </div>
+
     <!-- 編集ボタン -->
     <button @click="toggleFormVisibility" class="edit-btn">
       団体向けフォーム
@@ -66,7 +84,7 @@
     <!-- イベント詳細モーダル -->
     <div v-if="isModalVisible" class="modal">
       <div class="modal-content">
-        <span @click="closeModal" class="close-btn">&times;</span>
+        <v-btn @click="closeModal" class="close-btn"><v-icon>mdi-close</v-icon></v-btn>
         <h2>{{ modalEvent.title }}</h2>
         <p><strong>日付:</strong> {{ modalEvent.start.toLocaleDateString() }}</p>
         <p><strong>時間:</strong> {{ modalEvent.start.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }) }} ～ {{ modalEvent.end.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }) }}</p>
@@ -79,23 +97,7 @@
       </div>
     </div>
 
-    <!-- 編集・削除フォーム -->
-    <div v-if="isEditDeleteFormVisible" class="edit-delete-form">
-      <div class="form-group">
-        <label for="organizer-id">団体ID:</label>
-        <input type="text" v-model="organizerId" required />
-      </div>
-
-      <div class="form-group">
-        <label for="password">パスワード:</label>
-        <input type="password" v-model="password" required />
-      </div>
-
-      <!-- <button @click="handleUpdateEvent">更新</button> -->
-      <button @click="handleDeleteEvent">削除</button>
-
-      <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
-    </div>
+    
 
   </div>
 </template>
@@ -334,6 +336,7 @@ textarea {
 }
 
 /* モーダル */
+/* モーダル全体 */
 .modal {
   position: fixed;
   top: 0;
@@ -347,20 +350,34 @@ textarea {
   z-index: 1000;
 }
 
+/* モーダルコンテンツ */
 .modal-content {
+  position: relative; /* 閉じるボタンを正確に配置するため */
   background-color: white;
   padding: 2rem;
   border-radius: 10px;
   width: 60%;
   max-width: 800px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
+/* 閉じるボタン */
 .close-btn {
   position: absolute;
-  top: 0;
+  top: 10px; /* モーダルの端に配置 */
   right: 10px;
-  font-size: 2rem;
+  font-size: 1.5rem;
+  color: #333;
+  background: none;
+  border: none;
   cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: background-color 0.3s;
+}
+
+.close-btn:hover {
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 h2 {
