@@ -1,13 +1,10 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Login from "../pages/Login.vue";
 import SignUp from "../pages/SignUp.vue";
-// import CampusMap from "@/pages/MapPage.vue";
 import MyPage from "@/pages/MyPage.vue";
-import Ranking from "@/pages/Ranking.vue";
+import Ranking from "@/pages/RankingPage.vue";
 import Reader from "@/pages/Reader.vue";
-//import Dashboard from "../pages/Dashboard.vue";
 import { default as Home, default as testpage } from "@/pages/Home.vue";
-// import CampusMap from "@/pages/MapPage.vue";
 import EventCal from "@/pages/EventCal.vue";
 import TitleShop from "@/pages/TitleShop.vue";
 
@@ -18,8 +15,6 @@ const routes = [
   { path: "/reader", name: "Reader", component: Reader},
   { path: "/ranking", name: "Ranking", component: Ranking },
   { path: "/mypage", name: "MyPage", component: MyPage },
-  //{ path: "/dashboard", name: "Dashboard", component: Dashboard },
-  // { path: "/campus-map", name: "CampusMap", component: CampusMap },
   { path: "/testpage", name: "testpage", component: testpage },
   { path: "/eventcal", name: "EventCal", component: EventCal },
   { path: "/titleshop", name: "TitleShop", component: TitleShop }
