@@ -3,8 +3,8 @@
   <v-card @click="navigateToProfile" class="my-2 pb-3" outlined hover elevation="0">
     <v-row>
       <v-col cols="3" class="align-self-center  mx-3">
-        <v-icon size="x-large" class="position-absolute top-0 left-1">
-          mdi-square
+        <v-icon size="x-large" class="position-absolute top-0 left-1" color="orange" style="left: 4.5px;">
+          mdi-shield
         </v-icon>
         <span class="font-weight-bold text-h5 text-white position-absolute top-0 left-1">{{ rank }}</span>
       </v-col>
