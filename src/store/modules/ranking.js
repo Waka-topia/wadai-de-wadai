@@ -28,7 +28,6 @@ export default {
       commit("setError", null); // エラーをリセット
 
       try {
-        // ランキングデータを取得
         const rankings = await rankingService.getUserRanking();
         commit("setRankings", rankings); // 取得したランキングをセット
       } catch (error) {
@@ -44,7 +43,6 @@ export default {
 
       try {
         const userId = rootState.auth.userId; // 現在のユーザーIDを取得
-        // 自分のランキング情報を取得
         const myRanking = await rankingService.getMyRanking(userId); // サービスからデータ取得
         commit("setMyRanking", myRanking); // 自分のランキングをセット
       } catch (error) {
