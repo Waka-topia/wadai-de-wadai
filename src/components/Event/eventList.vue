@@ -96,9 +96,6 @@
         <button @click="toggleEditDeleteForm" class="edit-btn">編集・削除</button>
       </div>
     </div>
-
-    
-
   </div>
 </template>
 

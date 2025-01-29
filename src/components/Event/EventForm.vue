@@ -1,35 +1,62 @@
+/* EventForm.vue: イベント登録フォーム */
 <template>
-    <div class="event-form">
-      <v-form>
-        <v-text-field label="日付" v-model="event.date" required></v-text-field>
-        <v-time-picker label="開始時間" v-model="event.startTime"></v-time-picker>
-        <v-time-picker label="終了時間" v-model="event.endTime"></v-time-picker>
-        <v-text-field label="場所" v-model="event.location" required></v-text-field>
-        <v-textarea label="概要" v-model="event.description"></v-textarea>
-        <v-btn color="primary" @click="submit">登録</v-btn>
-        <v-btn color="error" @click="$emit('close')">キャンセル</v-btn>
-      </v-form>
+  <form @submit.prevent="submitEvent">
+    <div class="form-group">
+      <label for="date">日付:</label>
+      <input type="date" v-model="newEvent.date" required />
     </div>
-  </template>
-  
-  <script>
-  export default {
-    data() {
-      return {
-        event: {
-          date: "",
-          startTime: "",
-          endTime: "",
-          location: "",
-          description: "",
-        },
-      };
-    },
-    methods: {
-      submit() {
-        this.$emit("submitEvent", this.event);
+    <div class="form-group">
+      <label for="start-time">開始時刻:</label>
+      <input type="time" v-model="newEvent.startTime" required />
+    </div>
+    <div class="form-group">
+      <label for="end-time">終了時刻:</label>
+      <input type="time" v-model="newEvent.endTime" required />
+    </div>
+    <div class="form-group">
+      <label for="location">場所:</label>
+      <input type="text" v-model="newEvent.location" required />
+    </div>
+    <div class="form-group">
+      <label for="description">概要:</label>
+      <textarea v-model="newEvent.description" required></textarea>
+    </div>
+    <div class="form-group">
+      <label for="organizer-name">団体名:</label>
+      <input type="text" v-model="newEvent.organizerName" required />
+    </div>
+    <div class="form-group">
+      <label for="organizer-id">団体ID:</label>
+      <input type="text" v-model="organizerId" required />
+    </div>
+    <div class="form-group">
+      <label for="password">パスワード:</label>
+      <input type="password" v-model="password" required />
+    </div>
+    <button type="submit">イベントを登録</button>
+  </form>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      newEvent: {
+        date: "",
+        startTime: "",
+        endTime: "",
+        location: "",
+        description: "",
+        organizerName: "",
       },
+      organizerId: "",
+      password: "",
+    };
+  },
+  methods: {
+    submitEvent() {
+      this.$emit("submit-event", this.newEvent, this.organizerId, this.password);
     },
-  };
-  </script>
-  
+  },
+};
+</script>
