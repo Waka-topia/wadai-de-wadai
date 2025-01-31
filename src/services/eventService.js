@@ -11,6 +11,7 @@ import { doc, setDoc, getDoc, updateDoc, deleteDoc, collection, getDocs } from "
  * @returns {Promise<boolean>} パスワードが一致すればtrue、それ以外はfalse
  */
 export const verifyOrganizerPassword = async (organizerId, inputPassword) => {
+  // console.log("eventService",organizerId, inputPassword);
   try {
     const docRef = doc(db, "organizers", organizerId);  // コレクションを指定
     const docSnap = await getDoc(docRef);
@@ -39,6 +40,7 @@ export const verifyOrganizerPassword = async (organizerId, inputPassword) => {
  * @returns {Promise<void>}
  */
 export const addEvent = async (eventData, organizerId) => {
+  console.log(eventData);
   try {
     const eventId = uuidv4(); // ユニークなイベントIDを生成
 

@@ -1,6 +1,6 @@
 <!-- EditDeleteForm.vue: 編集・削除フォーム -->
 <template>
-    <div v-if="isEditDeleteFormVisible" class="edit-delete-form">
+    <div v-show="isEditDeleteFormVisible" class="edit-delete-form">
       <div class="form-group">
         <label for="organizer-id">団体ID:</label>
         <input type="text" v-model="organizerId" required />
@@ -16,6 +16,9 @@
   
   <script>
   export default {
+    props: {
+        isEditDeleteFormVisible: Boolean,
+    },
     data() {
       return {
         organizerId: "",
