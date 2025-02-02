@@ -1,5 +1,6 @@
 import EventCal from "@/pages/EventCal.vue";
 import { default as Home, default as testpage } from "@/pages/Home.vue";
+import InquiryPage from "@/pages/InquiryPage.vue";
 import MyPage from "@/pages/MyPage.vue";
 import Ranking from "@/pages/RankingPage.vue";
 import Reader from "@/pages/Reader.vue";
@@ -17,7 +18,8 @@ const routes = [
   { path: "/mypage", name: "MyPage", component: MyPage },
   { path: "/testpage", name: "testpage", component: testpage },
   { path: "/eventcal", name: "EventCal", component: EventCal },
-  { path: "/titleshop", name: "TitleShop", component: TitleShop }
+  { path: "/titleshop", name: "TitleShop", component: TitleShop },
+  { path: "/inquiry", name: "InquiryPage", component: InquiryPage }
 ];
 
 const router = createRouter({

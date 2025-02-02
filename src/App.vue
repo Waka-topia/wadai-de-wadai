@@ -1,31 +1,53 @@
 <template>
-  <v-app :class="{ 'no-scroll': isEventCalPage }">
+  <v-app>
     <v-app-bar color="orange">
       <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer">
       </v-app-bar-nav-icon>
 
-      <v-app-bar-title>
+      <v-app-bar-title class="font-weight-bold text-h5">
         和大DE話題-{{ title }}-
       </v-app-bar-title>
     </v-app-bar>
 
     <v-navigation-drawer v-model="drawer" class="bg-white">
       <v-list>
-        <v-list-item title="称号を受け取る" value="TitleShop" @click="gotoshop"></v-list-item>
+        <v-list-item size="large" @click="gotoshop" class="position-relative my-1" block>
+          <v-icon>
+            mdi-download
+          </v-icon>
+          称号を受け取る
+          <v-icon class="position-absolute right-0 mx-2">
+            mdi-chevron-right
+          </v-icon>
+        </v-list-item>
+        <v-list-item size="large" @click="gotoinquiry" class="position-relative my-1" block>
+          <v-icon>
+            mdi-email-outline
+          </v-icon>
+          お問い合わせ
+          <v-icon class="position-absolute right-0 mx-2">
+            mdi-chevron-right
+          </v-icon>
+        </v-list-item>
         <LogOutButton />
       </v-list>
     </v-navigation-drawer>
 
     <v-main>
       <router-view></router-view>
+      <div class="mb-6">
+        <v-footer app>
+          <span>&copy; 2025 和大DE話題</span>
+        </v-footer>
+      </div>
     </v-main>
   </v-app>
   <BottomNavigation v-if="showBottomNavigation" />
 </template>
 
 <script>
-import LogOutButton from '@/components/templates/LogOut.vue';
 import BottomNavigation from '@/components/templates/BottomNavigation.vue';
+import LogOutButton from '@/components/templates/LogOut.vue';
 
 export default {
   name: "App",
@@ -62,6 +84,7 @@ export default {
         '/mypage': 'マイページ',
         '/eventcal': '新歓日程',
         '/titleshop': '称号ショップ',
+        '/inquiry': 'お問い合わせ',
       };
       this.title = routeTitleMap[route.path];
     },
@@ -73,7 +96,10 @@ export default {
     },
     gotoshop() {
       this.$router.push('/titleshop');
-    }
+    },
+    gotoinquiry() {
+      this.$router.push('/inquiry');
+    },
   }
 };
 </script>
@@ -97,21 +123,5 @@ export default {
 v-app-bar-title {
   font-family: 'Kaisei Tokumin', sans-serif;
   /* Poppins フォントを指定 */
-  font-weight: 600;
-  /* 太字 */
-  font-size: 2rem;
-  /* フォントサイズを調整 */
-  color: #fff;
-  /* テキストカラー */
-}
-
-/* App.vue またはグローバルスタイルシートに追加 */
-.no-scroll {
-  overflow: hidden;
-  /* スクロールを無効化 */
-  height: 100vh;
-  /* ページ全体の高さを固定 */
-  width: 100vw;
-  /* ページ全体の幅を固定 */
 }
 </style>
