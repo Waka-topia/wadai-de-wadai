@@ -28,7 +28,7 @@
       </v-card>
     </template>
   </v-dialog>
-  <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
+  <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="3000">
     {{ snackbar.message }}
   </v-snackbar>
 </template>
