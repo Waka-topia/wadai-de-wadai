@@ -1,16 +1,7 @@
 <template>
-  <div>
-    <QRScanner></QRScanner>
-  </div>
+  <QRScanner></QRScanner>
 </template>
 
-<script>
+<script setup>
 import QRScanner from "@/components/templates/QRScanner.vue";
-
-export default {
-  name: "ReaderComponent",
-  components: {
-    QRScanner,
-  },
-};
 </script>
