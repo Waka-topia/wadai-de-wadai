@@ -1,55 +1,22 @@
 <template>
-  <v-sheet class="bg-orange-lighten-5 pa-12" rounded>
-    <v-card class="mx-auto px-6 py-8" max-width="344">
-      <v-form
-        v-model="form"
-        @submit.prevent="onSubmit"
-      >
+  <v-sheet class="pa-12" rounded>
+    <v-card class="py-8">
+      <v-form v-model="form" @submit.prevent="onSubmit">
 
-        <v-text-field
-          v-model="username"
-          :readonly="loading"
-          :rules="[required]"
-          class="mb-2"
-          label="Username"
-          placeholder="Enter your username"
-          clearable
-        />
-        <v-text-field
-          v-model="email"
-          :readonly="loading"
-          :rules="[required, emailDomainCheck]"
-          prepend-inner-icon="mdi-email-outline"
-          class="mb-2"
-          label="Email"
-          placeholder="Enter your email"
-          clearable
-        ></v-text-field>
+        <v-text-field v-model="username" :readonly="loading" :rules="[required]" class="mb-2" label="Username"
+          placeholder="Enter your username" clearable />
+        <v-text-field v-model="email" :readonly="loading" :rules="[required, emailDomainCheck]"
+          prepend-inner-icon="mdi-email-outline" class="mb-2" label="Email" placeholder="Enter your email"
+          clearable></v-text-field>
 
-        <v-text-field
-          v-model="password"
-          :readonly="loading"
-          :rules="[required]"
-          :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
-          :type="visible ? 'text' : 'password'"
-          prepend-inner-icon="mdi-lock-outline"
-          label="Password"
-          placeholder="Enter your password"
-          clearable
-          @click:append-inner="visible = !visible"
-        ></v-text-field>
+        <v-text-field v-model="password" :readonly="loading" :rules="[required]"
+          :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'" :type="visible ? 'text' : 'password'"
+          prepend-inner-icon="mdi-lock-outline" label="Password" placeholder="Enter your password" clearable
+          @click:append-inner="visible = !visible"></v-text-field>
 
         <br>
 
-        <v-btn
-          :disabled="!form"
-          :loading="loading"
-          color="primary"
-          size="large"
-          type="submit"
-          variant="elevated"
-          block
-        >
+        <v-btn :disabled="!form" :loading="loading" color="primary" size="large" type="submit" variant="elevated" block>
           Sign Up
         </v-btn>
         <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
@@ -60,6 +27,9 @@
       </v-btn>
     </v-card>
   </v-sheet>
+  <v-snackbar :v-model="snackbar.show" :color="snackbar.color" timeout="3000">
+    {{ snackbar.message }}
+  </v-snackbar>
 </template>
 
 <script>
@@ -72,14 +42,17 @@ export default {
       username: "",
       email: "",
       password: "",
-      errorMessage: null,
       visible: false,
+      snackbar: {
+        show: false,
+        color: "",
+        message: "",
+      },
     };
   },
   methods: {
     ...mapActions("auth", ["signup"]),
 
-    // メールアドレスのドメインをチェックするカスタムルール
     emailDomainCheck(value) {
       if (value && value.endsWith('@wakayama-u.ac.jp')) {
         return 'このドメインは使用できません';
@@ -89,15 +62,20 @@ export default {
 
     async onSubmit() {
       try {
-        // Vuexのsignupアクションを使用してサインアップ
         await this.signup({ email: this.email, password: this.password, username: this.username });
-        console.log("サインアップ成功");
 
-        // サインアップ後、リダイレクトなどの処理
-        this.$router.push("/login"); // 例：ダッシュボードに遷移
+        this.snackbar = {
+          show: true,
+          color: "success",
+          message: "サインアップしました",
+        };
+        this.$router.push("/login");
       } catch (error) {
-        console.error("サインアップエラー:", error.message);
-        this.errorMessage = "サインアップに失敗しました。メールアドレスまたはパスワードをご確認ください。";
+        this.snackbar = {
+          show: true,
+          color: "error",
+          message: `サインアップに失敗しました。メールアドレスまたはパスワードをご確認ください。${error.message}`,
+        };
       }
     },
     onLogIn() {
