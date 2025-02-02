@@ -1,46 +1,39 @@
 <template>
   <div>
-    <button @click="updateRanking" class="update-ranking-button"><v-icon>mdi-reload</v-icon></button>
+    <v-btn @click="updateRanking" size="x-large" color="success"><v-icon>mdi-reload</v-icon></v-btn>
     <RankingList />
+    <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="snackbar.timeout">
+      {{ snackbar.text }}
+    </v-snackbar>
   </div>
 </template>
 
-<script>
+<script setup>
 import RankingList from "@/components/UserRanking/RankingList.vue";
 import rankingService from '@/services/rankingService';
+import { ref } from "vue";
 
-export default {
-  name: "RankingPage",
-  components: {
-    RankingList,
-  },
-  methods: {
-    async updateRanking() {
-      try {
-        // ランキング更新メソッドを呼び出し
-        await rankingService.updateTop100();
-      } catch (error) {
-        console.error("ランキング更新エラー:", error);
-        alert("ランキングの更新に失敗しました。");
-      }
-    }
-  },
+const snackbar = ref({
+  show: false,
+  text: "",
+  color: "",
+  timeout: 3000,
+});
+
+const updateRanking = async () => {
+  try {
+    await rankingService.updateTop100();
+    snackbar.value = {
+      show: true,
+      text: "ランキングを更新しました。",
+      color: "success",
+    };
+  } catch (error) {
+    snackbar.value = {
+      show: true,
+      text: `ランキングの更新に失敗しました。${error}`,
+      color: "error",
+    };
+  }
 };
 </script>
-
-<style scoped>
-.update-ranking-button {
-  padding: 10px 20px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-  margin-top: 20px;
-}
-
-.update-ranking-button:hover {
-  background-color: #45a049;
-}
-</style>
