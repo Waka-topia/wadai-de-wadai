@@ -9,21 +9,15 @@
     <v-skeleton-loader v-if="isLoading" :elevation="0" type="list-item-avatar-three-line" />
     <v-alert v-if="error" :text="errorMessages" title="エラー" type="error"></v-alert>
     <div v-if="!isLoading && rankings.length > 0">
-      <ProfileCard
-      v-for="(user, index) in rankings"
-        :key="user.userId"
-        :name="user.displayName"
+      <ProfileCard v-for="(user, index) in rankings" :key="user.userId" :name="user.displayName"
         :status="user.nextShinkan ? `${user.nextShinkan.groupName} - ${user.nextShinkan.nextDate}` : '情報なし'"
-        :image="getImageUrl(user.photoURL)"
-        :rank="index + 1"
-        :count="user.count"
-      />
+        :image="getImageUrl(user.photoURL)" :rank="index + 1" :count="user.count" />
     </div>
   </div>
 </template>
 
 <script>
-import ProfileCard from '@/components/atoms/ProfileCard.vue';
+import ProfileCard from '@/components/MyPage/ProfileCard.vue';
 import { mapActions, mapGetters } from "vuex";
 
 export default {

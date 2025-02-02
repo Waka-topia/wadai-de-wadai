@@ -42,72 +42,78 @@
       <v-btn size="large" color="success" @click="saveShinkan">保存</v-btn>
     </div>
 
-    <!-- 次に行く新歓情報の表示 -->
-    <div v-if="nextShinkan.groupName" class="my-3 mt-5 next-shinkan">
-      <h3>次に行く新歓</h3>
-      <p>団体: {{ nextShinkan.groupName }}</p>
-      <p>日付: {{ nextShinkan.nextDate }}</p>
-    </div>
+    <!-- スナックバー通知 -->
+    <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="3000">
+      {{ snackbar.message }}
+    </v-snackbar>
   </div>
 </template>
 
-<script>
-import { allGroups } from '@/data/groups' // データをインポート
-import { mapActions, mapState } from 'vuex'
+<script setup>
+import { allGroups } from '@/data/groups'
+import { computed, onMounted, ref } from 'vue'
+import { useStore } from 'vuex'
 
-export default {
-  data() {
-    return {
-      selectedMainCategory: 'all',
-      selectedSubCategory: 'all',
-      selectedGroup: '',
-      selectedDate: '',
-      allGroups: allGroups, // インポートしたデータをセット
-      filteredGroups: [],
-    }
-  },
-  computed: {
-    ...mapState('shinkan', ['nextShinkan']),
-    userId() {
-      return this.$store.getters['auth/userId']
-    },
-  },
-  methods: {
-    ...mapActions('shinkan', ['saveNextShinkan']),
-    filterGroups() {
-      let groups =
-        this.selectedMainCategory === 'all'
-          ? this.allGroups
-          : this.allGroups.filter((group) => group.mainCategory === this.selectedMainCategory)
+const store = useStore()
 
-      if (this.selectedSubCategory !== 'all') {
-        groups = groups.filter((group) => group.subCategory === this.selectedSubCategory)
-      }
+// リアクティブな状態の定義
+const selectedMainCategory = ref('all')
+const selectedSubCategory = ref('all')
+const selectedGroup = ref('')
+const selectedDate = ref('')
+const filteredGroups = ref([])
+const isLoading = ref(false)
+const snackbar = ref({
+  show: false,
+  color: '',
+  message: ''
+})
 
-      this.filteredGroups = groups
-    },
-    saveShinkan() {
-      const userId = this.userId
-      const groupName = this.selectedGroup
-      const nextDate = this.selectedDate
+// Vuexのステート参照
+const userId = computed(() => store.state.auth.userId)
 
-      if (!userId) {
-        alert('ユーザーがログインしていません。')
-        return
-      }
+// メソッドの定義
+const filterGroups = () => {
+  let groups =
+    selectedMainCategory.value === 'all'
+      ? allGroups
+      : allGroups.filter((group) => group.mainCategory === selectedMainCategory.value)
 
-      if (!groupName || !nextDate) {
-        alert('団体と日付を選択してください')
-        return
-      }
+  if (selectedSubCategory.value !== 'all') {
+    groups = groups.filter((group) => group.subCategory === selectedSubCategory.value)
+  }
 
-      this.saveNextShinkan({ userId, groupName, nextDate })
-    },
-  },
-  mounted() {
-    this.filterGroups()
-  },
+  filteredGroups.value = groups
 }
+
+const saveShinkan = async () => {
+  try {
+    isLoading.value = true
+    await store.dispatch('shinkan/saveNextShinkan', {
+      userId: userId.value,
+      groupName: selectedGroup.value,
+      nextDate: selectedDate.value,
+    })
+    snackbar.value = {
+      show: true,
+      color: 'success',
+      message: '保存が完了しました'
+    }
+  } catch (error) {
+    snackbar.value = {
+      show: true,
+      color: 'error',
+      message: '保存に失敗しました: ' + error.message
+    }
+  } finally {
+    isLoading.value = false
+  }
+}
+
+// コンポーネントマウント時の処理
+onMounted(() => {
+  filterGroups()
+})
 </script>
 
 <style scoped>
@@ -117,11 +123,5 @@ input[type='date'] {
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 1rem;
-}
-
-.next-shinkan {
-  padding: 10px;
-  border-radius: 4px;
-  background-color: #fff3e0;
 }
 </style>

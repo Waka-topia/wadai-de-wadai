@@ -1,4 +1,4 @@
-import { collection, getDocs, getFirestore, setDoc, doc, deleteDoc } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocs, getFirestore, setDoc } from "firebase/firestore";
 import { db } from "../firebase/config"; // FirebaseのFirestoreインスタンス
 
 export default {
@@ -60,25 +60,25 @@ export default {
   },
   async updateTop100() {
     const db = getFirestore();
-  
+
     // `users`コレクションのすべてのユーザーを取得
     const usersRef = collection(db, "users");
     const snapshot = await getDocs(usersRef);
-  
+
     // ユーザーごとのスタンプ数と次の新歓情報を計算
     const userStats = [];
     for (const user of snapshot.docs) {
       const userId = user.id;
       const userData = user.data();
-  
+
       // `stampsReceived` 子コレクションのドキュメント数を取得
       const stampRef = collection(db, `users/${userId}/stampsReceived`);
       const stampSnapshot = await getDocs(stampRef);
-  
+
       // `NextShinkan` 子コレクションから `details` ドキュメントを取得
       const nextShinkanRef = collection(db, `users/${userId}/NextShinkan`);
       const nextShinkanSnapshot = await getDocs(nextShinkanRef);
-  
+
       let nextShinkanDetails = null;
       if (!nextShinkanSnapshot.empty) {
         // 最初のドキュメントのみを取得（想定）
@@ -89,7 +89,7 @@ export default {
           nextDate: detailsData.nextDate || null,
         };
       }
-      
+
       const photoURL = userData.photoURL || 'userIcon/defaultIcon.png';  // デフォルトのURLを設定
 
       userStats.push({
@@ -100,19 +100,19 @@ export default {
         nextShinkan: nextShinkanDetails, // 次の新歓情報を追加
       });
     }
-  
+
     // スタンプ数で降順ソート
     userStats.sort((a, b) => b.stampCount - a.stampCount);
-  
+
     // 上位100人を`top100`コレクションに保存
     const top100Ref = collection(db, "top100");
-  
+
     // 更新前に`top100`コレクションをクリア
     const top100Snapshot = await getDocs(top100Ref);
     for (const topDoc of top100Snapshot.docs) {
       await deleteDoc(topDoc.ref); // `deleteDoc` を使用して削除
     }
-  
+
     // 上位100人を保存
     for (let i = 0; i < Math.min(100, userStats.length); i++) {
       const user = userStats[i];

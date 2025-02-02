@@ -14,8 +14,8 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
 import { QrcodeStream } from "vue-qrcode-reader";
+import { mapActions } from "vuex";
 
 export default {
   components: {
@@ -147,6 +147,3 @@ export default {
   },
 };
 </script>
-
-<style>
-</style>

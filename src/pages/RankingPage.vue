@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import RankingList from "@/components/molecules/RankingList.vue";
+import RankingList from "@/components/UserRanking/RankingList.vue";
 import rankingService from '@/services/rankingService';
 
 export default {
@@ -24,7 +24,7 @@ export default {
         alert("ランキングの更新に失敗しました。");
       }
     }
-  }
+  },
 };
 </script>
 

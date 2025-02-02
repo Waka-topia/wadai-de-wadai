@@ -1,13 +1,10 @@
-import './assets/main.css';
-
 import { createApp } from 'vue';
-import App from './App.vue';
-import router from './router';
-import store from './store';
-import authService from './services/authService';
 import vuetify from "../src/plugins/vuetify";
-import "./assets/main.css";
-import './registerServiceWorker'
+import App from './App.vue';
+import './registerServiceWorker';
+import router from './router';
+import authService from './services/authService';
+import store from './store';
 
 const app = createApp(App);
 

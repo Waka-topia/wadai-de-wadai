@@ -1,25 +1,18 @@
 <template>
   <div>
-    <ProfileCard 
-      v-for="(user, index) in userInfo" 
-      :key="index" 
-      :name="user.displayName" 
-      :status="user.status"
-      :image="getImageUrl(user.photoURL)" 
-      :rank="user.rank" 
-      :count="user.count" 
-    />
+    <ProfileCard v-for="(user, index) in userInfo" :key="index" :name="user.displayName" :status="user.status"
+      :image="getImageUrl(user.photoURL)" :rank="user.rank" :count="user.count" />
     <EditForm />
     <TabsBar :tabsName="tabsName" :tabsComponent="tabsComponent" />
   </div>
 </template>
 
 <script>
+import DegreesList from '@/components/MyPage/DegreesList.vue';
+import EditForm from '@/components/EditForm/EditForm.vue';
+import ProfileCard from '@/components/MyPage/ProfileCard.vue';
 import StampsList from '@/components/StampsList.vue';
-import ProfileCard from '@/components/atoms/ProfileCard.vue';
-import DegreesList from '@/components/molecules/DegreesList.vue';
-import TabsBar from '@/components/organisms/TabsBar.vue';
-import EditForm from '@/components/atoms/EditForm.vue';
+import TabsBar from '@/components/MyPage/TabsBar.vue';
 import { mapActions, mapState } from "vuex";
 
 export default {

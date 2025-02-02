@@ -11,7 +11,9 @@
     </v-row>
     <v-row>
       <v-col cols="5" class="align-self-center pl-5">
-        <v-img :src="image" alt="ユーザーのアイコン" class="rounded-circle"></v-img>
+        <v-avatar size="140">
+          <v-img :src="image" alt="ユーザーのアイコン" class="rounded-circle"></v-img>
+        </v-avatar>
       </v-col>
       <v-col cols="7">
         <v-row class="mb-1">
@@ -41,42 +43,38 @@
       </v-col>
     </v-row>
   </v-card>
-  <!-- <EditForm /> -->
 </template>
 
-<script>
-// import EditForm from './EditForm.vue';
+<script setup>
+import { defineProps } from 'vue';
+import { useRouter } from 'vue-router';
 
-export default {
-  props: {
-    name: {
-      type: String,
-      required: true,
-    },
-    status: {
-      type: String,
-      required: true,
-    },
-    image: {
-      type: String,
-      required: true,
-    },
-    rank: {
-      type: Number,
-      required: true,
-    },
-    count: {
-      type: Number,
-      required: true,
-    },
+const router = useRouter()
+
+const props = defineProps({
+  name: {
+    type: String,
+    required: true
   },
-  methods: {
-    navigateToProfile() {
-      this.$router.push('/' + this.name);
-    },
+  status: {
+    type: String,
+    required: true
   },
-  // components: {
-  //   EditForm,
-  // }
-};
+  image: {
+    type: String,
+    required: true
+  },
+  rank: {
+    type: Number,
+    required: true
+  },
+  count: {
+    type: Number,
+    required: true
+  }
+})
+
+const navigateToProfile = () => {
+  router.push(`/${props.name}`)
+}
 </script>

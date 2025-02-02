@@ -1,4 +1,4 @@
-import { saveNextShinkan, getNextShinkan } from "../../services/nextShinkanService"; // インポートを追加
+import { getNextShinkan, saveNextShinkan } from "../../services/nextShinkanService";
 
 export default {
   namespaced: true,
@@ -21,21 +21,18 @@ export default {
     async saveNextShinkan({ commit }, { userId, groupName, nextDate }) {
       try {
         await saveNextShinkan(userId, groupName, nextDate); // Firestoreにデータ保存
-        commit("setNextShinkan", { groupName, nextDate });
+        commit("setNextShinkan", { groupName, nextDate }); // Vuexのstateにセット
       } catch (error) {
-        console.error("Error in saveNextShinkan action: ", error);
+        console.error(error);
         throw error;
       }
     },
-    // 次の新歓情報を取得
     async fetchNextShinkan({ commit }, userId) {
       try {
         const data = await getNextShinkan(userId); // Firestoreからデータ取得
-        if (data) {
-          commit("setNextShinkan", data); // Vuexのstateにセット
-        }
+        commit("setNextShinkan", data); // Vuexのstateにセット
       } catch (error) {
-        console.error("Error in fetchNextShinkan action: ", error);
+        console.error(error);
         throw error;
       }
     },

@@ -1,4 +1,4 @@
-import authService from "../../services/authService"; 
+import authService from "../../services/authService";
 
 export default {
   namespaced: true,
@@ -15,7 +15,7 @@ export default {
       state.idToken = token;
     },
     setUserId(state, uid) {
-      state.userId = uid;  // userIdをstateにセット
+      state.userId = uid;
     },
     clearAuthState(state) {
       state.user = null;
@@ -24,12 +24,11 @@ export default {
     },
     setPhotoURL(state, photoURL) {
       if (state.user) {
-        state.user.photoURL = photoURL; // Vuex の user に photoURL をセット
+        state.user.photoURL = photoURL;
       }
     },
   },
   actions: {
-    // 初期化処理
     initializeAuth({ commit }) {
       return new Promise((resolve, reject) => {
         authService.onAuthStateChanged((user) => {
@@ -49,8 +48,6 @@ export default {
         });
       });
     },
-
-    // ログイン処理
     async login({ commit }, { email, password }) {
       try {
         const user = await authService.login({ email, password });
@@ -64,8 +61,6 @@ export default {
         throw error;
       }
     },
-
-    // サインアップ処理
     async signup({ commit }, { email, password, username }) {
       try {
         const user = await authService.signup({ email, password, username });
@@ -79,8 +74,6 @@ export default {
         throw error;
       }
     },
-
-    // ログアウト処理
     async logout({ commit }) {
       try {
         await authService.logout();
@@ -93,9 +86,8 @@ export default {
     },
     async updatePhotoURL({ commit, state }, photoURL) {
       try {
-        // authService経由で画像URLを更新
         await authService.updatePhotoURL(state.user, photoURL);
-        commit("setPhotoURL", photoURL); // Vuex に保存
+        commit("setPhotoURL", photoURL);
         console.log("Photo URL updated to:", photoURL);
       } catch (error) {
         console.error("Error updating photo URL:", error);
@@ -103,24 +95,17 @@ export default {
       }
     },
   },
-  // getters: {
-  //   isAuthenticated: (state) => !!state.user,
-  //   user: (state) => state.user,
-  //   idToken: (state) => state.idToken,
-  //   userId: (state) => state.userId,
-  // },
+
   getters: {
     isAuthenticated: (state) => !!state.user,
     user: (state) => state.user,
     idToken: (state) => state.idToken,
     userId: (state) => state.userId,
-    email: (state) => state.user.email, // emailを取得するGetter
-    providerData: (state) => state.user.providerData, // providerDataを取得するGetter
-    photoURL: (state) => state.user.photoURL, // photoURLを取得するGetter
-  
-    // displayNameを取得するGetter
+    email: (state) => state.user.email,
+    providerData: (state) => state.user.providerData,
+    photoURL: (state) => state.user.photoURL,
     displayName: (state) => {
-      return state.user?.displayName || "ゲスト"; // displayNameが無ければデフォルトで"ゲスト"を表示
+      return state.user?.displayName || "ゲスト";
     },
   },
 };
