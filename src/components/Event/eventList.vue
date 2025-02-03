@@ -11,16 +11,16 @@
     ></vue-cal>
 
     <!-- イベントフォームの表示・非表示を制御するボタン -->
-    <button @click="toggleEventForm" v-if="!isModalVisible" class="show-form-btn">
-      イベントを追加
-    </button>
+    <v-btn @click="toggleEventForm" v-if="!isModalVisible" class="show-form-btn font-weight-bold" color="orange text-white" elevation="15">
+      {{ isEventFormVisible ? "フォームを閉じる" : "団体向けフォーム" }}
+    </v-btn>
 
     <EventForm v-if="isEventFormVisible" @submit-event="submitEvent" />  <!-- イベントフォーム -->
     <EventModal
       v-show="isModalVisible"
       :event="modalEvent"
       @close-modal="closeModal"
-      
+
       @delete-event="handleDeleteEvent"
     />
     <!-- @toggle-edit-delete="toggleEditDeleteForm" -->
@@ -168,13 +168,10 @@ export default {
   height: 100%;
 }
 .show-form-btn {
-  padding: 10px 20px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
+  position: fixed;
+  bottom: calc(env(safe-area-inset-bottom) + 20px + 56px);
+  right: 20px;
+  z-index: 100;
 }
 
 .show-form-btn:hover {

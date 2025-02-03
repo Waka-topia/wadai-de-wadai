@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-progress-linear color="success" v-if="isLoading" indeterminate=""></v-progress-linear>
-    <v-btn @click="updateRanking" size="large" color="success" icon="mdi-refresh" intermediate></v-btn>
+    <v-btn @click="updateRanking" size="large" color="orange" elevation="20" class="show-form-btn" icon="mdi-refresh" intermediate></v-btn>
     <RankingList :key="renderKey" />
     <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="snackbar.timeout">
       {{ snackbar.text }}
@@ -43,3 +43,12 @@ const updateRanking = async () => {
   }
 };
 </script>
+
+<style>
+.show-form-btn {
+  position: fixed;
+  bottom: calc(env(safe-area-inset-bottom) + 20px + 56px);
+  right: 20px;
+  z-index: 100;
+}
+</style>
