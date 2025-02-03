@@ -8,11 +8,11 @@
       <v-col
         v-for="stamp in stampImages"
         :key="stamp.stampId"
-        cols="4" sm="4" md="3"
+        cols="6" sm="4" md="3"
       >
-        <v-card elevation="0">
+        <v-card elevation="1" aspect-ratio="1">
           <v-img :src="getImageUrl(stamp.imageUrl)" :alt="stamp.name" aspect-ratio="1"></v-img>
-          <v-card-title class="text-body-2"><small>{{ stamp.name }}</small></v-card-title>
+          <v-card-title class="text-body-2 text-center"><small>{{ stamp.name }}</small></v-card-title>
           <v-card-text>{{ stamp.description }}</v-card-text>
         </v-card>
       </v-col>
