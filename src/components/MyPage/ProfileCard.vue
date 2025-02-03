@@ -3,10 +3,18 @@
   <v-card @click="navigateToProfile" class="my-2 pb-3" outlined hover elevation="0">
     <v-row>
       <v-col cols="3" class="align-self-center  mx-3">
-        <v-icon size="x-large" class="position-absolute top-0 left-1" color="orange" style="left: 4.5px;">
-          mdi-shield
-        </v-icon>
-        <span class="font-weight-bold text-h5 text-white position-absolute top-0 left-1">{{ rank }}</span>
+        <v-btn v-if="rank == 1" :style="{ backgroundColor: '#E6B422' }">
+          <span class="font-weight-bold text-white text-h5 position-absolute top-0 left-1">{{ rank }}</span>
+        </v-btn>
+        <v-btn v-else-if="rank == 2" :style="{ backgroundColor: '#C0C0C0' }">
+          <span class="font-weight-bold text-white text-h5 position-absolute top-0 left-1">{{ rank }}</span>
+        </v-btn>
+        <v-btn v-else-if="rank == 3" :style="{ backgroundColor: '#BB7333' }">
+          <span class="font-weight-bold text-white text-h5 position-absolute top-0 left-1">{{ rank }}</span>
+        </v-btn>
+        <v-btn v-else :style="{ backgroundColor: '#3F3F3F' }">
+          <span class="font-weight-bold text-white text-h5 position-absolute top-0 left-1">{{ rank }}</span>
+        </v-btn>
       </v-col>
     </v-row>
     <v-row>
