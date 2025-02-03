@@ -4,7 +4,7 @@
       <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer">
       </v-app-bar-nav-icon>
 
-      <v-app-bar-title class="font-weight-bold text-h5">
+      <v-app-bar-title class="font-weight-bold text-h5 text-white">
         和大DE話題-{{ title }}-
       </v-app-bar-title>
     </v-app-bar>
