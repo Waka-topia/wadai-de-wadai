@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-import ProfileCard from '@/components/MyPage/ProfileCard.vue';
+import ProfileCard from '@/components/UserRanking/ProfileCard.vue';
 import rankingService from '@/services/rankingService';
 import { onMounted, ref } from 'vue';
 
