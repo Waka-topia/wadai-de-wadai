@@ -11,7 +11,7 @@
 import DegreesList from '@/components/MyPage/DegreesList.vue';
 import EditForm from '@/components/EditForm/EditForm.vue';
 import ProfileCard from '@/components/MyPage/ProfileCard.vue';
-import StampsList from '@/components/StampsList.vue';
+import StampsList from '@/components/MyPage/StampsList.vue';
 import TabsBar from '@/components/MyPage/TabsBar.vue';
 import { mapActions, mapState } from "vuex";
 

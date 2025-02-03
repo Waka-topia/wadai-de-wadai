@@ -12,8 +12,8 @@
       >
         <v-card elevation="0">
           <v-img :src="getImageUrl(stamp.imageUrl)" :alt="stamp.name" aspect-ratio="1"></v-img>
-          <v-card-title class="text-body-2">{{ stamp.name }}</v-card-title>
-          <v-card-subtitle>{{ stamp.description }}</v-card-subtitle>
+          <v-card-title class="text-body-2"><small>{{ stamp.name }}</small></v-card-title>
+          <v-card-text>{{ stamp.description }}</v-card-text>
         </v-card>
       </v-col>
     </v-row>
@@ -51,7 +51,7 @@ export default {
       }
     },
     getImageUrl(relativePath) {
-      return new URL(`../assets/${relativePath}`, import.meta.url).href;
+      return new URL(`../../assets/${relativePath}`, import.meta.url).href;
     },
   },
   async created() {
