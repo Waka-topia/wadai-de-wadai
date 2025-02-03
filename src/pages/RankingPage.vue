@@ -1,7 +1,8 @@
 <template>
   <div>
-    <v-btn @click="updateRanking" size="x-large" color="success"><v-icon>mdi-reload</v-icon></v-btn>
-    <RankingList />
+    <v-progress-linear color="success" v-if="isLoading" indeterminate=""></v-progress-linear>
+    <v-btn @click="updateRanking" size="large" color="success" icon="mdi-refresh" intermediate></v-btn>
+    <RankingList :key="renderKey" />
     <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="snackbar.timeout">
       {{ snackbar.text }}
     </v-snackbar>
@@ -19,15 +20,20 @@ const snackbar = ref({
   color: "",
   timeout: 3000,
 });
+const renderKey = ref(0);
+const isLoading = ref(false);
 
 const updateRanking = async () => {
   try {
+    isLoading.value = true;
     await rankingService.updateTop100();
+    renderKey.value += 1;
     snackbar.value = {
       show: true,
       text: "ランキングを更新しました。",
       color: "success",
     };
+    isLoading.value = false;
   } catch (error) {
     snackbar.value = {
       show: true,
