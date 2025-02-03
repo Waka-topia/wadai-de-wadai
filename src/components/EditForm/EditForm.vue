@@ -2,7 +2,7 @@
   <div class="pa-4 text-center">
     <v-dialog v-model:model-value="dialog" max-width="700">
       <template #activator="{ props: activatorProps }">
-        <v-btn class="text-none font-weight-regular" prepend-icon="mdi-account" color="primary" v-bind="activatorProps">
+        <v-btn class="text-white font-weight-bold" color="orange" v-bind="activatorProps" elevation="3" rounded>
           プロフィール編集
         </v-btn>
       </template>
