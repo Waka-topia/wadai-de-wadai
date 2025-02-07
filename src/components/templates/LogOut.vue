@@ -10,7 +10,15 @@
         </v-list-item>
       </p>
       <p v-else>
-        <v-btn size="large" elevation="0" @click="$router.push('/login')" block>ログイン</v-btn>
+        <v-list-item size="large" elevation="0" @click="$router.push('/login')" class="position-relative" block>
+          <v-icon>
+            mdi-login
+          </v-icon>
+          ログイン
+          <v-icon class="position-absolute right-0 mx-2">
+            mdi-chevron-right
+          </v-icon>
+        </v-list-item>
       </p>
       <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
     </template>
