@@ -10,12 +10,29 @@
       style="height: 70vh"
     ></vue-cal>
 
-    <!-- イベントフォームの表示・非表示を制御するボタン -->
-    <v-btn @click="toggleEventForm" v-if="!isModalVisible" class="show-form-btn font-weight-bold" color="orange text-white" elevation="15">
-      {{ isEventFormVisible ? "フォームを閉じる" : "団体向けフォーム" }}
-    </v-btn>
+    <v-dialog v-model:model-value="dialog" max-width="700">
+      <template #activator="{ props: activatorProps }">
+        <v-btn class="text-white font-weight-bold show-form-btn" color="orange" v-bind="activatorProps" elevation="15" rounded>
+          団体向けフォーム
+        </v-btn>
+      </template>
+      <v-card>
+        <v-card-title class="text-h5 font-weight-bold">
+          <v-icon class="mr-2" color="primary">mdi-calendar-clock-outline</v-icon>
+          新歓イベントの登録
+        </v-card-title>
 
-    <EventForm v-if="isEventFormVisible" @submit-event="submitEvent" />  <!-- イベントフォーム -->
+        <v-divider />
+        <EventForm @submit-event="submitEvent" />
+        <v-divider />
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn text @click="dialog = false">キャンセル</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <EventModal
       v-show="isModalVisible"
       :event="modalEvent"
@@ -44,6 +61,7 @@ export default {
   },
   data() {
     return {
+      dialog: false,
       events: [],
       isModalVisible: false,
       modalEvent: {},

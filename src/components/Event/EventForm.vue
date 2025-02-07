@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent="submitEvent" class="event-form">
+  <form @submit.prevent="submitEvent" class="px-2 mx-2">
     <div class="form-group">
       <label for="date">日付:</label>
       <input type="date" v-model="newEvent.date" required class="form-control" />
@@ -77,15 +77,6 @@ export default {
 </script>
 
 <style scoped>
-.event-form {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
 .form-group {
   margin-bottom: 20px;
 }
