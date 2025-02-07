@@ -9,7 +9,7 @@
           prepend-inner-icon="mdi-email-outline" class="mb-2" label="Email" placeholder="Enter your email"
           clearable></v-text-field>
 
-        <v-text-field v-model="password" :readonly="loading" :rules="[required]"
+        <v-text-field v-model="password" :readonly="loading" :rules="[required, passwordRule]"
           :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'" :type="visible ? 'text' : 'password'"
           prepend-inner-icon="mdi-lock-outline" label="Password" placeholder="Enter your password" clearable
           @click:append-inner="visible = !visible"></v-text-field>
@@ -27,7 +27,7 @@
       </v-btn>
     </v-card>
   </v-sheet>
-  <v-snackbar :v-model="snackbar.show" :color="snackbar.color" timeout="3000">
+  <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
     {{ snackbar.message }}
   </v-snackbar>
 </template>
@@ -60,6 +60,13 @@ export default {
       return true;
     },
 
+    passwordRule(value) {
+      if (value && value.length < 8) {
+        return 'パスワードは8文字以上で入力してください';
+      }
+      return true;
+    },
+
     async onSubmit() {
       try {
         await this.signup({ email: this.email, password: this.password, username: this.username });
@@ -69,7 +76,10 @@ export default {
           color: "success",
           message: "サインアップしました",
         };
-        this.$router.push("/login");
+
+        setTimeout(() => {
+          this.$router.push("/login");
+        }, 1000);
       } catch (error) {
         this.snackbar = {
           show: true,

@@ -25,7 +25,7 @@
         ログインせずに開始する
       </v-btn>
     </v-card>
-    <v-snackbar :v-model="snackbar.show" :color="snackbar.color" timeout="3000">
+    <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
       {{ snackbar.message }}
     </v-snackbar>
   </v-sheet>
@@ -62,12 +62,15 @@ export default {
       try {
         await this.login({ email: this.email, password: this.password });
 
-        this.$router.push("/");
         this.snackbar = {
           show: true,
           color: "success",
           message: "ログインしました",
         };
+        
+        setTimeout(() => {
+          this.$router.push("/");
+        }, 1000);
       } catch (error) {
         this.snackbar = {
           show: true,

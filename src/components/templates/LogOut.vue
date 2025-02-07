@@ -72,8 +72,11 @@ export default {
           color: "success",
           message: "ログアウトしました",
         };
-        this.$router.push("/login");
         isActive.value = false;
+
+        setTimeout(() => {
+          this.$router.push("/login");
+        }, 1000);
       } catch (error) {
         this.snackbar = {
           show: true,
