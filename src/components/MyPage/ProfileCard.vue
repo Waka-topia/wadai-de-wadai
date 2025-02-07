@@ -1,6 +1,6 @@
 <template>
   <v-divider></v-divider>
-  <v-card @click="navigateToProfile" class="mt-2" outlined hover elevation="0">
+  <v-card class="mt-2" outlined hover elevation="0">
     <v-row>
       <v-avatar size="140" class="mx-auto mt-7 mb-3">
         <v-img :src="image" alt="ユーザーのアイコン" class="rounded-circle"></v-img>
@@ -62,8 +62,4 @@ const props = defineProps({
     required: true
   }
 })
-
-const navigateToProfile = () => {
-  router.push(`/${props.name}`)
-}
 </script>
