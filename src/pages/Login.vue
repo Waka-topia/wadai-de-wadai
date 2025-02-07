@@ -3,11 +3,12 @@
     <v-card class="py-8">
       <v-form v-model="form" @submit.prevent="onSubmit">
         <v-text-field v-model="email" :readonly="loading" :rules="[required, emailDomainCheck]"
-          prepend-inner-icon="mdi-email-outline" class="mb-2" label="Email" clearable></v-text-field>
+          prepend-inner-icon="mdi-email-outline" class="mb-2" label="Email" placeholder="sample@gmail.com"
+          clearable></v-text-field>
 
         <v-text-field v-model="password" :readonly="loading" :rules="[required]"
           :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'" :type="visible ? 'text' : 'password'"
-          prepend-inner-icon="mdi-lock-outline" label="Password" placeholder="Enter your password" clearable
+          prepend-inner-icon="mdi-lock-outline" label="Password" placeholder="Xa4%j87d" clearable
           @click:append-inner="visible = !visible"></v-text-field>
 
         <br>
@@ -67,7 +68,7 @@ export default {
           color: "success",
           message: "ログインしました",
         };
-        
+
         setTimeout(() => {
           this.$router.push("/");
         }, 1000);

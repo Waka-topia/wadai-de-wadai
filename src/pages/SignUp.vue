@@ -4,15 +4,15 @@
       <v-form v-model="form" @submit.prevent="onSubmit">
 
         <v-text-field v-model="username" :readonly="loading" :rules="[required]" class="mb-2" label="Username"
-          placeholder="Enter your username" clearable />
+          placeholder="わかやん" clearable hint="本名は使用しないでください。" />
         <v-text-field v-model="email" :readonly="loading" :rules="[required, emailDomainCheck]"
-          prepend-inner-icon="mdi-email-outline" class="mb-2" label="Email" placeholder="Enter your email"
-          clearable></v-text-field>
+          prepend-inner-icon="mdi-email-outline" class="mb-2" label="Email" placeholder="sample@gmail.com"
+          clearable hint="架空のメールアドレスでも構いません。"></v-text-field>
 
         <v-text-field v-model="password" :readonly="loading" :rules="[required, passwordRule]"
           :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'" :type="visible ? 'text' : 'password'"
-          prepend-inner-icon="mdi-lock-outline" label="Password" placeholder="Enter your password" clearable
-          @click:append-inner="visible = !visible"></v-text-field>
+          prepend-inner-icon="mdi-lock-outline" label="Password" placeholder="Xa4%j87d" clearable
+          @click:append-inner="visible = !visible" hint="8文字以上にしてください。"></v-text-field>
 
         <br>
 
