@@ -3,8 +3,9 @@
     <vue-cal
       :events="events"
       :on-event-click="openEventModal"
-      :disable-views="['years', 'year']"
-      today-button
+      hide-view-selector
+      active-view="month"
+      :disable-views="['years', 'year', 'week', 'day']"
       locale="ja"
       class="vuecal"
       style="height: 70vh"
@@ -12,7 +13,11 @@
       @cell-focus="selectedDate = $event"
     ></vue-cal>
 
-    <EventSchedule :events="events" :selected-date="selectedDate" />
+    <EventSchedule 
+      :events="events" 
+      :selected-date="selectedDate" 
+      @open-modal="openEventModal" 
+    />
 
     <v-dialog v-model:model-value="dialog" max-width="700">
       <template #activator="{ props: activatorProps }">

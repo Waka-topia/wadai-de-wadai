@@ -4,7 +4,7 @@
     <div v-if="filteredEvents.length === 0" class="no-events">イベントはありません</div>
 
     <div v-else class="event-list">
-      <div v-for="event in filteredEvents" :key="event.eventId" class="event-card">
+      <div v-for="event in filteredEvents" :key="event.eventId" class="event-card" @click="openEventModal(event)">
         <div class="event-time">
           {{ formatTime(event.start) }} - {{ formatTime(event.end) }}
         </div>
@@ -25,42 +25,46 @@ export default {
       required: true
     },
     selectedDate: {
-      type: [String, Date], // String または Date オブジェクトを受け取れるようにする
-      required: true
+      type: [String, Date],
+      default: null
     }
   },
   computed: {
-    /**
-     * selectedDate を YYYY-MM-DD 形式に変換する（日本時間基準）
-     */
-    formattedSelectedDate() {
-      const date = new Date(this.selectedDate);
-      const formattedDate = date.toLocaleDateString("ja-JP", { year: "numeric", month: "2-digit", day: "2-digit" })
-        .replace(/\//g, "-"); // YYYY-MM-DD 形式に変換
-      return formattedDate;
+    effectiveSelectedDate() {
+      return this.selectedDate ? new Date(this.selectedDate) : new Date();
     },
-    /**
-     * 指定された selectedDate に一致するイベントをフィルタリングする
-     */
+    formattedSelectedDate() {
+      return this.effectiveSelectedDate.toLocaleDateString("ja-JP", { 
+        year: "numeric", 
+        month: "2-digit", 
+        day: "2-digit" 
+      }).replace(/\//g, "-");
+    },
     filteredEvents() {
       return this.events.filter(event => {
-        const eventDate = new Date(event.start).toLocaleDateString("ja-JP", { year: "numeric", month: "2-digit", day: "2-digit" })
-          .replace(/\//g, "-");
+        const eventDate = new Date(event.start).toLocaleDateString("ja-JP", { 
+          year: "numeric", 
+          month: "2-digit", 
+          day: "2-digit" 
+        }).replace(/\//g, "-");
         return eventDate === this.formattedSelectedDate;
       });
     }
   },
   methods: {
-    /**
-     * 指定された日時を "HH:MM" 形式の日本時間で表示する
-     */
     formatTime(dateString) {
       const date = new Date(dateString);
       return date.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" });
+    },
+    openEventModal(event) {
+      console.log("openEventModalCall", event);
+      this.$emit("open-modal", event);
     }
   }
 };
 </script>
+
+
 
 <style scoped>
 .event-schedule {
@@ -87,6 +91,15 @@ export default {
   gap: 10px;
 }
 
+/* .event-card {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border-radius: 8px;
+  background: #f8f8f8;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+} */
+
 .event-card {
   display: flex;
   align-items: center;
@@ -94,7 +107,15 @@ export default {
   border-radius: 8px;
   background: #f8f8f8;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  cursor: pointer; /* クリック可能であることを示す */
+  transition: background 0.3s ease, box-shadow 0.3s ease;
 }
+
+.event-card:hover {
+  background: #ececec; /* ホバー時に背景色を少し明るく */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* 影を強調 */
+}
+
 
 .event-time {
   font-size: 14px;
