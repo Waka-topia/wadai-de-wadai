@@ -40,6 +40,7 @@ function getImageUrl(relativePath) {
 async function fetchRankings() {
   try {
     const data = await rankingService.fetchTop100();
+    console.log(data);
     rankings.value = data;
   } catch (err) {
     errorMessages.value = 'ランキングの取得に失敗しました: ' + err.message;

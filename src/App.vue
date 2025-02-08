@@ -107,7 +107,7 @@ export default {
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Kaisei+Tokumin&display=swap');
 
-.vuecal__event {
+/* .vuecal__event {
   border: 1px solid #388e3c;
   color: #666;
   background-color: #f8f8f8cc;
@@ -118,7 +118,7 @@ export default {
   z-index: 1;
   transition: box-shadow .3s, left .3s, width .3s;
   overflow: hidden;
-}
+} */
 
 v-app-bar-title {
   font-family: 'Kaisei Tokumin', sans-serif;

@@ -8,6 +8,7 @@
       locale="ja"
       class="vuecal"
       style="height: 70vh"
+      :selected-date="selectedDate"
     ></vue-cal>
 
     <EventSchedule :events="events" />
@@ -203,4 +204,18 @@ export default {
 .show-form-btn:active {
   background-color: #388e3c;
 }
+
+.vuecal__event {
+  border: 1px solid #388e3c;
+  color: #666;
+  background-color: #f8f8f8cc;
+  position: relative;
+  box-sizing: border-box;
+  left: 0;
+  width: 100%;
+  z-index: 1;
+  transition: box-shadow .3s, left .3s, width .3s;
+  overflow: hidden;
+}
+
 </style>

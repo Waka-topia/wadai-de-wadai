@@ -116,7 +116,7 @@ export default {
     // 上位100人を保存
     for (let i = 0; i < Math.min(100, userStats.length); i++) {
       const user = userStats[i];
-      const documentId = String(i + 1); // ドキュメントIDを1〜100に設定
+      const documentId = String(i + 1).padStart(3, '0'); // ドキュメントIDを1〜100に設定
       await setDoc(doc(top100Ref, documentId), {
         rank: i + 1,
         userId: user.userId,
