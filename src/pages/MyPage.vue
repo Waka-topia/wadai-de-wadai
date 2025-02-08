@@ -43,7 +43,7 @@ export default {
         {
           displayName: user.displayName,
           status: status,
-          photoURL: user.photoURL || 'userIcon/defaultUser.png', // 相対パス
+          photoURL: user.photoURL,
           rank: this.rank || 0,
           count: this.count || 0,
         },
@@ -70,7 +70,11 @@ export default {
     },
     // 画像パスを相対パスに変換
     getImageUrl(relativePath) {
-      return new URL(`../assets/${relativePath}`, import.meta.url).href;
+      if (relativePath) {
+        return new URL(`../assets/${relativePath}`, import.meta.url).href;
+      } else {
+        return new URL('../assets/userIcon/defaultIcon.png', import.meta.url).href;
+      }
     },
   },
   watch: {
