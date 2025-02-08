@@ -31,18 +31,21 @@ export default {
   },
   computed: {
     /**
-     * selectedDate を YYYY-MM-DD 形式に変換する
+     * selectedDate を YYYY-MM-DD 形式に変換する（日本時間基準）
      */
     formattedSelectedDate() {
       const date = new Date(this.selectedDate);
-      return date.toISOString().split("T")[0]; // YYYY-MM-DD 形式
+      const formattedDate = date.toLocaleDateString("ja-JP", { year: "numeric", month: "2-digit", day: "2-digit" })
+        .replace(/\//g, "-"); // YYYY-MM-DD 形式に変換
+      return formattedDate;
     },
     /**
      * 指定された selectedDate に一致するイベントをフィルタリングする
      */
     filteredEvents() {
       return this.events.filter(event => {
-        const eventDate = new Date(event.start).toISOString().split("T")[0]; // YYYY-MM-DD 形式
+        const eventDate = new Date(event.start).toLocaleDateString("ja-JP", { year: "numeric", month: "2-digit", day: "2-digit" })
+          .replace(/\//g, "-");
         return eventDate === this.formattedSelectedDate;
       });
     }
