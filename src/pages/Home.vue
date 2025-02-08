@@ -1,22 +1,13 @@
 <template>
-  <div v-if="isAuthenticated" class="d-flex flex-column justify-center align-center my-10">
-    <p class="text-emphasis font-weight-bold">こんにちは、{{ displayName }} さん！</p>
-    <p class="text-center text-emphasis pb-6">\ <span class="font-weight-bold">和大DE話題</span>でみんなと新歓に行こう /</p>
-    <p class="text-center text-medium-emphasis pb-6">自分のプロフィールを作成し、<br />新歓に行くことでスタンプが貯められます</p>
-    <v-img :width="211" aspect-ratio="1/1" cover src="https://www.wakayama-u.ac.jp/_files/00488693/mark01.gif"></v-img>
-  </div>
+  <div class="mx-3 my-3 text-center">
+    <h1>Home Page</h1>
+    <p>ようこそ！このアプリで新歓スタンプラリーを楽しんでください。</p>
 
-  <div v-else>
-    <RecommendLogin />
+    <!-- ユーザー名がVuexに保存されている場合に表示 -->
+    <p v-if="isAuthenticated">こんにちは、{{ displayName }} さん！</p>
+    <p v-else>ログインしていないようです。ログインしてください。</p>
   </div>
 </template>
 
 <script setup>
-import RecommendLogin from '@/components/templates/RecommendLogin.vue';
-import { computed } from 'vue';
-import { useStore } from 'vuex';
-
-const store = useStore();
-const isAuthenticated = computed(() => store.getters['auth/isAuthenticated']);
-const displayName = computed(() => store.getters['auth/user'].displayName);
 </script>
