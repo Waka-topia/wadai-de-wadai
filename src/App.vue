@@ -26,7 +26,7 @@
           </v-icon>
           お問い合わせ
           <v-icon class="position-absolute right-0 mx-2">
-            mdi-chevron-right
+            mdi-open-in-new
           </v-icon>
         </v-list-item>
         <LogOutButton />
@@ -98,7 +98,7 @@ export default {
       this.$router.push('/titleshop');
     },
     gotoinquiry() {
-      this.$router.push('/inquiry');
+      window.location.href = 'https://docs.google.com/forms/d/e/1FAIpQLScqd9venqOBZYzIWlDr6EjfHaCTizqLamkFlJUMBXCJaRmHdg/viewform?usp=header';
     },
   }
 };
