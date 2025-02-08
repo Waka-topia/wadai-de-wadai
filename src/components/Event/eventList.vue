@@ -9,9 +9,10 @@
       class="vuecal"
       style="height: 70vh"
       :selected-date="selectedDate"
+      @cell-focus="selectedDate = $event"
     ></vue-cal>
 
-    <EventSchedule :events="events" />
+    <EventSchedule :events="events" :selected-date="selectedDate" />
 
     <v-dialog v-model:model-value="dialog" max-width="700">
       <template #activator="{ props: activatorProps }">
@@ -75,6 +76,7 @@ export default {
       password: "",     // 修正されたプロパティ
       isEventFormVisible: false,  // フォーム表示制御用の変数
       scrollControl: false,  // スクロール制御用の変数
+      selectedDate: null, // カレンダーで選択された日付
     };
   },
   computed: {

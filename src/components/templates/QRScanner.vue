@@ -5,8 +5,8 @@
     <!-- QRコードリーダー -->
     <qrcode-stream @detect="onDetect" @init="onInit" />
 
-    <!-- QRコードデータ表示 -->
-    <p v-if="scannedData">読み取ったデータ: {{ scannedData }}</p>
+    <!-- QRコードデータ表示 ここを消せば読み取った時のテキストが消える。-->
+    <!-- <p v-if="scannedData">読み取ったデータ: {{ scannedData }}</p> -->
 
     <!-- テスト用ボタン -->
     <!-- <button @click="simulateQRCodeScan">QRコードを読み取ったと仮定</button> -->
