@@ -15,6 +15,6 @@ const getImageUrl = (relativePath) => {
   if (relativePath) {
     return new URL(`../../assets/${relativePath}`, import.meta.url).href;
   }
-  return 'https://via.placeholder.com/120';
+  return new URL('../../assets/userIcon/defaultIcon.png', import.meta.url).href;
 }
 </script>
