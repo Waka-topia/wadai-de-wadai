@@ -1,17 +1,25 @@
 <template>
   <div class="profile-image">
-    <v-btn color="green" v-if="!isEditing" @click="startEditing">アイコンを変更</v-btn>
+    <div class="text-center pa-4">
+      <v-btn @click="dialog = true" icon="mdi-pencil">
+      </v-btn>
 
-    <!-- アイコン選択フォーム（編集モード時のみ表示） -->
-    <div v-if="isEditing">
-      <div class="icons">
-        <img v-for="(icon, index) in icons" :key="index" :src="getImageUrl(`userIcon/userIcon${index + 1}.png`)"
-          alt="アイコン" :class="{ 'selected': selectedIcon === index }" @click="selectIcon(index)" />
-      </div>
-
-      <p v-if="selectedIcon !== null">選択されたアイコン: {{ selectedIcon + 1 }}</p>
-
-      <v-btn color="green" @click="saveIcon">アイコンを保存</v-btn>
+      <v-bottom-sheet v-model="dialog" width="auto">
+        <v-card prepend-icon="mdi-pencil" title="アイコンを変更" class="font-weight-bold">
+          <template v-slot:actions>
+            <v-container>
+              <v-row>
+                <v-col v-for="(icon, index) in icons" :key="index" cols="4" class="d-flex justify-center">
+                  <v-img :src="getImageUrl(`userIcon/userIcon${index + 1}.png`)" :alt="'アイコン' + (index + 1)"
+                    :width="100" :height="100" cover aspect-ratio="1/1" :class="{ 'selected': selectedIcon === index }"
+                    @click="selectIcon(index)">
+                  </v-img>
+                </v-col>
+              </v-row>
+            </v-container>
+          </template>
+        </v-card>
+      </v-bottom-sheet>
     </div>
 
     <!-- スナックバー通知 -->
@@ -28,8 +36,8 @@ import { useStore } from 'vuex'
 const store = useStore()
 
 // リアクティブな状態の定義
+const dialog = ref(false)
 const selectedIcon = ref(null)
-const isEditing = ref(false)
 const icons = Array.from({ length: 8 }, (_, index) => `userIcon${index + 1}`)
 const isLoading = ref(false)
 const snackbar = ref({
@@ -44,6 +52,7 @@ const photoURL = computed(() => store.getters['auth/photoURL'])
 // メソッド
 const selectIcon = (index) => {
   selectedIcon.value = index
+  saveIcon()
 }
 
 const saveIcon = async () => {
@@ -57,7 +66,7 @@ const saveIcon = async () => {
         color: 'success',
         message: 'アイコンを保存しました'
       }
-      isEditing.value = false
+      dialog.value = false
     } else {
       snackbar.value = {
         show: true,
@@ -76,34 +85,7 @@ const saveIcon = async () => {
   }
 }
 
-const startEditing = () => {
-  isEditing.value = true
-}
-
 const getImageUrl = (relativePath) => {
   return new URL(`../../assets/${relativePath}`, import.meta.url).href
 }
 </script>
-
-<style scoped>
-.profile-image {
-  text-align: center;
-}
-
-.icons {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-
-.icons img {
-  width: 50px;
-  height: 50px;
-  cursor: pointer;
-  border-radius: 50%;
-}
-
-.icons img.selected {
-  border: 3px solid blue;
-}
-</style>
