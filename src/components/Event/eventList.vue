@@ -10,6 +10,8 @@
       style="height: 70vh"
     ></vue-cal>
 
+    <EventSchedule :events="events" />
+
     <v-dialog v-model:model-value="dialog" max-width="700">
       <template #activator="{ props: activatorProps }">
         <v-btn class="text-white font-weight-bold show-form-btn" color="orange" v-bind="activatorProps" elevation="15" rounded>
@@ -51,6 +53,7 @@ import { mapGetters } from "vuex";
 import { verifyOrganizerPassword, addEvent, getEvents, deleteEvent } from "@/services/eventService";
 import EventForm from "@/components/Event/EventForm.vue";
 import EventModal from "@/components/Event/EventModal.vue";
+import EventSchedule from "@/components/Event/EventSchedule.vue";
 import { or } from "firebase/firestore";
 
 export default {
@@ -58,6 +61,7 @@ export default {
     VueCal,
     EventForm,
     EventModal,
+    EventSchedule,
   },
   data() {
     return {
