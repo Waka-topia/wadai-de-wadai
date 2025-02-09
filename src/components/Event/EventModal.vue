@@ -63,8 +63,10 @@
 
         <v-divider class="mb-3"></v-divider>
 
-        <!-- 削除ボタン -->
-        <v-btn @click="toggleEditDeleteForm" color="error" block>削除フォーム</v-btn>
+        <!-- 削除フォーム呼び出しボタン -->
+        <!-- <v-btn @click="toggleEditDeleteForm" color="error" block>削除フォーム</v-btn> -->
+        <v-btn @click="toggleEditDeleteForm" color="grey" block class="subtle-btn">削除フォーム</v-btn>
+
 
         <!-- 編集・削除フォーム -->
         <EditDeleteForm
@@ -179,5 +181,16 @@ export default {
 
 .v-btn {
   margin-top: 20px;
+}
+
+.subtle-btn {
+  background-color: #dcdcdc; /* 薄い灰色 */
+  color: #333; /* ボタンの文字色を暗く */
+  box-shadow: none; /* 影をなくす */
+  border: 1px solid #bbb; /* 薄い枠線を追加 */
+}
+
+.subtle-btn:hover {
+  background-color: #ccc; /* ホバー時の色を少し濃く */
 }
 </style>
