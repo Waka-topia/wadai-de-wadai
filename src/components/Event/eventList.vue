@@ -2,7 +2,7 @@
   <div class="event-list">
     <vue-cal
       :events="events"
-      :on-event-click="openEventModal"
+      
       hide-view-selector
       active-view="month"
       :disable-views="['years', 'year', 'week', 'day']"
@@ -10,7 +10,8 @@
       class="vuecal"
       style="height: 70vh"
       :selected-date="selectedDate"
-      @cell-focus="selectedDate = $event"
+      @cell-click="selectedDate = $event"
+      
     ></vue-cal>
 
     <EventSchedule 
@@ -80,7 +81,6 @@ export default {
       organizerId: "",  // 修正されたプロパティ
       password: "",     // 修正されたプロパティ
       isEventFormVisible: false,  // フォーム表示制御用の変数
-      scrollControl: false,  // スクロール制御用の変数
       selectedDate: null, // カレンダーで選択された日付
     };
   },
