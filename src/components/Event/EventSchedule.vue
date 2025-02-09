@@ -1,6 +1,11 @@
 <template>
   <div class="event-schedule">
-    <h3 class="title">{{ formattedSelectedDate }} の新歓イベント</h3>
+    <div class="nav-buttons">
+      <button @click="changeDate(-1)" class="nav-btn">&#x3C;</button>
+      <h3 class="title">{{ formattedSelectedDate }} の新歓イベント</h3>
+      <button @click="changeDate(1)" class="nav-btn">&#x3E;</button>
+    </div>
+    
     <div v-if="filteredEvents.length === 0" class="no-events">イベントはありません</div>
 
     <div v-else class="event-list">
@@ -29,12 +34,14 @@ export default {
       default: null
     }
   },
+  data() {
+    return {
+      internalSelectedDate: this.selectedDate ? new Date(this.selectedDate) : new Date()
+    };
+  },
   computed: {
-    effectiveSelectedDate() {
-      return this.selectedDate ? new Date(this.selectedDate) : new Date();
-    },
     formattedSelectedDate() {
-      return this.effectiveSelectedDate.toLocaleDateString("ja-JP", { 
+      return this.internalSelectedDate.toLocaleDateString("ja-JP", { 
         year: "numeric", 
         month: "2-digit", 
         day: "2-digit" 
@@ -57,14 +64,22 @@ export default {
       return date.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" });
     },
     openEventModal(event) {
-      console.log("openEventModalCall", event);
       this.$emit("open-modal", event);
+    },
+    changeDate(days) {
+      const newDate = new Date(this.internalSelectedDate);
+      newDate.setDate(newDate.getDate() + days);
+      this.internalSelectedDate = newDate;
+      this.$emit("update:selectedDate", newDate.toISOString().split("T")[0]);
+    }
+  },
+  watch: {
+    selectedDate(newVal) {
+      this.internalSelectedDate = new Date(newVal);
     }
   }
 };
 </script>
-
-
 
 <style scoped>
 .event-schedule {
@@ -73,10 +88,30 @@ export default {
   border-radius: 12px;
 }
 
+.nav-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.nav-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.nav-btn:hover {
+  color: #ff9800;
+}
+
 .title {
   font-size: 18px;
   font-weight: bold;
-  margin-bottom: 10px;
+  text-align: center;
 }
 
 .no-events {
@@ -91,15 +126,6 @@ export default {
   gap: 10px;
 }
 
-/* .event-card {
-  display: flex;
-  align-items: center;
-  padding: 12px;
-  border-radius: 8px;
-  background: #f8f8f8;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-} */
-
 .event-card {
   display: flex;
   align-items: center;
@@ -107,15 +133,14 @@ export default {
   border-radius: 8px;
   background: #f8f8f8;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  cursor: pointer; /* クリック可能であることを示す */
+  cursor: pointer;
   transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 .event-card:hover {
-  background: #ececec; /* ホバー時に背景色を少し明るく */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* 影を強調 */
+  background: #ececec;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
-
 
 .event-time {
   font-size: 14px;
