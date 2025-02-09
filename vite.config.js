@@ -14,19 +14,19 @@ export default defineConfig({
       registerType: 'autoUpdate', // サービスワーカーの自動更新
       manifest: {
         name: '和大DE和大',
-        short_name: 'WDW',
-        description: 'A Progressive Web App built with Vite and Vue',
+        short_name: 'ワダダ',
+        description: '和大DE和大は、新入生が友達に自慢をするためのツールです',
         theme_color: '#FF9900',
         icons: [
           {
-            src: '/icons/icon-192x192.png',
+            src: '/icons/AppIcon192.jpg',
             sizes: '192x192',
-            type: 'image/png',
+            type: 'image/jpeg',// 拡張子に合わせる
           },
           {
-            src: '/icons/icon-512x512.png',
+            src: '/icons/AppIcon512.jpg',
             sizes: '512x512',
-            type: 'image/png',
+            type: 'image/jpeg',
           },
         ],
       },
