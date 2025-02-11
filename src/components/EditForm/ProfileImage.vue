@@ -9,10 +9,10 @@
           <template v-slot:actions>
             <v-container>
               <v-row>
-                <v-col v-for="(icon, index) in icons" :key="index" cols="4" class="d-flex justify-center">
+                <v-col v-for="(icon, index) in icons" :key="index" sm="4" md="3" lg="2" xl="1" class="d-flex justify-center">
                   <v-img :src="getImageUrl(`userIcon/userIcon${index + 1}.png`)" :alt="'アイコン' + (index + 1)"
-                    :width="100" :height="100" cover aspect-ratio="1/1" :class="{ 'selected': selectedIcon === index }"
-                    @click="selectIcon(index)">
+                    :width="100" :height="100" max-width="100" max-height="100" cover aspect-ratio="1/1" :class="{ 'selected': selectedIcon === index }"
+                    @click="selectIcon(index)" contain>
                   </v-img>
                 </v-col>
               </v-row>
