@@ -18,7 +18,7 @@ import { mapActions, mapState } from "vuex";
 export default {
   data() {
     return {
-      tabsName: ['スタンプ', '称号'],
+      tabsName: ['獲得したスタンプ', '獲得した称号'],
       userInfo: [],
       tabsComponent: [StampsList, DegreesList],
       rank: 0,
