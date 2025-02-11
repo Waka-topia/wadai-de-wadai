@@ -1,6 +1,6 @@
 <template>
   <v-divider></v-divider>
-  <v-card @click="navigateToProfile" class="my-2 pb-3" outlined hover elevation="0">
+  <v-card class="my-2 pb-3" outlined hover elevation="0">
     <div v-if="rank == 1" class="position-absolute top-0 left-0 w-25 h-auto ml-3 z-10">
       <v-img :src='getImageUrl("rankings/ribbon1.png")' alt="ランキングのアイコン" class="w-33 h-33">
         <div class="font-weight-bold text-white text-xs-subtitle-1 text-sm-h4 text-md-h3 text-center text-no-wrap">{{ rank }}</div>
