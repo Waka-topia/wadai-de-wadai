@@ -4,15 +4,15 @@
     <v-alert v-else-if="!isAuthenticated" text="ログインして下さい" title="warning" type="warning"></v-alert>
     <v-alert v-else-if="stampImages.length === 0" text="スタンプをまだ持っていません。" title="info" type="info"></v-alert>
     <v-alert v-else-if="isErrored" :text="errorMessages" title="エラー" type="error"></v-alert>
-    <v-row class="mt-1" v-else>
+    <v-row class="mt-1 mx-1" v-else>
       <v-col
         v-for="stamp in stampImages"
         :key="stamp.stampId"
         cols="6" sm="4" md="3"
       >
-        <v-card elevation="1" aspect-ratio="1">
+        <v-card elevation="0" class="border-md" aspect-ratio="1">
           <v-img :src="getImageUrl(stamp.imageUrl)" :alt="stamp.name" aspect-ratio="1"></v-img>
-          <v-card-title class="text-body-2 text-center"><small>{{ stamp.name }}</small></v-card-title>
+          <v-card-title class="font-weight-bold text-body-2 text-center"><small>{{ stamp.name }}</small></v-card-title>
           <v-card-text>{{ stamp.description }}</v-card-text>
         </v-card>
       </v-col>
