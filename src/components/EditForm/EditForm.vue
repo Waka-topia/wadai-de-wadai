@@ -35,6 +35,7 @@
           <v-row dense>
             <UserName />
             <UserAdress />
+            <UserId />
           </v-row>
 
           <div class="py-4 mt-5">
@@ -73,6 +74,7 @@ import ProfileImage from "@/components/EditForm/ProfileImage.vue";
 import { ref } from 'vue';
 import UserAdress from "./UserAdress.vue";
 import UserIcon from "./UserIcon.vue";
+import UserId from "./UserId.vue";
 import UserName from "./UserName.vue";
 
 const dialog = ref(false)
