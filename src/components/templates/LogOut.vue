@@ -20,7 +20,6 @@
           </v-icon>
         </v-list-item>
       </p>
-      <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
     </template>
 
     <template v-slot:default="{ isActive }">
