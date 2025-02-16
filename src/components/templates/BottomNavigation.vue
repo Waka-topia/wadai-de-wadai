@@ -10,10 +10,9 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
-// ナビゲーションのアイテムを配列で定義
 const navigationItems = [
   { path: "/eventcal", icon: "mdi-calendar-clock-outline", label: "新歓日程" },
   { path: "/reader", icon: "mdi-qrcode-scan", label: "読み取る" },
@@ -21,18 +20,21 @@ const navigationItems = [
   { path: "/mypage", icon: "mdi-account", label: "マイページ" }
 ];
 
-// 現在のルートを取得
 const route = useRoute();
+const selectedIndex = ref(0);
 
-// 現在のルートに基づいて選択インデックスを計算
-const selectedIndex = computed(() => {
-  return navigationItems.findIndex(item => item.path === route.path);
-});
+// ルート変更時に selectedIndex を更新
+watch(
+  () => route.path,
+  (newPath) => {
+    selectedIndex.value = navigationItems.findIndex(item => item.path === newPath);
+  },
+  { immediate: true } // 初回も実行
+);
 </script>
 
 <style scoped>
 .bottom-nav {
-  /* iPhoneのホームインジケーター対策 */
   padding-bottom: env(safe-area-inset-bottom);
 }
 </style>
