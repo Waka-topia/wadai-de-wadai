@@ -98,7 +98,7 @@ export default {
       this.$router.push('/titleshop');
     },
     gotoinquiry() {
-      window.location.href = 'https://docs.google.com/forms/d/e/1FAIpQLScqd9venqOBZYzIWlDr6EjfHaCTizqLamkFlJUMBXCJaRmHdg/viewform?usp=header';
+      window.open('https://docs.google.com/forms/d/e/1FAIpQLScqd9venqOBZYzIWlDr6EjfHaCTizqLamkFlJUMBXCJaRmHdg/viewform?usp=header', '_blank');
     },
   }
 };
