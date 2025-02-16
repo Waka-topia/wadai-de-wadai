@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-skelton-loader v-if="isLoading" :elevation="1" type="image" />
+    <v-skeleton-loader v-if="isLoading" :elevation="1" type="image" />
     <v-alert v-else-if="!isAuthenticated" text="ログインして下さい" title="warning" type="warning"></v-alert>
     <v-alert v-else-if="stampImages.length === 0" text="スタンプをまだ持っていません。" title="info" type="info"></v-alert>
     <v-alert v-else-if="isErrored" :text="errorMessages" title="エラー" type="error"></v-alert>
