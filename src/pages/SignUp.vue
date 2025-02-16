@@ -3,7 +3,7 @@
     <v-card class="py-8">
       <v-form v-model="form" @submit.prevent="onSubmit">
 
-        <v-text-field v-model="username" :readonly="loading" :rules="[required]" class="mb-2" label="Username"
+        <v-text-field v-model="username" :readonly="loading" :rules="[required, nameCheck]" class="mb-2" label="Username"
           placeholder="わかやん" clearable hint="本名は使用しないでください。" />
         <v-text-field v-model="email" :readonly="loading" :rules="[required, emailDomainCheck]"
           prepend-inner-icon="mdi-email-outline" class="mb-2" label="Email" placeholder="sample@gmail.com"
@@ -53,9 +53,18 @@ export default {
   methods: {
     ...mapActions("auth", ["signup"]),
 
+    nameCheck(value) {
+      if (value.length < 1) {
+        return 'ユーザー名は1文字以上で入力してください';
+      }
+      return true;
+    },
+
     emailDomainCheck(value) {
       if (value && value.endsWith('@wakayama-u.ac.jp')) {
         return 'このドメインは使用できません';
+      } else if (!value) {
+        return 'メールアドレスを入力してください';
       }
       return true;
     },
@@ -63,6 +72,8 @@ export default {
     passwordRule(value) {
       if (value && value.length < 8) {
         return 'パスワードは8文字以上で入力してください';
+      } else if (!value) {
+        return 'パスワードを入力してください';
       }
       return true;
     },
