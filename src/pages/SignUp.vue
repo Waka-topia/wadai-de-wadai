@@ -54,8 +54,8 @@ export default {
     ...mapActions("auth", ["signup"]),
 
     nameCheck(value) {
-      if (value.length < 1) {
-        return 'ユーザー名は1文字以上で入力してください';
+      if (!value) {
+        return 'ユーザー名を入力してください';
       }
       return true;
     },
