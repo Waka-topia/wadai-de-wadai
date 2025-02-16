@@ -33,6 +33,7 @@ export default {
   computed: {
     UserInfo() {
       const user = this.$store.getters['auth/user'];
+      if (!user) return [];
       return [
         {
           displayName: user.displayName,
