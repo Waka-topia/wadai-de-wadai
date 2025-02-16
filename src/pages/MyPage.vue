@@ -1,57 +1,54 @@
 <template>
   <div>
-    <ProfileCard v-for="(user, index) in UserInfo" :key="index" :name="user.displayName"
-      :image="getImageUrl(user.photoURL)" :count="user.count" />
+    <ProfileCard
+      v-for="(user, index) in userInfo"
+      :key="index"
+      :name="user.displayName"
+      :image="getImageUrl(user.photoURL)"
+      :count="user.count"
+    />
     <EditForm />
     <TabsBar :tabsName="tabsName" :tabsComponent="tabsComponent" />
   </div>
 </template>
 
-<script>
+<script setup>
+import { computed, ref, markRaw } from 'vue';
+import { useStore } from 'vuex';
+
 import DegreesList from '@/components/MyPage/DegreesList.vue';
 import EditForm from '@/components/EditForm/EditForm.vue';
 import ProfileCard from '@/components/MyPage/ProfileCard.vue';
 import StampsList from '@/components/MyPage/StampsList.vue';
 import TabsBar from '@/components/MyPage/TabsBar.vue';
-import { markRaw } from 'vue';
 
-export default {
-  data() {
-    return {
-      tabsName: ['獲得したスタンプ', '獲得した称号'],
-      tabsComponent: [markRaw(StampsList), markRaw(DegreesList)],
-      rank: 0,
-      count: 0,
-    };
-  },
-  name: "UserDashboard",
-  components: {
-    ProfileCard,
-    TabsBar,
-    EditForm
-  },
-  computed: {
-    UserInfo() {
-      const user = this.$store.getters['auth/user'];
-      if (!user) return [];
-      return [
-        {
-          displayName: user.displayName,
-          photoURL: user.photoURL,
-          count: this.count || 0,
-        },
-      ];
+const store = useStore();
+
+const tabsName = ref(['獲得したスタンプ', '獲得した称号']);
+const tabsComponent = ref([markRaw(StampsList), markRaw(DegreesList)]);
+
+// Vuexからスタンプリストを取得し、スタンプ数を計算
+const stampCount = computed(() => {
+  const stamps = store.getters['stamps/userStampImages']; // Vuexのgetterから取得
+  return stamps ? stamps.length : 0;
+});
+
+const userInfo = computed(() => {
+  const user = store.getters['auth/user'];
+  if (!user) return [];
+  return [
+    {
+      displayName: user.displayName,
+      photoURL: user.photoURL,
+      count: stampCount.value, // スタンプ数を設定
     },
-  },
-  methods: {
-    // 画像パスを相対パスに変換
-    getImageUrl(relativePath) {
-      if (relativePath) {
-        return new URL(`../assets/${relativePath}`, import.meta.url).href;
-      } else {
-        return new URL('../assets/userIcon/defaultIcon.png', import.meta.url).href;
-      }
-    },
-  },
+  ];
+});
+
+// 画像パスを相対パスに変換
+const getImageUrl = (relativePath) => {
+  return relativePath
+    ? new URL(`../assets/${relativePath}`, import.meta.url).href
+    : new URL('../assets/userIcon/defaultIcon.png', import.meta.url).href;
 };
 </script>
