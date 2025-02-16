@@ -9,7 +9,7 @@
 
       <v-card>
         <v-card-title class="text-h5 font-weight-bold">
-          <v-icon class="mr-2" color="primary">mdi-account</v-icon>
+          <v-icon class="mr-2" color="orange">mdi-account</v-icon>
           ユーザープロフィール
         </v-card-title>
 
@@ -24,7 +24,7 @@
           <div class="py-4">
             <v-row align="center">
               <v-col cols="auto">
-                <v-icon color="primary" large>mdi-information</v-icon>
+                <v-icon color="orange" large>mdi-information</v-icon>
               </v-col>
               <v-col>
                 <h3 class="text-h5 font-weight-bold">基本情報</h3>
@@ -41,7 +41,7 @@
           <div class="py-4 mt-5">
             <v-row align="center">
               <v-col cols="auto">
-                <v-icon color="primary" large>mdi-map-marker</v-icon>
+                <v-icon color="orange" large>mdi-map-marker</v-icon>
               </v-col>
               <v-col>
                 <h3 class="text-h5 font-weight-bold">次に行く新歓設定</h3>

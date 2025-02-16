@@ -3,7 +3,7 @@
     <v-card class="pa-3 elevation-1" outlined>
       <v-row align="center" justify="space-between">
         <v-col cols="auto">
-          <v-icon color="primary">mdi-email</v-icon>
+          <v-icon color="grey">mdi-email</v-icon>
         </v-col>
         <v-col>
           <div class="text-subtitle-1 font-weight-medium">メールアドレス</div>
