@@ -1,11 +1,10 @@
+// src/store/modules/users.js
 import { getPhotoURL } from "@/services/authService";
 import { getNextShinkan } from "@/services/nextShinkanService";
-import { getUserTitles } from "@/services/titleService";
 
 const state = () => ({
   userPhotoURLs: {},
   nextShinkanDetails: {},
-  userTitles: {},
 });
 
 const actions = {
@@ -29,16 +28,6 @@ const actions = {
       throw error;
     }
   },
-  async fetchUserTitles({ commit }, userId) {
-    try {
-      const titles = await getUserTitles(userId);
-      commit("setUserTitles", { userId, titles });
-      return titles;
-    } catch (error) {
-      console.error("Error fetching user titles:", error);
-      throw error;
-    }
-  },
 };
 
 const mutations = {
@@ -48,15 +37,11 @@ const mutations = {
   setNextShinkanDetails(state, { userId, nextShinkan }) {
     state.nextShinkanDetails[userId] = nextShinkan;
   },
-  setUserTitles(state, { userId, titles }) {
-    state.userTitles[userId] = titles;
-  },
 };
 
 const getters = {
   getUserPhotoURL: (state) => (userId) => state.userPhotoURLs[userId] || null,
   getNextShinkanDetails: (state) => (userId) => state.nextShinkanDetails[userId] || null,
-  getUserTitles: (state) => (userId) => state.userTitles[userId] || [],
 };
 
 export default {

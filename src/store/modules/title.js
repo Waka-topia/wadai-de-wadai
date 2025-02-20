@@ -1,32 +1,49 @@
 // src/store/modules/title.js
+
+import { getUserTitles as fetchUserTitlesFromService } from "@/services/titleService";
 import { getAllTitles, addTitleToUser } from "../../services/titleService";
 
-const state = {
+const state = () => ({
   titles: [], // Firestoreから取得したすべてのタイトル
-  userTitles: [], // ユーザーが獲得したタイトル
-};
+  userTitles: {}, // 各ユーザーの称号をオブジェクトの配列で保持
+});
 
 const getters = {
-  allTitles: state => state.titles,
-  userTitles: state => state.userTitles,
+  allTitles: (state) => state.titles,
+  getUserTitles: (state) => (userId) => state.userTitles[userId] || [],
 };
 
 const actions = {
-  // Firestoreからすべてのタイトルをフェッチするアクション
   async fetchAllTitles({ commit }) {
     try {
-      const titles = await getAllTitles();
+      const titles = await getAllTitles();  // 既存のgetAllTitlesを使用
       commit("setTitles", titles);
     } catch (error) {
       console.error("Error fetching titles:", error);
     }
   },
 
-  // ユーザーにタイトルを追加するアクション
+  async fetchUserTitles({ commit }, userId) {
+    try {
+      const titles = await fetchUserTitlesFromService(userId);  // fetchUserTitlesFromServiceに変更
+      const formattedTitles = titles.map(title => ({
+        id: title.id,
+        name: title.name,
+        description: title.description,
+        earnedAt: title.earnedAt,
+      }));
+      commit("setUserTitles", { userId, titles: formattedTitles });
+      return formattedTitles;
+    } catch (error) {
+      console.error("Error fetching user titles:", error);
+      throw error;
+    }
+  },
+
   async addTitleToUser({ commit }, { userID, titleID, titleData }) {
     try {
       await addTitleToUser(userID, titleID, titleData);
-      commit("addUserTitle", titleID);
+      commit("addUserTitle", { userID, titleID, titleData });
     } catch (error) {
       console.error("Error adding title:", error);
     }
@@ -34,15 +51,23 @@ const actions = {
 };
 
 const mutations = {
-  // タイトル一覧をステートに保存
   setTitles(state, titles) {
     state.titles = titles;
   },
 
-  // ユーザーのタイトル一覧をステートに追加
-  addUserTitle(state, titleID) {
-    if (!state.userTitles.includes(titleID)) {
-      state.userTitles.push(titleID);
+  setUserTitles(state, { userId, titles }) {
+    state.userTitles[userId] = titles;
+  },
+
+  addUserTitle(state, { userID, titleID, titleData }) {
+    if (!state.userTitles[userID]) {
+      state.userTitles[userID] = [];
+    }
+    if (!state.userTitles[userID].some(title => title.id === titleID)) {
+      state.userTitles[userID].push({
+        id: titleID,
+        ...titleData,
+      });
     }
   },
 };
