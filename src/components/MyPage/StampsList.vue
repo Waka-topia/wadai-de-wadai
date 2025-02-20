@@ -13,7 +13,7 @@
         <v-card elevation="0" class="border-md" aspect-ratio="1">
           <v-img :src="getImageUrl(stamp.imageUrl)" :alt="stamp.name" aspect-ratio="1"></v-img>
           <v-card-title class="font-weight-bold text-body-2 text-center"><small>{{ stamp.name }}</small></v-card-title>
-          <v-card-text>{{ stamp.description }}</v-card-text>
+          <!-- <v-card-text>{{ stamp.description }}</v-card-text> -->
         </v-card>
       </v-col>
     </v-row>

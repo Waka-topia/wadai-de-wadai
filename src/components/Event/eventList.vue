@@ -14,6 +14,16 @@
       
     ></vue-cal>
 
+    <v-btn 
+      class="text-white font-weight-bold set-today-btn" 
+      color="blue" 
+      elevation="" 
+      rounded 
+      @click="setToday">
+      <v-icon left>mdi-calendar-today</v-icon>
+      Today
+    </v-btn>
+
     <EventSchedule 
       :events="events" 
       :selected-date="selectedDate" 
@@ -184,6 +194,9 @@ export default {
         console.error("Error in handleDeleteEvent:", error);
         this.errorMessage = error.message;
       }
+    },
+    setToday() {
+      this.selectedDate = new Date().toISOString().split('T')[0]; // 今日の日付を設定
     },
   },
   mounted() {

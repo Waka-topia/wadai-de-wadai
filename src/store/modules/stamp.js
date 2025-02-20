@@ -19,45 +19,6 @@ const mutations = {
 };
 
 const actions = {
-  // QRコードスキャン後にスタンプを登録
-//   async addStamp({ commit, rootState }, { groupId, stampId }) {
-//     const userId = rootState.auth.userId; // ログイン中のユーザーID
-//     if (!userId) throw new Error("User is not logged in.");
-//     try {
-//       // Firestoreにスタンプを登録
-//       await addStampToUser(userId, groupId, stampId);
-//       // スタンプ情報をVuexストアに追加
-//       const newStamp = { stampId, groupId, timestamp: new Date().toISOString() };
-//       commit("ADD_STAMP", newStamp);
-//     } catch (error) {
-//       console.error("Failed to add stamp: ", error);
-//     }
-//   },
-
-    // async addStamp({ commit, rootState }, { groupId, stampId }) {
-    //     const userId = rootState.auth.userId; // ログイン中のユーザーID
-    //     if (!userId) throw new Error("User is not logged in.");
-    //     try {
-    //     // Firestoreにスタンプを登録
-    //     const result = await addStampToUser(userId, groupId, stampId);
-
-    //     if (result.exists) {
-    //         // すでに存在する場合
-    //         console.warn("スタンプはすでに存在します:", stampId);
-    //         return { message: "このスタンプは既に取得済みです。" };
-    //     }
-
-    //     // スタンプ情報をVuexストアに追加
-    //     const newStamp = { stampId, groupId, timestamp: new Date().toISOString() };
-    //     commit("ADD_STAMP", newStamp);
-
-    //     return { message: "スタンプが正常に追加されました。" };
-    //     } catch (error) {
-    //     console.error("Failed to add stamp: ", error);
-    //     throw new Error("スタンプの追加中にエラーが発生しました。");
-    //     }
-    // },
-
     async addStamp({ commit, rootState }, { groupId, stampId }) {
       const userId = rootState.auth.userId; // ログイン中のユーザーID
       const displayName = rootState.auth.user?.displayName; // ログイン中のユーザー名
