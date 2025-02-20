@@ -8,7 +8,7 @@ import TitleShop from "@/pages/TitleShop.vue";
 import { createRouter, createWebHistory } from "vue-router";
 import Login from "../pages/Login.vue";
 import SignUp from "../pages/SignUp.vue";
-import Rule from "../pages/rule.vue";
+import Rule from "../pages/RulePage.vue";
 
 const routes = [
   { path: "/", name: "Home", component: Home },
