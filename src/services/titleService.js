@@ -80,3 +80,21 @@ export async function addTitleToUser(userID, titleID, titleData) {
     throw error;
   }
 }
+
+export async function getUserTitles(userID) {
+  if (!userID || typeof userID !== "string") {
+    throw new Error("Invalid userID");
+  }
+
+  const userTitlesCollectionRef = collection(db, `users/${userID}/titles`);
+  try {
+    const querySnapshot = await getDocs(userTitlesCollectionRef);
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+  } catch (error) {
+    console.error("ユーザーの称号取得中にエラーが発生しました:", error);
+    throw error;
+  }
+}
