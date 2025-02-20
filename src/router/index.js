@@ -8,6 +8,7 @@ import TitleShop from "@/pages/TitleShop.vue";
 import { createRouter, createWebHistory } from "vue-router";
 import Login from "../pages/Login.vue";
 import SignUp from "../pages/SignUp.vue";
+import Rule from "../pages/rule.vue";
 
 const routes = [
   { path: "/", name: "Home", component: Home },
@@ -19,7 +20,8 @@ const routes = [
   { path: "/testpage", name: "testpage", component: testpage },
   { path: "/eventcal", name: "EventCal", component: EventCal },
   { path: "/titleshop", name: "TitleShop", component: TitleShop },
-  { path: "/inquiry", name: "InquiryPage", component: InquiryPage }
+  { path: "/inquiry", name: "InquiryPage", component: InquiryPage },
+  {path: "/rule", name: "Rule", component: Rule}
 ];
 
 const router = createRouter({

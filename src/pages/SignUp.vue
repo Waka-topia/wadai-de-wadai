@@ -13,9 +13,13 @@
           prepend-inner-icon="mdi-lock-outline" label="Password" placeholder="Xa4%j87d" clearable
           @click:append-inner="visible = !visible" hint="8文字以上にしてください。"></v-text-field>
 
+        <v-btn @click="openRules" text color="primary">利用規約を確認</v-btn> <!-- モーダルを表示するボタン -->
+
+        <v-checkbox v-model="agree" :rules="[requiredAgree]" label="利用規約に同意する" />
+
         <br>
 
-        <v-btn :disabled="!form" :loading="isLoading" color="primary" size="large" type="submit" variant="elevated"
+        <v-btn :disabled="!form || !agree" :loading="isLoading" color="primary" size="large" type="submit" variant="elevated"
           block>
           Sign Up
         </v-btn>
@@ -30,19 +34,36 @@
   <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
     {{ snackbar.message }}
   </v-snackbar>
+
+  <!-- モーダル（Rule.vue） -->
+  <v-dialog v-model="dialog" max-width="600px">
+    <v-card>
+      <v-card-text>
+        <rule-component />
+      </v-card-text>
+      <v-card-actions>
+        <v-btn color="primary" @click="dialog = false">閉じる</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script>
 import { mapActions } from "vuex";
+import RuleComponent from "@/components/Rule.vue"; // Rule.vue をインポート
 
 export default {
   name: "UserSignup",
+  components: {
+    RuleComponent, // Rule.vue コンポーネントを登録
+  },
   data() {
     return {
       username: "",
       email: "",
       password: "",
       visible: false,
+      agree: false,  // チェックボックス用のデータ
       snackbar: {
         show: false,
         color: "",
@@ -50,6 +71,7 @@ export default {
       },
       form: false,
       isLoading: false,
+      dialog: false, // モーダルの表示状態
     };
   },
   methods: {
@@ -57,6 +79,10 @@ export default {
 
     required(value) {
       return !!value || 'このフィールドは必須です。';
+    },
+
+    requiredAgree(value) {
+      return value || '利用規約に同意する必要があります。';
     },
 
     nameCheck(value) {
@@ -80,9 +106,22 @@ export default {
       return true;
     },
 
+    openRules() {
+      this.dialog = true; // モーダルを開く
+    },
+
     async onSubmit() {
+      if (!this.agree) {
+        this.snackbar = {
+          show: true,
+          color: "error",
+          message: "利用規約に同意する必要があります。",
+        };
+        return;
+      }
+
       try {
-        this.isLoading = true
+        this.isLoading = true;
         await this.signup({ email: this.email, password: this.password, username: this.username });
 
         this.snackbar = {
@@ -113,9 +152,10 @@ export default {
           message: `サインアップに失敗しました。メールアドレスまたはパスワードをご確認ください。${error.message}`,
         };
       } finally {
-        this.isLoading = false
+        this.isLoading = false;
       }
     },
+
     onLogIn() {
       this.$router.push("/login");
     },

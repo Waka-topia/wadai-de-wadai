@@ -29,6 +29,12 @@
             mdi-open-in-new
           </v-icon>
         </v-list-item>
+        <v-list-item size="large" @click="gotorule" class="position-relative my-1" block>
+          <v-icon>
+            mdi-information-outline
+          </v-icon>
+          利用規約
+        </v-list-item>
         <LogOutButton />
       </v-list>
     </v-navigation-drawer>
@@ -85,6 +91,7 @@ export default {
         '/eventcal': '新歓日程',
         '/titleshop': '称号ショップ',
         '/inquiry': 'お問い合わせ',
+        '/rule': '利用規約',
       };
       this.title = routeTitleMap[route.path];
     },
@@ -99,6 +106,9 @@ export default {
     },
     gotoinquiry() {
       window.open('https://docs.google.com/forms/d/e/1FAIpQLScqd9venqOBZYzIWlDr6EjfHaCTizqLamkFlJUMBXCJaRmHdg/viewform?usp=header', '_blank');
+    },
+    gotorule() {
+      this.$router.push('/rule');
     },
   }
 };
