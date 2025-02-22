@@ -5,18 +5,32 @@
       <h3 class="title">{{ formattedSelectedDate }} の新歓イベント</h3>
       <button @click="changeDate(1)" class="nav-btn">&#x3E;</button>
     </div>
-    
+
     <div v-if="filteredEvents.length === 0" class="no-events">イベントはありません</div>
 
-    <div v-else class="event-list">
-      <div v-for="event in filteredEvents" :key="event.eventId" class="event-card" @click="openEventModal(event)">
-        <div class="event-time">
-          {{ formatTime(event.start) }} - {{ formatTime(event.end) }}
-        </div>
-        <div class="event-details">
-          <h4 class="event-title">{{ event.title }}</h4>
-          <p class="event-location">📍 {{ event.location }}</p>
-        </div>
+    <div v-else class="d-flex flex-column ga-2">
+      <div v-for="event in filteredEvents" :key="event.eventId" class="border-md rounded-lg" @click="openEventModal(event)">
+        <v-row class="py-4">
+          <v-col cols="3" class="text-center justify-center align-center font-weight-bold text-body-2">
+            <div >
+              {{ formatTime(event.start) }}
+            </div>
+            <div>
+              〜
+            </div>
+            <div>
+              {{ formatTime(event.end) }}
+            </div>
+          </v-col>
+            <v-divider vertical></v-divider>
+          <v-col cols="9">
+            <div>
+              <p class="text-h6 font-weight-bold">{{ event.title }}</p>
+              <p class="text-caption font-weight-bold text-grey-lighten-2 text-truncate">{{ event.description }}</p>
+              <p class="text-body-2 font-weight-bold text-orange"><v-icon color="orange">mdi-map-marker</v-icon>{{ event.location }}</p>
+            </div>
+          </v-col>
+        </v-row>
       </div>
     </div>
   </div>
@@ -41,18 +55,18 @@ export default {
   },
   computed: {
     formattedSelectedDate() {
-      return this.internalSelectedDate.toLocaleDateString("ja-JP", { 
-        year: "numeric", 
-        month: "2-digit", 
-        day: "2-digit" 
+      return this.internalSelectedDate.toLocaleDateString("ja-JP", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
       }).replace(/\//g, "-");
     },
     filteredEvents() {
       return this.events.filter(event => {
-        const eventDate = new Date(event.start).toLocaleDateString("ja-JP", { 
-          year: "numeric", 
-          month: "2-digit", 
-          day: "2-digit" 
+        const eventDate = new Date(event.start).toLocaleDateString("ja-JP", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit"
         }).replace(/\//g, "-");
         return eventDate === this.formattedSelectedDate;
       });
@@ -118,48 +132,5 @@ export default {
   text-align: center;
   color: #888;
   font-size: 14px;
-}
-
-.event-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.event-card {
-  display: flex;
-  align-items: center;
-  padding: 12px;
-  border-radius: 8px;
-  background: #f8f8f8;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-  transition: background 0.3s ease, box-shadow 0.3s ease;
-}
-
-.event-card:hover {
-  background: #ececec;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-.event-time {
-  font-size: 14px;
-  font-weight: bold;
-  color: #ff9800;
-  margin-right: 10px;
-}
-
-.event-details {
-  flex: 1;
-}
-
-.event-title {
-  font-size: 16px;
-  font-weight: bold;
-}
-
-.event-location {
-  font-size: 14px;
-  color: #666;
 }
 </style>
