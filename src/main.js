@@ -4,6 +4,7 @@ import App from './App.vue';
 import './registerServiceWorker';
 import router from './router';
 import authService from './services/authService';
+import { getNextShinkan } from './services/nextShinkanService';
 import store from './store';
 
 const app = createApp(App);
@@ -22,6 +23,8 @@ authService.onAuthStateChanged(async (user) => {
     store.commit('auth/setUser', user);
     store.commit('auth/setIdToken', idToken);
     store.commit('auth/setUserId', user.uid);
+    const nextShinkan = await getNextShinkan(user.uid);
+    store.commit('shinkan/setNextShinkan', nextShinkan);
     console.log('User authenticated:', user);
   } else {
     store.commit('auth/clearAuthState');
