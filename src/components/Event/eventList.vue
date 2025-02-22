@@ -2,7 +2,7 @@
   <div class="event-list">
     <vue-cal
       :events="events"
-      
+
       hide-view-selector
       active-view="month"
       :disable-views="['years', 'year', 'week', 'day']"
@@ -11,23 +11,24 @@
       style="height: 70vh"
       :selected-date="selectedDate"
       @cell-click="selectedDate = $event"
-      
+
     ></vue-cal>
 
-    <v-btn 
-      class="text-white font-weight-bold set-today-btn" 
-      color="blue" 
-      elevation="" 
-      rounded 
+    <v-divider class="my-5"></v-divider>
+
+    <v-btn
+      class="font-weight-bold set-today-btn"
+      variant="outlined"
+      rounded
       @click="setToday">
       <v-icon left>mdi-calendar-today</v-icon>
-      Today
+      今日の新歓イベント
     </v-btn>
 
-    <EventSchedule 
-      :events="events" 
-      :selected-date="selectedDate" 
-      @open-modal="openEventModal" 
+    <EventSchedule
+      :events="events"
+      :selected-date="selectedDate"
+      @open-modal="openEventModal"
     />
 
     <v-dialog v-model:model-value="dialog" max-width="700">
