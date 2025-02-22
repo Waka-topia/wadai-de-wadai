@@ -34,6 +34,9 @@
             mdi-information-outline
           </v-icon>
           利用規約
+          <v-icon class="position-absolute right-0 mx-2">
+            mdi-chevron-right
+          </v-icon>
         </v-list-item>
         <LogOutButton />
       </v-list>
