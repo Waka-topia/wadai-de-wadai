@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="isAuthenticated" class="d-flex flex-column justify-center align-center my-10">
     <ProfileCard
       v-for="(user, index) in userInfo"
       :key="index"
@@ -10,6 +10,9 @@
     <EditForm />
     <TabsBar :tabsName="tabsName" :tabsComponent="tabsComponent" />
   </div>
+  <div v-else>
+    <RecommendLogin />
+  </div>
 </template>
 
 <script setup>
@@ -19,6 +22,7 @@ import { useStore } from 'vuex';
 import DegreesList from '@/components/MyPage/DegreesList.vue';
 import EditForm from '@/components/EditForm/EditForm.vue';
 import ProfileCard from '@/components/MyPage/ProfileCard.vue';
+import RecommendLogin from '@/components/templates/RecommendLogin.vue';
 import StampsList from '@/components/MyPage/StampsList.vue';
 import TabsBar from '@/components/MyPage/TabsBar.vue';
 
@@ -26,6 +30,8 @@ const store = useStore();
 
 const tabsName = ref(['獲得したスタンプ', '獲得した称号']);
 const tabsComponent = ref([markRaw(StampsList), markRaw(DegreesList)]);
+
+const isAuthenticated = computed(() => store.getters['auth/isAuthenticated']);
 
 // Vuexからスタンプリストを取得し、スタンプ数を計算
 const stampCount = computed(() => {
