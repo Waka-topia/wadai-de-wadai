@@ -2,7 +2,7 @@
   <form @submit.prevent="submitEvent" class="px-2 mx-2">
     <div class="form-group">
       <label for="date">日付:</label>
-      <input type="date" v-model="newEvent.date" required class="form-control" />
+      <input type="date" v-model="newEvent.date" required class="form-control" min="2025-04-01" max="2025-05-31" />
     </div>
     <div class="form-group">
       <label for="start-time">開始時刻:</label>

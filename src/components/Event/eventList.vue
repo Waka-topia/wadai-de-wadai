@@ -11,7 +11,8 @@
       style="height: 70vh"
       :selected-date="selectedDate"
       @cell-click="selectedDate = $event"
-
+      :min-date = "minDate" 
+      :max-date = "maxDate"
     ></vue-cal>
 
     <v-divider class="my-5"></v-divider>
@@ -93,6 +94,8 @@ export default {
       password: "",     // 修正されたプロパティ
       isEventFormVisible: false,  // フォーム表示制御用の変数
       selectedDate: null, // カレンダーで選択された日付
+      minDate: new Date('2025-04-01'),  // 2025年4月1日
+      maxDate: new Date('2025-05-31')   // 2025年5月31日
     };
   },
   computed: {
