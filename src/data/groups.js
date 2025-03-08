@@ -53,7 +53,7 @@ export const allGroups = [
     {id:  49, name :"マンドリンクラブ", mainCategory: "club", subCategory: "culture"},
     {id:  50, name :"流行音楽倶楽部", mainCategory: "club", subCategory: "culture"},
     {id:  51, name :"絵画部", mainCategory: "club", subCategory: "culture"},
-    {id:  52, name :"文芸部v", mainCategory: "club", subCategory: "culture"},
+    {id:  52, name :"文芸部", mainCategory: "club", subCategory: "culture"},
     {id:  53, name :"STEP", mainCategory: "club", subCategory: "culture"},
     {id:  54, name :"mycom", mainCategory: "club", subCategory: "culture"},
     {id:  55, name :"プラットホーム", mainCategory: "club", subCategory: "culture"},
