@@ -48,7 +48,9 @@ export default {
   padding: 20px;
   background-color: #fff;
   height: auto;
-  flex-direction: column; /* 縦並びに変更 */
+  width: 100%;
+  max-width: 800px; /* コンテナの最大幅を設定 */
+  margin: 0 auto; /* 中央揃え */
 }
 
 .title-list {
@@ -56,13 +58,13 @@ export default {
   padding: 0;
   margin: 0;
   display: flex;
-  flex-direction: column; /* 縦に並べる */
-  align-items: center; /* 中央揃え */
+  flex-direction: column;
+  width: 100%; /* リストの幅を100%に */
 }
 
 .title-item {
-  width: 100%; /* 横幅を100%にして、縦に並ぶように調整 */
-  margin: 15px 0; /* 縦に間隔を空ける */
+  width: 100%;
+  margin: 15px 0;
   padding: 20px;
   background-color: #f4f7fa;
   border-radius: 10px;
@@ -75,21 +77,45 @@ export default {
 }
 
 .title-card {
-  text-align: left; /* 左詰めに変更 */
+  text-align: left;
+  width: 100%;
 }
 
 .title-name {
   font-size: 1.2em;
   font-weight: bold;
   color: #333;
-  margin-bottom: 5px; /* title-name と description の間にスペースを追加 */
+  margin-bottom: 10px;
+  word-break: break-word; /* 長い単語があっても折り返す */
 }
 
 .title-description {
   font-size: 1em;
   color: #666;
-  white-space: nowrap; /* 文字の折り返しを防ぐ */
-  overflow: hidden;
-  text-overflow: ellipsis; /* 長い文字がはみ出る場合は省略記号を表示 */
+  white-space: normal; /* 文字を折り返すように変更 */
+  overflow: visible; /* オーバーフローを表示するように変更 */
+  text-overflow: clip; /* 省略記号を削除 */
+  word-break: break-word; /* 長い単語があっても折り返す */
+  line-height: 1.5; /* 行間を適切に設定 */
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .title-container {
+    padding: 10px;
+  }
+  
+  .title-item {
+    padding: 15px;
+    margin: 10px 0;
+  }
+  
+  .title-name {
+    font-size: 1.1em;
+  }
+  
+  .title-description {
+    font-size: 0.9em;
+  }
 }
 </style>

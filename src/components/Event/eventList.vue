@@ -2,7 +2,6 @@
   <div class="event-list">
     <vue-cal
       :events="events"
-
       hide-view-selector
       active-view="month"
       :disable-views="['years', 'year', 'week', 'day']"
@@ -59,10 +58,13 @@
       v-show="isModalVisible"
       :event="modalEvent"
       @close-modal="closeModal"
-
       @delete-event="handleDeleteEvent"
     />
-    <!-- @toggle-edit-delete="toggleEditDeleteForm" -->
+
+    <!-- フィードバック用のスナックバー -->
+    <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
+      {{ snackbar.message }}
+    </v-snackbar>
   </div>
 </template>
 
@@ -95,7 +97,14 @@ export default {
       isEventFormVisible: false,  // フォーム表示制御用の変数
       selectedDate: null, // カレンダーで選択された日付
       minDate: new Date('2025-04-01'),  // 2025年4月1日
-      maxDate: new Date('2025-05-31')   // 2025年5月31日
+      maxDate: new Date('2025-05-31'),   // 2025年5月31日
+      // スナックバー関連の状態を追加
+      snackbar: {
+        show: false,
+        color: "",
+        message: "",
+      },
+      errorMessage: "" // エラーメッセージ保存用
     };
   },
   computed: {
@@ -118,13 +127,14 @@ export default {
         }));
       } catch (error) {
         console.error("イベントの取得に失敗しました:", error);
+        this.showSnackbar("error", `イベントの取得に失敗しました: ${error.message}`);
       }
     },
     async submitEvent(newEvent, organizerId, password) {
       try {
         const isPasswordValid = await verifyOrganizerPassword(organizerId, password);
         if (!isPasswordValid) {
-          alert("団体IDまたはパスワードが間違っています。");
+          this.showSnackbar("error", "団体IDまたはパスワードが間違っています。");
           return;
         }
         const eventData = {
@@ -138,9 +148,11 @@ export default {
         };
         await addEvent(eventData, organizerId);
         this.fetchEvents();
-        alert("イベントを登録しました。");
+        this.showSnackbar("success", "イベントを登録しました。");
+        this.dialog = false; // 登録後にダイアログを閉じる
       } catch (error) {
         console.error("イベントの登録に失敗しました:", error);
+        this.showSnackbar("error", `イベントの登録に失敗しました: ${error.message}`);
       }
     },
     openEventModal(event) {
@@ -157,14 +169,6 @@ export default {
     toggleEventForm() {
       this.isEventFormVisible = !this.isEventFormVisible;  // フォームの表示・非表示を切り替える
     },
-    // toggleEditDeleteForm() {
-    //   this.isEditDeleteFormVisible = !this.isEditDeleteFormVisible;
-    //   if (this.isEditDeleteFormVisible) {
-    //     // フォームを開くとき、選択されたイベントの organizerId を初期値に設定
-    //     this.DeleteFormOrganizerId = this.modalEvent.organizerId || "";  // 修正
-    //     this.DeleteFormPassword = "";  // 修正
-    //   }
-    // },
     async handleDeleteEvent(organizerId, password) {
       console.log("handleDeleteEvent started");
       console.log("modalEvent", this.modalEvent);
@@ -172,7 +176,7 @@ export default {
       try {
         if (!this.modalEvent.eventId) {
           console.warn("No eventId found, returning");
-          this.errorMessage = "削除対象のイベントが選択されていません。";
+          this.showSnackbar("error", "削除対象のイベントが選択されていません。");
           return;
         }
 
@@ -185,23 +189,34 @@ export default {
 
         if (!isPasswordValid) {
           console.warn("Invalid password, returning");
-          this.errorMessage = "団体IDまたはパスワードが間違っています。";
+          this.showSnackbar("error", "団体IDまたはパスワードが間違っています。");
           return;
         }
 
         console.log("deleteEvent", this.modalEvent.eventId);
         await deleteEvent(this.modalEvent.eventId, organizerId, password);
 
+        // 削除成功時にスナックバーで成功メッセージを表示
+        this.showSnackbar("success", "新歓イベントを削除しました");
+        
         this.fetchEvents();
         this.closeModal();
       } catch (error) {
         console.error("Error in handleDeleteEvent:", error);
-        this.errorMessage = error.message;
+        this.showSnackbar("error", `イベントの削除に失敗しました: ${error.message}`);
       }
     },
     setToday() {
       this.selectedDate = new Date().toISOString().split('T')[0]; // 今日の日付を設定
     },
+    // スナックバー表示用のヘルパーメソッドを追加
+    showSnackbar(color, message) {
+      this.snackbar = {
+        show: true,
+        color: color,
+        message: message
+      };
+    }
   },
   mounted() {
     this.fetchEvents();
