@@ -7,76 +7,76 @@
         <v-icon>mdi-close</v-icon>
       </v-btn>
 
-      <!-- イベントのタイトル -->
-      <v-card class="elevation-5 rounded-lg pa-5">
-        <v-card-title class="text-h5 font-weight-bold primary--text mb-2">{{
-          event.title
-        }}</v-card-title>
-        <v-divider class="mb-4"></v-divider>
+      <!-- イベント情報のコンテンツ (カードを使わない) -->
+      <div class="event-container">
+        <h2 class="event-title text-h5 font-weight-bold primary--text">
+          {{ event.title }}
+        </h2>
+        <div class="event-divider"></div>
 
         <!-- アイコンとラベルを使って情報表示 -->
-        <v-row class="mb-3">
-          <v-col cols="1" class="d-flex justify-center align-center">
+        <div class="info-row">
+          <div class="icon-wrapper">
             <v-icon color="primary">mdi-calendar</v-icon>
-          </v-col>
-          <v-col cols="11">
-            <span class="info-text"
-              ><strong>日付:</strong>
-              {{ event.start ? event.start.toLocaleDateString() : '日付情報がありません' }}</span
-            >
-          </v-col>
-        </v-row>
+          </div>
+          <div class="info-content">
+            <span class="info-text">
+              <strong>日付:</strong>
+              {{ event.start ? event.start.toLocaleDateString() : '日付情報がありません' }}
+            </span>
+          </div>
+        </div>
 
-        <v-row class="mb-3">
-          <v-col cols="1" class="d-flex justify-center align-center">
+        <div class="info-row">
+          <div class="icon-wrapper">
             <v-icon color="primary">mdi-clock</v-icon>
-          </v-col>
-          <v-col cols="11">
-            <span class="info-text"
-              ><strong>時間:</strong>
+          </div>
+          <div class="info-content">
+            <span class="info-text">
+              <strong>時間:</strong>
               {{
                 event.start
                   ? event.start.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })
                   : '時間情報がありません'
               }}
-              ～
+              <span class="time-separator">～</span>
               {{
                 event.end
                   ? event.end.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })
                   : '時間情報がありません'
               }}
             </span>
-          </v-col>
-        </v-row>
+          </div>
+        </div>
 
-        <v-row class="mb-3">
-          <v-col cols="1" class="d-flex justify-center align-center">
+        <div class="info-row">
+          <div class="icon-wrapper">
             <v-icon color="primary">mdi-map-marker</v-icon>
-          </v-col>
-          <v-col cols="11">
-            <span class="info-text"><strong>場所:</strong> {{ event.location }}</span>
-          </v-col>
-        </v-row>
+          </div>
+          <div class="info-content">
+            <span class="info-text"> <strong>場所:</strong> {{ event.location }} </span>
+          </div>
+        </div>
 
-        <v-row class="mb-3">
-          <v-col cols="1" class="d-flex justify-center align-center">
+        <div class="info-row">
+          <div class="icon-wrapper">
             <v-icon color="primary">mdi-information</v-icon>
-          </v-col>
-          <v-col cols="11">
-            <span class="info-text"><strong>概要:</strong> {{ event.description }}</span>
-          </v-col>
-        </v-row>
+          </div>
+          <div class="info-content">
+            <span class="info-text"> <strong>概要:</strong> {{ event.description }} </span>
+          </div>
+        </div>
 
-        <v-row class="mb-4">
-          <v-col cols="1" class="d-flex justify-center align-center">
+        <div class="info-row">
+          <div class="icon-wrapper">
             <v-icon color="primary">mdi-account</v-icon>
-          </v-col>
-          <v-col cols="11">
-            <span class="info-text"><strong>団体名:</strong> {{ event.organizerName }}</span>
-          </v-col>
-        </v-row>
+          </div>
+          <div class="info-content">
+            <span class="info-text"> <strong>団体名:</strong> {{ event.organizerName }} </span>
+          </div>
+        </div>
 
-        <v-divider class="mb-4"></v-divider>
+        <div class="event-divider"></div>
 
         <!-- 削除フォーム呼び出しボタン -->
         <v-btn
@@ -99,7 +99,7 @@
             @delete-event="handleDeleteEvent"
           />
         </div>
-      </v-card>
+      </div>
     </div>
   </div>
 </template>
@@ -177,21 +177,22 @@ export default {
 
 .modal-content {
   background-color: #fff;
-  padding: 30px;
-  border-radius: 12px;
-  max-width: 600px;
+  padding: 24px;
+  border-radius: 16px;
+  max-width: 550px;
   width: 90%;
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   transform: scale(1);
   transition: transform 0.3s ease;
+  position: relative;
 }
 
 .close-btn {
   position: absolute;
-  top: 15px;
-  right: 15px;
+  top: 12px;
+  right: 12px;
   z-index: 10;
   background-color: rgba(255, 255, 255, 0.9) !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -202,9 +203,55 @@ export default {
   transform: scale(1.05);
 }
 
-.v-card-title {
+.event-container {
+  padding: 0 8px;
+}
+
+.event-title {
+  margin-top: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  position: relative;
+  padding-left: 16px;
   border-left: 4px solid var(--v-primary-base);
-  padding-left: 12px;
+}
+
+.event-divider {
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0.05),
+    rgba(0, 0, 0, 0.1),
+    rgba(0, 0, 0, 0.05)
+  );
+  margin: 20px 0;
+}
+
+.info-row {
+  display: flex;
+  margin-bottom: 16px;
+  padding: 8px 4px;
+  transition: background-color 0.2s ease;
+  border-radius: 8px;
+}
+
+.info-row:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.icon-wrapper {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 16px;
+}
+
+.info-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
 }
 
 .info-text {
@@ -215,11 +262,17 @@ export default {
 .info-text strong {
   color: #424242;
   font-weight: 600;
-  margin-right: 4px;
+  margin-right: 8px;
+  display: inline-block;
 }
 
 .v-icon {
   font-size: 22px;
+}
+
+.time-separator {
+  margin: 0 6px;
+  color: var(--v-primary-base);
 }
 
 .delete-form-btn {
@@ -229,6 +282,7 @@ export default {
   text-transform: none;
   transition: all 0.3s ease;
   height: 48px;
+  margin-top: 8px;
 }
 
 .delete-form-btn:hover {
@@ -247,8 +301,17 @@ export default {
     font-size: 14px;
   }
 
-  .v-card-title {
+  .event-title {
     font-size: 1.2rem !important;
+  }
+
+  .info-row {
+    margin-bottom: 12px;
+  }
+
+  .icon-wrapper {
+    width: 28px;
+    margin-right: 12px;
   }
 }
 </style>
