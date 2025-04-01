@@ -1,5 +1,4 @@
 <template>
-  <v-divider></v-divider>
   <v-card class="mt-2" outlined hover elevation="0">
     <!-- アバター部分 -->
     <v-row>
@@ -7,12 +6,12 @@
         <v-img :src="image" alt="ユーザーのアイコン" class="rounded-circle"></v-img>
       </v-avatar>
     </v-row>
-    
+
     <!-- ユーザー名 -->
     <v-row class="mb-3">
-      <span class="font-weight-bold text-h4 mx-auto">{{ name }}</span>
+      <span class="font-weight-bold text-h4 mx-auto text-truncate">{{ name }}</span>
     </v-row>
-    
+
     <!-- スタンプとアイコン情報 -->
     <v-row justify="center" align="center" class="my-2">
       <!-- スタンプ情報 -->
@@ -25,12 +24,12 @@
           </div>
         </div>
       </v-col>
-      
+
       <!-- 区切り線 -->
       <v-col cols="auto" class="px-3">
         <v-divider vertical></v-divider>
       </v-col>
-      
+
       <!-- アイコン情報 -->
       <!-- <v-col cols="12" sm="5" class="pa-0">
         <div class="d-flex align-center justify-start">
@@ -42,30 +41,30 @@
         </div>
       </v-col> -->
     </v-row>
-    
+
     <v-spacer class="my-2"></v-spacer>
   </v-card>
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
-import { useRouter } from 'vue-router';
+import { defineProps } from 'vue'
+import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
 const props = defineProps({
   name: {
     type: String,
-    required: true
+    required: true,
   },
   image: {
     type: String,
-    required: true
+    required: true,
   },
   count: {
     type: Number,
-    required: true
-  }
+    required: true,
+  },
 })
 </script>
 
@@ -84,15 +83,15 @@ const props = defineProps({
   .v-row.justify-center {
     flex-direction: column;
   }
-  
+
   .v-divider.vertical {
     display: none;
   }
-  
+
   .v-col {
     margin-bottom: 8px;
   }
-  
+
   .d-flex.align-center.justify-end,
   .d-flex.align-center.justify-start {
     justify-content: center !important;
