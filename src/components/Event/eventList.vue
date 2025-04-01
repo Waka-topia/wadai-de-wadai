@@ -10,30 +10,28 @@
       style="height: 70vh"
       :selected-date="selectedDate"
       @cell-click="selectedDate = $event"
-      :min-date = "minDate" 
-      :max-date = "maxDate"
+      :min-date="minDate"
+      :max-date="maxDate"
     ></vue-cal>
 
     <v-divider class="my-5"></v-divider>
 
-    <v-btn
-      class="font-weight-bold set-today-btn"
-      variant="outlined"
-      rounded
-      @click="setToday">
+    <v-btn class="font-weight-bold set-today-btn" variant="outlined" rounded @click="setToday">
       <v-icon left>mdi-calendar-today</v-icon>
       今日の新歓イベント
     </v-btn>
 
-    <EventSchedule
-      :events="events"
-      :selected-date="selectedDate"
-      @open-modal="openEventModal"
-    />
+    <EventSchedule :events="events" :selected-date="selectedDate" @open-modal="openEventModal" />
 
     <v-dialog v-model:model-value="dialog" max-width="700">
       <template #activator="{ props: activatorProps }">
-        <v-btn class="text-white font-weight-bold show-form-btn" color="orange" v-bind="activatorProps" elevation="15" rounded>
+        <v-btn
+          class="text-white font-weight-bold show-form-btn"
+          color="orange"
+          v-bind="activatorProps"
+          elevation="15"
+          rounded
+        >
           団体向けフォーム
         </v-btn>
       </template>
@@ -69,14 +67,13 @@
 </template>
 
 <script>
-import VueCal from "vue-cal";
-import "vue-cal/dist/vuecal.css";
-import { mapGetters } from "vuex";
-import { verifyOrganizerPassword, addEvent, getEvents, deleteEvent } from "@/services/eventService";
-import EventForm from "@/components/Event/EventForm.vue";
-import EventModal from "@/components/Event/EventModal.vue";
-import EventSchedule from "@/components/Event/EventSchedule.vue";
-import { or } from "firebase/firestore";
+import VueCal from 'vue-cal'
+import 'vue-cal/dist/vuecal.css'
+import { mapGetters } from 'vuex'
+import { verifyOrganizerPassword, addEvent, getEvents, deleteEvent } from '@/services/eventService'
+import EventForm from '@/components/Event/EventForm.vue'
+import EventModal from '@/components/Event/EventModal.vue'
+import EventSchedule from '@/components/Event/EventSchedule.vue'
 
 export default {
   components: {
@@ -92,28 +89,28 @@ export default {
       isModalVisible: false,
       modalEvent: {},
       isEditDeleteFormVisible: false,
-      organizerId: "",  // 修正されたプロパティ
-      password: "",     // 修正されたプロパティ
-      isEventFormVisible: false,  // フォーム表示制御用の変数
+      organizerId: '', // 修正されたプロパティ
+      password: '', // 修正されたプロパティ
+      isEventFormVisible: false, // フォーム表示制御用の変数
       selectedDate: null, // カレンダーで選択された日付
-      minDate: new Date('2025-04-01'),  // 2025年4月1日
-      maxDate: new Date('2025-05-31'),   // 2025年5月31日
+      minDate: new Date('2025-04-01'), // 2025年4月1日
+      maxDate: new Date('2025-05-31'), // 2025年5月31日
       // スナックバー関連の状態を追加
       snackbar: {
         show: false,
-        color: "",
-        message: "",
+        color: '',
+        message: '',
       },
-      errorMessage: "" // エラーメッセージ保存用
-    };
+      errorMessage: '', // エラーメッセージ保存用
+    }
   },
   computed: {
-    ...mapGetters("event", ["allEvents"]),
+    ...mapGetters('event', ['allEvents']),
   },
   methods: {
     async fetchEvents() {
       try {
-        const events = await getEvents();
+        const events = await getEvents()
         this.events = events.map((event) => ({
           start: new Date(`${event.date}T${event.startTime}`),
           end: new Date(`${event.date}T${event.endTime}`),
@@ -124,18 +121,18 @@ export default {
           organizerName: event.organizerName,
           eventId: event.eventId,
           organizerId: event.organizerId,
-        }));
+        }))
       } catch (error) {
-        console.error("イベントの取得に失敗しました:", error);
-        this.showSnackbar("error", `イベントの取得に失敗しました: ${error.message}`);
+        console.error('イベントの取得に失敗しました:', error)
+        this.showSnackbar('error', `イベントの取得に失敗しました: ${error.message}`)
       }
     },
     async submitEvent(newEvent, organizerId, password) {
       try {
-        const isPasswordValid = await verifyOrganizerPassword(organizerId, password);
+        const isPasswordValid = await verifyOrganizerPassword(organizerId, password)
         if (!isPasswordValid) {
-          this.showSnackbar("error", "団体IDまたはパスワードが間違っています。");
-          return;
+          this.showSnackbar('error', '団体IDまたはパスワードが間違っています。')
+          return
         }
         const eventData = {
           date: newEvent.date,
@@ -145,85 +142,84 @@ export default {
           description: newEvent.description,
           organizerName: newEvent.organizerName,
           class: newEvent.class,
-        };
-        await addEvent(eventData, organizerId);
-        this.fetchEvents();
-        this.showSnackbar("success", "イベントを登録しました。");
-        this.dialog = false; // 登録後にダイアログを閉じる
+        }
+        await addEvent(eventData, organizerId)
+        this.fetchEvents()
+        this.showSnackbar('success', 'イベントを登録しました。')
+        this.dialog = false // 登録後にダイアログを閉じる
       } catch (error) {
-        console.error("イベントの登録に失敗しました:", error);
-        this.showSnackbar("error", `イベントの登録に失敗しました: ${error.message}`);
+        console.error('イベントの登録に失敗しました:', error)
+        this.showSnackbar('error', `イベントの登録に失敗しました: ${error.message}`)
       }
     },
     openEventModal(event) {
-      this.modalEvent = { ...event };
-      console.log("modalEvent", this.modalEvent);
-      this.isModalVisible = true;
-      this.scrollControl = true;
+      this.modalEvent = { ...event }
+      console.log('modalEvent', this.modalEvent)
+      this.isModalVisible = true
+      this.scrollControl = true
     },
     closeModal() {
-      this.isModalVisible = false;
-      this.modalEvent = {};
-      this.scrollControl = false;
+      this.isModalVisible = false
+      this.modalEvent = {}
+      this.scrollControl = false
     },
     toggleEventForm() {
-      this.isEventFormVisible = !this.isEventFormVisible;  // フォームの表示・非表示を切り替える
+      this.isEventFormVisible = !this.isEventFormVisible // フォームの表示・非表示を切り替える
     },
     async handleDeleteEvent(organizerId, password) {
-      console.log("handleDeleteEvent started");
-      console.log("modalEvent", this.modalEvent);
+      console.log('handleDeleteEvent started')
+      console.log('modalEvent', this.modalEvent)
 
       try {
         if (!this.modalEvent.eventId) {
-          console.warn("No eventId found, returning");
-          this.showSnackbar("error", "削除対象のイベントが選択されていません。");
-          return;
+          console.warn('No eventId found, returning')
+          this.showSnackbar('error', '削除対象のイベントが選択されていません。')
+          return
         }
 
-        console.log("organizerId", organizerId);
-        console.log("password", password);
+        console.log('organizerId', organizerId)
+        console.log('password', password)
 
-        console.log("Verifying password...");
-        const isPasswordValid = await verifyOrganizerPassword(organizerId, password);
-        console.log("verifyOrganizerPassword result:", isPasswordValid);
+        console.log('Verifying password...')
+        const isPasswordValid = await verifyOrganizerPassword(organizerId, password)
+        console.log('verifyOrganizerPassword result:', isPasswordValid)
 
         if (!isPasswordValid) {
-          console.warn("Invalid password, returning");
-          this.showSnackbar("error", "団体IDまたはパスワードが間違っています。");
-          return;
+          console.warn('Invalid password, returning')
+          this.showSnackbar('error', '団体IDまたはパスワードが間違っています。')
+          return
         }
 
-        console.log("deleteEvent", this.modalEvent.eventId);
-        await deleteEvent(this.modalEvent.eventId, organizerId, password);
+        console.log('deleteEvent', this.modalEvent.eventId)
+        await deleteEvent(this.modalEvent.eventId, organizerId, password)
 
         // 削除成功時にスナックバーで成功メッセージを表示
-        this.showSnackbar("success", "新歓イベントを削除しました");
-        
-        this.fetchEvents();
-        this.closeModal();
+        this.showSnackbar('success', '新歓イベントを削除しました')
+
+        this.fetchEvents()
+        this.closeModal()
       } catch (error) {
-        console.error("Error in handleDeleteEvent:", error);
-        this.showSnackbar("error", `イベントの削除に失敗しました: ${error.message}`);
+        console.error('Error in handleDeleteEvent:', error)
+        this.showSnackbar('error', `イベントの削除に失敗しました: ${error.message}`)
       }
     },
     setToday() {
-      this.selectedDate = new Date().toISOString().split('T')[0]; // 今日の日付を設定
+      this.selectedDate = new Date().toISOString().split('T')[0] // 今日の日付を設定
     },
     // スナックバー表示用のヘルパーメソッドを追加
     showSnackbar(color, message) {
       this.snackbar = {
         show: true,
         color: color,
-        message: message
-      };
-    }
+        message: message,
+      }
+    },
   },
   mounted() {
-    this.fetchEvents();
+    this.fetchEvents()
   },
-};
+}
 </script>
-
 
 <style>
 .event-list {
@@ -253,8 +249,10 @@ export default {
   left: 0;
   width: 100%;
   z-index: 1;
-  transition: box-shadow .3s, left .3s, width .3s;
+  transition:
+    box-shadow 0.3s,
+    left 0.3s,
+    width 0.3s;
   overflow: hidden;
 }
-
 </style>
