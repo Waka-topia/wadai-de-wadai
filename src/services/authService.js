@@ -1,61 +1,92 @@
-import {
-    signInWithEmailAndPassword,
-    createUserWithEmailAndPassword,
-    updateProfile,
-    signOut,  // signOut をインポート
-  } from "firebase/auth";
-  import { auth } from "../firebase/config";
-  import { onAuthStateChanged } from "firebase/auth";
-  
-  // ログイン処理
-  export const login = async (email, password) => {
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, onAuthStateChanged, signOut } from "firebase/auth";
+import { auth } from "../firebase/config";
+import { doc, setDoc, getDoc } from "firebase/firestore"; // Firestore の関数をインポート
+import { db } from "../firebase/config"; // Firestore インスタンスをインポート
+import store from "@/store";
+
+// Firestore から photoURL を取得する関数
+export async function getPhotoURL(userId) {
+  try {
+    // Firestore の正しいドキュメント参照を作成
+    const docRef = doc(db, `users/${userId}`);
+
+    // ドキュメントを取得
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      return data.photoURL || null; // photoURL を返す（存在しない場合は null）
+    } else {
+      console.log("No such document!");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error getting photo URL: ", error);
+    throw error;
+  }
+}
+
+export default {
+  onAuthStateChanged(callback) {
+    return onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const idToken = await user.getIdToken();
+        store.commit('auth/setUser', user);
+        store.commit('auth/setIdToken', idToken);
+        store.commit('auth/setUserId', user.uid);
+      } else {
+        store.commit('auth/clearAuthState');
+      }
+      if (callback) callback(user);
+    });
+  },
+
+  async login({ email, password }) {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      return userCredential.user; // 成功したユーザー情報を返す
+      return userCredential.user;
     } catch (error) {
-      console.error("Login Error:", error.message); // エラー内容をコンソールに表示
-      throw new Error("ログインに失敗しました。"); // ユーザー向けにエラーメッセージを変更
+      console.error("Login failed:", error);
+      throw error;
     }
-  };
-  
-  // サインアップ処理
-  export const signUp = async (email, password, displayName = "") => {
+  },
+
+  async signup({ email, password, username }) {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-  
-      // Firebaseのユーティリティ関数を使用してユーザー名を設定
-      if (displayName) {
-        await updateProfile(userCredential.user, { displayName });
-      }
-  
-      return userCredential.user; // 成功したユーザー情報を返す
+      const user = userCredential.user;
+      await updateProfile(user, { displayName: username });
+      return user;
     } catch (error) {
-      console.error("Sign Up Error:", error.message); // エラー内容をコンソールに表示
-      throw new Error("サインアップに失敗しました。"); // ユーザー向けにエラーメッセージを変更
+      console.error("Sign-up failed:", error);
+      throw error;
     }
-  };
-  
-  // 認証状態を監視する関数
-  export const observeAuthState = (callback) => {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        console.log("User logged in:", user); // ログインしたユーザー情報をログに表示
-        callback(user); // ユーザー情報をコールバック関数に渡す
-      } else {
-        console.log("No user logged in"); // ログインしていないことをログに表示
-        callback(null); // ログインしていない場合は null を渡す
-      }
-    });
-  };
-  
-  // ログアウト処理
-  export const logout = async () => {
+  },
+
+  async logout() {
     try {
-      await signOut(auth); // FirebaseのsignOut関数を使用してログアウト
-      console.log("ログアウトしました");
+      await signOut(auth);
     } catch (error) {
-      console.error("Logout Error:", error.message); // エラー内容をコンソールに表示
-      throw new Error("ログアウトに失敗しました。"); // ユーザー向けにエラーメッセージを変更
+      console.error("Logout failed:", error);
+      throw error;
     }
-  };
-  
+  },
+
+  // 画像URLの更新処理
+  async updatePhotoURL(user, photoURL) {
+    try {
+      // Firebase Authentication のプロフィール情報を更新
+      await updateProfile(user, { photoURL });
+
+      // Firestore の参照先を定義
+      const docRef = doc(db, `users/${user.uid}`);
+      // Firestore に photoURL を保存
+      await setDoc(docRef, { photoURL }, { merge: true });
+
+      console.log("User photo URL updated in Firestore and Authentication:", photoURL);
+    } catch (error) {
+      console.error("Error updating photo URL:", error);
+      throw error;
+    }
+  },
+};

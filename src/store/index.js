@@ -1,41 +1,33 @@
-// src/store/index.js
-import { createStore } from 'vuex';
-import { login, signUp } from '../services/authService';
-import { getStamps } from '../services/firestoreService';
-import auth from "./modules/auth"; // authモジュールをインポート
+//src/store/index.js
+import { createStore } from "vuex";
+import authModule from "./modules/auth";
+import stampModule from "./modules/stamp"; // スタンプモジュールをインポート
+import rankingModule from "./modules/ranking"; // ランキングモジュールをインポート
+import shinkanModule from "./modules/shinkan"; // 新歓モジュールをインポート
+import userModule from "./modules/user"; // ユーザーモジュールをインポート
+import titleModule from "./modules/title"; // タイトルモジュールをインポート
+import eventModule from "./modules/event"; // イベントモジュールをインポート
 
 export default createStore({
   state: {
-    user: null,
-    stamps: [],
+    // ストア全体の状態を記述（今回は空でも問題なし）
   },
   modules: {
-    auth, // authモジュールを登録
-  },
-  mutations: {
-    setUser(state, user) {
-      state.user = user;
+    auth: authModule,
+    stamps: {
+      namespaced: true, // 名前空間を有効にする
+      ...stampModule,
     },
-    setStamps(state, stamps) {
-      state.stamps = stamps;
+    users: {
+      namespaced: true, // 名前空間を有効にする
+      ...userModule,
     },
-  },
-  actions: {
-    async login({ commit }, { email, password }) {
-      const user = await login(email, password);
-      commit('setUser', user);
+    ranking: rankingModule, // ランキングモジュールを登録
+    shinkan: shinkanModule, // 新歓モジュールを登録
+    title: titleModule, // タイトルモジュールを登録
+    event: {
+      namespaced: true, // 名前空間を有効にする
+      ...eventModule, // イベントモジュールを登録
     },
-    async signUp({ commit }, { email, password }) {
-      const user = await signUp(email, password);
-      commit('setUser', user);
-    },
-    async fetchStamps({ commit }, userId) {
-      const stamps = await getStamps(userId);
-      commit('setStamps', stamps);
-    },
-  },
-  getters: {
-    user: (state) => state.user,
-    stamps: (state) => state.stamps,
   },
 });
