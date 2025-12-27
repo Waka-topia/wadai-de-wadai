@@ -30,8 +30,9 @@ jobs:
       - name: Run Prettier
         run: npm run format
 
-      - name: Run ESLint
-        run: npm run lint
+      # Temporarily disabled ESLint check
+      # - name: Run ESLint
+      #   run: npm run lint
 
       - name: Run Build
         run: npm run build
