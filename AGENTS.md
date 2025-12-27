@@ -25,6 +25,7 @@
 ### ✅ 変更前の必須チェック
 
 新しいコードを追加する前に:
+
 1. **`eslint.config.js`** を読んで、すべてのルールを理解する
 2. **`docs/coding-style.md`** を読んで、コーディング規約を確認
 3. **`docs/architecture.md`** を読んで、既存のパターンを把握
@@ -35,6 +36,7 @@
 ## コード生成プロトコル
 
 ### ステップ1: 調査フェーズ
+
 ```bash
 # 類似する既存コードを検索
 grep -r "関連キーワード" src/
@@ -47,16 +49,19 @@ ls src/components/
 ```
 
 ### ステップ2: 設計フェーズ
+
 - 既存のアーキテクチャパターンに従う
 - 新しいパターンを導入しない（既存のパターンで解決できる場合）
 - サービス層、コンポーネント層の責務を明確にする
 
 ### ステップ3: 実装フェーズ
+
 - ESLintルールに**完全準拠**したコードを生成
 - Prettierフォーマット規則を守る
 - JSDocコメントを記述する
 
 ### ステップ4: 検証フェーズ
+
 ```bash
 # Lint実行（必須）
 npm run lint
@@ -75,25 +80,28 @@ npm run build
 ## 命名規則（厳格）
 
 ### ファイル名
-| タイプ | 命名規則 | 例 |
-|--------|----------|-----|
-| Vueコンポーネント | PascalCase | `UserProfile.vue` |
-| JavaScript | camelCase | `userService.js` |
-| フォルダ（components配下） | kebab-case | `user-profile/` |
+
+| タイプ                     | 命名規則   | 例                |
+| -------------------------- | ---------- | ----------------- |
+| Vueコンポーネント          | PascalCase | `UserProfile.vue` |
+| JavaScript                 | camelCase  | `userService.js`  |
+| フォルダ（components配下） | kebab-case | `user-profile/`   |
 
 ### 変数・関数名
-| タイプ | 命名規則 | 例 |
-|--------|----------|-----|
-| 変数 | camelCase | `userName`, `isActive` |
-| 関数 | camelCase | `fetchUser`, `handleClick` |
-| 定数 | camelCase（UPPER_SNAKEではない） | `apiEndpoint` |
+
+| タイプ | 命名規則                         | 例                         |
+| ------ | -------------------------------- | -------------------------- |
+| 変数   | camelCase                        | `userName`, `isActive`     |
+| 関数   | camelCase                        | `fetchUser`, `handleClick` |
+| 定数   | camelCase（UPPER_SNAKEではない） | `apiEndpoint`              |
 
 ### Vue固有
-| タイプ | 命名規則 | 例 |
-|--------|----------|-----|
-| Props | camelCase | `userName`, `isLoading` |
-| Events | camelCase | `@userClick`, `@dataUpdate` |
-| コンポーネント（template内） | PascalCase | `<UserProfile />` |
+
+| タイプ                       | 命名規則   | 例                          |
+| ---------------------------- | ---------- | --------------------------- |
+| Props                        | camelCase  | `userName`, `isLoading`     |
+| Events                       | camelCase  | `@userClick`, `@dataUpdate` |
+| コンポーネント（template内） | PascalCase | `<UserProfile />`           |
 
 ---
 
@@ -102,6 +110,7 @@ npm run build
 ### JavaScript
 
 #### 関数定義
+
 ```javascript
 // ❌ 絶対NG
 function myFunction() {}
@@ -114,6 +123,7 @@ export const myFunction = (param) => {
 ```
 
 #### Export
+
 ```javascript
 // ❌ 絶対NG（Vueファイル以外）
 export default myFunction
@@ -124,15 +134,16 @@ export const myConfig = { ... }
 ```
 
 #### 禁止事項
+
 ```javascript
 // ❌ アンダースコア禁止
 const _privateVar = 'value'
 
 // ❌ セミコロン禁止（Prettierが削除）
-const value = 'test';
+const value = 'test'
 
 // ❌ ダブルクォート禁止
-const message = "Hello"
+const message = 'Hello'
 
 // ❌ スペースなしコメント禁止
 //コメント
@@ -141,17 +152,21 @@ const message = "Hello"
 ### Vue
 
 #### API スタイル
+
 ```vue
 <!-- ❌ 絶対NG: Options API -->
 <script>
 export default {
-  data() { return {} }
+  data() {
+    return {}
+  },
 }
 </script>
 
 <!-- ✅ 必須パターン: script setup -->
 <script setup>
 import { ref } from 'vue'
+
 const count = ref(0)
 </script>
 ```
@@ -233,6 +248,7 @@ src/
 ```javascript
 /**
  * ユーザー情報を取得する
+ *
  * @param {string} userId - ユーザーID
  * @returns {Promise<Object>} ユーザー情報
  */
@@ -284,15 +300,17 @@ npm run build
 ### よくあるLintエラー
 
 #### `import/no-default-export`
+
 ```javascript
 // ❌ NG
-export default function() {}
+export default function () {}
 
 // ✅ OK（Vueファイル以外）
 export const myFunction = () => {}
 ```
 
 #### `func-style`
+
 ```javascript
 // ❌ NG
 function myFunction() {}
@@ -302,6 +320,7 @@ const myFunction = () => {}
 ```
 
 #### `camelcase`
+
 ```javascript
 // ❌ NG
 const user_name = 'test'
@@ -311,6 +330,7 @@ const userName = 'test'
 ```
 
 #### `no-underscore-dangle`
+
 ```javascript
 // ❌ NG
 const _privateVar = 'value'
@@ -320,6 +340,7 @@ const privateVar = 'value'
 ```
 
 #### `vue/component-api-style`
+
 ```vue
 <!-- ❌ NG -->
 <script>
@@ -346,8 +367,8 @@ import { ref } from 'vue'
 // After: export const fetchUser = (userId, options) => {}  // 破壊的変更
 
 // ✅ 新しい関数を追加
-export const fetchUser = (id) => {}  // 既存を維持
-export const fetchUserWithOptions = (userId, options) => {}  // 新規追加
+export const fetchUser = (id) => {} // 既存を維持
+export const fetchUserWithOptions = (userId, options) => {} // 新規追加
 ```
 
 ### Vuexストアの変更
@@ -371,7 +392,7 @@ export const fetchUserWithOptions = (userId, options) => {}  // 新規追加
 const apiKey = import.meta.env.VITE_FIREBASE_API_KEY
 
 // ❌ NG: ハードコード
-const apiKey = 'AIza...'  // 絶対にコミットしない
+const apiKey = 'AIza...' // 絶対にコミットしない
 ```
 
 ---
@@ -393,6 +414,7 @@ const loadHeavyLib = async () => {
 ## テスト（将来的な拡張）
 
 現在テストフレームワークは未導入ですが、追加する場合:
+
 - **Vitest** を推奨（Viteとの互換性）
 - テストファイルは `*.spec.js` または `*.test.js`
 

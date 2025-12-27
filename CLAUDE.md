@@ -7,18 +7,22 @@
 ## 最重要原則
 
 ### 1. ESLint設定を絶対に守る
+
 - このプロジェクトは **厳格なESLint設定** を使用しています
 - コード生成時は `eslint.config.js` のルールに**完全に準拠**してください
 - 不明な場合は `docs/coding-style.md` を参照
 
 ### 2. 常にLintを実行
+
 ```bash
 npm run lint
 ```
+
 - コード生成後は**必ず**上記コマンドでチェック
 - エラーがある場合は修正してから次に進む
 
 ### 3. Prettier設定に従う
+
 - `.prettierrc.json` に定義されたフォーマット規則を守る
 - セミコロンなし、シングルクォート、インデント2スペース
 
@@ -29,6 +33,7 @@ npm run lint
 ### 必須の構文パターン
 
 #### ❌ 禁止パターン
+
 ```javascript
 // default export禁止（Vueファイル以外）
 export default function myFunction() {}
@@ -40,10 +45,11 @@ function myFunction() {}
 const _privateVar = 'value'
 
 // セミコロン禁止（Prettierが自動削除）
-const value = 'test';
+const value = 'test'
 ```
 
 #### ✅ 推奨パターン
+
 ```javascript
 // 名前付きexport + アロー関数式
 export const myFunction = () => {
@@ -63,13 +69,14 @@ const message = 'Hello World'
 ### Vueコンポーネント
 
 #### ❌ 禁止パターン
+
 ```vue
 <!-- Options API禁止 -->
 <script>
 export default {
   data() {
     return { count: 0 }
-  }
+  },
 }
 </script>
 
@@ -78,6 +85,7 @@ export default {
 ```
 
 #### ✅ 推奨パターン
+
 ```vue
 <script setup>
 import { ref } from 'vue'
@@ -102,6 +110,7 @@ const increment = () => {
 ## ファイル作成時のルール
 
 ### Vueコンポーネント
+
 - **ファイル名**: PascalCase（例: `UserProfile.vue`）
 - **フォルダ名**: kebab-case（例: `user-profile/`）
 - **配置場所**:
@@ -109,6 +118,7 @@ const increment = () => {
   - `src/pages/`: ページコンポーネント
 
 ### JavaScript
+
 - **ファイル名**: camelCase（例: `userService.js`）
 - **export**: 名前付きのみ（default export禁止）
 
@@ -117,15 +127,16 @@ const increment = () => {
 ## インポート順序（自動ソート）
 
 Prettierプラグインにより以下の順序で自動ソートされます:
+
 ```javascript
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { VBtn } from 'vuetify/components'
 import { getAuth } from 'firebase/auth'
-import axios from 'axios'              // サードパーティ
-import { userService } from '@/services/userService'  // @/エイリアス
-import { formatDate } from './utils'   // 相対パス
+import axios from 'axios' // サードパーティ
+import { userService } from '@/services/userService' // @/エイリアス
+import { formatDate } from './utils' // 相対パス
 ```
 
 ---
@@ -133,9 +144,11 @@ import { formatDate } from './utils'   // 相対パス
 ## JSDoc推奨
 
 関数には可能な限りJSDocを記述してください:
+
 ```javascript
 /**
  * ユーザー情報を取得する
+ *
  * @param {string} userId - ユーザーID
  * @returns {Promise<Object>} ユーザー情報
  */
@@ -165,6 +178,7 @@ export const fetchUser = async (userId) => {
 ## よくあるエラーと修正方法
 
 ### エラー: `import/no-default-export`
+
 ```javascript
 // ❌ NG
 export default { name: 'test' }
@@ -174,6 +188,7 @@ export const config = { name: 'test' }
 ```
 
 ### エラー: `func-style`
+
 ```javascript
 // ❌ NG
 function calculate() {}
@@ -183,6 +198,7 @@ const calculate = () => {}
 ```
 
 ### エラー: `camelcase`
+
 ```javascript
 // ❌ NG
 const user_name = 'John'
@@ -192,6 +208,7 @@ const userName = 'John'
 ```
 
 ### エラー: `no-underscore-dangle`
+
 ```javascript
 // ❌ NG
 const _privateVar = 'value'
@@ -205,22 +222,22 @@ const privateVar = 'value'
 ## プロジェクト構造
 
 ### サービス層を優先
+
 - コンポーネントから直接Firebaseを呼ばない
 - `src/services/` にビジネスロジックを配置
 
 ```javascript
 // ✅ 推奨パターン
 // src/services/userService.js
-import { getFirestore, doc, getDoc } from 'firebase/firestore'
+import { doc, getDoc, getFirestore } from 'firebase/firestore'
+// src/components/UserProfile.vue
+import { fetchUserById } from '@/services/userService'
 
 export const fetchUserById = async (userId) => {
   const db = getFirestore()
   const userDoc = await getDoc(doc(db, 'users', userId))
   return userDoc.data()
 }
-
-// src/components/UserProfile.vue
-import { fetchUserById } from '@/services/userService'
 
 const loadUser = async () => {
   const user = await fetchUserById('123')
@@ -248,14 +265,17 @@ const apiKey = import.meta.env.VITE_FIREBASE_API_KEY
 ## トラブルシューティング
 
 ### Lintエラーが大量に出る
+
 1. `npm run lint` で自動修正を試す
 2. それでもエラーが残る場合は `docs/coding-style.md` を参照
 3. `eslint.config.js` で該当ルールを確認
 
 ### インポート順序がバラバラ
+
 ```bash
 npm run format
 ```
+
 Prettierが自動的に正しい順序にソートします
 
 ---
