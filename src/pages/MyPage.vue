@@ -1,14 +1,14 @@
 <template>
-  <div v-if="isAuthenticated" class="d-flex flex-column justify-center my-10">
+  <div class="d-flex flex-column justify-center my-10" v-if="isAuthenticated">
     <ProfileCard
       v-for="(user, index) in userInfo"
+      :count="user.count"
+      :image="getImageUrl(user.photoURL)"
       :key="index"
       :name="user.displayName"
-      :image="getImageUrl(user.photoURL)"
-      :count="user.count"
     />
     <EditForm />
-    <TabsBar :tabsName="tabsName" :tabsComponent="tabsComponent" />
+    <TabsBar :tabs-component="tabsComponent" :tabs-name="tabsName" />
   </div>
   <div v-else>
     <RecommendLogin />
@@ -16,15 +16,14 @@
 </template>
 
 <script setup>
-import { computed, ref, markRaw } from 'vue'
+import { computed, markRaw, ref } from 'vue'
 import { useStore } from 'vuex'
-
-import DegreesList from '@/components/MyPage/DegreesList.vue'
 import EditForm from '@/components/EditForm/EditForm.vue'
+import DegreesList from '@/components/MyPage/DegreesList.vue'
 import ProfileCard from '@/components/MyPage/ProfileCard.vue'
-import RecommendLogin from '@/components/templates/RecommendLogin.vue'
 import StampsList from '@/components/MyPage/StampsList.vue'
 import TabsBar from '@/components/MyPage/TabsBar.vue'
+import RecommendLogin from '@/components/templates/RecommendLogin.vue'
 
 const store = useStore()
 

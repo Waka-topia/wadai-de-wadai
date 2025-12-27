@@ -1,10 +1,11 @@
-import { getDocs, collection, setDoc, doc } from 'firebase/firestore'
+import { collection, doc, getDocs, setDoc } from 'firebase/firestore'
 import { db } from '../firebase/config'
 import { getUserStamps } from '../services/stampService' // ユーザーのスタンプ取得サービス
 
 /**
  * Fetches all titles from the Firestore "titles" collection.
- * @returns {Promise<Array<Object>>} - An array of title data.
+ *
+ * @returns {Promise<Object[]>} - An array of title data.
  */
 export async function getAllTitles() {
   const titlesCollectionRef = collection(db, 'titles')
@@ -18,8 +19,9 @@ export async function getAllTitles() {
 
 /**
  * Checks if the user can earn a specific title based on the new criteria.
+ *
  * @param {Object} titleData - The title data containing required stamps and required number.
- * @param {Array<string>} userStamps - The stamps the user possesses.
+ * @param {string[]} userStamps - The stamps the user possesses.
  * @returns {boolean} - Whether the user meets the criteria.
  */
 export function canEarnTitle(titleData, userStamps) {
@@ -39,6 +41,7 @@ export function canEarnTitle(titleData, userStamps) {
 
 /**
  * Adds a title to the user's list of titles if eligible.
+ *
  * @param {string} userID - The ID of the user.
  * @param {string} titleID - The ID of the title.
  * @param {Object} titleData - The data of the title.

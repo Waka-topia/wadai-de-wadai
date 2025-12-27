@@ -1,7 +1,7 @@
 // src/store/modules/title.js
 
 import { getUserTitles as fetchUserTitlesFromService } from '@/services/titleService'
-import { getAllTitles, addTitleToUser } from '../../services/titleService'
+import { addTitleToUser, getAllTitles } from '../../services/titleService'
 
 const state = () => ({
   titles: [], // Firestoreから取得したすべてのタイトル

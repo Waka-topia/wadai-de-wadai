@@ -2,7 +2,7 @@
   <div>
     <!-- 第一段階: カテゴリー選択 -->
     <div class="d-flex flex-column my-3">
-      <label for="main-category" class="font-weight-bold">カテゴリーで絞り込み:</label>
+      <label class="font-weight-bold" for="main-category">カテゴリーで絞り込み:</label>
       <select v-model="selectedMainCategory" @change="filterGroups">
         <option value="all">すべて</option>
         <option value="club">部活</option>
@@ -12,8 +12,8 @@
     </div>
 
     <!-- 第二段階: 運動系/文化系の選択 -->
-    <div v-if="selectedMainCategory !== 'all'" class="d-flex flex-column my-3">
-      <label for="sub-category" class="font-weight-bold">運動系または文化系:</label>
+    <div class="d-flex flex-column my-3" v-if="selectedMainCategory !== 'all'">
+      <label class="font-weight-bold" for="sub-category">運動系または文化系:</label>
       <select v-model="selectedSubCategory" @change="filterGroups">
         <option value="all">すべて</option>
         <option value="sports">運動系</option>
@@ -23,7 +23,7 @@
 
     <!-- 団体選択 -->
     <div class="d-flex flex-column my-3">
-      <label for="group" class="font-weight-bold">団体を選択:</label>
+      <label class="font-weight-bold" for="group">団体を選択:</label>
       <select v-model="selectedGroup">
         <option v-for="group in filteredGroups" :key="group.id" :value="group.name">
           {{ group.name }}
@@ -33,13 +33,13 @@
 
     <!-- 日付選択 -->
     <div class="d-flex flex-column my-3">
-      <label for="date" class="font-weight-bold">日付を選択:</label>
+      <label class="font-weight-bold" for="date">日付を選択:</label>
       <input type="date" v-model="selectedDate" />
     </div>
 
     <!-- 保存ボタン -->
     <div class="d-flex flex-column my-3 mt-5">
-      <v-btn size="large" color="success" @click="saveShinkan">保存</v-btn>
+      <v-btn @click="saveShinkan" color="success" size="large">保存</v-btn>
     </div>
 
     <!-- スナックバー通知 -->
@@ -50,9 +50,9 @@
 </template>
 
 <script setup>
-import { allGroups } from '@/data/groups'
 import { computed, onMounted, ref } from 'vue'
 import { useStore } from 'vuex'
+import { allGroups } from '@/data/groups'
 
 const store = useStore()
 

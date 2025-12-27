@@ -1,34 +1,34 @@
 <template>
   <div>
-    <v-skeleton-loader v-if="isLoading" :elevation="0" type="list-item-avatar-three-line" />
-    <v-skeleton-loader v-if="isLoading" :elevation="0" type="list-item-avatar-three-line" />
-    <v-skeleton-loader v-if="isLoading" :elevation="0" type="list-item-avatar-three-line" />
-    <v-skeleton-loader v-if="isLoading" :elevation="0" type="list-item-avatar-three-line" />
-    <v-skeleton-loader v-if="isLoading" :elevation="0" type="list-item-avatar-three-line" />
-    <v-skeleton-loader v-if="isLoading" :elevation="0" type="list-item-avatar-three-line" />
-    <v-skeleton-loader v-if="isLoading" :elevation="0" type="list-item-avatar-three-line" />
-    <v-alert v-if="error" :text="errorMessages" title="エラー" type="error"></v-alert>
+    <v-skeleton-loader type="list-item-avatar-three-line" v-if="isLoading" :elevation="0" />
+    <v-skeleton-loader type="list-item-avatar-three-line" v-if="isLoading" :elevation="0" />
+    <v-skeleton-loader type="list-item-avatar-three-line" v-if="isLoading" :elevation="0" />
+    <v-skeleton-loader type="list-item-avatar-three-line" v-if="isLoading" :elevation="0" />
+    <v-skeleton-loader type="list-item-avatar-three-line" v-if="isLoading" :elevation="0" />
+    <v-skeleton-loader type="list-item-avatar-three-line" v-if="isLoading" :elevation="0" />
+    <v-skeleton-loader type="list-item-avatar-three-line" v-if="isLoading" :elevation="0" />
+    <v-alert type="error" title="エラー" v-if="error" :text="errorMessages"></v-alert>
     <div v-if="!isLoading && rankings.length > 0">
       <ProfileCard
         v-for="(user, index) in rankings"
+        :count="user.count"
+        :image="getImageUrl(user.photoURL)"
         :key="user.userId"
         :name="user.displayName"
+        :rank="index + 1"
         :status="
           user.nextShinkan
             ? `${user.nextShinkan.groupName} - ${user.nextShinkan.nextDate}`
             : '情報なし'
         "
-        :image="getImageUrl(user.photoURL)"
-        :rank="index + 1"
-        :count="user.count"
       />
     </div>
   </div>
 </template>
 
 <script>
-import ProfileCard from '@/components/MyPage/ProfileCard.vue'
 import { mapActions, mapGetters } from 'vuex'
+import ProfileCard from '@/components/MyPage/ProfileCard.vue'
 
 export default {
   name: 'ProfileList',

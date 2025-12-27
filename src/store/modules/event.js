@@ -1,5 +1,5 @@
 //src/store/modules/event.js
-import { addEvent, updateEvent, deleteEvent, getEvents } from '../../services/eventService'
+import { addEvent, deleteEvent, getEvents, updateEvent } from '../../services/eventService'
 
 const state = {
   events: [], // イベントデータを格納
@@ -18,6 +18,7 @@ const getters = {
 const actions = {
   /**
    * Firebaseから全てのイベント情報を取得する
+   *
    * @param {Object} context Vuexのコンテキスト
    */
   async fetchEvents({ commit }) {
@@ -32,6 +33,7 @@ const actions = {
 
   /**
    * イベントを新規登録する
+   *
    * @param {Object} context Vuexのコンテキスト
    * @param {Object} payload イベントデータと団体ID
    */
@@ -46,6 +48,7 @@ const actions = {
 
   /**
    * イベント情報を更新する
+   *
    * @param {Object} context Vuexのコンテキスト
    * @param {Object} payload 更新データ、団体ID、パスワード
    */
@@ -61,6 +64,7 @@ const actions = {
 
   /**
    * イベントを削除する
+   *
    * @param {Object} context Vuexのコンテキスト
    * @param {Object} payload イベントID、団体ID、パスワード
    */
@@ -76,6 +80,7 @@ const actions = {
 
   /**
    * 編集モードを切り替える
+   *
    * @param {Object} context Vuexのコンテキスト
    * @param {boolean} isEditing 編集モードの状態
    */

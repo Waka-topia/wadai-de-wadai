@@ -4,8 +4,8 @@
       <template #activator="{ props: activatorProps }">
         <v-btn
           class="text-white font-weight-bold"
-          color="orange"
           v-bind="activatorProps"
+          color="orange"
           elevation="3"
           rounded
         >
@@ -20,7 +20,7 @@
         </v-card-title>
 
         <v-card-text>
-          <v-row align="center" justify="center" class="mb-4">
+          <v-row class="mb-4" align="center" justify="center">
             <UserIcon />
             <ProfileImage />
           </v-row>
@@ -65,7 +65,7 @@
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn text @click="dialog = false">キャンセル</v-btn>
+          <v-btn @click="dialog = false" text>キャンセル</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -73,10 +73,10 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import NextShinkan from '@/components/EditForm/NextShinkan.vue'
 import NextShinkanView from '@/components/EditForm/NextShinkanView.vue'
 import ProfileImage from '@/components/EditForm/ProfileImage.vue'
-import { ref } from 'vue'
 import UserAdress from './UserAdress.vue'
 import UserIcon from './UserIcon.vue'
 import UserId from './UserId.vue'

@@ -1,14 +1,14 @@
 <template>
   <div>
-    <v-progress-linear color="success" v-if="isLoading" indeterminate=""></v-progress-linear>
+    <v-progress-linear v-if="isLoading" color="success" indeterminate=""></v-progress-linear>
     <v-btn
+      class="show-form-btn"
       @click="updateRanking"
-      size="large"
       color="orange"
       elevation="20"
-      class="show-form-btn"
       icon="mdi-refresh"
       intermediate
+      size="large"
     ></v-btn>
     <RankingList :key="renderKey" />
     <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="snackbar.timeout">
@@ -18,9 +18,9 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import RankingList from '@/components/UserRanking/RankingList.vue'
 import rankingService from '@/services/rankingService'
-import { ref } from 'vue'
 
 const snackbar = ref({
   show: false,

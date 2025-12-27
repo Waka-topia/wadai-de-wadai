@@ -1,13 +1,13 @@
 <template>
   <v-dialog max-width="500">
-    <template v-slot:activator="{ props: activatorProps }">
+    <template #activator="{ props: activatorProps }">
       <p v-if="user">
         <v-list-item
-          size="large"
-          v-bind="activatorProps"
-          variant="flat"
           class="position-relative"
+          v-bind="activatorProps"
           block
+          size="large"
+          variant="flat"
         >
           <v-icon> mdi-logout </v-icon>
           ログアウト
@@ -15,11 +15,11 @@
       </p>
       <p v-else>
         <v-list-item
-          size="large"
-          elevation="0"
-          @click="$router.push('/login')"
           class="position-relative"
+          @click="$router.push('/login')"
           block
+          elevation="0"
+          size="large"
         >
           <v-icon> mdi-login </v-icon>
           ログイン
@@ -28,13 +28,13 @@
       </p>
     </template>
 
-    <template v-slot:default="{ isActive }">
+    <template #default="{ isActive }">
       <v-card title="注意">
         <v-card-text> ログアウトします。本当によろしいですか？ </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn text="キャンセル" @click="isActive.value = false"></v-btn>
-          <v-btn text="ログアウト" @click="onLogout(isActive)" color="red"></v-btn>
+          <v-btn @click="isActive.value = false" text="キャンセル"></v-btn>
+          <v-btn @click="onLogout(isActive)" color="red" text="ログアウト"></v-btn>
         </v-card-actions>
       </v-card>
     </template>

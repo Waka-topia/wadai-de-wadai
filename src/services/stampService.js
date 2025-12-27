@@ -1,10 +1,10 @@
 import {
   collection,
   doc,
-  setDoc,
-  getDocs,
   getDoc,
+  getDocs,
   serverTimestamp,
+  setDoc,
   updateDoc,
 } from 'firebase/firestore'
 import { db } from '../firebase/config'

@@ -1,11 +1,11 @@
 <template>
   <v-divider></v-divider>
-  <v-card class="my-2 pb-3" outlined hover elevation="0">
-    <div v-if="rank == 1" class="position-absolute top-0 left-0 w-25 h-auto ml-3 z-10">
+  <v-card class="my-2 pb-3" elevation="0" hover outlined>
+    <div class="position-absolute top-0 left-0 w-25 h-auto ml-3 z-10" v-if="rank == 1">
       <v-img
-        :src="getImageUrl('rankings/ribbon1.png')"
-        alt="ランキングのアイコン"
         class="w-33 h-33"
+        alt="ランキングのアイコン"
+        :src="getImageUrl('rankings/ribbon1.png')"
       >
         <div
           class="font-weight-bold text-white text-xs-subtitle-1 text-sm-h4 text-md-h3 text-center text-no-wrap"
@@ -14,11 +14,11 @@
         </div>
       </v-img>
     </div>
-    <div v-else-if="rank == 2" class="position-absolute top-0 left-0 w-25 h-auto ml-3 z-10">
+    <div class="position-absolute top-0 left-0 w-25 h-auto ml-3 z-10" v-else-if="rank == 2">
       <v-img
+        class="w-33 h-100"
+        alt="ランキングのアイコン"
         :src="getImageUrl('rankings/ribbon2.png')"
-        alt="ランキングのアイコン"
-        class="w-33 h-100"
       >
         <div
           class="font-weight-bold text-white text-xs-subtitle-1 text-sm-h4 text-md-h3 text-center text-no-wrap"
@@ -27,11 +27,11 @@
         </div>
       </v-img>
     </div>
-    <div v-else-if="rank == 3" class="position-absolute top-0 left-0 w-25 h-auto ml-3 z-10">
+    <div class="position-absolute top-0 left-0 w-25 h-auto ml-3 z-10" v-else-if="rank == 3">
       <v-img
+        class="w-33 h-100"
+        alt="ランキングのアイコン"
         :src="getImageUrl('rankings/ribbon3.png')"
-        alt="ランキングのアイコン"
-        class="w-33 h-100"
       >
         <div
           class="font-weight-bold text-white text-xs-subtitle-1 text-sm-h4 text-md-h3 text-center text-no-wrap"
@@ -40,11 +40,11 @@
         </div>
       </v-img>
     </div>
-    <div v-else class="position-absolute top-0 left-0 w-25 h-auto ml-3 z-10">
+    <div class="position-absolute top-0 left-0 w-25 h-auto ml-3 z-10" v-else>
       <v-img
-        :src="getImageUrl('rankings/ribbon4.png')"
-        alt="ランキングのアイコン"
         class="w-33 h-100"
+        alt="ランキングのアイコン"
+        :src="getImageUrl('rankings/ribbon4.png')"
       >
         <div
           class="font-weight-bold text-white text-xs-subtitle-1 text-sm-h4 text-md-h3 text-center text-no-wrap"
@@ -54,30 +54,30 @@
       </v-img>
     </div>
     <v-row class="mt-4 mb-2">
-      <v-col cols="5" md="4" lg="4" class="align-self-center pl-5 mt-3 d-flex justify-center">
+      <v-col class="align-self-center pl-5 mt-3 d-flex justify-center" cols="5" lg="4" md="4">
         <v-avatar size="140">
-          <v-img :src="image" alt="ユーザーのアイコン" class="rounded-circle"></v-img>
+          <v-img class="rounded-circle" alt="ユーザーのアイコン" :src="image"></v-img>
         </v-avatar>
       </v-col>
-      <v-col cols="7" md="8" lg="8">
+      <v-col cols="7" lg="8" md="8">
         <v-row class="mb-1">
           <span class="font-weight-bold text-h5">{{ name }}</span>
         </v-row>
         <v-row class="mb-1">
-          <v-icon size="x-large" color="red"> mdi-stamper </v-icon>
+          <v-icon color="red" size="x-large"> mdi-stamper </v-icon>
           <p class="ml-1 text-h6 text-red font-weight-bold">
             {{ count
             }}<small class="ml-1 text-red font-weight-bold" style="line-height: 1">スタンプ</small>
           </p>
         </v-row>
         <v-row class="pb-1">
-          <v-icon size="x-small" color="orange ml-2"> mdi-triangle-down </v-icon>
+          <v-icon color="orange ml-2" size="x-small"> mdi-triangle-down </v-icon>
           <small class="text-orange ml-1 font-weight-bold"> 次回参加予定の団体 </small>
         </v-row>
         <v-row>
           <v-chip
-            color="orange"
             class="font-weight-bold"
+            color="orange"
             style="
               max-width: 100%;
               height: 50px;

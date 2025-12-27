@@ -1,15 +1,15 @@
 <template>
   <div>
     <!-- エラー発生時のアラート -->
-    <v-alert v-if="error" :text="errorMessages" title="エラー" type="error" />
+    <v-alert type="error" title="エラー" v-if="error" :text="errorMessages" />
 
     <!-- 読み込み中のスケルトンローダー -->
     <template v-if="isLoading">
       <v-skeleton-loader
-        v-for="n in 7"
-        :key="n"
-        :elevation="0"
         type="list-item-avatar-three-line"
+        v-for="n in 7"
+        :elevation="0"
+        :key="n"
       />
     </template>
 
@@ -17,25 +17,25 @@
     <div v-if="!isLoading && rankings.length">
       <ProfileCard
         v-for="(user, index) in rankings"
+        :count="user.stampCount"
+        :image="getImageUrl(user.photoURL)"
         :key="user.userId"
         :name="user.displayName"
+        :rank="index + 1"
         :status="
           user.nextShinkan
             ? `${user.nextShinkan.groupName} - ${user.nextShinkan.nextDate}`
             : '情報なし'
         "
-        :image="getImageUrl(user.photoURL)"
-        :rank="index + 1"
-        :count="user.stampCount"
       />
     </div>
   </div>
 </template>
 
 <script setup>
+import { onMounted, ref } from 'vue'
 import ProfileCard from '@/components/UserRanking/ProfileCard.vue'
 import rankingService from '@/services/rankingService'
-import { onMounted, ref } from 'vue'
 
 // 各種状態をrefで定義
 const rankings = ref([])

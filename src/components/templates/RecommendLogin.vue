@@ -7,17 +7,17 @@
       自分のプロフィールを作成し、<br />新歓に行くことでスタンプが貯められます
     </p>
     <v-btn
+      class="mx-3 px-3 my-6 font-weight-bold text-white"
       @click="router.push('/login')"
+      color="orange"
       elevation="15"
       prepend-icon="mdi-email"
-      size="x-large"
-      class="mx-3 px-3 my-6 font-weight-bold text-white"
-      color="orange"
       rounded
+      size="x-large"
     >
       メールアドレスでログイン
     </v-btn>
-    <v-btn size="large" variant="plain" @click="router.push('/signup')">アカウントを作成</v-btn>
+    <v-btn @click="router.push('/signup')" size="large" variant="plain">アカウントを作成</v-btn>
   </div>
 </template>
 

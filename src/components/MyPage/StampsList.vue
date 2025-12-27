@@ -1,23 +1,23 @@
 <template>
   <div>
-    <v-skeleton-loader v-if="isLoading" :elevation="1" type="image" />
+    <v-skeleton-loader type="image" v-if="isLoading" :elevation="1" />
     <v-alert
+      type="warning"
+      title="warning"
       v-else-if="!isAuthenticated"
       text="ログインして下さい"
-      title="warning"
-      type="warning"
     ></v-alert>
     <v-alert
+      type="info"
+      title="info"
       v-else-if="stampImages.length === 0"
       text="スタンプをまだ持っていません。"
-      title="info"
-      type="info"
     ></v-alert>
-    <v-alert v-else-if="isErrored" :text="errorMessages" title="エラー" type="error"></v-alert>
+    <v-alert type="error" title="エラー" v-else-if="isErrored" :text="errorMessages"></v-alert>
     <v-row class="mt-1 mx-1" v-else>
-      <v-col v-for="stamp in stampImages" :key="stamp.stampId" cols="6" sm="4" md="3">
-        <v-card elevation="0" class="border-md" aspect-ratio="1">
-          <v-img :src="getImageUrl(stamp.imageUrl)" :alt="stamp.name" aspect-ratio="1"></v-img>
+      <v-col v-for="stamp in stampImages" :key="stamp.stampId" cols="6" md="3" sm="4">
+        <v-card class="border-md" aspect-ratio="1" elevation="0">
+          <v-img :alt="stamp.name" :src="getImageUrl(stamp.imageUrl)" aspect-ratio="1"></v-img>
           <v-card-title class="font-weight-bold text-body-2 text-center"
             ><small>{{ stamp.name }}</small></v-card-title
           >
@@ -62,13 +62,6 @@ export default {
       return new URL(`../../assets/${relativePath}`, import.meta.url).href
     },
   },
-  async created() {
-    if (this.isAuthenticated) {
-      await this.loadStampImages()
-    } else {
-      this.isLoading = false // 認証が必要な場合も読み込み終了
-    }
-  },
   watch: {
     isAuthenticated: {
       immediate: true,
@@ -78,6 +71,13 @@ export default {
         }
       },
     },
+  },
+  async created() {
+    if (this.isAuthenticated) {
+      await this.loadStampImages()
+    } else {
+      this.isLoading = false // 認証が必要な場合も読み込み終了
+    }
   },
 }
 </script>

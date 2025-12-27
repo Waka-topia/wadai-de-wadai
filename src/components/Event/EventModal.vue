@@ -1,9 +1,9 @@
 <template>
   <!-- モーダルが表示されるかどうかをisModalVisibleに基づいて表示 -->
-  <div v-show="isModalVisible" class="modal">
+  <div class="modal" v-show="isModalVisible">
     <div class="modal-content">
       <!-- モーダルの閉じるボタン -->
-      <v-btn @click="handleCloseModal" class="close-btn" icon>
+      <v-btn class="close-btn" @click="handleCloseModal" icon>
         <v-icon>mdi-close</v-icon>
       </v-btn>
 
@@ -80,11 +80,11 @@
 
         <!-- 削除フォーム呼び出しボタン -->
         <v-btn
-          @click="toggleEditDeleteForm"
-          color="grey darken-1"
           class="delete-form-btn white--text"
-          depressed
+          @click="toggleEditDeleteForm"
           block
+          color="grey darken-1"
+          depressed
         >
           <v-icon left>mdi-delete</v-icon>
           削除フォーム
@@ -106,6 +106,7 @@
 
 <script>
 import EditDeleteForm from '@/components/Event/EditDeleteForm.vue'
+
 // import { or } from "firebase/firestore";
 
 export default {

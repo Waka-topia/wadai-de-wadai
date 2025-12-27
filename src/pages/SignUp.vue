@@ -1,41 +1,41 @@
 <template>
-  <v-progress-linear color="success" v-if="isLoading" indeterminate=""></v-progress-linear>
+  <v-progress-linear v-if="isLoading" color="success" indeterminate=""></v-progress-linear>
   <v-sheet class="pa-12" rounded>
     <v-card class="py-8">
       <v-form v-model="form" @submit.prevent="onSubmit">
         <v-text-field
+          class="mb-2"
           v-model="username"
           :rules="[required, nameCheck]"
-          class="mb-2"
-          label="Username"
-          placeholder="わかやん"
           clearable
           hint="本名は使用しないでください。"
+          label="Username"
+          placeholder="わかやん"
         />
         <v-text-field
+          class="mb-2"
           v-model="email"
           :rules="[required, emailDomainCheck]"
-          prepend-inner-icon="mdi-email-outline"
-          class="mb-2"
-          label="Email"
-          placeholder="sample@gmail.com"
           clearable
           hint="架空のメールアドレスでも構いません。"
+          label="Email"
+          placeholder="sample@gmail.com"
+          prepend-inner-icon="mdi-email-outline"
         ></v-text-field>
         <v-text-field
           v-model="password"
-          :rules="[required, passwordRule]"
           :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
+          :rules="[required, passwordRule]"
           :type="visible ? 'text' : 'password'"
-          prepend-inner-icon="mdi-lock-outline"
+          @click:append-inner="visible = !visible"
+          clearable
+          hint="8文字以上にしてください。"
           label="Password"
           placeholder="Xa4%j87d"
-          clearable
-          @click:append-inner="visible = !visible"
-          hint="8文字以上にしてください。"
+          prepend-inner-icon="mdi-lock-outline"
         ></v-text-field>
 
-        <v-btn @click="openRules" text color="primary">利用規約を確認</v-btn>
+        <v-btn @click="openRules" color="primary" text>利用規約を確認</v-btn>
         <!-- モーダルを表示するボタン -->
 
         <v-checkbox v-model="agree" :rules="[requiredAgree]" label="利用規約に同意する" />
@@ -43,19 +43,19 @@
         <br />
 
         <v-btn
+          type="submit"
           :disabled="!form || !agree"
           :loading="isLoading"
+          block
           color="primary"
           size="large"
-          type="submit"
           variant="elevated"
-          block
         >
           Sign Up
         </v-btn>
       </v-form>
       <v-divider class="mt-10"></v-divider>
-      <v-btn variant="text" @click="onLogIn"> アカウントをお持ちの方はこちら </v-btn>
+      <v-btn @click="onLogIn" variant="text"> アカウントをお持ちの方はこちら </v-btn>
     </v-card>
   </v-sheet>
   <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
@@ -69,7 +69,7 @@
         <rule-component />
       </v-card-text>
       <v-card-actions>
-        <v-btn color="primary" @click="dialog = false">閉じる</v-btn>
+        <v-btn @click="dialog = false" color="primary">閉じる</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
