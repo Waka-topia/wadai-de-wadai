@@ -3,5 +3,5 @@
 </template>
 
 <script setup>
-import TitleList from "@/components/ExchangeTitle.vue";
+import TitleList from '@/components/ExchangeTitle.vue'
 </script>

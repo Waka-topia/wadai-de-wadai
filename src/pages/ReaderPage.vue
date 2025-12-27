@@ -9,11 +9,11 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import { useStore } from 'vuex';
-import QRScanner from "@/components/templates/QRScanner.vue";
-import RecommendLogin from '@/components/templates/RecommendLogin.vue';
+import { computed } from 'vue'
+import { useStore } from 'vuex'
+import QRScanner from '@/components/templates/QRScanner.vue'
+import RecommendLogin from '@/components/templates/RecommendLogin.vue'
 
-const store = useStore();
-const isAuthenticated = computed(() => store.getters['auth/isAuthenticated']);
+const store = useStore()
+const isAuthenticated = computed(() => store.getters['auth/isAuthenticated'])
 </script>

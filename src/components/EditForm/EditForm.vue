@@ -2,7 +2,13 @@
   <div class="pa-4 text-center">
     <v-dialog v-model:model-value="dialog" max-width="700">
       <template #activator="{ props: activatorProps }">
-        <v-btn class="text-white font-weight-bold" color="orange" v-bind="activatorProps" elevation="3" rounded>
+        <v-btn
+          class="text-white font-weight-bold"
+          color="orange"
+          v-bind="activatorProps"
+          elevation="3"
+          rounded
+        >
           プロフィール編集
         </v-btn>
       </template>
@@ -53,7 +59,6 @@
             <NextShinkan />
             <NextShinkanView />
           </v-card>
-
         </v-card-text>
 
         <v-divider />
@@ -68,14 +73,14 @@
 </template>
 
 <script setup>
-import NextShinkan from "@/components/EditForm/NextShinkan.vue";
-import NextShinkanView from "@/components/EditForm/NextShinkanView.vue";
-import ProfileImage from "@/components/EditForm/ProfileImage.vue";
-import { ref } from 'vue';
-import UserAdress from "./UserAdress.vue";
-import UserIcon from "./UserIcon.vue";
-import UserId from "./UserId.vue";
-import UserName from "./UserName.vue";
+import NextShinkan from '@/components/EditForm/NextShinkan.vue'
+import NextShinkanView from '@/components/EditForm/NextShinkanView.vue'
+import ProfileImage from '@/components/EditForm/ProfileImage.vue'
+import { ref } from 'vue'
+import UserAdress from './UserAdress.vue'
+import UserIcon from './UserIcon.vue'
+import UserId from './UserId.vue'
+import UserName from './UserName.vue'
 
 const dialog = ref(false)
 </script>

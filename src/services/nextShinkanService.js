@@ -1,5 +1,5 @@
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { db } from "../firebase/config";
+import { doc, getDoc, setDoc } from 'firebase/firestore'
+import { db } from '../firebase/config'
 
 /**
  * 新歓データを Firestore に保存する
@@ -9,16 +9,15 @@ import { db } from "../firebase/config";
  */
 export async function saveNextShinkan(userId, groupName, nextDate) {
   try {
-    const docRef = doc(db, `users/${userId}/NextShinkan`, "details");
+    const docRef = doc(db, `users/${userId}/NextShinkan`, 'details')
 
     await setDoc(docRef, {
       groupName,
       nextDate,
-    });
-
+    })
   } catch (error) {
-    console.error(error);
-    throw error;
+    console.error(error)
+    throw error
   }
 }
 
@@ -29,14 +28,13 @@ export async function saveNextShinkan(userId, groupName, nextDate) {
  */
 export async function getNextShinkan(userId) {
   try {
-    const docRef = doc(db, `users/${userId}/NextShinkan`, "details");
+    const docRef = doc(db, `users/${userId}/NextShinkan`, 'details')
 
-    const docSnap = await getDoc(docRef);
+    const docSnap = await getDoc(docRef)
 
-    return docSnap.data();
-    
+    return docSnap.data()
   } catch (error) {
-    console.error(error);
-    throw error;
+    console.error(error)
+    throw error
   }
 }

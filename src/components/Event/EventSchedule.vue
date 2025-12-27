@@ -9,25 +9,35 @@
     <div v-if="filteredEvents.length === 0" class="no-events">イベントはありません</div>
 
     <div v-else class="d-flex flex-column ga-2">
-      <div v-for="event in filteredEvents" :key="event.eventId" class="border-md rounded-lg" @click="openEventModal(event)">
+      <div
+        v-for="event in filteredEvents"
+        :key="event.eventId"
+        class="border-md rounded-lg"
+        @click="openEventModal(event)"
+      >
         <v-row class="py-4">
-          <v-col cols="3" class="text-center justify-center align-center font-weight-bold text-body-2">
-            <div >
+          <v-col
+            cols="3"
+            class="text-center justify-center align-center font-weight-bold text-body-2"
+          >
+            <div>
               {{ formatTime(event.start) }}
             </div>
-            <div>
-              〜
-            </div>
+            <div>〜</div>
             <div>
               {{ formatTime(event.end) }}
             </div>
           </v-col>
-            <v-divider vertical></v-divider>
+          <v-divider vertical></v-divider>
           <v-col cols="9">
             <div>
               <p class="text-h6 font-weight-bold">{{ event.title }}</p>
-              <p class="text-caption font-weight-bold text-grey-lighten-2 text-truncate">{{ event.description }}</p>
-              <p class="text-body-2 font-weight-bold text-orange"><v-icon color="orange">mdi-map-marker</v-icon>{{ event.location }}</p>
+              <p class="text-caption font-weight-bold text-grey-lighten-2 text-truncate">
+                {{ event.description }}
+              </p>
+              <p class="text-body-2 font-weight-bold text-orange">
+                <v-icon color="orange">mdi-map-marker</v-icon>{{ event.location }}
+              </p>
             </div>
           </v-col>
         </v-row>
@@ -41,58 +51,62 @@ export default {
   props: {
     events: {
       type: Array,
-      required: true
+      required: true,
     },
     selectedDate: {
       type: [String, Date],
-      default: null
-    }
+      default: null,
+    },
   },
   data() {
     return {
-      internalSelectedDate: this.selectedDate ? new Date(this.selectedDate) : new Date()
-    };
+      internalSelectedDate: this.selectedDate ? new Date(this.selectedDate) : new Date(),
+    }
   },
   computed: {
     formattedSelectedDate() {
-      return this.internalSelectedDate.toLocaleDateString("ja-JP", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit"
-      }).replace(/\//g, "-");
+      return this.internalSelectedDate
+        .toLocaleDateString('ja-JP', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+        })
+        .replace(/\//g, '-')
     },
     filteredEvents() {
-      return this.events.filter(event => {
-        const eventDate = new Date(event.start).toLocaleDateString("ja-JP", {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit"
-        }).replace(/\//g, "-");
-        return eventDate === this.formattedSelectedDate;
-      });
-    }
+      return this.events.filter((event) => {
+        const eventDate = new Date(event.start)
+          .toLocaleDateString('ja-JP', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+          })
+          .replace(/\//g, '-')
+        return eventDate === this.formattedSelectedDate
+      })
+    },
   },
   methods: {
     formatTime(dateString) {
-      const date = new Date(dateString);
-      return date.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" });
+      const date = new Date(dateString)
+      return date.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })
     },
     openEventModal(event) {
-      this.$emit("open-modal", event);
+      this.$emit('open-modal', event)
     },
     changeDate(days) {
-      const newDate = new Date(this.internalSelectedDate);
-      newDate.setDate(newDate.getDate() + days);
-      this.internalSelectedDate = newDate;
-      this.$emit("update:selectedDate", newDate.toISOString().split("T")[0]);
-    }
+      const newDate = new Date(this.internalSelectedDate)
+      newDate.setDate(newDate.getDate() + days)
+      this.internalSelectedDate = newDate
+      this.$emit('update:selectedDate', newDate.toISOString().split('T')[0])
+    },
   },
   watch: {
     selectedDate(newVal) {
-      this.internalSelectedDate = new Date(newVal);
-    }
-  }
-};
+      this.internalSelectedDate = new Date(newVal)
+    },
+  },
+}
 </script>
 
 <style scoped>

@@ -9,9 +9,11 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import { useStore } from 'vuex';
+import { computed } from 'vue'
+import { useStore } from 'vuex'
 
 const store = useStore()
-const nextShinkan = computed(() => store.state.shinkan.nextShinkan || {"groupName": "未設定", "nextDate": "未設定"});
+const nextShinkan = computed(
+  () => store.state.shinkan.nextShinkan || { groupName: '未設定', nextDate: '未設定' },
+)
 </script>

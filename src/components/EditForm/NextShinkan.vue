@@ -66,7 +66,7 @@ const isLoading = ref(false)
 const snackbar = ref({
   show: false,
   color: '',
-  message: ''
+  message: '',
 })
 
 // Vuexのステート参照
@@ -97,13 +97,13 @@ const saveShinkan = async () => {
     snackbar.value = {
       show: true,
       color: 'success',
-      message: '保存が完了しました'
+      message: '保存が完了しました',
     }
   } catch (error) {
     snackbar.value = {
       show: true,
       color: 'error',
-      message: '保存に失敗しました: ' + error.message
+      message: '保存に失敗しました: ' + error.message,
     }
   } finally {
     isLoading.value = false

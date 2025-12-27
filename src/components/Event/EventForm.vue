@@ -2,7 +2,14 @@
   <form @submit.prevent="submitEvent" class="px-2 mx-2">
     <div class="form-group">
       <label for="date">日付:</label>
-      <input type="date" v-model="newEvent.date" required class="form-control" min="2025-04-01" max="2025-05-31" />
+      <input
+        type="date"
+        v-model="newEvent.date"
+        required
+        class="form-control"
+        min="2025-04-01"
+        max="2025-05-31"
+      />
     </div>
     <div class="form-group">
       <label for="start-time">開始時刻:</label>
@@ -14,15 +21,32 @@
     </div>
     <div class="form-group">
       <label for="location">場所:</label>
-      <input type="text" v-model="newEvent.location" required class="form-control" placeholder="イベントの場所" />
+      <input
+        type="text"
+        v-model="newEvent.location"
+        required
+        class="form-control"
+        placeholder="イベントの場所"
+      />
     </div>
     <div class="form-group">
       <label for="description">概要:</label>
-      <textarea v-model="newEvent.description" required class="form-control" placeholder="イベントの概要を入力"></textarea>
+      <textarea
+        v-model="newEvent.description"
+        required
+        class="form-control"
+        placeholder="イベントの概要を入力"
+      ></textarea>
     </div>
     <div class="form-group">
       <label for="organizer-name">団体名(略称可):</label>
-      <input type="text" v-model="newEvent.organizerName" required class="form-control" placeholder="団体名（略称可）" />
+      <input
+        type="text"
+        v-model="newEvent.organizerName"
+        required
+        class="form-control"
+        placeholder="団体名（略称可）"
+      />
     </div>
     <div class="form-group">
       <label for="organizer-id">団体ID:</label>
@@ -30,7 +54,13 @@
     </div>
     <div class="form-group">
       <label for="password">パスワード:</label>
-      <input type="password" v-model="password" required class="form-control" placeholder="パスワード" />
+      <input
+        type="password"
+        v-model="password"
+        required
+        class="form-control"
+        placeholder="パスワード"
+      />
     </div>
     <button type="submit" class="submit-btn">イベントを登録</button>
   </form>
@@ -41,39 +71,39 @@ export default {
   data() {
     return {
       newEvent: {
-        date: "",
-        startTime: "",
-        endTime: "",
-        location: "",
-        description: "",
-        organizerName: "",
-        class: "custom-event",
+        date: '',
+        startTime: '',
+        endTime: '',
+        location: '',
+        description: '',
+        organizerName: '',
+        class: 'custom-event',
       },
-      organizerId: "",
-      password: "",
-    };
+      organizerId: '',
+      password: '',
+    }
   },
   methods: {
     // フォームをリセットするメソッド
     resetForm() {
       this.newEvent = {
-        date: "",
-        startTime: "",
-        endTime: "",
-        location: "",
-        description: "",
-        organizerName: "",
-        class: "custom-event",
-      };
+        date: '',
+        startTime: '',
+        endTime: '',
+        location: '',
+        description: '',
+        organizerName: '',
+        class: 'custom-event',
+      }
     },
 
     // イベントを送信するメソッド
     submitEvent() {
-      this.$emit("submit-event", this.newEvent, this.organizerId, this.password);  // 親コンポーネントにイベントを送信
-      this.resetForm(); // 送信後にフォームをリセット
+      this.$emit('submit-event', this.newEvent, this.organizerId, this.password) // 親コンポーネントにイベントを送信
+      this.resetForm() // 送信後にフォームをリセット
     },
   },
-};
+}
 </script>
 
 <style scoped>
@@ -89,7 +119,8 @@ label {
   margin-bottom: 8px;
 }
 
-input, textarea {
+input,
+textarea {
   width: 100%;
   padding: 10px;
   border: 2px solid #ccc;
@@ -98,8 +129,9 @@ input, textarea {
   transition: border-color 0.3s ease;
 }
 
-input:focus, textarea:focus {
-  border-color: #4CAF50;
+input:focus,
+textarea:focus {
+  border-color: #4caf50;
   outline: none;
 }
 
@@ -111,7 +143,7 @@ textarea {
 .submit-btn {
   display: inline-block;
   padding: 12px 24px;
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
   font-size: 16px;
   border: none;

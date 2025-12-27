@@ -3,5 +3,5 @@
 </template>
 
 <script setup>
-import Rule from "@/components/Rule.vue";
+import Rule from '@/components/Rule.vue'
 </script>
