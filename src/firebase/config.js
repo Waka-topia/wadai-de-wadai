@@ -1,16 +1,15 @@
-// src/firebase/config.js
 import { initializeApp } from 'firebase/app'
 import { getFirestore } from 'firebase/firestore'
 import { getAuth } from 'firebase/auth'
 
 // Firebaseの設定
 const firebaseConfig = {
-  apiKey: 'AIzaSyDwkloo4u-Iu_A53IYYcIgm7sMIBQw0D4k',
-  authDomain: 'wadai-de-wadai.firebaseapp.com',
-  projectId: 'wadai-de-wadai',
-  storageBucket: 'wadai-de-wadai.firebasestorage.app',
-  messagingSenderId: '121459315235',
-  appId: '1:121459315235:web:78d854282cf20c051c1796',
+  apiKey: getEnvVar('VITE_API_KEY'),
+  authDomain: getEnvVar('VITE_AUTH_DOMAIN'),
+  projectId: getEnvVar('VITE_PROJECT_ID'),
+  storageBucket: getEnvVar('VITE_STORAGE_BUCKET'),
+  messagingSenderId: getEnvVar('VITE_MESSAGING_SENDER_ID'),
+  appId: getEnvVar('VITE_APP_ID'),
 }
 
 // Firebase初期化
