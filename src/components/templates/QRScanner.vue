@@ -3,9 +3,9 @@
     <h2 class="text-center">QRコードをスキャンしてください</h2>
 
     <!-- QRコードリーダー -->
-    <qrcode-stream @detect="onDetect" @init="onInit" />
+    <QrcodeStream @detect="onDetect" @init="onInit" />
 
-    <!-- QRコードデータ表示 ここを消せば読み取った時のテキストが消える。-->
+    <!-- QRコードデータ表示 ここを消せば読み取った時のテキストが消える。 -->
     <!-- <p v-if="scannedData">読み取ったデータ: {{ scannedData }}</p> -->
 
     <!-- テスト用ボタン -->

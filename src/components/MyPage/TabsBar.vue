@@ -1,6 +1,6 @@
 <template>
   <v-card color="basil" elevation="0">
-    <v-tabs class="text-grey-lighten-1" v-model="tab" bg-color="transparent" color="orange" grow>
+    <v-tabs v-model="tab" class="text-grey-lighten-1" bg-color="transparent" color="orange" grow>
       <v-tab v-for="(tabName, index) in props.tabsName" :key="index">{{ tabName }}</v-tab>
     </v-tabs>
 

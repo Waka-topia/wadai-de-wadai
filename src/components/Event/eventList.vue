@@ -1,22 +1,22 @@
 <template>
   <div class="event-list">
-    <vue-cal
+    <VueCal
       class="vuecal"
       :disable-views="['years', 'year', 'week', 'day']"
       :events="events"
       :max-date="maxDate"
       :min-date="minDate"
       :selected-date="selectedDate"
-      @cell-click="selectedDate = $event"
       active-view="month"
       hide-view-selector
       locale="ja"
       style="height: 70vh"
-    ></vue-cal>
+      @cell-click="selectedDate = $event"
+    ></VueCal>
 
     <v-divider class="my-5"></v-divider>
 
-    <v-btn class="font-weight-bold set-today-btn" @click="setToday" rounded variant="outlined">
+    <v-btn class="font-weight-bold set-today-btn" rounded variant="outlined" @click="setToday">
       <v-icon left>mdi-calendar-today</v-icon>
       今日の新歓イベント
     </v-btn>
@@ -47,7 +47,7 @@
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn @click="dialog = false" text>キャンセル</v-btn>
+          <v-btn text @click="dialog = false">キャンセル</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

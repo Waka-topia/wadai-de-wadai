@@ -1,15 +1,15 @@
 <template>
   <div>
     <!-- エラー発生時のアラート -->
-    <v-alert type="error" title="エラー" v-if="error" :text="errorMessages" />
+    <v-alert v-if="error" type="error" title="エラー" :text="errorMessages" />
 
     <!-- 読み込み中のスケルトンローダー -->
     <template v-if="isLoading">
       <v-skeleton-loader
-        type="list-item-avatar-three-line"
         v-for="n in 7"
-        :elevation="0"
         :key="n"
+        type="list-item-avatar-three-line"
+        :elevation="0"
       />
     </template>
 
@@ -17,9 +17,9 @@
     <div v-if="!isLoading && rankings.length">
       <ProfileCard
         v-for="(user, index) in rankings"
+        :key="user.userId"
         :count="user.stampCount"
         :image="getImageUrl(user.photoURL)"
-        :key="user.userId"
         :name="user.displayName"
         :rank="index + 1"
         :status="
@@ -44,6 +44,7 @@ const error = ref(false)
 const errorMessages = ref('')
 
 // 画像のURLを生成する関数
+/** @param relativePath */
 function getImageUrl(relativePath) {
   if (relativePath) {
     return new URL(`../../assets/${relativePath}`, import.meta.url).href
@@ -52,6 +53,9 @@ function getImageUrl(relativePath) {
 }
 
 // ランキングデータを取得する非同期関数
+/**
+ *
+ */
 async function fetchRankings() {
   try {
     const data = await rankingService.fetchTop100()

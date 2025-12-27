@@ -4,8 +4,8 @@
     <v-card class="py-8">
       <v-form v-model="form" @submit.prevent="onSubmit">
         <v-text-field
-          class="mb-2"
           v-model="email"
+          class="mb-2"
           :rules="[required, emailDomainCheck]"
           clearable
           label="Email"
@@ -17,11 +17,11 @@
           :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
           :rules="[required]"
           :type="visible ? 'text' : 'password'"
-          @click:append-inner="visible = !visible"
           clearable
           label="Password"
           placeholder="Xa4%j87d"
           prepend-inner-icon="mdi-lock-outline"
+          @click:append-inner="visible = !visible"
         ></v-text-field>
 
         <br />
@@ -39,8 +39,8 @@
         </v-btn>
       </v-form>
       <v-divider class="mt-10"></v-divider>
-      <v-btn @click="onSignUp" variant="text"> アカウントを作成する </v-btn>
-      <v-btn @click="onStart" variant="text"> ログインせずに開始する </v-btn>
+      <v-btn variant="text" @click="onSignUp"> アカウントを作成する </v-btn>
+      <v-btn variant="text" @click="onStart"> ログインせずに開始する </v-btn>
     </v-card>
     <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
       {{ snackbar.message }}

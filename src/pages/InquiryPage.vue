@@ -14,7 +14,7 @@
                 required
               ></v-text-field>
               <v-textarea v-model="content" label="お問い合わせ内容" required></v-textarea>
-              <v-btn @click="submitInquiry" color="primary">送信</v-btn>
+              <v-btn color="primary" @click="submitInquiry">送信</v-btn>
             </v-form>
           </v-card-text>
         </v-col>

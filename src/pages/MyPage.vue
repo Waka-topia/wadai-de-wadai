@@ -1,10 +1,10 @@
 <template>
-  <div class="d-flex flex-column justify-center my-10" v-if="isAuthenticated">
+  <div v-if="isAuthenticated" class="d-flex flex-column justify-center my-10">
     <ProfileCard
       v-for="(user, index) in userInfo"
+      :key="index"
       :count="user.count"
       :image="getImageUrl(user.photoURL)"
-      :key="index"
       :name="user.displayName"
     />
     <EditForm />

@@ -65,7 +65,7 @@
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn @click="dialog = false" text>キャンセル</v-btn>
+          <v-btn text @click="dialog = false">キャンセル</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

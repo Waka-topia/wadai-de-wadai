@@ -1,7 +1,7 @@
 <template>
   <div class="profile-image">
     <div class="text-center pa-4">
-      <v-btn @click="dialog = true" icon="mdi-pencil"> </v-btn>
+      <v-btn icon="mdi-pencil" @click="dialog = true"> </v-btn>
 
       <v-bottom-sheet v-model="dialog" width="auto">
         <v-card class="font-weight-bold" title="アイコンを変更" prepend-icon="mdi-pencil">
@@ -9,9 +9,9 @@
             <v-container>
               <v-row>
                 <v-col
-                  class="d-flex justify-center"
                   v-for="(icon, index) in icons"
                   :key="index"
+                  class="d-flex justify-center"
                   lg="2"
                   md="3"
                   sm="4"
@@ -23,12 +23,12 @@
                     :height="100"
                     :src="getImageUrl(`userIcon/userIcon${index + 1}.png`)"
                     :width="100"
-                    @click="selectIcon(index)"
                     aspect-ratio="1/1"
                     contain
                     cover
                     max-height="100"
                     max-width="100"
+                    @click="selectIcon(index)"
                   >
                   </v-img>
                 </v-col>

@@ -33,13 +33,13 @@
       <!-- アイコン情報 -->
       <!-- <v-col cols="12" sm="5" class="pa-0">
         <div class="d-flex align-center justify-start">
-          <v-icon size="x-large" color="orange" class="mr-2">mdi-webcam</v-icon>
-          <div class="stats-text">
-            <span class="text-h6 text-orange font-weight-bold">0</span>
-            <span class="text-subtitle-2 text-orange font-weight-bold">個</span>
-          </div>
+        <v-icon size="x-large" color="orange" class="mr-2">mdi-webcam</v-icon>
+        <div class="stats-text">
+        <span class="text-h6 text-orange font-weight-bold">0</span>
+        <span class="text-subtitle-2 text-orange font-weight-bold">個</span>
         </div>
-      </v-col> -->
+        </div>
+        </v-col> -->
     </v-row>
 
     <v-spacer class="my-2"></v-spacer>

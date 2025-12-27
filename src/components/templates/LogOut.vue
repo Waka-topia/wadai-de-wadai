@@ -16,10 +16,10 @@
       <p v-else>
         <v-list-item
           class="position-relative"
-          @click="$router.push('/login')"
           block
           elevation="0"
           size="large"
+          @click="$router.push('/login')"
         >
           <v-icon> mdi-login </v-icon>
           ログイン
@@ -33,8 +33,8 @@
         <v-card-text> ログアウトします。本当によろしいですか？ </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn @click="isActive.value = false" text="キャンセル"></v-btn>
-          <v-btn @click="onLogout(isActive)" color="red" text="ログアウト"></v-btn>
+          <v-btn text="キャンセル" @click="isActive.value = false"></v-btn>
+          <v-btn color="red" text="ログアウト" @click="onLogout(isActive)"></v-btn>
         </v-card-actions>
       </v-card>
     </template>

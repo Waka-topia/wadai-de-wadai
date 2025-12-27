@@ -1,4 +1,4 @@
-//src/store/index.js
+// src/store/index.js
 import { createStore } from 'vuex'
 import authModule from './modules/auth'
 import eventModule from './modules/event' // イベントモジュールをインポート

@@ -1,9 +1,9 @@
 <template>
   <!-- モーダルが表示されるかどうかをisModalVisibleに基づいて表示 -->
-  <div class="modal" v-show="isModalVisible">
+  <div v-show="isModalVisible" class="modal">
     <div class="modal-content">
       <!-- モーダルの閉じるボタン -->
-      <v-btn class="close-btn" @click="handleCloseModal" icon>
+      <v-btn class="close-btn" icon @click="handleCloseModal">
         <v-icon>mdi-close</v-icon>
       </v-btn>
 
@@ -81,10 +81,10 @@
         <!-- 削除フォーム呼び出しボタン -->
         <v-btn
           class="delete-form-btn white--text"
-          @click="toggleEditDeleteForm"
           block
           color="grey darken-1"
           depressed
+          @click="toggleEditDeleteForm"
         >
           <v-icon left>mdi-delete</v-icon>
           削除フォーム

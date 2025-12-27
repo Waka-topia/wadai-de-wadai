@@ -4,8 +4,7 @@ import { getUserStamps } from '../services/stampService' // ユーザーのス�
 
 /**
  * Fetches all titles from the Firestore "titles" collection.
- *
- * @returns {Promise<Object[]>} - An array of title data.
+ * @returns {Promise<object[]>} - An array of title data.
  */
 export async function getAllTitles() {
   const titlesCollectionRef = collection(db, 'titles')
@@ -19,8 +18,7 @@ export async function getAllTitles() {
 
 /**
  * Checks if the user can earn a specific title based on the new criteria.
- *
- * @param {Object} titleData - The title data containing required stamps and required number.
+ * @param {object} titleData - The title data containing required stamps and required number.
  * @param {string[]} userStamps - The stamps the user possesses.
  * @returns {boolean} - Whether the user meets the criteria.
  */
@@ -41,10 +39,9 @@ export function canEarnTitle(titleData, userStamps) {
 
 /**
  * Adds a title to the user's list of titles if eligible.
- *
  * @param {string} userID - The ID of the user.
  * @param {string} titleID - The ID of the title.
- * @param {Object} titleData - The data of the title.
+ * @param {object} titleData - The data of the title.
  * @returns {Promise<void>} - Resolves when the title is added.
  */
 export async function addTitleToUser(userID, titleID, titleData) {
@@ -84,6 +81,7 @@ export async function addTitleToUser(userID, titleID, titleData) {
   }
 }
 
+/** @param userID */
 export async function getUserTitles(userID) {
   if (!userID || typeof userID !== 'string') {
     throw new Error('Invalid userID')

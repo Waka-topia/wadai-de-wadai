@@ -3,12 +3,12 @@
     <v-progress-linear v-if="isLoading" color="success" indeterminate=""></v-progress-linear>
     <v-btn
       class="show-form-btn"
-      @click="updateRanking"
       color="orange"
       elevation="20"
       icon="mdi-refresh"
       intermediate
       size="large"
+      @click="updateRanking"
     ></v-btn>
     <RankingList :key="renderKey" />
     <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="snackbar.timeout">

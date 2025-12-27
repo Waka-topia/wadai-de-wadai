@@ -12,6 +12,7 @@ import store from '@/store'
 import { auth, db } from '../firebase/config'
 
 // Firestore から photoURL を取得する関数
+/** @param userId */
 export async function getPhotoURL(userId) {
   try {
     // Firestore の正しいドキュメント参照を作成

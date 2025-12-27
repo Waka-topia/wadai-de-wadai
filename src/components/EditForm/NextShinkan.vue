@@ -12,7 +12,7 @@
     </div>
 
     <!-- 第二段階: 運動系/文化系の選択 -->
-    <div class="d-flex flex-column my-3" v-if="selectedMainCategory !== 'all'">
+    <div v-if="selectedMainCategory !== 'all'" class="d-flex flex-column my-3">
       <label class="font-weight-bold" for="sub-category">運動系または文化系:</label>
       <select v-model="selectedSubCategory" @change="filterGroups">
         <option value="all">すべて</option>
@@ -34,12 +34,12 @@
     <!-- 日付選択 -->
     <div class="d-flex flex-column my-3">
       <label class="font-weight-bold" for="date">日付を選択:</label>
-      <input type="date" v-model="selectedDate" />
+      <input v-model="selectedDate" type="date" />
     </div>
 
     <!-- 保存ボタン -->
     <div class="d-flex flex-column my-3 mt-5">
-      <v-btn @click="saveShinkan" color="success" size="large">保存</v-btn>
+      <v-btn color="success" size="large" @click="saveShinkan">保存</v-btn>
     </div>
 
     <!-- スナックバー通知 -->
