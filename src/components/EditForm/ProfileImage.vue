@@ -9,9 +9,9 @@
             <v-container>
               <v-row>
                 <v-col
+                  class="d-flex justify-center"
                   v-for="(icon, index) in icons"
                   :key="index"
-                  class="d-flex justify-center"
                   lg="2"
                   md="3"
                   sm="4"
