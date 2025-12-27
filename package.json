@@ -21,6 +21,7 @@
     "leaflet": "^1.9.4",
     "leaflet-control-geocoder": "^2.4.0",
     "mapbox-gl": "^3.8.0",
+    "npm-check-updates": "^19.2.0",
     "register-service-worker": "^1.7.2",
     "uuid": "^11.0.3",
     "vite-plugin-pwa": "^0.21.1",
