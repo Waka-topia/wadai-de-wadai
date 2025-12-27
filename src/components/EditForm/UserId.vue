@@ -15,9 +15,9 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import { useStore } from 'vuex';
+import { computed } from 'vue'
+import { useStore } from 'vuex'
 
-const store = useStore();
-const userId = computed(() => store.getters["auth/userId"] || "Unknown");
+const store = useStore()
+const userId = computed(() => store.getters['auth/userId'] || 'Unknown')
 </script>

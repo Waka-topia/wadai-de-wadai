@@ -15,7 +15,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref } from 'vue'
 
 const props = defineProps({
   tabsName: {
@@ -25,7 +25,7 @@ const props = defineProps({
   tabsComponent: {
     type: Array,
     required: true,
-  }
+  },
 })
 
 const tab = ref(props.tabsName[0])

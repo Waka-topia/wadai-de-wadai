@@ -7,7 +7,12 @@
           <v-card-text>
             <v-form>
               <v-text-field v-model="name" label="お名前" required></v-text-field>
-              <v-text-field v-model="email" label="メールアドレス" placeholder="xxxxxxxx@wakayama-u.ac.jp" required></v-text-field>
+              <v-text-field
+                v-model="email"
+                label="メールアドレス"
+                placeholder="xxxxxxxx@wakayama-u.ac.jp"
+                required
+              ></v-text-field>
               <v-textarea v-model="content" label="お問い合わせ内容" required></v-textarea>
               <v-btn @click="submitInquiry" color="primary">送信</v-btn>
             </v-form>
@@ -18,5 +23,4 @@
   </v-main>
 </template>
 
-<script setup>
-</script>
+<script setup></script>

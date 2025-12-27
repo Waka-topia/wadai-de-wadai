@@ -16,29 +16,29 @@ export default {
   computed: {
     // Vuex の getter を使用してユーザーの称号を取得
     userId() {
-      return this.$store.getters['auth/userId']; // authモジュールのuserIdを取得
+      return this.$store.getters['auth/userId'] // authモジュールのuserIdを取得
     },
     userTitles() {
-      return this.$store.getters['title/getUserTitles'](this.userId);
-    }
+      return this.$store.getters['title/getUserTitles'](this.userId)
+    },
   },
   created() {
     // コンポーネント作成時に、ユーザーの称号を取得するアクションを呼び出す
-    this.fetchUserTitles();
+    this.fetchUserTitles()
   },
   methods: {
     async fetchUserTitles() {
       try {
-        await this.$store.dispatch('title/fetchUserTitles', this.userId);
-        
+        await this.$store.dispatch('title/fetchUserTitles', this.userId)
+
         // userTitles をコンソールに出力
-        console.log("取得したユーザーの称号:", this.userTitles);
+        console.log('取得したユーザーの称号:', this.userTitles)
       } catch (error) {
-        console.error("称号の取得に失敗しました:", error);
+        console.error('称号の取得に失敗しました:', error)
       }
-    }
-  }
-};
+    },
+  },
+}
 </script>
 
 <style scoped>
@@ -104,16 +104,16 @@ export default {
   .title-container {
     padding: 10px;
   }
-  
+
   .title-item {
     padding: 15px;
     margin: 10px 0;
   }
-  
+
   .title-name {
     font-size: 1.1em;
   }
-  
+
   .title-description {
     font-size: 0.9em;
   }

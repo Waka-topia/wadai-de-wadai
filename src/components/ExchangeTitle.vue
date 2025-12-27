@@ -14,62 +14,63 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   data() {
     return {
       error: null, // エラーメッセージを保存
-    };
+    }
   },
   computed: {
     // Vuexストアからタイトルデータを取得
-    ...mapGetters("title", ["allTitles"]),
+    ...mapGetters('title', ['allTitles']),
     titles() {
-      return this.allTitles;
+      return this.allTitles
     },
   },
   methods: {
-    ...mapActions("title", ["fetchAllTitles", "addTitleToUser"]),
+    ...mapActions('title', ['fetchAllTitles', 'addTitleToUser']),
 
     userId() {
-      return this.$store.getters["auth/userId"];
+      return this.$store.getters['auth/userId']
     },
 
     async claimTitle(title) {
       try {
-        this.error = null;
-        const userID = this.userId();
+        this.error = null
+        const userID = this.userId()
         if (!userID) {
-          throw new Error("ログインしてください。");
+          throw new Error('ログインしてください。')
         }
 
         await this.addTitleToUser({
           userID,
           titleID: title.id,
           titleData: title,
-        });
+        })
       } catch (err) {
-        console.error("Error claiming title:", err);
-        this.error = err.message === "User does not meet the criteria for this title"
-          ? "条件を満たしていません。"
-          : err.message;
+        console.error('Error claiming title:', err)
+        this.error =
+          err.message === 'User does not meet the criteria for this title'
+            ? '条件を満たしていません。'
+            : err.message
       }
     },
 
     async loadTitles() {
       try {
-        await this.fetchAllTitles();
+        await this.fetchAllTitles()
       } catch (error) {
-        console.error("Error loading titles:", error);
-        this.error = "称号データの取得に失敗しました。";
+        console.error('Error loading titles:', error)
+        this.error = '称号データの取得に失敗しました。'
       }
     },
   },
   mounted() {
-    this.loadTitles();
+    this.loadTitles()
   },
-};
+}
 </script>
 
 <style scoped>
@@ -102,7 +103,9 @@ export default {
   border-radius: 8px;
   padding: 16px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .title-card:hover {

@@ -1,18 +1,35 @@
 <template>
   <div class="profile-image">
     <div class="text-center pa-4">
-      <v-btn @click="dialog = true" icon="mdi-pencil">
-      </v-btn>
+      <v-btn @click="dialog = true" icon="mdi-pencil"> </v-btn>
 
       <v-bottom-sheet v-model="dialog" width="auto">
         <v-card prepend-icon="mdi-pencil" title="アイコンを変更" class="font-weight-bold">
           <template v-slot:actions>
             <v-container>
               <v-row>
-                <v-col v-for="(icon, index) in icons" :key="index" sm="4" md="3" lg="2" xl="1" class="d-flex justify-center">
-                  <v-img :src="getImageUrl(`userIcon/userIcon${index + 1}.png`)" :alt="'アイコン' + (index + 1)"
-                    :width="100" :height="100" max-width="100" max-height="100" cover aspect-ratio="1/1" :class="{ 'selected': selectedIcon === index }"
-                    @click="selectIcon(index)" contain>
+                <v-col
+                  v-for="(icon, index) in icons"
+                  :key="index"
+                  sm="4"
+                  md="3"
+                  lg="2"
+                  xl="1"
+                  class="d-flex justify-center"
+                >
+                  <v-img
+                    :src="getImageUrl(`userIcon/userIcon${index + 1}.png`)"
+                    :alt="'アイコン' + (index + 1)"
+                    :width="100"
+                    :height="100"
+                    max-width="100"
+                    max-height="100"
+                    cover
+                    aspect-ratio="1/1"
+                    :class="{ selected: selectedIcon === index }"
+                    @click="selectIcon(index)"
+                    contain
+                  >
                   </v-img>
                 </v-col>
               </v-row>
@@ -43,7 +60,7 @@ const isLoading = ref(false)
 const snackbar = ref({
   show: false,
   color: '',
-  message: ''
+  message: '',
 })
 
 // computedプロパティ
@@ -64,21 +81,21 @@ const saveIcon = async () => {
       snackbar.value = {
         show: true,
         color: 'success',
-        message: 'アイコンを保存しました'
+        message: 'アイコンを保存しました',
       }
       dialog.value = false
     } else {
       snackbar.value = {
         show: true,
         color: 'error',
-        message: 'アイコンを選択してください'
+        message: 'アイコンを選択してください',
       }
     }
   } catch (error) {
     snackbar.value = {
       show: true,
       color: 'error',
-      message: 'アイコンの保存に失敗しました: ' + error.message
+      message: 'アイコンの保存に失敗しました: ' + error.message,
     }
   } finally {
     isLoading.value = false
