@@ -1,0 +1,27 @@
+# Ignore artifacts:
+build
+coverage
+dist
+dist-ssr
+
+# Dependencies
+node_modules
+
+# Lock files
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Environment
+.env
+.env.*
+
+# Git
+.git
+
+# Logs
+*.log
+
+# PWA generated files
+sw.js
+workbox-*.js
