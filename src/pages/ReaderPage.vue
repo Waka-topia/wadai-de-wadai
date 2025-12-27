@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isAuthenticated" class="d-flex flex-column justify-center align-center my-10">
+  <div class="d-flex flex-column justify-center align-center my-10" v-if="isAuthenticated">
     <QRScanner></QRScanner>
   </div>
 

@@ -1,16 +1,18 @@
 import {
-  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  updateProfile,
   onAuthStateChanged,
+  signInWithEmailAndPassword,
   signOut,
+  updateProfile,
 } from 'firebase/auth'
-import { auth } from '../firebase/config'
-import { doc, setDoc, getDoc } from 'firebase/firestore' // Firestore の関数をインポート
-import { db } from '../firebase/config' // Firestore インスタンスをインポート
+import { doc, getDoc, setDoc } from 'firebase/firestore' // Firestore の関数をインポート
+
+// Firestore インスタンスをインポート
 import store from '@/store'
+import { auth, db } from '../firebase/config'
 
 // Firestore から photoURL を取得する関数
+/** @param userId */
 export async function getPhotoURL(userId) {
   try {
     // Firestore の正しいドキュメント参照を作成

@@ -1,12 +1,13 @@
-//src/store/index.js
+// src/store/index.js
 import { createStore } from 'vuex'
 import authModule from './modules/auth'
-import stampModule from './modules/stamp' // スタンプモジュールをインポート
+import eventModule from './modules/event' // イベントモジュールをインポート
 import rankingModule from './modules/ranking' // ランキングモジュールをインポート
 import shinkanModule from './modules/shinkan' // 新歓モジュールをインポート
-import userModule from './modules/user' // ユーザーモジュールをインポート
+import stampModule from './modules/stamp' // スタンプモジュールをインポート
+
 import titleModule from './modules/title' // タイトルモジュールをインポート
-import eventModule from './modules/event' // イベントモジュールをインポート
+import userModule from './modules/user' // ユーザーモジュールをインポート
 
 export default createStore({
   state: {

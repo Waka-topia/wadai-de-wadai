@@ -1,6 +1,6 @@
 <template>
-  <v-avatar size="120" class="mb-2">
-    <v-img :src="getImageUrl(photoURL)" alt="ユーザーのアイコン" />
+  <v-avatar class="mb-2" size="120">
+    <v-img alt="ユーザーのアイコン" :src="getImageUrl(photoURL)" />
   </v-avatar>
 </template>
 

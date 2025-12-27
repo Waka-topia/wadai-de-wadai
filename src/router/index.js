@@ -1,3 +1,4 @@
+import { createRouter, createWebHistory } from 'vue-router'
 import EventCal from '@/pages/EventCal.vue'
 import { default as Home, default as testpage } from '@/pages/Home.vue'
 import InquiryPage from '@/pages/InquiryPage.vue'
@@ -5,10 +6,9 @@ import MyPage from '@/pages/MyPage.vue'
 import Ranking from '@/pages/RankingPage.vue'
 import Reader from '@/pages/ReaderPage.vue'
 import TitleShop from '@/pages/TitleShop.vue'
-import { createRouter, createWebHistory } from 'vue-router'
 import Login from '../pages/Login.vue'
-import SignUp from '../pages/SignUp.vue'
 import Rule from '../pages/RulePage.vue'
+import SignUp from '../pages/SignUp.vue'
 
 const routes = [
   { path: '/', name: 'Home', component: Home },

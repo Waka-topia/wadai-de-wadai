@@ -1,22 +1,22 @@
 <template>
   <div class="event-list">
-    <vue-cal
-      :events="events"
-      hide-view-selector
-      active-view="month"
-      :disable-views="['years', 'year', 'week', 'day']"
-      locale="ja"
+    <VueCal
       class="vuecal"
-      style="height: 70vh"
-      :selected-date="selectedDate"
-      @cell-click="selectedDate = $event"
-      :min-date="minDate"
+      :disable-views="['years', 'year', 'week', 'day']"
+      :events="events"
       :max-date="maxDate"
-    ></vue-cal>
+      :min-date="minDate"
+      :selected-date="selectedDate"
+      active-view="month"
+      hide-view-selector
+      locale="ja"
+      style="height: 70vh"
+      @cell-click="selectedDate = $event"
+    ></VueCal>
 
     <v-divider class="my-5"></v-divider>
 
-    <v-btn class="font-weight-bold set-today-btn" variant="outlined" rounded @click="setToday">
+    <v-btn class="font-weight-bold set-today-btn" rounded variant="outlined" @click="setToday">
       <v-icon left>mdi-calendar-today</v-icon>
       今日の新歓イベント
     </v-btn>
@@ -27,8 +27,8 @@
       <template #activator="{ props: activatorProps }">
         <v-btn
           class="text-white font-weight-bold show-form-btn"
-          color="orange"
           v-bind="activatorProps"
+          color="orange"
           elevation="15"
           rounded
         >
@@ -70,10 +70,10 @@
 import VueCal from 'vue-cal'
 import 'vue-cal/dist/vuecal.css'
 import { mapGetters } from 'vuex'
-import { verifyOrganizerPassword, addEvent, getEvents, deleteEvent } from '@/services/eventService'
 import EventForm from '@/components/Event/EventForm.vue'
 import EventModal from '@/components/Event/EventModal.vue'
 import EventSchedule from '@/components/Event/EventSchedule.vue'
+import { addEvent, deleteEvent, getEvents, verifyOrganizerPassword } from '@/services/eventService'
 
 export default {
   components: {
@@ -106,6 +106,9 @@ export default {
   },
   computed: {
     ...mapGetters('event', ['allEvents']),
+  },
+  mounted() {
+    this.fetchEvents()
   },
   methods: {
     async fetchEvents() {
@@ -214,9 +217,6 @@ export default {
         message: message,
       }
     },
-  },
-  mounted() {
-    this.fetchEvents()
   },
 }
 </script>

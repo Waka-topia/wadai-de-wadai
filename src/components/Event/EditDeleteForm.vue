@@ -1,5 +1,5 @@
 <template>
-  <div v-show="isEditDeleteFormVisible" class="edit-delete-form">
+  <div class="edit-delete-form" v-show="isEditDeleteFormVisible">
     <div class="form-group">
       <label for="organizer-id">団体ID:</label>
       <input type="text" v-model="organizerId" required />
@@ -8,10 +8,10 @@
       <label for="password">パスワード:</label>
       <input type="password" v-model="password" required />
     </div>
-    <button @click="$emit('delete-event', organizerId, password)" class="delete-button">
+    <button class="delete-button" @click="$emit('delete-event', organizerId, password)">
       削除
     </button>
-    <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+    <p class="error-message" v-if="errorMessage">{{ errorMessage }}</p>
   </div>
 </template>
 

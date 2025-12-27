@@ -1,7 +1,7 @@
 name: Feature request
 description: File a feature request.
-title: "[FEATURE]: "
-labels: ["enhancement"]
+title: '[FEATURE]: '
+labels: ['enhancement']
 body:
   - type: markdown
     attributes:
@@ -40,4 +40,3 @@ body:
       description: スクリーンショットや参考資料などがあれば追加してください
     validations:
       required: false
-

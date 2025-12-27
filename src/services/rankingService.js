@@ -162,6 +162,7 @@ export default {
 
   /**
    * Firestoreからランキングデータ（top100）を取得する関数
+   *
    * @returns {Promise<Array>} ランキングデータの配列
    */
   async fetchTop100() {

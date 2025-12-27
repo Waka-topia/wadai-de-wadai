@@ -1,5 +1,5 @@
 // import { addStampToUser, getUserStamps } from "../../services/firestoreService";
-import { addStampToUser, getUserStamps, getUserStampImages } from '../../services/stampService'
+import { addStampToUser, getUserStampImages, getUserStamps } from '../../services/stampService'
 
 const state = {
   stamps: [], // ユーザーが受け取ったスタンプ一覧

@@ -1,34 +1,34 @@
 <template>
   <div class="profile-image">
     <div class="text-center pa-4">
-      <v-btn @click="dialog = true" icon="mdi-pencil"> </v-btn>
+      <v-btn icon="mdi-pencil" @click="dialog = true"> </v-btn>
 
       <v-bottom-sheet v-model="dialog" width="auto">
-        <v-card prepend-icon="mdi-pencil" title="アイコンを変更" class="font-weight-bold">
-          <template v-slot:actions>
+        <v-card class="font-weight-bold" title="アイコンを変更" prepend-icon="mdi-pencil">
+          <template #actions>
             <v-container>
               <v-row>
                 <v-col
+                  class="d-flex justify-center"
                   v-for="(icon, index) in icons"
                   :key="index"
-                  sm="4"
-                  md="3"
                   lg="2"
+                  md="3"
+                  sm="4"
                   xl="1"
-                  class="d-flex justify-center"
                 >
                   <v-img
-                    :src="getImageUrl(`userIcon/userIcon${index + 1}.png`)"
                     :alt="'アイコン' + (index + 1)"
-                    :width="100"
-                    :height="100"
-                    max-width="100"
-                    max-height="100"
-                    cover
-                    aspect-ratio="1/1"
                     :class="{ selected: selectedIcon === index }"
-                    @click="selectIcon(index)"
+                    :height="100"
+                    :src="getImageUrl(`userIcon/userIcon${index + 1}.png`)"
+                    :width="100"
+                    aspect-ratio="1/1"
                     contain
+                    cover
+                    max-height="100"
+                    max-width="100"
+                    @click="selectIcon(index)"
                   >
                   </v-img>
                 </v-col>

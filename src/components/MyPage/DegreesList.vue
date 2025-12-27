@@ -1,7 +1,7 @@
 <template>
   <div class="title-container">
     <ul class="title-list">
-      <li v-for="title in userTitles" :key="title.id" class="title-item">
+      <li class="title-item" v-for="title in userTitles" :key="title.id">
         <div class="title-card">
           <h3 class="title-name">{{ title.name }}</h3>
           <p class="title-description">{{ title.description }}</p>

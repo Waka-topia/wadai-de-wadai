@@ -8,19 +8,19 @@
       </v-app-bar-title>
     </v-app-bar>
 
-    <v-navigation-drawer v-model="drawer" class="bg-white">
+    <v-navigation-drawer class="bg-white" v-model="drawer">
       <v-list>
-        <v-list-item size="large" @click="gotoshop" class="position-relative my-1" block>
+        <v-list-item class="position-relative my-1" block size="large" @click="gotoshop">
           <v-icon> mdi-download </v-icon>
           称号を受け取る
           <v-icon class="position-absolute right-0 mx-2"> mdi-chevron-right </v-icon>
         </v-list-item>
-        <v-list-item size="large" @click="gotoinquiry" class="position-relative my-1" block>
+        <v-list-item class="position-relative my-1" block size="large" @click="gotoinquiry">
           <v-icon> mdi-email-outline </v-icon>
           お問い合わせ
           <v-icon class="position-absolute right-0 mx-2"> mdi-open-in-new </v-icon>
         </v-list-item>
-        <v-list-item size="large" @click="gotorule" class="position-relative my-1" block>
+        <v-list-item class="position-relative my-1" block size="large" @click="gotorule">
           <v-icon> mdi-information-outline </v-icon>
           利用規約
           <v-icon class="position-absolute right-0 mx-2"> mdi-chevron-right </v-icon>

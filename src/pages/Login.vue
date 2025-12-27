@@ -1,39 +1,39 @@
 <template>
-  <v-progress-linear color="success" v-if="isLoading" indeterminate=""></v-progress-linear>
+  <v-progress-linear v-if="isLoading" color="success" indeterminate=""></v-progress-linear>
   <v-sheet class="pa-12" rounded>
     <v-card class="py-8">
       <v-form v-model="form" @submit.prevent="onSubmit">
         <v-text-field
+          class="mb-2"
           v-model="email"
           :rules="[required, emailDomainCheck]"
-          prepend-inner-icon="mdi-email-outline"
-          class="mb-2"
+          clearable
           label="Email"
           placeholder="sample@gmail.com"
-          clearable
+          prepend-inner-icon="mdi-email-outline"
         ></v-text-field>
         <v-text-field
           v-model="password"
-          :rules="[required]"
           :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
+          :rules="[required]"
           :type="visible ? 'text' : 'password'"
-          prepend-inner-icon="mdi-lock-outline"
+          clearable
           label="Password"
           placeholder="Xa4%j87d"
-          clearable
+          prepend-inner-icon="mdi-lock-outline"
           @click:append-inner="visible = !visible"
         ></v-text-field>
 
         <br />
 
         <v-btn
+          type="submit"
           :disabled="!form"
           :loading="isLoading"
+          block
           color="success"
           size="large"
-          type="submit"
           variant="elevated"
-          block
         >
           Sign In
         </v-btn>

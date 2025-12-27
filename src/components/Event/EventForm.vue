@@ -1,68 +1,68 @@
 <template>
-  <form @submit.prevent="submitEvent" class="px-2 mx-2">
+  <form class="px-2 mx-2" @submit.prevent="submitEvent">
     <div class="form-group">
       <label for="date">日付:</label>
       <input
+        class="form-control"
         type="date"
         v-model="newEvent.date"
-        required
-        class="form-control"
-        min="2025-04-01"
         max="2025-05-31"
+        min="2025-04-01"
+        required
       />
     </div>
     <div class="form-group">
       <label for="start-time">開始時刻:</label>
-      <input type="time" v-model="newEvent.startTime" required class="form-control" />
+      <input class="form-control" type="time" v-model="newEvent.startTime" required />
     </div>
     <div class="form-group">
       <label for="end-time">終了時刻:</label>
-      <input type="time" v-model="newEvent.endTime" required class="form-control" />
+      <input class="form-control" type="time" v-model="newEvent.endTime" required />
     </div>
     <div class="form-group">
       <label for="location">場所:</label>
       <input
+        class="form-control"
         type="text"
         v-model="newEvent.location"
-        required
-        class="form-control"
         placeholder="イベントの場所"
+        required
       />
     </div>
     <div class="form-group">
       <label for="description">概要:</label>
       <textarea
-        v-model="newEvent.description"
-        required
         class="form-control"
+        v-model="newEvent.description"
         placeholder="イベントの概要を入力"
+        required
       ></textarea>
     </div>
     <div class="form-group">
       <label for="organizer-name">団体名(略称可):</label>
       <input
+        class="form-control"
         type="text"
         v-model="newEvent.organizerName"
-        required
-        class="form-control"
         placeholder="団体名（略称可）"
+        required
       />
     </div>
     <div class="form-group">
       <label for="organizer-id">団体ID:</label>
-      <input type="text" v-model="organizerId" required class="form-control" placeholder="団体ID" />
+      <input class="form-control" type="text" v-model="organizerId" placeholder="団体ID" required />
     </div>
     <div class="form-group">
       <label for="password">パスワード:</label>
       <input
+        class="form-control"
         type="password"
         v-model="password"
-        required
-        class="form-control"
         placeholder="パスワード"
+        required
       />
     </div>
-    <button type="submit" class="submit-btn">イベントを登録</button>
+    <button class="submit-btn" type="submit">イベントを登録</button>
   </form>
 </template>
 

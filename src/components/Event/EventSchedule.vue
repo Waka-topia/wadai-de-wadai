@@ -1,24 +1,24 @@
 <template>
   <div class="event-schedule">
     <div class="nav-buttons">
-      <button @click="changeDate(-1)" class="nav-btn">&#x3C;</button>
+      <button class="nav-btn" @click="changeDate(-1)">&#x3C;</button>
       <h3 class="title">{{ formattedSelectedDate }} の新歓イベント</h3>
-      <button @click="changeDate(1)" class="nav-btn">&#x3E;</button>
+      <button class="nav-btn" @click="changeDate(1)">&#x3E;</button>
     </div>
 
-    <div v-if="filteredEvents.length === 0" class="no-events">イベントはありません</div>
+    <div class="no-events" v-if="filteredEvents.length === 0">イベントはありません</div>
 
-    <div v-else class="d-flex flex-column ga-2">
+    <div class="d-flex flex-column ga-2" v-else>
       <div
+        class="border-md rounded-lg"
         v-for="event in filteredEvents"
         :key="event.eventId"
-        class="border-md rounded-lg"
         @click="openEventModal(event)"
       >
         <v-row class="py-4">
           <v-col
-            cols="3"
             class="text-center justify-center align-center font-weight-bold text-body-2"
+            cols="3"
           >
             <div>
               {{ formatTime(event.start) }}
@@ -86,6 +86,11 @@ export default {
       })
     },
   },
+  watch: {
+    selectedDate(newVal) {
+      this.internalSelectedDate = new Date(newVal)
+    },
+  },
   methods: {
     formatTime(dateString) {
       const date = new Date(dateString)
@@ -99,11 +104,6 @@ export default {
       newDate.setDate(newDate.getDate() + days)
       this.internalSelectedDate = newDate
       this.$emit('update:selectedDate', newDate.toISOString().split('T')[0])
-    },
-  },
-  watch: {
-    selectedDate(newVal) {
-      this.internalSelectedDate = new Date(newVal)
     },
   },
 }
