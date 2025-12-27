@@ -98,11 +98,8 @@
 
 <script setup>
 import { defineProps } from 'vue'
-import { useRouter } from 'vue-router'
 
-const router = useRouter()
-
-const props = defineProps({
+defineProps({
   name: {
     type: String,
     required: true,
@@ -124,10 +121,6 @@ const props = defineProps({
     required: true,
   },
 })
-
-const navigateToProfile = () => {
-  router.push(`/${props.name}`)
-}
 
 const getImageUrl = (relativePath) => {
   if (relativePath) {
