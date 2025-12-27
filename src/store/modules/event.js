@@ -1,11 +1,5 @@
 //src/store/modules/event.js
-import {
-  addEvent,
-  getEvent,
-  updateEvent,
-  deleteEvent,
-  getEvents,
-} from '../../services/eventService'
+import { addEvent, updateEvent, deleteEvent, getEvents } from '../../services/eventService'
 
 const state = {
   events: [], // イベントデータを格納

@@ -28,4 +28,9 @@ import { useStore } from 'vuex'
 const store = useStore()
 const isAuthenticated = computed(() => store.getters['auth/isAuthenticated'])
 const displayName = computed(() => store.getters['auth/user'].displayName)
+
+// ESLint rule: vue/multi-word-component-names
+defineOptions({
+  name: 'HomePage',
+})
 </script>

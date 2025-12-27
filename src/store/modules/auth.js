@@ -30,7 +30,7 @@ export default {
   },
   actions: {
     initializeAuth({ commit }) {
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
         authService.onAuthStateChanged((user) => {
           if (user) {
             user.getIdToken().then((idToken) => {
