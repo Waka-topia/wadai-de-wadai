@@ -200,16 +200,16 @@ export default [
   // ===========================================
   // vite.config.js専用設定
   // ===========================================
-  // PWA manifestのプロパティ名（short_name, theme_color）を許可
+  // PWA manifestのプロパティ名（short_name, theme_color, start_url等）を許可するため
+  // プロパティ名のキャメルケース強制を無効化
   {
     files: ['vite.config.js'],
     rules: {
       camelcase: [
         'error',
         {
-          properties: 'always',
+          properties: 'never',
           ignoreDestructuring: false,
-          allow: ['short_name', 'theme_color'], // PWA manifest仕様のため許可
         },
       ],
     },
