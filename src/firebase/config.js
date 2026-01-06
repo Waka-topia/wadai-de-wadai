@@ -29,9 +29,7 @@ if (missingVars.length > 0) {
     '❌ Firebase設定エラー: 以下の環境変数が設定されていません:',
     missingVars.join(', '),
   )
-  console.error(
-    '📝 プロジェクトルートに .env ファイルを作成し、Firebase設定を追加してください。',
-  )
+  console.error('📝 プロジェクトルートに .env ファイルを作成し、Firebase設定を追加してください。')
   console.error('📖 詳細は README.md を参照してください。')
 }
 
@@ -47,9 +45,7 @@ try {
   console.log('✅ Firebase初期化成功')
 } catch (error) {
   console.error('❌ Firebase初期化エラー:', error)
-  console.error(
-    '💡 .env ファイルにFirebase設定が正しく設定されているか確認してください。',
-  )
+  console.error('💡 .env ファイルにFirebase設定が正しく設定されているか確認してください。')
   // エラーが発生してもアプリは起動できるように、ダミーオブジェクトをエクスポート
   // ただし、Firebase機能は使用できません
 }

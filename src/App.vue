@@ -8,7 +8,7 @@
       </v-app-bar-title>
     </v-app-bar>
 
-    <v-navigation-drawer v-model="drawer" class="bg-white">
+    <v-navigation-drawer class="bg-white" v-model="drawer">
       <v-list>
         <v-list-item class="position-relative my-1" block size="large" @click="gotoshop">
           <v-icon> mdi-download </v-icon>

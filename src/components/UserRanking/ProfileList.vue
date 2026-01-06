@@ -1,13 +1,13 @@
 <template>
   <div>
-    <v-skeleton-loader v-if="isLoading" type="list-item-avatar-three-line" :elevation="0" />
-    <v-skeleton-loader v-if="isLoading" type="list-item-avatar-three-line" :elevation="0" />
-    <v-skeleton-loader v-if="isLoading" type="list-item-avatar-three-line" :elevation="0" />
-    <v-skeleton-loader v-if="isLoading" type="list-item-avatar-three-line" :elevation="0" />
-    <v-skeleton-loader v-if="isLoading" type="list-item-avatar-three-line" :elevation="0" />
-    <v-skeleton-loader v-if="isLoading" type="list-item-avatar-three-line" :elevation="0" />
-    <v-skeleton-loader v-if="isLoading" type="list-item-avatar-three-line" :elevation="0" />
-    <v-alert v-if="error" type="error" title="エラー" :text="errorMessages"></v-alert>
+    <v-skeleton-loader type="list-item-avatar-three-line" v-if="isLoading" :elevation="0" />
+    <v-skeleton-loader type="list-item-avatar-three-line" v-if="isLoading" :elevation="0" />
+    <v-skeleton-loader type="list-item-avatar-three-line" v-if="isLoading" :elevation="0" />
+    <v-skeleton-loader type="list-item-avatar-three-line" v-if="isLoading" :elevation="0" />
+    <v-skeleton-loader type="list-item-avatar-three-line" v-if="isLoading" :elevation="0" />
+    <v-skeleton-loader type="list-item-avatar-three-line" v-if="isLoading" :elevation="0" />
+    <v-skeleton-loader type="list-item-avatar-three-line" v-if="isLoading" :elevation="0" />
+    <v-alert type="error" title="エラー" v-if="error" :text="errorMessages"></v-alert>
     <div v-if="!isLoading && rankings.length > 0">
       <ProfileCard
         v-for="(user, index) in rankings"
@@ -42,7 +42,6 @@ export default {
     ...mapActions('ranking', ['fetchRankings']),
     async fetchAdditionalUserData(userId) {
       try {
-         
         const photoURL = await this.$store.dispatch('users/getPhotoURL', userId)
         const nextShinkan = await this.$store.dispatch('users/getNextShinkanDetails', userId)
         return { photoURL, nextShinkan }

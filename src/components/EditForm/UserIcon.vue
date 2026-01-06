@@ -9,7 +9,7 @@ import { computed } from 'vue'
 import { useStore } from 'vuex'
 
 const store = useStore()
- 
+
 const photoURL = computed(() => store.getters['auth/photoURL'])
 
 const getImageUrl = (relativePath) => {
