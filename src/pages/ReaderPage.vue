@@ -1,6 +1,6 @@
 <template>
-  <div class="d-flex flex-column justify-center align-center my-10" v-if="isAuthenticated">
-    <QRScanner></QRScanner>
+  <div v-if="isAuthenticated" class="d-flex flex-column justify-center align-center my-10">
+    <QrScannerComponent></QrScannerComponent>
   </div>
 
   <div v-else>
@@ -11,7 +11,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useStore } from 'vuex'
-import QRScanner from '@/components/templates/QRScanner.vue'
+import QrScannerComponent from '@/components/templates/QRScanner.vue'
 import RecommendLogin from '@/components/templates/RecommendLogin.vue'
 
 const store = useStore()

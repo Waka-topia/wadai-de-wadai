@@ -3,9 +3,9 @@
     <div class="form-group">
       <label for="date">日付:</label>
       <input
+        v-model="newEvent.date"
         class="form-control"
         type="date"
-        v-model="newEvent.date"
         max="2025-05-31"
         min="2025-04-01"
         required
@@ -13,18 +13,18 @@
     </div>
     <div class="form-group">
       <label for="start-time">開始時刻:</label>
-      <input class="form-control" type="time" v-model="newEvent.startTime" required />
+      <input v-model="newEvent.startTime" class="form-control" type="time" required />
     </div>
     <div class="form-group">
       <label for="end-time">終了時刻:</label>
-      <input class="form-control" type="time" v-model="newEvent.endTime" required />
+      <input v-model="newEvent.endTime" class="form-control" type="time" required />
     </div>
     <div class="form-group">
       <label for="location">場所:</label>
       <input
+        v-model="newEvent.location"
         class="form-control"
         type="text"
-        v-model="newEvent.location"
         placeholder="イベントの場所"
         required
       />
@@ -32,8 +32,8 @@
     <div class="form-group">
       <label for="description">概要:</label>
       <textarea
-        class="form-control"
         v-model="newEvent.description"
+        class="form-control"
         placeholder="イベントの概要を入力"
         required
       ></textarea>
@@ -41,23 +41,23 @@
     <div class="form-group">
       <label for="organizer-name">団体名(略称可):</label>
       <input
+        v-model="newEvent.organizerName"
         class="form-control"
         type="text"
-        v-model="newEvent.organizerName"
         placeholder="団体名（略称可）"
         required
       />
     </div>
     <div class="form-group">
       <label for="organizer-id">団体ID:</label>
-      <input class="form-control" type="text" v-model="organizerId" placeholder="団体ID" required />
+      <input v-model="organizerId" class="form-control" type="text" placeholder="団体ID" required />
     </div>
     <div class="form-group">
       <label for="password">パスワード:</label>
       <input
+        v-model="password"
         class="form-control"
         type="password"
-        v-model="password"
         placeholder="パスワード"
         required
       />
@@ -68,6 +68,7 @@
 
 <script>
 export default {
+  emits: ['submitEvent'],
   data() {
     return {
       newEvent: {
@@ -99,7 +100,7 @@ export default {
 
     // イベントを送信するメソッド
     submitEvent() {
-      this.$emit('submit-event', this.newEvent, this.organizerId, this.password) // 親コンポーネントにイベントを送信
+      this.$emit('submitEvent', this.newEvent, this.organizerId, this.password) // 親コンポーネントにイベントを送信
       this.resetForm() // 送信後にフォームをリセット
     },
   },

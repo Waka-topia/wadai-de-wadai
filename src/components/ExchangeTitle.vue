@@ -1,15 +1,15 @@
 <template>
   <div class="titles-container">
     <h1 class="page-title">称号一覧</h1>
-    <ul class="titles-list" v-if="titles.length">
-      <li class="title-card" v-for="title in titles" :key="title.id">
+    <ul v-if="titles.length" class="titles-list">
+      <li v-for="title in titles" :key="title.id" class="title-card">
         <h2 class="title-name">{{ title.name }}</h2>
         <p class="title-description">{{ title.description }}</p>
         <v-btn color="primary" @click="claimTitle(title)">獲得する</v-btn>
       </li>
     </ul>
-    <p class="no-titles-message" v-else>称号がありません。</p>
-    <p class="error-message" v-if="error">{{ error }}</p>
+    <p v-else class="no-titles-message">称号がありません。</p>
+    <p v-if="error" class="error-message">{{ error }}</p>
   </div>
 </template>
 
@@ -39,13 +39,13 @@ export default {
     async claimTitle(title) {
       try {
         this.error = null
-        const userID = this.userId()
-        if (!userID) {
+        const userId = this.userId()
+        if (!userId) {
           throw new Error('ログインしてください。')
         }
 
         await this.addTitleToUser({
-          userID,
+          userID: userId,
           titleID: title.id,
           titleData: title,
         })

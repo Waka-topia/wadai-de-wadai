@@ -1,17 +1,17 @@
 <template>
-  <div class="edit-delete-form" v-show="isEditDeleteFormVisible">
+  <div v-show="isEditDeleteFormVisible" class="edit-delete-form">
     <div class="form-group">
       <label for="organizer-id">団体ID:</label>
-      <input type="text" v-model="organizerId" required />
+      <input v-model="organizerId" type="text" required />
     </div>
     <div class="form-group">
       <label for="password">パスワード:</label>
-      <input type="password" v-model="password" required />
+      <input v-model="password" type="password" required />
     </div>
-    <button class="delete-button" @click="$emit('delete-event', organizerId, password)">
+    <button class="delete-button" @click="$emit('deleteEvent', organizerId, password)">
       削除
     </button>
-    <p class="error-message" v-if="errorMessage">{{ errorMessage }}</p>
+    <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
   </div>
 </template>
 
@@ -20,6 +20,7 @@ export default {
   props: {
     isEditDeleteFormVisible: Boolean,
   },
+  emits: ['deleteEvent'],
   data() {
     return {
       organizerId: '',

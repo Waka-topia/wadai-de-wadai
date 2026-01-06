@@ -1,6 +1,7 @@
 import { fileURLToPath, URL } from 'node:url'
 import vue from '@vitejs/plugin-vue'
 import { defineConfig } from 'vite'
+import { nodePolyfills } from 'vite-plugin-node-polyfills'
 import { VitePWA } from 'vite-plugin-pwa'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
@@ -9,6 +10,16 @@ export default defineConfig({
   plugins: [
     vue(),
     vueDevTools(),
+    nodePolyfills({
+      // bcryptjsで必要なcryptoモジュールをpolyfill
+      globals: {
+        Buffer: true,
+        global: true,
+        process: true,
+      },
+      // cryptoモジュールを明示的に有効化
+      include: ['crypto'],
+    }),
     VitePWA({
       registerType: 'autoUpdate', // サービスワーカーの自動更新
       manifest: {

@@ -9,9 +9,9 @@
             <v-container>
               <v-row>
                 <v-col
-                  class="d-flex justify-center"
                   v-for="(icon, index) in icons"
                   :key="index"
+                  class="d-flex justify-center"
                   lg="2"
                   md="3"
                   sm="4"
@@ -75,8 +75,8 @@ const saveIcon = async () => {
   try {
     if (selectedIcon.value !== null) {
       isLoading.value = true
-      const iconURL = `userIcon/userIcon${selectedIcon.value + 1}.png`
-      await store.dispatch('auth/updatePhotoURL', iconURL)
+      const iconUrl = `userIcon/userIcon${selectedIcon.value + 1}.png`
+      await store.dispatch('auth/updatePhotoURL', iconUrl)
       snackbar.value = {
         show: true,
         color: 'success',

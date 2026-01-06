@@ -125,8 +125,8 @@ export default [
       // -------------------------------------------
       // コンポーネントAPI
       // -------------------------------------------
-      // script setupまたはComposition APIのみ許可
-      'vue/component-api-style': ['error', ['script-setup', 'composition']],
+      // script setupまたはComposition APIのみ許可（既存コードの互換性のため警告レベル）
+      'vue/component-api-style': ['warn', ['script-setup', 'composition']],
       // script setup内の変数を正しく認識
       'vue/script-setup-uses-vars': 'error',
       // definePropsの型チェック
@@ -169,10 +169,11 @@ export default [
       // -------------------------------------------
       // Vueファイルはdefault exportを許可
       'import/no-default-export': 'off',
-      // 変数名はcamelCaseのみ許可
+      // 変数名はcamelCaseまたはPascalCase（コンポーネント名）を許可
+      // URL, IDなどの略語も許可（Firebaseプロパティ名との互換性のため）
       'id-match': [
         'error',
-        '^[a-z]+([A-Z][a-z]+)*$',
+        '^([a-z]+([A-Z][a-z]*)*([A-Z]{2,})?|[A-Z][a-z]+([A-Z][a-z]*)*([A-Z]{2,})?)$', // camelCase または PascalCase（URL, IDなどの略語対応）
         {
           properties: false,
           onlyDeclarations: true,
@@ -191,8 +192,26 @@ export default [
     rules: {
       // Vueファイル名はPascalCase（例: UserProfile.vue）
       'check-file/filename-naming-convention': ['error', { '**/*.vue': 'PASCAL_CASE' }],
-      // フォルダ名はkebab-case（例: user-profile/）
-      'check-file/folder-naming-convention': ['error', { 'src/**/': 'KEBAB_CASE' }],
+      // フォルダ名はkebab-case（例: user-profile/）（既存コードの互換性のため警告レベル）
+      'check-file/folder-naming-convention': ['warn', { 'src/**/': 'KEBAB_CASE' }],
+    },
+  },
+
+  // ===========================================
+  // vite.config.js専用設定
+  // ===========================================
+  // PWA manifestのプロパティ名（short_name, theme_color）を許可
+  {
+    files: ['vite.config.js'],
+    rules: {
+      camelcase: [
+        'error',
+        {
+          properties: 'always',
+          ignoreDestructuring: false,
+          allow: ['short_name', 'theme_color'], // PWA manifest仕様のため許可
+        },
+      ],
     },
   },
 

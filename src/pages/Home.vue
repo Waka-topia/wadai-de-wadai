@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex flex-column justify-center align-center my-10" v-if="isAuthenticated">
+  <div v-if="isAuthenticated" class="d-flex flex-column justify-center align-center my-10">
     <p class="text-emphasis font-weight-bold">こんにちは、{{ displayName }} さん！</p>
     <p class="text-center text-emphasis pb-6">
       \ <span class="font-weight-bold">和大DE話題</span>でみんなと新歓に行こう /
@@ -13,7 +13,7 @@
       aspect-ratio="1/1"
       cover
     ></v-img>
-  </div>
+  </div>  
 
   <div v-else>
     <RecommendLogin />

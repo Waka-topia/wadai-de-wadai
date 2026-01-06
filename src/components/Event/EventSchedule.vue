@@ -6,13 +6,13 @@
       <button class="nav-btn" @click="changeDate(1)">&#x3E;</button>
     </div>
 
-    <div class="no-events" v-if="filteredEvents.length === 0">イベントはありません</div>
+    <div v-if="filteredEvents.length === 0" class="no-events">イベントはありません</div>
 
-    <div class="d-flex flex-column ga-2" v-else>
+    <div v-else class="d-flex flex-column ga-2">
       <div
-        class="border-md rounded-lg"
         v-for="event in filteredEvents"
         :key="event.eventId"
+        class="border-md rounded-lg"
         @click="openEventModal(event)"
       >
         <v-row class="py-4">
@@ -58,6 +58,7 @@ export default {
       default: null,
     },
   },
+  emits: ['openModal', 'update:selectedDate'],
   data() {
     return {
       internalSelectedDate: this.selectedDate ? new Date(this.selectedDate) : new Date(),
@@ -97,7 +98,7 @@ export default {
       return date.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })
     },
     openEventModal(event) {
-      this.$emit('open-modal', event)
+      this.$emit('openModal', event)
     },
     changeDate(days) {
       const newDate = new Date(this.internalSelectedDate)

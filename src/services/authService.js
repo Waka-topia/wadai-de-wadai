@@ -11,9 +11,17 @@ import { doc, getDoc, setDoc } from 'firebase/firestore' // Firestore の関数�
 import store from '@/store'
 import { auth, db } from '../firebase/config'
 
+// Firebaseが正しく初期化されているかチェック
+if (!auth || !db) {
+  console.error('❌ Firebaseが初期化されていません。.envファイルを確認してください。')
+}
+
 // Firestore から photoURL を取得する関数
 /** @param userId */
 export async function getPhotoURL(userId) {
+  if (!db) {
+    throw new Error('Firebaseが初期化されていません。.envファイルを確認してください。')
+  }
   try {
     // Firestore の正しいドキュメント参照を作成
     const docRef = doc(db, `users/${userId}`)
@@ -36,6 +44,11 @@ export async function getPhotoURL(userId) {
 
 export default {
   onAuthStateChanged(callback) {
+    if (!auth) {
+      console.error('❌ Firebase Authが初期化されていません。')
+      if (callback) callback(null)
+      return () => {} // 空のunsubscribe関数を返す
+    }
     return onAuthStateChanged(auth, async (user) => {
       if (user) {
         const idToken = await user.getIdToken()
@@ -50,6 +63,9 @@ export default {
   },
 
   async login({ email, password }) {
+    if (!auth) {
+      throw new Error('Firebase Authが初期化されていません。.envファイルを確認してください。')
+    }
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password)
       return userCredential.user
@@ -60,6 +76,9 @@ export default {
   },
 
   async signup({ email, password, username }) {
+    if (!auth) {
+      throw new Error('Firebase Authが初期化されていません。.envファイルを確認してください。')
+    }
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password)
       const user = userCredential.user
@@ -72,6 +91,10 @@ export default {
   },
 
   async logout() {
+    if (!auth) {
+      console.warn('Firebase Authが初期化されていません。')
+      return
+    }
     try {
       await signOut(auth)
     } catch (error) {
@@ -82,6 +105,9 @@ export default {
 
   // 画像URLの更新処理
   async updatePhotoURL(user, photoURL) {
+    if (!auth || !db) {
+      throw new Error('Firebaseが初期化されていません。.envファイルを確認してください。')
+    }
     try {
       // Firebase Authentication のプロフィール情報を更新
       await updateProfile(user, { photoURL })

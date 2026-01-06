@@ -1,6 +1,6 @@
 <template>
   <v-layout>
-    <v-bottom-navigation class="bottom-nav" v-model="selectedIndex" active color="orange" fixed>
+    <v-bottom-navigation v-model="selectedIndex" class="bottom-nav" active color="orange" fixed>
       <v-btn v-for="(item, index) in navigationItems" :key="index" :to="item.path">
         <v-icon>{{ item.icon }}</v-icon>
         <span>{{ item.label }}</span>
