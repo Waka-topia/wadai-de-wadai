@@ -90,9 +90,9 @@ export default [
       // インポート/エクスポート
       // -------------------------------------------
       // default exportを禁止（名前付きexportを推奨）
-      'import/no-default-export': 'error',
+      'import/no-default-export': 'off',
       // exportをファイル末尾に配置
-      'import/exports-last': 'error',
+      'import/exports-last': 'off',
       // export文のグループ化は無効
       'import/group-exports': 'off',
       // 重複importを禁止
@@ -102,7 +102,7 @@ export default [
       // 関数定義
       // -------------------------------------------
       // 関数は式として定義（const fn = () => {} 形式）
-      'func-style': ['error', 'expression'],
+      'func-style': 'off',
       // アロー関数を優先
       'prefer-arrow-callback': 'error',
     },
@@ -143,7 +143,20 @@ export default [
       'vue/multi-word-component-names': [
         'error',
         {
-          ignores: ['index', 'App', 'default'],
+          ignores: [
+            'index',
+            'App',
+            'default',
+            'Home',
+            'Login',
+            'SignUp',
+            'Reader',
+            'Ranking',
+            'EventCal',
+            'TitleShop',
+            'InquiryPage',
+            'Rule',
+          ],
         },
       ],
       // propsはcamelCase

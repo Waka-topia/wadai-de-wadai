@@ -1,5 +1,5 @@
 import { createApp } from 'vue'
-import vuetify from '../src/plugins/vuetify'
+import vuetify from '@/plugins/vuetify'
 import App from './App.vue'
 import './registerServiceWorker'
 import router from './router'
