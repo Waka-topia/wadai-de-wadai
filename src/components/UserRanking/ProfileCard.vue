@@ -1,7 +1,7 @@
 <template>
   <v-divider></v-divider>
   <v-card class="my-2 pb-3" elevation="0" hover outlined>
-    <div v-if="rank == 1" class="position-absolute top-0 left-0 w-25 h-auto ml-3 z-10">
+    <div class="position-absolute top-0 left-0 w-25 h-auto ml-3 z-10" v-if="rank == 1">
       <v-img
         class="w-33 h-33"
         alt="ランキングのアイコン"
@@ -14,7 +14,7 @@
         </div>
       </v-img>
     </div>
-    <div v-else-if="rank == 2" class="position-absolute top-0 left-0 w-25 h-auto ml-3 z-10">
+    <div class="position-absolute top-0 left-0 w-25 h-auto ml-3 z-10" v-else-if="rank == 2">
       <v-img
         class="w-33 h-100"
         alt="ランキングのアイコン"
@@ -27,7 +27,7 @@
         </div>
       </v-img>
     </div>
-    <div v-else-if="rank == 3" class="position-absolute top-0 left-0 w-25 h-auto ml-3 z-10">
+    <div class="position-absolute top-0 left-0 w-25 h-auto ml-3 z-10" v-else-if="rank == 3">
       <v-img
         class="w-33 h-100"
         alt="ランキングのアイコン"
@@ -40,7 +40,7 @@
         </div>
       </v-img>
     </div>
-    <div v-else class="position-absolute top-0 left-0 w-25 h-auto ml-3 z-10">
+    <div class="position-absolute top-0 left-0 w-25 h-auto ml-3 z-10" v-else>
       <v-img
         class="w-33 h-100"
         alt="ランキングのアイコン"

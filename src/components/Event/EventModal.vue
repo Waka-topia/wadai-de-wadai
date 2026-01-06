@@ -1,6 +1,6 @@
 <template>
   <!-- モーダルが表示されるかどうかをisModalVisibleに基づいて表示 -->
-  <div v-show="isModalVisible" class="modal">
+  <div class="modal" v-show="isModalVisible">
     <div class="modal-content">
       <!-- モーダルの閉じるボタン -->
       <v-btn class="close-btn" icon @click="handleCloseModal">

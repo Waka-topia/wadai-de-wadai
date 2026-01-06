@@ -4,8 +4,8 @@
     <v-card class="py-8">
       <v-form v-model="form" @submit.prevent="onSubmit">
         <v-text-field
-          v-model="email"
           class="mb-2"
+          v-model="email"
           :rules="[required, emailDomainCheck]"
           clearable
           label="Email"

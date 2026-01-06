@@ -7,6 +7,7 @@ import { db } from '../firebase/config' // Firebaseインスタンスをイン�
 
 /**
  * Firebaseのorganizersコレクションから団体情報を取得し、パスワードを検証する
+ *
  * @param {string} organizerId 団体ID
  * @param {string} inputPassword ユーザーが入力したパスワード
  * @returns {Promise<boolean>} パスワードが一致すればtrue、それ以外はfalse
@@ -36,6 +37,7 @@ export const verifyOrganizerPassword = async (organizerId, inputPassword) => {
 
 /**
  * Firebaseに新しいイベントを登録する
+ *
  * @param {object} eventData イベントデータ
  * @param {string} organizerId 団体ID
  * @returns {Promise<void>}
@@ -61,6 +63,7 @@ export const addEvent = async (eventData, organizerId) => {
 
 /**
  * Firebaseから単一のイベント情報を取得する
+ *
  * @param {string} eventId イベントID
  * @returns {Promise<object>}
  */
@@ -82,6 +85,7 @@ export const getEvent = async (eventId) => {
 
 /**
  * Firebaseから全てのイベント情報を取得する
+ *
  * @returns {Promise<Array>} イベント情報のリスト
  */
 export const getEvents = async () => {
@@ -97,6 +101,7 @@ export const getEvents = async () => {
 
 /**
  * イベント情報を更新する
+ *
  * @param {string} eventId イベントID
  * @param {object} eventData 更新データ
  * @param {string} organizerId 団体ID
@@ -127,6 +132,7 @@ export const updateEvent = async (eventId, eventData, organizerId, inputPassword
 
 /**
  * イベントを削除する
+ *
  * @param {string} eventId イベントID
  * @param {string} organizerId 団体ID
  * @param {string} inputPassword ユーザーが入力したパスワード
