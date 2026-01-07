@@ -73,12 +73,17 @@ export async function getUserStampImages(userId) {
     const userStamps = userStampsSnapshot.docs.map((doc) => doc.id) // stampId のリスト
 
     // stamps コレクションから該当するスタンプのデータを取得
-    const stampPromises = userStamps.map(async (stampId) => {
+    const stampImages = []
+    for (const stampId of userStamps) {
       const stampDoc = await getDoc(doc(db, 'stamps', stampId))
-      return stampDoc.exists() ? { stampId, ...stampDoc.data() } : null
-    })
-
-    return (await Promise.all(stampPromises)).filter((item) => item !== null)
+      if (stampDoc.exists()) {
+        stampImages.push({
+          stampId,
+          ...stampDoc.data(), // imageUrl, name, description などを展開
+        })
+      }
+    }
+    return stampImages
   } catch (error) {
     console.error('Error fetching user stamp images: ', error)
     throw error

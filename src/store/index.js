@@ -15,7 +15,10 @@ export default createStore({
   },
   modules: {
     auth: authModule,
-    stamps: stampModule,
+    stamps: {
+      namespaced: true, // 名前空間を有効にする
+      ...stampModule,
+    },
     users: {
       namespaced: true, // 名前空間を有効にする
       ...userModule,

@@ -12,6 +12,7 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_APP_ID,
 }
 
+// Firebase初期化
 const app = initializeApp(firebaseConfig)
 const db = getFirestore(app)
 const auth = getAuth(app)
