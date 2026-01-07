@@ -1,14 +1,14 @@
 <template>
   <div>
     <!-- エラー発生時のアラート -->
-    <v-alert v-if="error" type="error" title="エラー" :text="errorMessages" />
+    <v-alert type="error" title="エラー" v-if="error" :text="errorMessages" />
 
     <!-- 読み込み中のスケルトンローダー -->
     <template v-if="isLoading">
       <v-skeleton-loader
+        type="list-item-avatar-three-line"
         v-for="n in 7"
         :key="n"
-        type="list-item-avatar-three-line"
         :elevation="0"
       />
     </template>
@@ -53,9 +53,6 @@ function getImageUrl(relativePath) {
 }
 
 // ランキングデータを取得する非同期関数
-/**
- *
- */
 async function fetchRankings() {
   try {
     const data = await rankingService.fetchTop100()
