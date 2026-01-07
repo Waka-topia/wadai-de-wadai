@@ -18,7 +18,6 @@ const getters = {
 const actions = {
   /**
    * Firebaseから全てのイベント情報を取得する
-   *
    * @param {object} context Vuexのコンテキスト
    * @param {Function} context.commit Vuexのcommit関数
    */
@@ -34,7 +33,6 @@ const actions = {
 
   /**
    * イベントを新規登録する
-   *
    * @param {object} context Vuexのコンテキスト
    * @param {Function} context.commit Vuexのcommit関数
    * @param {object} payload イベントデータと団体ID
@@ -52,7 +50,6 @@ const actions = {
 
   /**
    * イベント情報を更新する
-   *
    * @param {object} context Vuexのコンテキスト
    * @param {Function} context.commit Vuexのcommit関数
    * @param {object} context.state Vuexのstate
@@ -73,7 +70,6 @@ const actions = {
 
   /**
    * イベントを削除する
-   *
    * @param {object} context Vuexのコンテキスト
    * @param {Function} context.commit Vuexのcommit関数
    * @param {object} payload イベントID、団体ID、パスワード
@@ -93,7 +89,6 @@ const actions = {
 
   /**
    * 編集モードを切り替える
-   *
    * @param {object} context Vuexのコンテキスト
    * @param {Function} context.commit Vuexのcommit関数
    * @param {boolean} isEditing 編集モードの状態
