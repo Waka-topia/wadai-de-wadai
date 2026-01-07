@@ -1,20 +1,20 @@
 <template>
   <div>
-    <v-skeleton-loader type="image" v-if="isLoading" :elevation="1" />
+    <v-skeleton-loader v-if="isLoading" type="image" :elevation="1" />
     <v-alert
+      v-else-if="!isAuthenticated"
       type="warning"
       title="warning"
-      v-else-if="!isAuthenticated"
       text="ログインして下さい"
     ></v-alert>
     <v-alert
+      v-else-if="stampImages.length === 0"
       type="info"
       title="info"
-      v-else-if="stampImages.length === 0"
       text="スタンプをまだ持っていません。"
     ></v-alert>
-    <v-alert type="error" title="エラー" v-else-if="isErrored" :text="errorMessages"></v-alert>
-    <v-row class="mt-1 mx-1" v-else>
+    <v-alert v-else-if="isErrored" type="error" title="エラー" :text="errorMessages"></v-alert>
+    <v-row v-else class="mt-1 mx-1">
       <v-col v-for="stamp in stampImages" :key="stamp.stampId" cols="6" md="3" sm="4">
         <v-card class="border-md" aspect-ratio="1" elevation="0">
           <v-img :alt="stamp.name" :src="getImageUrl(stamp.imageUrl)" aspect-ratio="1"></v-img>
