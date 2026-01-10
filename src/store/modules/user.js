@@ -1,4 +1,3 @@
-// src/store/modules/users.js
 import { getPhotoURL } from '@/services/authService'
 import { getNextShinkan } from '@/services/nextShinkanService'
 

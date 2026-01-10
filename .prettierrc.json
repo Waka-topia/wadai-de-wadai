@@ -20,5 +20,17 @@
     "^@/(.*)$",
     "^[./]"
   ],
-  "attributeGroups": ["$CODE_GUIDE"]
+  "attributeGroups": [
+    "^(is|v-is)$",
+    "^v-for$",
+    "^(v-if|v-else-if|v-else|v-show|v-cloak)$",
+    "^(v-once|v-pre)$",
+    "^id$",
+    "^(ref|key|v-slot|slot)$",
+    "^v-model",
+    "^v-",
+    "$DEFAULT",
+    "^(@|v-on:)",
+    "^(v-html|v-text)$"
+  ]
 }

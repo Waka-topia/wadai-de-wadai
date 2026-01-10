@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex flex-column justify-center my-10" v-if="isAuthenticated">
+  <div v-if="isAuthenticated" class="d-flex flex-column justify-center my-10">
     <ProfileCard :count="stampCount" :name="displayName" :photo-url-resolved="photoURLResolved" />
     <EditForm />
     <TabsBar :tabs-component="tabsComponent" :tabs-name="tabsName" />

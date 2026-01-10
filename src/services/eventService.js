@@ -1,9 +1,7 @@
-// src/service/eventService.js
-import { collection, deleteDoc, doc, getDoc, getDocs, setDoc, updateDoc } from 'firebase/firestore' // 必要なFirestoreの関数をインポート
-
+import { collection, deleteDoc, doc, getDoc, getDocs, setDoc, updateDoc } from 'firebase/firestore'
 import bcrypt from 'bcryptjs' // bcryptをインポート
 import { v4 as uuidv4 } from 'uuid' // UUID生成ライブラリを利用
-import { db } from '../firebase/config' // Firebaseインスタンスをインポート
+import { db } from '@/firebase/config'
 
 /**
  * Firebaseのorganizersコレクションから団体情報を取得し、パスワードを検証する

@@ -1,6 +1,6 @@
 import { collection, doc, getDocs, setDoc } from 'firebase/firestore'
-import { db } from '../firebase/config'
-import { getUserStamps } from '../services/stampService' // ユーザーのスタンプ取得サービス
+import { db } from '@/firebase/config'
+import { getUserStamps } from './stampService'
 
 /**
  * Fetches all titles from the Firestore "titles" collection.

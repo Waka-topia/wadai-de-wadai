@@ -65,11 +65,7 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'RulePage',
-}
-</script>
+<script setup></script>
 
 <style scoped>
 .rules-container {

@@ -1,4 +1,4 @@
-import rankingService from '../../services/rankingService' // rankingServiceをインポート
+import rankingService from '@/services/rankingService'
 
 export default {
   namespaced: true,

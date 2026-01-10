@@ -1,6 +1,6 @@
 <template>
   <!-- モーダルが表示されるかどうかをisModalVisibleに基づいて表示 -->
-  <div class="modal" v-show="isModalVisible">
+  <div v-show="isModalVisible" class="modal">
     <div class="modal-content">
       <!-- モーダルの閉じるボタン -->
       <v-btn class="close-btn" icon @click="handleCloseModal">
@@ -105,9 +105,7 @@
 </template>
 
 <script>
-import EditDeleteForm from '@/components/Event/EditDeleteForm.vue'
-
-// import { or } from "firebase/firestore";
+import EditDeleteForm from './EditDeleteForm.vue'
 
 export default {
   components: {

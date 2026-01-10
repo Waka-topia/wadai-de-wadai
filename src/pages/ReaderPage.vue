@@ -1,6 +1,6 @@
 <template>
-  <div class="d-flex flex-column justify-center align-center my-10" v-if="isAuthenticated">
-    <QrScannerComponent></QrScannerComponent>
+  <div v-if="isAuthenticated" class="d-flex flex-column justify-center align-center my-10">
+    <QrScannerComponent />
   </div>
 
   <div v-else>

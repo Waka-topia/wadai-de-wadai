@@ -1,14 +1,14 @@
 <template>
   <div>
     <!-- エラー発生時のアラート -->
-    <v-alert type="error" title="エラー" v-if="error" :text="errorMessages" />
+    <v-alert v-if="error" type="error" title="エラー" :text="errorMessages" />
 
     <!-- 読み込み中のスケルトンローダー -->
     <template v-if="isLoading">
       <v-skeleton-loader
-        type="list-item-avatar-three-line"
         v-for="n in 7"
         :key="n"
+        type="list-item-avatar-three-line"
         :elevation="0"
       />
     </template>

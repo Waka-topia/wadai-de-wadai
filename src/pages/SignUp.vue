@@ -4,8 +4,8 @@
     <v-card class="py-8">
       <v-form v-model="form" @submit.prevent="onSubmit">
         <v-text-field
-          class="mb-2"
           v-model="username"
+          class="mb-2"
           :rules="[required, nameCheck]"
           clearable
           hint="本名は使用しないでください。"
@@ -13,8 +13,8 @@
           placeholder="わかやん"
         />
         <v-text-field
-          class="mb-2"
           v-model="email"
+          class="mb-2"
           :rules="[required, emailDomainCheck]"
           clearable
           hint="架空のメールアドレスでも構いません。"
@@ -66,7 +66,7 @@
   <v-dialog v-model="dialog" max-width="600px">
     <v-card>
       <v-card-text>
-        <RuleComponent />
+        <TermsRule />
       </v-card-text>
       <v-card-actions>
         <v-btn color="primary" @click="dialog = false">閉じる</v-btn>
@@ -77,12 +77,12 @@
 
 <script>
 import { mapActions } from 'vuex'
-import RuleComponent from '@/components/Rule.vue' // Rule.vue をインポート
+import TermsRule from '@/components/templates/TermsRule.vue'
 
 export default {
   name: 'UserSignup',
   components: {
-    RuleComponent, // Rule.vue コンポーネントを登録
+    TermsRule,
   },
   data() {
     return {

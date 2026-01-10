@@ -3,8 +3,8 @@
     <template #activator="{ props: activatorProps }">
       <p v-if="user">
         <v-list-item
-          class="position-relative"
           v-bind="activatorProps"
+          class="position-relative"
           block
           size="large"
           variant="flat"
