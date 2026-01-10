@@ -1,7 +1,7 @@
 <template>
-  <Rule />
+  <TermsRule />
 </template>
 
 <script setup>
-import Rule from '@/components/Rule.vue'
+import TermsRule from '@/components/templates/TermsRule.vue'
 </script>
