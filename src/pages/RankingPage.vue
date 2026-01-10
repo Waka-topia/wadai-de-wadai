@@ -19,7 +19,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import RankingList from '@/components/UserRanking/RankingList.vue'
+import RankingList from '@/components/user-ranking/RankingList.vue'
 import rankingService from '@/services/rankingService'
 
 const snackbar = ref({
