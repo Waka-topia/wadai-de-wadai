@@ -7,7 +7,7 @@
         </v-col>
         <v-col>
           <div class="text-subtitle-1 font-weight-medium">ユーザー名</div>
-          <div class="text-body-1">{{ displayName }}</div>
+          <div class="text-body-1">{{ props.displayName }}</div>
         </v-col>
       </v-row>
     </v-card>
@@ -15,9 +15,11 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useStore } from 'vuex'
-
-const store = useStore()
-const displayName = computed(() => store.getters['auth/displayName'] || 'Unknown')
+const props = defineProps({
+  displayName: {
+    type: String,
+    default: '',
+    required: true,
+  },
+})
 </script>

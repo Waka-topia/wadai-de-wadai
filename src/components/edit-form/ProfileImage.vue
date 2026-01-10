@@ -21,7 +21,7 @@
                     :alt="'アイコン' + (index + 1)"
                     :class="{ selected: selectedIcon === index }"
                     :height="100"
-                    :src="getImageUrl(`userIcon/userIcon${index + 1}.png`)"
+                    :src="`src/assets/userIcon/userIcon${index + 1}.png`"
                     :width="100"
                     aspect-ratio="1/1"
                     contain
@@ -99,9 +99,5 @@ const saveIcon = async () => {
   } finally {
     isLoading.value = false
   }
-}
-
-const getImageUrl = (relativePath) => {
-  return new URL(`../../assets/${relativePath}`, import.meta.url).href
 }
 </script>

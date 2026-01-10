@@ -21,7 +21,7 @@
 
         <v-card-text>
           <v-row class="mb-4" align="center" justify="center">
-            <UserIcon />
+            <UserIcon :photo-url-resolved="photoURLResolved" />
             <ProfileImage />
           </v-row>
 
@@ -39,9 +39,9 @@
           </div>
 
           <v-row dense>
-            <UserName />
-            <UserAdress />
-            <UserId />
+            <UserName :display-name="displayName" />
+            <UserAddress :email="email" />
+            <UserId :user-id="userId" />
           </v-row>
 
           <div class="py-4 mt-5">
@@ -73,14 +73,21 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import NextShinkan from '@/components/EditForm/NextShinkan.vue'
-import NextShinkanView from '@/components/EditForm/NextShinkanView.vue'
-import ProfileImage from '@/components/EditForm/ProfileImage.vue'
-import UserAdress from './UserAdress.vue'
+import { ref, computed } from 'vue'
+import { useStore } from 'vuex'
+import NextShinkan from './NextShinkan.vue'
+import NextShinkanView from './NextShinkanView.vue'
+import ProfileImage from './ProfileImage.vue'
+import UserAddress from './UserAddress.vue'
 import UserIcon from './UserIcon.vue'
 import UserId from './UserId.vue'
 import UserName from './UserName.vue'
 
 const dialog = ref(false)
+
+const store = useStore()
+const photoURLResolved = computed(() => store.getters['auth/photoURLResolved'])
+const displayName = computed(() => store.getters['auth/displayName'] || 'Unknown')
+const email = computed(() => store.getters['auth/email'] || 'Unknown')
+const userId = computed(() => store.getters['auth/userId'] || 'Unknown')
 </script>

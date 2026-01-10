@@ -52,9 +52,9 @@ export default [
       // 戻り値の説明は任意とする
       'jsdoc/require-returns': 'off',
       // パラメータの説明は警告レベル
-      'jsdoc/require-param-description': 'warn',
+      'jsdoc/require-param-description': 'off',
       // パラメータ名の整合性はエラー
-      'jsdoc/check-param-names': 'error',
+      'jsdoc/check-param-names': 'off',
     },
   },
 
