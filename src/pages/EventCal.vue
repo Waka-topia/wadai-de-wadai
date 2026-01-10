@@ -3,5 +3,5 @@
 </template>
 
 <script setup>
-import EventList from '@/components/Event/EventList.vue'
+import EventList from '@/components/event/EventList.vue'
 </script>

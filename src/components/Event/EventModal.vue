@@ -105,9 +105,7 @@
 </template>
 
 <script>
-import EditDeleteForm from '@/components/Event/EditDeleteForm.vue'
-
-// import { or } from "firebase/firestore";
+import EditDeleteForm from './EditDeleteForm.vue'
 
 export default {
   components: {
