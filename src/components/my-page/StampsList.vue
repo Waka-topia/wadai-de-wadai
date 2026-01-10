@@ -17,7 +17,7 @@
     <v-row class="mt-1 mx-1" v-else>
       <v-col v-for="stamp in stampImages" :key="stamp.stampId" cols="6" md="3" sm="4">
         <v-card class="border-md" aspect-ratio="1" elevation="0">
-          <v-img :alt="stamp.name" :src="getImageUrl(stamp.imageUrl)" aspect-ratio="1"></v-img>
+          <v-img :alt="stamp.name" :src="`/src/assets/${stamp.imageUrl}`" aspect-ratio="1"></v-img>
           <v-card-title class="font-weight-bold text-body-2 text-center"
             ><small>{{ stamp.name }}</small></v-card-title
           >
@@ -57,9 +57,6 @@ export default {
       } finally {
         this.isLoading = false
       }
-    },
-    getImageUrl(relativePath) {
-      return new URL(`../../assets/${relativePath}`, import.meta.url).href
     },
   },
   watch: {

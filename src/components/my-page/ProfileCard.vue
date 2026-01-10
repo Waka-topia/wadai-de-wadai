@@ -3,13 +3,17 @@
     <!-- アバター部分 -->
     <v-row>
       <v-avatar class="mx-auto mt-7 mb-3" size="140">
-        <v-img class="rounded-circle" alt="ユーザーのアイコン" :src="image"></v-img>
+        <v-img
+          class="rounded-circle"
+          alt="ユーザーのアイコン"
+          :src="props.photoUrlResolved"
+        ></v-img>
       </v-avatar>
     </v-row>
 
     <!-- ユーザー名 -->
     <v-row class="mb-3">
-      <span class="font-weight-bold text-h4 mx-auto text-truncate">{{ name }}</span>
+      <span class="font-weight-bold text-h4 mx-auto text-truncate">{{ props.name }}</span>
     </v-row>
 
     <!-- スタンプとアイコン情報 -->
@@ -19,7 +23,7 @@
         <div class="d-flex align-center justify-end">
           <v-icon class="mr-2" color="red" size="x-large">mdi-stamper</v-icon>
           <div class="stats-text">
-            <span class="text-h6 text-red font-weight-bold">{{ count }}</span>
+            <span class="text-h6 text-red font-weight-bold">{{ props.count }}</span>
             <span class="text-subtitle-2 text-red font-weight-bold">スタンプ</span>
           </div>
         </div>
@@ -47,20 +51,19 @@
 </template>
 
 <script setup>
-import { defineProps } from 'vue'
-
-defineProps({
+const props = defineProps({
   name: {
-    type: String,
-    required: true,
-  },
-  image: {
     type: String,
     required: true,
   },
   count: {
     type: Number,
     required: true,
+  },
+  photoUrlResolved: {
+    type: String,
+    default: '',
+    required: false,
   },
 })
 </script>
