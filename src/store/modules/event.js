@@ -20,7 +20,7 @@ const actions = {
    * Firebaseから全てのイベント情報を取得する
    *
    * @param {object} context Vuexのコンテキスト
-   * @param context.commit
+   * @param {Function} context.commit Vuexのcommit関数
    */
   async fetchEvents({ commit }) {
     try {
@@ -36,10 +36,10 @@ const actions = {
    * イベントを新規登録する
    *
    * @param {object} context Vuexのコンテキスト
+   * @param {Function} context.commit Vuexのcommit関数
    * @param {object} payload イベントデータと団体ID
-   * @param context.commit
-   * @param payload.eventData
-   * @param payload.organizerId
+   * @param {object} payload.eventData イベントデータ
+   * @param {string} payload.organizerId 団体ID
    */
   async createEvent({ commit }, { eventData, organizerId }) {
     try {
@@ -54,12 +54,12 @@ const actions = {
    * イベント情報を更新する
    *
    * @param {object} context Vuexのコンテキスト
+   * @param {Function} context.commit Vuexのcommit関数
+   * @param {object} context.state Vuexのstate
    * @param {object} payload 更新データ、団体ID、パスワード
-   * @param context.commit
-   * @param context.state
-   * @param payload.eventData
-   * @param payload.organizerId
-   * @param payload.inputPassword
+   * @param {object} payload.eventData イベントデータ
+   * @param {string} payload.organizerId 団体ID
+   * @param {string} payload.inputPassword パスワード
    */
   async updateEvent({ commit, state }, { eventData, organizerId, inputPassword }) {
     try {
@@ -75,11 +75,11 @@ const actions = {
    * イベントを削除する
    *
    * @param {object} context Vuexのコンテキスト
+   * @param {Function} context.commit Vuexのcommit関数
    * @param {object} payload イベントID、団体ID、パスワード
-   * @param context.commit
-   * @param payload.eventId
-   * @param payload.organizerId
-   * @param payload.inputPassword
+   * @param {string} payload.eventId イベントID
+   * @param {string} payload.organizerId 団体ID
+   * @param {string} payload.inputPassword パスワード
    */
   async deleteEvent({ commit }, { eventId, organizerId, inputPassword }) {
     try {
@@ -95,7 +95,7 @@ const actions = {
    * 編集モードを切り替える
    *
    * @param {object} context Vuexのコンテキスト
-   * @param context.commit
+   * @param {Function} context.commit Vuexのcommit関数
    * @param {boolean} isEditing 編集モードの状態
    */
   toggleEditMode({ commit }, isEditing) {

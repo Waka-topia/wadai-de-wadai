@@ -115,8 +115,12 @@ export default {
   },
   props: {
     isModalVisible: Boolean,
-    event: Object,
+    event: {
+      type: Object,
+      default: () => ({}),
+    },
   },
+  emits: ['closeModal', 'deleteEvent'],
   data() {
     return {
       isEditDeleteFormVisible: false,
@@ -137,7 +141,7 @@ export default {
     // モーダルを閉じる処理
     handleCloseModal() {
       // モーダルを閉じるためのイベントを送信
-      this.$emit('close-modal')
+      this.$emit('closeModal')
 
       // 削除フォームが開いている場合は非表示にする
       this.isEditDeleteFormVisible = false
@@ -151,9 +155,9 @@ export default {
     handleDeleteEvent(organizerId, password) {
       // console.log(organizerId, password);
       // 受け取ったデータを親コンポーネントに伝播
-      const DeleteFormOrganizerId = organizerId
-      const DeleteFormPassword = password
-      this.$emit('delete-event', DeleteFormOrganizerId, DeleteFormPassword)
+      const deleteFormOrganizerId = organizerId
+      const deleteFormPassword = password
+      this.$emit('deleteEvent', deleteFormOrganizerId, deleteFormPassword)
     },
   },
 }

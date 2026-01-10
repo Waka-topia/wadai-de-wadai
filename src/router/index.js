@@ -1,14 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import EventCal from '@/pages/EventCal.vue'
-import { default as Home, default as testpage } from '@/pages/Home.vue'
+import Home from '@/pages/Home.vue'
 import InquiryPage from '@/pages/InquiryPage.vue'
+import Login from '@/pages/Login.vue'
 import MyPage from '@/pages/MyPage.vue'
 import Ranking from '@/pages/RankingPage.vue'
 import Reader from '@/pages/ReaderPage.vue'
+import Rule from '@/pages/RulePage.vue'
+import SignUp from '@/pages/SignUp.vue'
 import TitleShop from '@/pages/TitleShop.vue'
-import Login from '../pages/Login.vue'
-import Rule from '../pages/RulePage.vue'
-import SignUp from '../pages/SignUp.vue'
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
@@ -17,7 +17,7 @@ const routes = [
   { path: '/reader', name: 'Reader', component: Reader },
   { path: '/ranking', name: 'Ranking', component: Ranking },
   { path: '/mypage', name: 'MyPage', component: MyPage },
-  { path: '/testpage', name: 'testpage', component: testpage },
+  { path: '/testpage', name: 'testpage', component: Home },
   { path: '/eventcal', name: 'EventCal', component: EventCal },
   { path: '/titleshop', name: 'TitleShop', component: TitleShop },
   { path: '/inquiry', name: 'InquiryPage', component: InquiryPage },

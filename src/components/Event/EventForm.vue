@@ -68,6 +68,7 @@
 
 <script>
 export default {
+  emits: ['submitEvent'],
   data() {
     return {
       newEvent: {
@@ -99,7 +100,7 @@ export default {
 
     // イベントを送信するメソッド
     submitEvent() {
-      this.$emit('submit-event', this.newEvent, this.organizerId, this.password) // 親コンポーネントにイベントを送信
+      this.$emit('submitEvent', this.newEvent, this.organizerId, this.password) // 親コンポーネントにイベントを送信
       this.resetForm() // 送信後にフォームをリセット
     },
   },

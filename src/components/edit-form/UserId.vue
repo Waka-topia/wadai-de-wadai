@@ -7,7 +7,7 @@
         </v-col>
         <v-col>
           <div class="text-subtitle-1 font-weight-medium">ユーザーID</div>
-          <div class="text-caption text-break">{{ userId }}</div>
+          <div class="text-caption text-break">{{ props.userId }}</div>
         </v-col>
       </v-row>
     </v-card>
@@ -15,9 +15,11 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useStore } from 'vuex'
-
-const store = useStore()
-const userId = computed(() => store.getters['auth/userId'] || 'Unknown')
+const props = defineProps({
+  userId: {
+    type: String,
+    default: '',
+    required: true,
+  },
+})
 </script>

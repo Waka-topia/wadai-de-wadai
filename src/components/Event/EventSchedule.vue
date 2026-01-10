@@ -58,6 +58,7 @@ export default {
       default: null,
     },
   },
+  emits: ['openModal', 'update:selectedDate'],
   data() {
     return {
       internalSelectedDate: this.selectedDate ? new Date(this.selectedDate) : new Date(),
@@ -97,7 +98,7 @@ export default {
       return date.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })
     },
     openEventModal(event) {
-      this.$emit('open-modal', event)
+      this.$emit('openModal', event)
     },
     changeDate(days) {
       const newDate = new Date(this.internalSelectedDate)

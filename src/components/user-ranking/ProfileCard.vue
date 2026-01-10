@@ -2,11 +2,7 @@
   <v-divider></v-divider>
   <v-card class="my-2 pb-3" elevation="0" hover outlined>
     <div class="position-absolute top-0 left-0 w-25 h-auto ml-3 z-10" v-if="rank == 1">
-      <v-img
-        class="w-33 h-33"
-        alt="ランキングのアイコン"
-        :src="getImageUrl('rankings/ribbon1.png')"
-      >
+      <v-img class="w-33 h-33" alt="ランキングのアイコン" :src="`/src/assets/rankings/ribbon1.png`">
         <div
           class="font-weight-bold text-white text-xs-subtitle-1 text-sm-h4 text-md-h3 text-center text-no-wrap"
         >
@@ -18,7 +14,7 @@
       <v-img
         class="w-33 h-100"
         alt="ランキングのアイコン"
-        :src="getImageUrl('rankings/ribbon2.png')"
+        :src="`/src/assets/rankings/ribbon2.png`"
       >
         <div
           class="font-weight-bold text-white text-xs-subtitle-1 text-sm-h4 text-md-h3 text-center text-no-wrap"
@@ -31,7 +27,7 @@
       <v-img
         class="w-33 h-100"
         alt="ランキングのアイコン"
-        :src="getImageUrl('rankings/ribbon3.png')"
+        :src="`/src/assets/rankings/ribbon3.png`"
       >
         <div
           class="font-weight-bold text-white text-xs-subtitle-1 text-sm-h4 text-md-h3 text-center text-no-wrap"
@@ -44,7 +40,7 @@
       <v-img
         class="w-33 h-100"
         alt="ランキングのアイコン"
-        :src="getImageUrl('rankings/ribbon4.png')"
+        :src="`/src/assets/rankings/ribbon4.png`"
       >
         <div
           class="font-weight-bold text-white text-xs-subtitle-1 text-sm-h4 text-md-h3 text-center text-no-wrap"
@@ -97,8 +93,6 @@
 </template>
 
 <script setup>
-import { defineProps } from 'vue'
-
 defineProps({
   name: {
     type: String,
@@ -121,11 +115,4 @@ defineProps({
     required: true,
   },
 })
-
-const getImageUrl = (relativePath) => {
-  if (relativePath) {
-    return new URL(`../../assets/${relativePath}`, import.meta.url).href
-  }
-  return 'https://via.placeholder.com/120'
-}
 </script>

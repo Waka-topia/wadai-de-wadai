@@ -39,13 +39,13 @@ export default {
     async claimTitle(title) {
       try {
         this.error = null
-        const userID = this.userId()
-        if (!userID) {
+        const userId = this.userId()
+        if (!userId) {
           throw new Error('ログインしてください。')
         }
 
         await this.addTitleToUser({
-          userID,
+          userID: userId,
           titleID: title.id,
           titleData: title,
         })

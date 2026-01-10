@@ -19,7 +19,7 @@
         v-for="(user, index) in rankings"
         :key="user.userId"
         :count="user.stampCount"
-        :image="getImageUrl(user.photoURL)"
+        :image="`/src/assets/${user.photoURL}`"
         :name="user.displayName"
         :rank="index + 1"
         :status="
@@ -34,7 +34,7 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
-import ProfileCard from '@/components/UserRanking/ProfileCard.vue'
+import ProfileCard from './ProfileCard.vue'
 import rankingService from '@/services/rankingService'
 
 // 各種状態をrefで定義
@@ -43,17 +43,7 @@ const isLoading = ref(true)
 const error = ref(false)
 const errorMessages = ref('')
 
-// 画像のURLを生成する関数
-/** @param relativePath */
-function getImageUrl(relativePath) {
-  if (relativePath) {
-    return new URL(`../../assets/${relativePath}`, import.meta.url).href
-  }
-  return new URL(`../../assets/${relativePath}`, import.meta.url).href
-}
-
-// ランキングデータを取得する非同期関数
-async function fetchRankings() {
+const fetchRankings = async () => {
   try {
     const data = await rankingService.fetchTop100()
     console.log(data)

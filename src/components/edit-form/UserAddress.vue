@@ -7,7 +7,7 @@
         </v-col>
         <v-col>
           <div class="text-subtitle-1 font-weight-medium">メールアドレス</div>
-          <div class="text-body-1">{{ email }}</div>
+          <div class="text-body-1">{{ props.email }}</div>
         </v-col>
       </v-row>
     </v-card>
@@ -15,9 +15,11 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useStore } from 'vuex'
-
-const store = useStore()
-const email = computed(() => store.getters['auth/email'] || 'Unknown')
+const props = defineProps({
+  email: {
+    type: String,
+    default: '',
+    required: true,
+  },
+})
 </script>

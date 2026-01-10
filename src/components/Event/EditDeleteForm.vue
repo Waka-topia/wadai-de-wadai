@@ -8,9 +8,7 @@
       <label for="password">パスワード:</label>
       <input type="password" v-model="password" required />
     </div>
-    <button class="delete-button" @click="$emit('delete-event', organizerId, password)">
-      削除
-    </button>
+    <button class="delete-button" @click="$emit('deleteEvent', organizerId, password)">削除</button>
     <p class="error-message" v-if="errorMessage">{{ errorMessage }}</p>
   </div>
 </template>
@@ -20,6 +18,7 @@ export default {
   props: {
     isEditDeleteFormVisible: Boolean,
   },
+  emits: ['deleteEvent'],
   data() {
     return {
       organizerId: '',
