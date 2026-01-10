@@ -143,20 +143,7 @@ export default [
       'vue/multi-word-component-names': [
         'error',
         {
-          ignores: [
-            'index',
-            'App',
-            'default',
-            'Home',
-            'Login',
-            'SignUp',
-            'Reader',
-            'Ranking',
-            'EventCal',
-            'TitleShop',
-            'InquiryPage',
-            'Rule',
-          ],
+          ignores: ['index', 'App', 'default'],
         },
       ],
       // propsはcamelCase

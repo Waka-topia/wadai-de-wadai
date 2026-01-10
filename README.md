@@ -114,19 +114,14 @@ wadai-de-wadai/
 
 ## 環境変数
 
-`.env` ファイルをプロジェクトルートに作成してFirebase設定を追加してください:
+`.env` ファイルを作成してFirebase設定を追加:
 
 ```bash
-VITE_API_KEY=your-api-key-here
-VITE_AUTH_DOMAIN=your-project-id.firebaseapp.com
-VITE_PROJECT_ID=your-project-id
-VITE_STORAGE_BUCKET=your-project-id.appspot.com
-VITE_MESSAGING_SENDER_ID=your-messaging-sender-id
-VITE_APP_ID=your-app-id
+VITE_FIREBASE_API_KEY=your_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
+VITE_FIREBASE_PROJECT_ID=your_project_id
+# ...その他のFirebase設定
 ```
-
-**注意**: `.env`ファイルは`.gitignore`に含まれているため、Gitにはコミットされません。  
-Firebase Console (https://console.firebase.google.com/) からプロジェクト設定を確認して、実際の値を設定してください。
 
 ---
 
