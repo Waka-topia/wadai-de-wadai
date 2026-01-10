@@ -1,4 +1,4 @@
-import { getNextShinkan, saveNextShinkan } from '../../services/nextShinkanService'
+import { getNextShinkan, saveNextShinkan } from '@/services/nextShinkanService'
 
 export default {
   namespaced: true,

@@ -5,11 +5,9 @@ import {
   signOut,
   updateProfile,
 } from 'firebase/auth'
-import { doc, getDoc, setDoc } from 'firebase/firestore' // Firestore の関数をインポート
-
-// Firestore インスタンスをインポート
+import { doc, getDoc, setDoc } from 'firebase/firestore'
+import { auth, db } from '@/firebase/config'
 import store from '@/store'
-import { auth, db } from '../firebase/config'
 
 // Firestore から photoURL を取得する関数
 /** @param userId */

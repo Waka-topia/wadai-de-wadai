@@ -1,5 +1,5 @@
 import { collection, deleteDoc, doc, getDocs, getFirestore, setDoc } from 'firebase/firestore'
-import { db } from '../firebase/config' // FirebaseのFirestoreインスタンス
+import { db } from '@/firebase/config'
 
 export default {
   // 全ユーザーのランキングを取得
