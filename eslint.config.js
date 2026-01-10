@@ -127,8 +127,6 @@ export default [
       // -------------------------------------------
       // script setupまたはComposition APIのみ許可（既存コードの互換性のため警告レベル）
       'vue/component-api-style': ['warn', ['script-setup', 'composition']],
-      // script setup内の変数を正しく認識
-      'vue/script-setup-uses-vars': 'error',
       // definePropsの型チェック
       'vue/valid-define-props': 'error',
 
