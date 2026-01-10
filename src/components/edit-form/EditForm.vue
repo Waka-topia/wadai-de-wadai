@@ -3,8 +3,8 @@
     <v-dialog v-model:model-value="dialog" max-width="700">
       <template #activator="{ props: activatorProps }">
         <v-btn
-          class="text-white font-weight-bold"
           v-bind="activatorProps"
+          class="text-white font-weight-bold"
           color="orange"
           elevation="3"
           rounded

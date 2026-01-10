@@ -4,8 +4,8 @@
     <v-card class="py-8">
       <v-form v-model="form" @submit.prevent="onSubmit">
         <v-text-field
-          class="mb-2"
           v-model="username"
+          class="mb-2"
           :rules="[required, nameCheck]"
           clearable
           hint="本名は使用しないでください。"
@@ -13,8 +13,8 @@
           placeholder="わかやん"
         />
         <v-text-field
-          class="mb-2"
           v-model="email"
+          class="mb-2"
           :rules="[required, emailDomainCheck]"
           clearable
           hint="架空のメールアドレスでも構いません。"

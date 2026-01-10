@@ -26,8 +26,8 @@
     <v-dialog v-model:model-value="dialog" max-width="700">
       <template #activator="{ props: activatorProps }">
         <v-btn
-          class="text-white font-weight-bold show-form-btn"
           v-bind="activatorProps"
+          class="text-white font-weight-bold show-form-btn"
           color="orange"
           elevation="15"
           rounded

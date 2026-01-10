@@ -55,6 +55,8 @@ export default [
       'jsdoc/require-param-description': 'off',
       // パラメータ名の整合性はエラー
       'jsdoc/check-param-names': 'off',
+      // Prettierが空行を追加するため、ESLintは空行を許可
+      'jsdoc/tag-lines': ['warn', 'any', { startLines: 1 }],
     },
   },
 
