@@ -36,4 +36,20 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Vuetifyを別チャンクに分離
+          vuetify: ['vuetify', 'vuetify/components', 'vuetify/directives'],
+          // Firebaseを別チャンクに分離
+          firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore', 'firebase/storage'],
+          // Vue関連を別チャンクに分離
+          'vue-vendor': ['vue', 'vue-router', 'vuex'],
+        },
+      },
+    },
+    // チャンクサイズ警告の閾値を調整（オプション）
+    chunkSizeWarningLimit: 600,
+  },
 })

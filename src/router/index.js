@@ -1,27 +1,62 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import EventCal from '@/pages/EventCal.vue'
-import Home from '@/pages/Home.vue'
-import InquiryPage from '@/pages/InquiryPage.vue'
-import Login from '@/pages/Login.vue'
-import MyPage from '@/pages/MyPage.vue'
-import Ranking from '@/pages/RankingPage.vue'
-import Reader from '@/pages/ReaderPage.vue'
-import Rule from '@/pages/RulePage.vue'
-import SignUp from '@/pages/SignUp.vue'
-import TitleShop from '@/pages/TitleShop.vue'
 
+/** ルート定義 各ページコンポーネントは動的インポートでコード分割 */
 const routes = [
-  { path: '/', name: 'Home', component: Home },
-  { path: '/login', name: 'Login', component: Login },
-  { path: '/signup', name: 'SignUp', component: SignUp },
-  { path: '/reader', name: 'Reader', component: Reader },
-  { path: '/ranking', name: 'Ranking', component: Ranking },
-  { path: '/mypage', name: 'MyPage', component: MyPage },
-  { path: '/testpage', name: 'testpage', component: Home },
-  { path: '/eventcal', name: 'EventCal', component: EventCal },
-  { path: '/titleshop', name: 'TitleShop', component: TitleShop },
-  { path: '/inquiry', name: 'InquiryPage', component: InquiryPage },
-  { path: '/rule', name: 'Rule', component: Rule },
+  {
+    path: '/',
+    name: 'Home',
+    component: () => import('@/pages/Home.vue'),
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: () => import('@/pages/Login.vue'),
+  },
+  {
+    path: '/signup',
+    name: 'SignUp',
+    component: () => import('@/pages/SignUp.vue'),
+  },
+  {
+    path: '/reader',
+    name: 'Reader',
+    component: () => import('@/pages/ReaderPage.vue'),
+  },
+  {
+    path: '/ranking',
+    name: 'Ranking',
+    component: () => import('@/pages/RankingPage.vue'),
+  },
+  {
+    path: '/mypage',
+    name: 'MyPage',
+    component: () => import('@/pages/MyPage.vue'),
+  },
+  {
+    path: '/testpage',
+    name: 'testpage',
+    component: () => import('@/pages/Home.vue'),
+  },
+  {
+    path: '/eventcal',
+    name: 'EventCal',
+    component: () => import('@/pages/EventCal.vue'),
+  },
+  {
+    path: '/titleshop',
+    name: 'TitleShop',
+    component: () => import('@/pages/TitleShop.vue'),
+  },
+  {
+    path: '/inquiry',
+    name: 'InquiryPage',
+    component: () => import('@/pages/InquiryPage.vue'),
+  },
+  {
+    path: '/rule',
+    name: 'Rule',
+    component: () => import('@/pages/RulePage.vue'),
+  },
 ]
 
 const router = createRouter({
