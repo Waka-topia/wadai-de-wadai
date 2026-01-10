@@ -104,6 +104,13 @@ export default {
     email: (state) => state.user.email,
     providerData: (state) => state.user.providerData,
     photoURL: (state) => state.user.photoURL,
+    photoURLResolved: (state) => {
+      if (state.user?.photoURL) {
+        return `/src/assets/${state.user?.photoURL}`
+      } else {
+        return '/src/assets/userIcon/defaultIcon.png'
+      }
+    },
     displayName: (state) => {
       return state.user?.displayName || 'ゲスト'
     },
