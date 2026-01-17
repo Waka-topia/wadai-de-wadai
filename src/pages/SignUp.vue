@@ -38,7 +38,12 @@
         <v-btn color="primary" text @click="openRules">利用規約を確認</v-btn>
         <!-- モーダルを表示するボタン -->
 
-        <v-checkbox v-model="agree" :rules="[requiredAgree]" label="利用規約に同意する" />
+        <v-checkbox
+          v-model="agree"
+          :rules="[required, requiredAgree]"
+          label="利用規約に同意する"
+          color="orange"
+        />
 
         <br />
 
@@ -55,7 +60,7 @@
         </v-btn>
       </v-form>
       <v-divider class="mt-10"></v-divider>
-      <v-btn variant="text" @click="onLogIn"> アカウントをお持ちの方はこちら </v-btn>
+      <v-btn variant="text" @click="onLogin"> アカウントをお持ちの方はこちら </v-btn>
     </v-card>
   </v-sheet>
   <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
@@ -75,117 +80,94 @@
   </v-dialog>
 </template>
 
-<script>
-import { mapActions } from 'vuex'
+<script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
+
 import TermsRule from '@/components/templates/TermsRule.vue'
 
-export default {
-  name: 'UserSignup',
-  components: {
-    TermsRule,
-  },
-  data() {
-    return {
-      username: '',
-      email: '',
-      password: '',
-      visible: false,
-      agree: false, // チェックボックス用のデータ
-      snackbar: {
-        show: false,
-        color: '',
-        message: '',
-      },
-      form: false,
-      isLoading: false,
-      dialog: false, // モーダルの表示状態
+const username = ref('')
+const email = ref('')
+const password = ref('')
+const visible = ref(false)
+const agree = ref(false)
+const form = ref(false)
+const isLoading = ref(false)
+const dialog = ref(false)
+const snackbar = ref({
+  show: false,
+  color: '',
+  message: '',
+})
+
+const router = useRouter()
+const store = useStore()
+
+const required = (value) => !!value || 'このフィールドは必須です。'
+
+const requiredAgree = (value) => {
+  if (!value) {
+    return '利用規約に同意する必要があります。'
+  }
+  return true
+}
+
+const nameCheck = (value) => {
+  if (value && value.length < 2) {
+    return 'ユーザー名は2文字以上で入力してください'
+  }
+  return true
+}
+
+const emailDomainCheck = (value) => {
+  if (value && value.endsWith('@wakayama-u.ac.jp')) {
+    return 'このドメインは使用できません'
+  }
+  return true
+}
+
+const passwordRule = (value) => {
+  if (value && value.length < 8) {
+    return 'パスワードは8文字以上で入力してください'
+  }
+  return true
+}
+
+const openRules = () => {
+  dialog.value = true
+}
+
+const onLogin = () => {
+  router.push('/login')
+}
+
+const onSubmit = async () => {
+  try {
+    isLoading.value = true
+    await store.dispatch('auth/signup', {
+      email: email.value,
+      password: password.value,
+      username: username.value,
+    })
+
+    snackbar.value = {
+      show: true,
+      color: 'success',
+      message: 'サインアップしました',
     }
-  },
-  methods: {
-    ...mapActions('auth', ['signup']),
 
-    required(value) {
-      return !!value || 'このフィールドは必須です。'
-    },
-
-    requiredAgree(value) {
-      return value || '利用規約に同意する必要があります。'
-    },
-
-    nameCheck(value) {
-      if (value && value.length < 2) {
-        return 'ユーザー名は2文字以上で入力してください'
-      }
-      return true
-    },
-
-    emailDomainCheck(value) {
-      if (value && value.endsWith('@wakayama-u.ac.jp')) {
-        return 'このドメインは使用できません'
-      }
-      return true
-    },
-
-    passwordRule(value) {
-      if (value && value.length < 8) {
-        return 'パスワードは8文字以上で入力してください'
-      }
-      return true
-    },
-
-    openRules() {
-      this.dialog = true // モーダルを開く
-    },
-
-    async onSubmit() {
-      if (!this.agree) {
-        this.snackbar = {
-          show: true,
-          color: 'error',
-          message: '利用規約に同意する必要があります。',
-        }
-        return
-      }
-
-      try {
-        this.isLoading = true
-        await this.signup({ email: this.email, password: this.password, username: this.username })
-
-        this.snackbar = {
-          show: true,
-          color: 'success',
-          message: 'サインアップしました',
-        }
-
-        setTimeout(() => {
-          this.$router.push('/login')
-        }, 1000)
-      } catch (error) {
-        // Firebase のエラーコードを処理
-        if (error.code === 'auth/email-already-in-use') {
-          error.message =
-            'このメールアドレスはすでに登録されています。別のメールアドレスを使用してください。'
-        } else if (error.code === 'auth/weak-password') {
-          error.message = 'パスワードが弱すぎます。8文字以上の強力なパスワードを使用してください。'
-        } else if (error.code === 'auth/invalid-email') {
-          error.message = 'メールアドレスの形式が正しくありません。'
-        } else if (error.code === 'auth/network-request-failed') {
-          error.message = 'ネットワークエラーが発生しました。接続を確認してください。'
-        }
-
-        this.snackbar = {
-          show: true,
-          color: 'error',
-          message: `サインアップに失敗しました。メールアドレスまたはパスワードをご確認ください。${error.message}`,
-        }
-      } finally {
-        this.isLoading = false
-      }
-    },
-
-    onLogIn() {
-      this.$router.push('/login')
-    },
-  },
+    setTimeout(() => {
+      router.push('/login')
+    }, 1000)
+  } catch (error) {
+    snackbar.value = {
+      show: true,
+      color: 'error',
+      message: `サインアップに失敗しました。${error.message}`,
+    }
+  } finally {
+    isLoading.value = false
+  }
 }
 </script>
