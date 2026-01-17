@@ -48,81 +48,64 @@
   </v-sheet>
 </template>
 
-<script>
-import { mapActions } from 'vuex'
+<script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
 
-export default {
-  name: 'UserLogin',
-  data() {
-    return {
-      email: '',
-      password: '',
-      visible: false,
-      snackbar: {
-        show: false,
-        color: '',
-        message: '',
-      },
-      form: false,
-      isLoading: false,
+const email = ref('')
+const password = ref('')
+const visible = ref(false)
+const form = ref(false)
+const isLoading = ref(false)
+const snackbar = ref({
+  show: false,
+  color: '',
+  message: '',
+})
+
+const router = useRouter()
+const store = useStore()
+
+const required = (value) => !!value || 'このフィールドは必須です。'
+
+const emailDomainCheck = (value) => {
+  if (value && value.endsWith('@wakayama-u.ac.jp')) {
+    return 'このドメインは使用できません'
+  }
+  return true
+}
+
+const onSignUp = () => {
+  router.push('/signup')
+}
+
+const onStart = () => {
+  router.push('/')
+}
+
+const onSubmit = async () => {
+  try {
+    isLoading.value = true
+    await store.dispatch('auth/login', { email: email.value, password: password.value })
+
+    snackbar.value = {
+      show: true,
+      color: 'success',
+      message: 'ログインしました',
     }
-  },
-  methods: {
-    ...mapActions('auth', ['login']),
 
-    required(value) {
-      return !!value || 'このフィールドは必須です。'
-    },
-
-    emailDomainCheck(value) {
-      if (value && value.endsWith('@wakayama-u.ac.jp')) {
-        return 'このドメインは使用できません'
-      }
-      return true
-    },
-
-    async onSubmit() {
-      try {
-        this.isLoading = true
-        await this.login({ email: this.email, password: this.password })
-
-        this.snackbar = {
-          show: true,
-          color: 'success',
-          message: 'ログインしました',
-        }
-
-        setTimeout(() => {
-          this.$router.push('/')
-        }, 1000)
-      } catch (error) {
-        // Firebase のエラーコードを処理
-        if (error.code === 'auth/email-already-in-use') {
-          error.message =
-            'このメールアドレスはすでに登録されています。別のメールアドレスを使用してください。'
-        } else if (error.code === 'auth/weak-password') {
-          error.message = 'パスワードが弱すぎます。8文字以上の強力なパスワードを使用してください。'
-        } else if (error.code === 'auth/invalid-email') {
-          error.message = 'メールアドレスの形式が正しくありません。'
-        } else if (error.code === 'auth/network-request-failed') {
-          error.message = 'ネットワークエラーが発生しました。接続を確認してください。'
-        }
-
-        this.snackbar = {
-          show: true,
-          color: 'error',
-          message: `ログインに失敗しました: ${error.message}`,
-        }
-      } finally {
-        this.isLoading = false
-      }
-    },
-    onSignUp() {
-      this.$router.push('/signup')
-    },
-    onStart() {
-      this.$router.push('/')
-    },
-  },
+    setTimeout(() => {
+      router.push('/')
+    }, 1000)
+  } catch (error) {
+    snackbar.value = {
+      show: true,
+      color: 'error',
+      message: `ログインに失敗しました: ${error.message}`,
+    }
+  } finally {
+    isLoading.value = false
+  }
 }
 </script>
