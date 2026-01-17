@@ -35,8 +35,8 @@
           @click:append-inner="visible = !visible"
         ></v-text-field>
 
-        <v-btn color="primary" text @click="openRules">利用規約を確認</v-btn>
         <!-- モーダルを表示するボタン -->
+        <v-btn color="primary" text @click="openRules">利用規約を確認</v-btn>
 
         <v-checkbox
           v-model="agree"
@@ -67,7 +67,7 @@
     {{ snackbar.message }}
   </v-snackbar>
 
-  <!-- モーダル（Rule.vue） -->
+  <!-- モーダル -->
   <v-dialog v-model="dialog" max-width="600px">
     <v-card>
       <v-card-text>
