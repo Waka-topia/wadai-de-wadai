@@ -44,50 +44,44 @@
   </v-snackbar>
 </template>
 
-<script>
-import { mapActions, mapGetters } from 'vuex'
+<script setup>
+import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
 
-export default {
-  name: 'UserLogout',
-  computed: {
-    ...mapGetters('auth', ['user']),
-  },
-  data() {
-    return {
-      snackbar: {
-        show: false,
-        color: '',
-        message: '',
-      },
+const router = useRouter()
+const store = useStore()
+
+const user = computed(() => store.getters['auth/user'])
+
+const snackbar = ref({
+  show: false,
+  color: '',
+  message: '',
+})
+
+const onLogout = async (isActive) => {
+  try {
+    await store.dispatch('auth/logout')
+    await store.dispatch('auth/initializeAuth')
+    sessionStorage.removeItem('user')
+
+    snackbar.value = {
+      show: true,
+      color: 'success',
+      message: 'ログアウトしました',
     }
-  },
-  methods: {
-    ...mapActions('auth', ['logout', 'initializeAuth']),
+    isActive.value = false
 
-    async onLogout(isActive) {
-      try {
-        await this.logout()
-        await this.$store.dispatch('auth/initializeAuth')
-        sessionStorage.removeItem('user')
-
-        this.snackbar = {
-          show: true,
-          color: 'success',
-          message: 'ログアウトしました',
-        }
-        isActive.value = false
-
-        setTimeout(() => {
-          this.$router.push('/login')
-        }, 1000)
-      } catch (error) {
-        this.snackbar = {
-          show: true,
-          color: 'error',
-          message: `ログアウトに失敗しました: ${error.message}`,
-        }
-      }
-    },
-  },
+    setTimeout(() => {
+      router.push('/login')
+    }, 1000)
+  } catch (error) {
+    snackbar.value = {
+      show: true,
+      color: 'error',
+      message: `ログアウトに失敗しました: ${error.message}`,
+    }
+  }
 }
 </script>
