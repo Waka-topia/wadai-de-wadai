@@ -40,7 +40,7 @@
 
         <v-checkbox
           v-model="agree"
-          :rules="[required, requiredAgree]"
+          :rules="[requiredAgree]"
           label="利用規約に同意する"
           color="orange"
         />
