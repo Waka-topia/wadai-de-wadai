@@ -46,67 +46,68 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    events: {
-      type: Array,
-      required: true,
-    },
-    selectedDate: {
-      type: [String, Date],
-      default: null,
-    },
+<script setup>
+import { ref, computed, watch } from 'vue'
+
+const props = defineProps({
+  events: {
+    type: Array,
+    required: true,
   },
-  emits: ['openModal', 'update:selectedDate'],
-  data() {
-    return {
-      internalSelectedDate: this.selectedDate ? new Date(this.selectedDate) : new Date(),
-    }
+  selectedDate: {
+    type: [String, Date],
+    default: null,
   },
-  computed: {
-    formattedSelectedDate() {
-      return this.internalSelectedDate
-        .toLocaleDateString('ja-JP', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-        })
-        .replace(/\//g, '-')
-    },
-    filteredEvents() {
-      return this.events.filter((event) => {
-        const eventDate = new Date(event.start)
-          .toLocaleDateString('ja-JP', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-          })
-          .replace(/\//g, '-')
-        return eventDate === this.formattedSelectedDate
+})
+
+const emit = defineEmits(['openModal', 'update:selectedDate'])
+
+const internalSelectedDate = ref(props.selectedDate ? new Date(props.selectedDate) : new Date())
+
+const formattedSelectedDate = computed(() => {
+  return internalSelectedDate.value
+    .toLocaleDateString('ja-JP', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    })
+    .replace(/\//g, '-')
+})
+
+const filteredEvents = computed(() => {
+  return props.events.filter((event) => {
+    const eventDate = new Date(event.start)
+      .toLocaleDateString('ja-JP', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
       })
-    },
+      .replace(/\//g, '-')
+    return eventDate === formattedSelectedDate.value
+  })
+})
+
+watch(
+  () => props.selectedDate,
+  (newVal) => {
+    internalSelectedDate.value = new Date(newVal)
   },
-  watch: {
-    selectedDate(newVal) {
-      this.internalSelectedDate = new Date(newVal)
-    },
-  },
-  methods: {
-    formatTime(dateString) {
-      const date = new Date(dateString)
-      return date.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })
-    },
-    openEventModal(event) {
-      this.$emit('openModal', event)
-    },
-    changeDate(days) {
-      const newDate = new Date(this.internalSelectedDate)
-      newDate.setDate(newDate.getDate() + days)
-      this.internalSelectedDate = newDate
-      this.$emit('update:selectedDate', newDate.toISOString().split('T')[0])
-    },
-  },
+)
+
+const formatTime = (dateString) => {
+  const date = new Date(dateString)
+  return date.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })
+}
+
+const openEventModal = (event) => {
+  emit('openModal', event)
+}
+
+const changeDate = (days) => {
+  const newDate = new Date(internalSelectedDate.value)
+  newDate.setDate(newDate.getDate() + days)
+  internalSelectedDate.value = newDate
+  emit('update:selectedDate', newDate.toISOString().split('T')[0])
 }
 </script>
 
