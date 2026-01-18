@@ -13,20 +13,18 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    isEditDeleteFormVisible: Boolean,
-  },
-  emits: ['deleteEvent'],
-  data() {
-    return {
-      organizerId: '',
-      password: '',
-      errorMessage: '',
-    }
-  },
-}
+<script setup>
+import { ref } from 'vue'
+
+defineProps({
+  isEditDeleteFormVisible: Boolean,
+})
+
+defineEmits(['deleteEvent'])
+
+const organizerId = ref('')
+const password = ref('')
+const errorMessage = ref('')
 </script>
 
 <style scoped>
@@ -50,7 +48,7 @@ label {
 input {
   width: 100%;
   padding: 8px;
-  border: 1px solid #ccc; /* 枠線を常に表示 */
+  border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 14px;
 }
