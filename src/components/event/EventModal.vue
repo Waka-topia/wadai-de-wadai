@@ -1,20 +1,16 @@
 <template>
-  <!-- モーダルが表示されるかどうかをisModalVisibleに基づいて表示 -->
   <div v-show="isModalVisible" class="modal">
     <div class="modal-content">
-      <!-- モーダルの閉じるボタン -->
       <v-btn class="close-btn" icon @click="handleCloseModal">
         <v-icon>mdi-close</v-icon>
       </v-btn>
 
-      <!-- イベント情報のコンテンツ (カードを使わない) -->
       <div class="event-container">
         <h2 class="event-title text-h5 font-weight-bold primary--text">
           {{ event.title }}
         </h2>
         <div class="event-divider"></div>
 
-        <!-- アイコンとラベルを使って情報表示 -->
         <div class="info-row">
           <div class="icon-wrapper">
             <v-icon color="primary">mdi-calendar</v-icon>
@@ -78,7 +74,6 @@
 
         <div class="event-divider"></div>
 
-        <!-- 削除フォーム呼び出しボタン -->
         <v-btn
           class="delete-form-btn white--text"
           block
@@ -90,7 +85,6 @@
           削除フォーム
         </v-btn>
 
-        <!-- 編集・削除フォーム -->
         <div class="mt-3">
           <EditDeleteForm
             v-show="isEditDeleteFormVisible"
@@ -104,65 +98,56 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref } from 'vue'
 import EditDeleteForm from './EditDeleteForm.vue'
 
-export default {
-  components: {
-    EditDeleteForm,
+const props = defineProps({
+  isModalVisible: Boolean,
+  event: {
+    type: Object,
+    default: () => ({}),
   },
-  props: {
-    isModalVisible: Boolean,
-    event: {
-      type: Object,
-      default: () => ({}),
-    },
-  },
-  emits: ['closeModal', 'deleteEvent'],
-  data() {
-    return {
-      isEditDeleteFormVisible: false,
-      password: '',
-    }
-  },
-  methods: {
-    // 削除フォームを表示・非表示にする処理
-    toggleEditDeleteForm() {
-      this.isEditDeleteFormVisible = !this.isEditDeleteFormVisible
-      if (this.isEditDeleteFormVisible) {
-        this.organizerId = this.event.organizerId || ''
-        this.password = ''
-        this.errorMessage = ''
-      }
-    },
+})
 
-    // モーダルを閉じる処理
-    handleCloseModal() {
-      // モーダルを閉じるためのイベントを送信
-      this.$emit('closeModal')
+const emit = defineEmits(['closeModal', 'deleteEvent'])
 
-      // 削除フォームが開いている場合は非表示にする
-      this.isEditDeleteFormVisible = false
+const isEditDeleteFormVisible = ref(false)
+const password = ref('')
+const organizerId = ref('')
+const errorMessage = ref('')
 
-      // 必要な変数をリセット
-      this.organizerId = ''
-      this.password = ''
-      this.errorMessage = ''
-    },
+// 削除フォームを表示・非表示にする処理
+const toggleEditDeleteForm = () => {
+  isEditDeleteFormVisible.value = !isEditDeleteFormVisible.value
+  if (isEditDeleteFormVisible.value) {
+    organizerId.value = props.event.organizerId || ''
+    password.value = ''
+    errorMessage.value = ''
+  }
+}
 
-    handleDeleteEvent(organizerId, password) {
-      // console.log(organizerId, password);
-      // 受け取ったデータを親コンポーネントに伝播
-      const deleteFormOrganizerId = organizerId
-      const deleteFormPassword = password
-      this.$emit('deleteEvent', deleteFormOrganizerId, deleteFormPassword)
-    },
-  },
+// モーダルを閉じる処理
+const handleCloseModal = () => {
+  // モーダルを閉じるためのイベントを送信
+  emit('closeModal')
+
+  // 削除フォームが開いている場合は非表示にする
+  isEditDeleteFormVisible.value = false
+
+  // 必要な変数をリセット
+  organizerId.value = ''
+  password.value = ''
+  errorMessage.value = ''
+}
+
+const handleDeleteEvent = (formOrganizerId, formPassword) => {
+  // 受け取ったデータを親コンポーネントに伝播
+  emit('deleteEvent', formOrganizerId, formPassword)
 }
 </script>
 
 <style scoped>
-/* モーダルのスタイル調整 */
 .modal {
   position: fixed;
   top: 0;
@@ -293,7 +278,6 @@ export default {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* モバイル対応 */
 @media (max-width: 600px) {
   .modal-content {
     width: 95%;
