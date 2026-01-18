@@ -59,166 +59,134 @@
       @delete-event="handleDeleteEvent"
     />
 
-    <!-- フィードバック用のスナックバー -->
     <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
       {{ snackbar.message }}
     </v-snackbar>
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, onMounted } from 'vue'
 import VueCal from 'vue-cal'
 import 'vue-cal/dist/vuecal.css'
-import { mapGetters } from 'vuex'
 import EventForm from './EventForm.vue'
 import EventModal from './EventModal.vue'
 import EventSchedule from './EventSchedule.vue'
 import { addEvent, deleteEvent, getEvents, verifyOrganizerPassword } from '@/services/eventService'
 
-export default {
-  components: {
-    VueCal,
-    EventForm,
-    EventModal,
-    EventSchedule,
-  },
-  data() {
-    return {
-      dialog: false,
-      events: [],
-      isModalVisible: false,
-      modalEvent: {},
-      isEditDeleteFormVisible: false,
-      organizerId: '', // 修正されたプロパティ
-      password: '', // 修正されたプロパティ
-      isEventFormVisible: false, // フォーム表示制御用の変数
-      selectedDate: null, // カレンダーで選択された日付
-      minDate: new Date('2025-04-01'), // 2025年4月1日
-      maxDate: new Date('2025-05-31'), // 2025年5月31日
-      // スナックバー関連の状態を追加
-      snackbar: {
-        show: false,
-        color: '',
-        message: '',
-      },
-      errorMessage: '', // エラーメッセージ保存用
-    }
-  },
-  computed: {
-    ...mapGetters('event', ['allEvents']),
-  },
-  mounted() {
-    this.fetchEvents()
-  },
-  methods: {
-    async fetchEvents() {
-      try {
-        const events = await getEvents()
-        this.events = events.map((event) => ({
-          start: new Date(`${event.date}T${event.startTime}`),
-          end: new Date(`${event.date}T${event.endTime}`),
-          title: event.organizerName,
-          class: event.class,
-          location: event.location,
-          description: event.description,
-          organizerName: event.organizerName,
-          eventId: event.eventId,
-          organizerId: event.organizerId,
-        }))
-      } catch (error) {
-        console.error('イベントの取得に失敗しました:', error)
-        this.showSnackbar('error', `イベントの取得に失敗しました: ${error.message}`)
-      }
-    },
-    async submitEvent(newEvent, organizerId, password) {
-      try {
-        const isPasswordValid = await verifyOrganizerPassword(organizerId, password)
-        if (!isPasswordValid) {
-          this.showSnackbar('error', '団体IDまたはパスワードが間違っています。')
-          return
-        }
-        const eventData = {
-          date: newEvent.date,
-          startTime: newEvent.startTime,
-          endTime: newEvent.endTime,
-          location: newEvent.location,
-          description: newEvent.description,
-          organizerName: newEvent.organizerName,
-          class: newEvent.class,
-        }
-        await addEvent(eventData, organizerId)
-        this.fetchEvents()
-        this.showSnackbar('success', 'イベントを登録しました。')
-        this.dialog = false // 登録後にダイアログを閉じる
-      } catch (error) {
-        console.error('イベントの登録に失敗しました:', error)
-        this.showSnackbar('error', `イベントの登録に失敗しました: ${error.message}`)
-      }
-    },
-    openEventModal(event) {
-      this.modalEvent = { ...event }
-      console.log('modalEvent', this.modalEvent)
-      this.isModalVisible = true
-      this.scrollControl = true
-    },
-    closeModal() {
-      this.isModalVisible = false
-      this.modalEvent = {}
-      this.scrollControl = false
-    },
-    toggleEventForm() {
-      this.isEventFormVisible = !this.isEventFormVisible // フォームの表示・非表示を切り替える
-    },
-    async handleDeleteEvent(organizerId, password) {
-      console.log('handleDeleteEvent started')
-      console.log('modalEvent', this.modalEvent)
+// Data
+const dialog = ref(false)
+const events = ref([])
+const isModalVisible = ref(false)
+const modalEvent = ref({})
+const snackbar = ref({
+  show: false,
+  color: '',
+  message: '',
+})
+const selectedDate = ref(null)
+const minDate = ref(new Date('2025-04-01'))
+const maxDate = ref(new Date('2025-05-31'))
 
-      try {
-        if (!this.modalEvent.eventId) {
-          console.warn('No eventId found, returning')
-          this.showSnackbar('error', '削除対象のイベントが選択されていません。')
-          return
-        }
-
-        console.log('organizerId', organizerId)
-        console.log('password', password)
-
-        console.log('Verifying password...')
-        const isPasswordValid = await verifyOrganizerPassword(organizerId, password)
-        console.log('verifyOrganizerPassword result:', isPasswordValid)
-
-        if (!isPasswordValid) {
-          console.warn('Invalid password, returning')
-          this.showSnackbar('error', '団体IDまたはパスワードが間違っています。')
-          return
-        }
-
-        console.log('deleteEvent', this.modalEvent.eventId)
-        await deleteEvent(this.modalEvent.eventId, organizerId, password)
-
-        // 削除成功時にスナックバーで成功メッセージを表示
-        this.showSnackbar('success', '新歓イベントを削除しました')
-
-        this.fetchEvents()
-        this.closeModal()
-      } catch (error) {
-        console.error('Error in handleDeleteEvent:', error)
-        this.showSnackbar('error', `イベントの削除に失敗しました: ${error.message}`)
-      }
-    },
-    setToday() {
-      this.selectedDate = new Date().toISOString().split('T')[0] // 今日の日付を設定
-    },
-    // スナックバー表示用のヘルパーメソッドを追加
-    showSnackbar(color, message) {
-      this.snackbar = {
-        show: true,
-        color: color,
-        message: message,
-      }
-    },
-  },
+// Methods
+const showSnackbar = (color, message) => {
+  snackbar.value = {
+    show: true,
+    color: color,
+    message: message,
+  }
 }
+
+const fetchEvents = async () => {
+  try {
+    const fetchedEvents = await getEvents()
+    events.value = fetchedEvents.map((event) => ({
+      start: new Date(`${event.date}T${event.startTime}`),
+      end: new Date(`${event.date}T${event.endTime}`),
+      title: event.organizerName,
+      class: event.class,
+      location: event.location,
+      description: event.description,
+      organizerName: event.organizerName,
+      eventId: event.eventId,
+      organizerId: event.organizerId,
+    }))
+  } catch (error) {
+    console.error('イベントの取得に失敗しました:', error)
+    showSnackbar('error', `イベントの取得に失敗しました: ${error.message}`)
+  }
+}
+
+const submitEvent = async (newEvent, orgId, pass) => {
+  try {
+    const isPasswordValid = await verifyOrganizerPassword(orgId, pass)
+    if (!isPasswordValid) {
+      showSnackbar('error', '団体IDまたはパスワードが間違っています。')
+      return
+    }
+    const eventData = {
+      date: newEvent.date,
+      startTime: newEvent.startTime,
+      endTime: newEvent.endTime,
+      location: newEvent.location,
+      description: newEvent.description,
+      organizerName: newEvent.organizerName,
+      class: newEvent.class,
+    }
+    await addEvent(eventData, orgId)
+    fetchEvents()
+    showSnackbar('success', 'イベントを登録しました。')
+    dialog.value = false
+  } catch (error) {
+    console.error('イベントの登録に失敗しました:', error)
+    showSnackbar('error', `イベントの登録に失敗しました: ${error.message}`)
+  }
+}
+
+const openEventModal = (event) => {
+  modalEvent.value = { ...event }
+  isModalVisible.value = true
+}
+
+const closeModal = () => {
+  isModalVisible.value = false
+  modalEvent.value = {}
+}
+
+const handleDeleteEvent = async (orgId, pass) => {
+  try {
+    if (!modalEvent.value.eventId) {
+      showSnackbar('error', '削除対象のイベントが選択されていません。')
+      return
+    }
+
+    const isPasswordValid = await verifyOrganizerPassword(orgId, pass)
+
+    if (!isPasswordValid) {
+      showSnackbar('error', '団体IDまたはパスワードが間違っています。')
+      return
+    }
+
+    await deleteEvent(modalEvent.value.eventId, orgId, pass)
+
+    showSnackbar('success', '新歓イベントを削除しました')
+
+    fetchEvents()
+    closeModal()
+  } catch (error) {
+    console.error('Error in handleDeleteEvent:', error)
+    showSnackbar('error', `イベントの削除に失敗しました: ${error.message}`)
+  }
+}
+
+const setToday = () => {
+  selectedDate.value = new Date().toISOString().split('T')[0]
+}
+
+// Lifecycle
+onMounted(() => {
+  fetchEvents()
+})
 </script>
 
 <style>
