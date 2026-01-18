@@ -29,45 +29,48 @@
 </template>
 
 <script setup>
-  import { ref, computed, watch } from 'vue'
-  import { useStore } from 'vuex'
-  
-  const store = useStore()
-  
-  const isLoading = ref(true) // 初期は読み込み中
-  const isErrored = ref(false)
-  const errorMessages = ref('画像の取得に失敗しました')
-  
-  const userStampImages = computed(() => store.getters['stamps/userStampImages'])
-  const isAuthenticated = computed(() => store.getters['auth/isAuthenticated'])
-  
-  const stampImages = computed(() => {
-    return userStampImages.value || []
-  })
-  
-  const fetchUserStampImages = () => store.dispatch('stamps/fetchUserStampImages')
-  
-  const loadStampImages = async () => {
-    try {
-      await fetchUserStampImages()
-    } catch (error) {
-      isErrored.value = true
-      errorMessages.value = error.message || error
-    } finally {
-      isLoading.value = false
-    }
+import { ref, computed, watch } from 'vue'
+import { useStore } from 'vuex'
+
+const store = useStore()
+
+const isLoading = ref(true) // 初期は読み込み中
+const isErrored = ref(false)
+const errorMessages = ref('画像の取得に失敗しました')
+
+const userStampImages = computed(() => store.getters['stamps/userStampImages'])
+const isAuthenticated = computed(() => store.getters['auth/isAuthenticated'])
+
+const stampImages = computed(() => {
+  return userStampImages.value || []
+})
+
+const fetchUserStampImages = () => store.dispatch('stamps/fetchUserStampImages')
+
+const loadStampImages = async () => {
+  try {
+    await fetchUserStampImages()
+  } catch (error) {
+    isErrored.value = true
+    errorMessages.value = error.message || error
+  } finally {
+    isLoading.value = false
   }
-  
-  watch(isAuthenticated, (newVal) => {
+}
+
+watch(
+  isAuthenticated,
+  (newVal) => {
     if (newVal) {
       loadStampImages()
     }
-  }, { immediate: true })
+  },
+  { immediate: true },
+)
 
-  if (isAuthenticated.value) {
-    loadStampImages()
-  } else {
-    isLoading.value = false // 認証が必要な場合も読み込み終了
-  }
+if (isAuthenticated.value) {
+  loadStampImages()
+} else {
+  isLoading.value = false // 認証が必要な場合も読み込み終了
+}
 </script>
-
