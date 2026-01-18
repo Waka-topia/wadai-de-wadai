@@ -66,44 +66,40 @@
   </form>
 </template>
 
-<script>
-export default {
-  emits: ['submitEvent'],
-  data() {
-    return {
-      newEvent: {
-        date: '',
-        startTime: '',
-        endTime: '',
-        location: '',
-        description: '',
-        organizerName: '',
-        class: 'custom-event',
-      },
-      organizerId: '',
-      password: '',
-    }
-  },
-  methods: {
-    // フォームをリセットするメソッド
-    resetForm() {
-      this.newEvent = {
-        date: '',
-        startTime: '',
-        endTime: '',
-        location: '',
-        description: '',
-        organizerName: '',
-        class: 'custom-event',
-      }
-    },
+<script setup>
+import { ref } from 'vue'
 
-    // イベントを送信するメソッド
-    submitEvent() {
-      this.$emit('submitEvent', this.newEvent, this.organizerId, this.password) // 親コンポーネントにイベントを送信
-      this.resetForm() // 送信後にフォームをリセット
-    },
-  },
+const emit = defineEmits(['submitEvent'])
+
+const newEvent = ref({
+  date: '',
+  startTime: '',
+  endTime: '',
+  location: '',
+  description: '',
+  organizerName: '',
+  class: 'custom-event',
+})
+const organizerId = ref('')
+const password = ref('')
+
+// フォームをリセットするメソッド
+const resetForm = () => {
+  newEvent.value = {
+    date: '',
+    startTime: '',
+    endTime: '',
+    location: '',
+    description: '',
+    organizerName: '',
+    class: 'custom-event',
+  }
+}
+
+// イベントを送信するメソッド
+const submitEvent = () => {
+  emit('submitEvent', newEvent.value, organizerId.value, password.value) // 親コンポーネントにイベントを送信
+  resetForm() // 送信後にフォームをリセット
 }
 </script>
 
