@@ -25,6 +25,11 @@
         </v-card>
       </v-col>
     </v-row>
+
+    <!-- スナックバー通知 -->
+    <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="3000">
+      {{ snackbar.message }}
+    </v-snackbar>
   </div>
 </template>
 
@@ -33,10 +38,14 @@ import { ref, computed, watch } from 'vue'
 import { useStore } from 'vuex'
 
 const store = useStore()
-
-const isLoading = ref(true) // 初期は読み込み中
+const isLoading = ref(true)
 const isErrored = ref(false)
 const errorMessages = ref('画像の取得に失敗しました')
+const snackbar = ref({
+  show: false,
+  color: '',
+  message: '',
+})
 
 const userStampImages = computed(() => store.getters['stamps/userStampImages'])
 const isAuthenticated = computed(() => store.getters['auth/isAuthenticated'])
@@ -51,8 +60,14 @@ const loadStampImages = async () => {
   try {
     await fetchUserStampImages()
   } catch (error) {
+    /// エラーが起きたらsnackbarを出すようにしたい
     isErrored.value = true
     errorMessages.value = error.message || error
+    snackbar.value = {
+      show: true,
+      color: 'error',
+      message: '画像の取得に失敗しました',
+    }
   } finally {
     isLoading.value = false
   }
@@ -71,6 +86,6 @@ watch(
 if (isAuthenticated.value) {
   loadStampImages()
 } else {
-  isLoading.value = false // 認証が必要な場合も読み込み終了
+  isLoading.value = false
 }
 </script>

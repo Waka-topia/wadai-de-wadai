@@ -10,6 +10,11 @@
 
     <!-- テスト用ボタン -->
     <!-- <button @click="simulateQRCodeScan">QRコードを読み取ったと仮定</button> -->
+
+    <!-- スナックバー通知 -->
+    <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="3000">
+      {{ snackbar.message }}
+    </v-snackbar>
   </div>
 </template>
 
@@ -18,19 +23,20 @@ import { ref } from 'vue'
 import { useStore } from 'vuex'
 import { QrcodeStream } from 'vue-qrcode-reader'
 
-// 追加した変数: store
 const store = useStore()
-const scannedData = ref(null) // 読み取ったQRコードのデータ
-const isInitialized = ref(false) // 初期化フラグ
+const scannedData = ref(null)
+const isInitialized = ref(false)
+const snackbar = ref({
+  show: false,
+  color: '',
+  message: '',
+})
 
-// データの抽出
 const extractData = (rawData) => {
   try {
-    // rawDataがオブジェクトの場合、そのまま利用
     const groupId = rawData?.groupId
     const stampId = rawData?.stampId
 
-    // データが存在する場合はオブジェクトを返す
     if (groupId && stampId) {
       return { groupId, stampId }
     } else {
@@ -39,80 +45,94 @@ const extractData = (rawData) => {
   } catch (error) {
     console.error('データ抽出エラー:', error)
   }
-  return null // 必要なデータがない場合はnullを返す
+  return null
 }
 
-// Firestore に QR データを保存する処理
 const addStampToFirestore = async (qrData) => {
   try {
     const result = await store.dispatch('stamps/addStamp', qrData)
     console.log('Firestore へのスタンプ追加結果:', result)
-    alert(result.message)
+    snackbar.value = {
+      show: true,
+      color: 'success',
+      message: result.message,
+    }
   } catch (error) {
     console.error('Firestore へのスタンプ追加中にエラーが発生しました:', error)
-    alert('エラーが発生しました。スタンプを追加できませんでした。')
+    snackbar.value = {
+      show: true,
+      color: 'error',
+      message: 'エラーが発生しました。スタンプを追加できませんでした。',
+    }
   }
 }
 
-// QRコードが正常に読み取られた時の処理
 const onDetect = (decodedResult) => {
   console.log('QRコードの検出結果:', decodedResult)
   const result = Array.isArray(decodedResult) ? decodedResult[0] : decodedResult
   console.log('QRコードのresult:', result)
 
-  // QRコードの生データ（rawValue）を取得
   const rawData = result?.rawValue
   console.log('rawValue:', rawData)
 
   if (!rawData) {
     console.error('QRコードの生データが取得できませんでした:', decodedResult)
-    alert('QRコードが正しく読み取れませんでした。もう一度お試しください。')
+    snackbar.value = {
+      show: true,
+      color: 'error',
+      message: 'QRコードが正しく読み取れませんでした。もう一度お試しください。',
+    }
     return
   }
 
   let parsedData
   try {
-    // rawDataが文字列の場合はJSONとしてパース
     if (typeof rawData === 'string') {
-      // 文字列データをJSONとしてパース
       parsedData = JSON.parse(rawData)
     } else if (typeof rawData === 'object') {
-      // JSONオブジェクトがそのまま渡された場合はそのまま使用
       parsedData = rawData
     } else {
       throw new Error('データ形式が不正です')
     }
   } catch (error) {
     console.error('QRコードのデータ解析エラー:', error)
-    alert('QRコードのデータ解析に失敗しました。もう一度お試しください。')
+    snackbar.value = {
+      show: true,
+      color: 'error',
+      message: 'QRコードのデータ解析に失敗しました。もう一度お試しください。',
+    }
     return
   }
 
-  // 必要なデータを抽出
   const extractedData = extractData(parsedData)
 
   if (extractedData) {
     scannedData.value = JSON.stringify(extractedData)
     console.log('抽出されたデータ:', extractedData)
 
-    // Firestore に保存
     addStampToFirestore(extractedData)
   } else {
-    alert('必要なデータが見つかりませんでした。正しいQRコードを使用してください。')
+    snackbar.value = {
+      show: true,
+      color: 'error',
+      message: '必要なデータが見つかりませんでした。正しいQRコードを使用してください。',
+    }
   }
 }
 
-// 初期化時のメッセージ
-const onInit = (promise) => {
-  promise
-    .then(() => {
-      isInitialized.value = true
-      console.log('QRコードリーダーが初期化されました。')
-    })
-    .catch((err) => {
-      console.error('QRコードリーダーの初期化エラー:', err)
-      alert('カメラが使えません。設定を確認してください。HTTPSでアクセスする必要があります。')
-    })
+const onInit = async (promise) => {
+  try {
+    await promise
+    isInitialized.value = true
+    console.log('QRコードリーダーが初期化されました。')
+  } catch (err) {
+    console.error('QRコードリーダーの初期化エラー:', err)
+    snackbar.value = {
+      show: true,
+      color: 'error',
+      message: 'カメラが使えません。設定を確認してください。HTTPSでアクセスする必要があります。',
+    }
+  }
 }
 
 // テスト用: QRコード読み取りの仮想データを設定しFirestoreにアップロード
@@ -122,10 +142,10 @@ const onInit = (promise) => {
       groupId: 'group123',
       stampId: 'stamp456', // QRコードから取得したスタンプID
     }
-  
+
     scannedData.value = JSON.stringify(qrData)
     console.log('テスト用読み取ったデータ:', scannedData.value)
-  
+
     try {
       await addStampToFirestore(qrData)
     } catch (error) {
