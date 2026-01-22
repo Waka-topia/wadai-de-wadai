@@ -60,7 +60,6 @@ const loadStampImages = async () => {
   try {
     await fetchUserStampImages()
   } catch (error) {
-    /// エラーが起きたらsnackbarを出すようにしたい
     isErrored.value = true
     errorMessages.value = error.message || error
     snackbar.value = {
