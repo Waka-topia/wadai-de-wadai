@@ -41,9 +41,19 @@ const extractData = (rawData) => {
       return { groupId, stampId }
     } else {
       console.error('必要なデータが不足しています:', rawData)
+      snackbar.value = {
+        show: true,
+        color: 'error',
+        message: '必要なデータが不足しています。',
+      }
     }
   } catch (error) {
     console.error('データ抽出エラー:', error)
+    snackbar.value = {
+      show: true,
+      color: 'error',
+      message: 'データ抽出中にエラーが発生しました。',
+    }
   }
   return null
 }
@@ -51,7 +61,6 @@ const extractData = (rawData) => {
 const addStampToFirestore = async (qrData) => {
   try {
     const result = await store.dispatch('stamps/addStamp', qrData)
-    console.log('Firestore へのスタンプ追加結果:', result)
     snackbar.value = {
       show: true,
       color: 'success',
@@ -70,10 +79,8 @@ const addStampToFirestore = async (qrData) => {
 const onDetect = (decodedResult) => {
   console.log('QRコードの検出結果:', decodedResult)
   const result = Array.isArray(decodedResult) ? decodedResult[0] : decodedResult
-  console.log('QRコードのresult:', result)
 
   const rawData = result?.rawValue
-  console.log('rawValue:', rawData)
 
   if (!rawData) {
     console.error('QRコードの生データが取得できませんでした:', decodedResult)
@@ -87,12 +94,15 @@ const onDetect = (decodedResult) => {
 
   let parsedData
   try {
-    if (typeof rawData === 'string') {
-      parsedData = JSON.parse(rawData)
-    } else if (typeof rawData === 'object') {
-      parsedData = rawData
-    } else {
-      throw new Error('データ形式が不正です')
+    switch (typeof rawData) {
+      case 'string':
+        parsedData = JSON.parse(rawData)
+        break
+      case 'object':
+        parsedData = rawData
+        break
+      default:
+        throw new Error('データ形式が不正です')
     }
   } catch (error) {
     console.error('QRコードのデータ解析エラー:', error)
@@ -108,8 +118,6 @@ const onDetect = (decodedResult) => {
 
   if (extractedData) {
     scannedData.value = JSON.stringify(extractedData)
-    console.log('抽出されたデータ:', extractedData)
-
     addStampToFirestore(extractedData)
   } else {
     snackbar.value = {
@@ -124,7 +132,11 @@ const onInit = async (promise) => {
   try {
     await promise
     isInitialized.value = true
-    console.log('QRコードリーダーが初期化されました。')
+    snackbar.value = {
+      show: true,
+      color: 'error',
+      message: 'QRコードリーダーが初期化されました。',
+    }
   } catch (err) {
     console.error('QRコードリーダーの初期化エラー:', err)
     snackbar.value = {
