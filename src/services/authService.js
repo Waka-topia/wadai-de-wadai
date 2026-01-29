@@ -52,7 +52,17 @@ export default {
       const userCredential = await signInWithEmailAndPassword(auth, email, password)
       return userCredential.user
     } catch (error) {
-      console.error('Login failed:', error)
+      switch (error.code) {
+        case 'auth/invalid-email':
+          error.message = 'メールアドレスの形式が正しくありません。'
+          break
+        case 'auth/invalid-credentials':
+          error.message = 'メールアドレスまたはパスワードが正しくありません。'
+          break
+        case 'auth/network-request-failed':
+          error.message = 'ネットワークエラーが発生しました。接続を確認してください。'
+          break
+      }
       throw error
     }
   },
@@ -64,7 +74,21 @@ export default {
       await updateProfile(user, { displayName: username })
       return user
     } catch (error) {
-      console.error('Sign-up failed:', error)
+      switch (error.code) {
+        case 'auth/email-already-in-use':
+          error.message =
+            'このメールアドレスは既に使用されています。別のメールアドレスを使用してください。'
+          break
+        case 'auth/invalid-email':
+          error.message = 'メールアドレスの形式が正しくありません。'
+          break
+        case 'auth/weak-password':
+          error.message = 'パスワードが弱すぎます。8文字以上の強力なパスワードを使用してください。'
+          break
+        case 'auth/network-request-failed':
+          error.message = 'ネットワークエラーが発生しました。接続を確認してください。'
+          break
+      }
       throw error
     }
   },
@@ -74,6 +98,11 @@ export default {
       await signOut(auth)
     } catch (error) {
       console.error('Logout failed:', error)
+      switch (error.code) {
+        case 'auth/network-request-failed':
+          error.message = 'ネットワークエラーが発生しました。接続を確認してください。'
+          break
+      }
       throw error
     }
   },
