@@ -3,31 +3,31 @@
     <v-bottom-navigation v-model="selectedIndex" class="bottom-nav" active color="orange" grow>
       <v-btn to="/eventcal" value="eventcal">
         <v-icon>mdi-calendar-month</v-icon>
-        <!-- <span>新歓日程</span> -->
+        <span>新歓日程</span>
       </v-btn>
 
       <v-btn to="/reader" value="reader">
         <v-icon>mdi-qrcode-scan</v-icon>
-        <!-- <span>読み取る</span> -->
+        <span>読み取る</span>
       </v-btn>
 
       <div class="home-btn-wrapper">
         <v-btn to="/" value="home" class="home-btn" :ripple="false">
           <div class="home-icon-bg">
             <v-icon size="32" color="white">mdi-home</v-icon>
+            <span class="home-label-in-circle">ホーム</span>
           </div>
-          <!-- <span class="home-label">ホーム</span> -->
         </v-btn>
       </div>
 
       <v-btn to="/jobs" value="jobs">
         <v-icon>mdi-briefcase-search</v-icon>
-        <!-- <span>求人情報</span> -->
+        <span>求人情報</span>
       </v-btn>
 
       <v-btn to="/mypage" value="mypage">
         <v-icon>mdi-account</v-icon>
-        <!-- <span>マイページ</span> -->
+        <span>マイページ</span>
       </v-btn>
     </v-bottom-navigation>
   </v-layout>
@@ -57,52 +57,59 @@ watch(
 
 <style scoped>
 .bottom-nav {
-  height: 64px !important; /* なぜか高さが足りない場合があるので強制 */
+  height: 64px !important;
   padding-bottom: env(safe-area-inset-bottom);
-  overflow: visible !important; /* ホームボタンが飛び出すように */
-  contain: none !important; /* ホームボタンが飛び出すように */
+  overflow: visible !important;
+  contain: none !important;
+  box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.05) !important;
 }
 
 .home-btn-wrapper {
   position: relative;
-  width: min-content;
+  width: 80px; /* min-widthから固定幅へ */
   display: flex;
   justify-content: center;
-  align-items: flex-end;
+  align-items: center; /* flex-endからcenterに変更（あるいは指定なし） */
+  overflow: visible; /* はみ出しを許可 */
 }
 
 .home-btn {
-  height: 100% !important;
-  margin-top: -20px; /* 上に突き出させる */
-  opacity: 1 !important; /* アクティブ時の透明度変化を無効化 */
+  /* 下の見切れを解消するために上に移動させる */
+  transform: translateY(-8px) !important;
+
+  /* position: absolute を使うと親の高さ制限を無視して上に突き抜けます */
+  position: absolute !important;
+  bottom: 10px !important; /* 数値を大きくするほど上に上がります */
+
+  height: auto !important;
   background: transparent !important;
+  padding: 0 !important;
+  min-width: auto !important;
 }
 
 .home-icon-bg {
-  width: 56px;
-  height: 56px;
-  background-color: #ff9800; /* Orange */
+  width: 72px;
+  height: 72px;
+  background-color: #ff9800;
   border-radius: 50%;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-  border: 4px solid white; /* 背景色と同じにして切り抜き感を出す */
-  margin-bottom: 4px;
+  /* 下が見切れないよう、影も考慮して少し上に配置 */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  border: 4px solid white;
 }
 
-.home-label {
+.home-label-in-circle {
   font-size: 10px;
-  color: #ff9800;
+  color: white;
   font-weight: bold;
+  line-height: 1;
+  margin-top: 2px;
 }
 
-/* 通常のボタンのアクティブ状態のスタイル調整 */
-:deep(.v-btn--active) > .v-btn__overlay {
-  opacity: 0.1;
-}
-
-/* ホームボタンの強制スタイル */
+/* Hide the default overlay interaction for the custom button */
 :deep(.home-btn.v-btn--active) > .v-btn__overlay {
   opacity: 0 !important;
 }
