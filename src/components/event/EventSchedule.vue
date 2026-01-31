@@ -1,19 +1,14 @@
 <template>
   <div class="event-schedule">
-    <div class="nav-buttons">
-      <button class="nav-btn" @click="changeDate(-1)">&#x3C;</button>
-      <h3 class="title">{{ formattedSelectedDate }} の新歓イベント</h3>
-      <button class="nav-btn" @click="changeDate(1)">&#x3E;</button>
-    </div>
-
     <div v-if="filteredEvents.length === 0" class="no-events">イベントはありません</div>
 
     <div v-else class="d-flex flex-column ga-2">
       <div
         v-for="event in filteredEvents"
         :key="event.eventId"
+        :to="'/eventcal/' + event.eventId"
         class="border-md rounded-lg"
-        @click="openEventModal(event)"
+        @click="router.push('/eventcal/' + event.eventId)"
       >
         <v-row class="py-4">
           <v-col
@@ -21,17 +16,17 @@
             cols="3"
           >
             <div>
-              {{ formatTime(event.start) }}
+              {{ event.startTime }}
             </div>
             <div>〜</div>
             <div>
-              {{ formatTime(event.end) }}
+              {{ event.endTime }}
             </div>
           </v-col>
           <v-divider vertical></v-divider>
           <v-col cols="9">
             <div>
-              <p class="text-h6 font-weight-bold">{{ event.title }}</p>
+              <p class="text-h6 font-weight-bold">{{ event.organizerName }}</p>
               <p class="text-caption font-weight-bold text-grey-lighten-2 text-truncate">
                 {{ event.description }}
               </p>
@@ -47,68 +42,25 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { computed } from 'vue'
+import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+const store = useStore()
 
 const props = defineProps({
-  events: {
-    type: Array,
-    required: true,
-  },
   selectedDate: {
-    type: [String, Date],
-    default: null,
+    type: String,
+    default: '',
   },
 })
 
-const emit = defineEmits(['openModal', 'update:selectedDate'])
-
-const internalSelectedDate = ref(props.selectedDate ? new Date(props.selectedDate) : new Date())
-
-const formattedSelectedDate = computed(() => {
-  return internalSelectedDate.value
-    .toLocaleDateString('ja-JP', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    })
-    .replace(/\//g, '-')
-})
-
+// TODO: Optimize filtering by date on the Vuex side if performance becomes an issue
 const filteredEvents = computed(() => {
-  return props.events.filter((event) => {
-    const eventDate = new Date(event.start)
-      .toLocaleDateString('ja-JP', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-      })
-      .replace(/\//g, '-')
-    return eventDate === formattedSelectedDate.value
-  })
+  const allEvents = store.getters['event/allEvents']
+  return allEvents.filter((event) => event.date === props.selectedDate)
 })
-
-watch(
-  () => props.selectedDate,
-  (newVal) => {
-    internalSelectedDate.value = new Date(newVal)
-  },
-)
-
-const formatTime = (dateString) => {
-  const date = new Date(dateString)
-  return date.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })
-}
-
-const openEventModal = (event) => {
-  emit('openModal', event)
-}
-
-const changeDate = (days) => {
-  const newDate = new Date(internalSelectedDate.value)
-  newDate.setDate(newDate.getDate() + days)
-  internalSelectedDate.value = newDate
-  emit('update:selectedDate', newDate.toISOString().split('T')[0])
-}
 </script>
 
 <style scoped>
@@ -116,26 +68,6 @@ const changeDate = (days) => {
   padding: 16px;
   background: #fff;
   border-radius: 12px;
-}
-
-.nav-buttons {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  margin-bottom: 10px;
-}
-
-.nav-btn {
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-
-.nav-btn:hover {
-  color: #ff9800;
 }
 
 .title {

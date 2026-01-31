@@ -1,6 +1,6 @@
 import { collection, deleteDoc, doc, getDoc, getDocs, setDoc, updateDoc } from 'firebase/firestore'
-import bcrypt from 'bcryptjs' // bcryptをインポート
-import { v4 as uuidv4 } from 'uuid' // UUID生成ライブラリを利用
+import bcrypt from 'bcryptjs'
+import { v4 as uuidv4 } from 'uuid'
 import { db } from '@/firebase/config'
 
 /**
@@ -11,22 +11,16 @@ import { db } from '@/firebase/config'
  * @returns {Promise<boolean>} パスワードが一致すればtrue、それ以外はfalse
  */
 export const verifyOrganizerPassword = async (organizerId, inputPassword) => {
-  // console.log("eventService",organizerId, inputPassword);
   try {
-    const docRef = doc(db, 'organizers', organizerId) // コレクションを指定
+    const docRef = doc(db, 'organizers', organizerId)
     const docSnap = await getDoc(docRef)
 
     if (!docSnap.exists()) {
       throw new Error('団体が見つかりません')
     }
 
-    const organizerData = docSnap.data()
-    const passwordHash = organizerData.passwordHash
-
-    // bcryptで入力されたパスワードをハッシュと比較
-    const isPasswordValid = await bcrypt.compare(inputPassword, passwordHash)
-
-    return isPasswordValid
+    const { passwordHash } = docSnap.data()
+    return await bcrypt.compare(inputPassword, passwordHash)
   } catch (error) {
     console.error('Failed to verify organizer password:', error)
     throw new Error('パスワードの検証に失敗しました')
@@ -38,21 +32,16 @@ export const verifyOrganizerPassword = async (organizerId, inputPassword) => {
  *
  * @param {object} eventData イベントデータ
  * @param {string} organizerId 団体ID
+ * @param {string} inputPassword ユーザーが入力したパスワード
  * @returns {Promise<void>}
  */
-export const addEvent = async (eventData, organizerId) => {
-  console.log(eventData)
+export const addEventService = async (eventData, organizerId, inputPassword) => {
   try {
-    const eventId = uuidv4() // ユニークなイベントIDを生成
-
-    const eventDoc = {
-      ...eventData,
-      eventId, // イベントIDを追加
-      organizerId, // 団体IDを追加
-    }
-
-    const eventRef = doc(db, 'events', eventId) // コレクション参照
-    await setDoc(eventRef, eventDoc)
+    // await verifyOrganizerPassword(organizerId, inputPassword)
+    console.log(inputPassword)
+    const eventId = uuidv4()
+    const eventRef = doc(db, 'events', eventId)
+    await setDoc(eventRef, { ...eventData, eventId, organizerId })
   } catch (error) {
     console.error('Failed to add event:', error)
     throw new Error('イベントの登録に失敗しました')
@@ -63,18 +52,18 @@ export const addEvent = async (eventData, organizerId) => {
  * Firebaseから単一のイベント情報を取得する
  *
  * @param {string} eventId イベントID
- * @returns {Promise<object>}
+ * @returns {Promise<object>} イベントデータ
  */
-export const getEvent = async (eventId) => {
+export const getEventService = async (eventId) => {
   try {
-    const docRef = doc(db, 'events', eventId) // コレクション参照
+    const docRef = doc(db, 'events', eventId)
     const docSnap = await getDoc(docRef)
 
-    if (docSnap.exists()) {
-      return docSnap.data()
-    } else {
+    if (!docSnap.exists()) {
       throw new Error('イベントが見つかりません')
     }
+
+    return docSnap.data()
   } catch (error) {
     console.error('Failed to get event:', error)
     throw new Error('イベント情報の取得に失敗しました')
@@ -86,14 +75,34 @@ export const getEvent = async (eventId) => {
  *
  * @returns {Promise<Array>} イベント情報のリスト
  */
-export const getEvents = async () => {
+export const getEventsService = async () => {
   try {
-    const eventsSnapshot = await getDocs(collection(db, 'events')) // コレクション参照
-    const eventsList = eventsSnapshot.docs.map((doc) => doc.data()) // ドキュメントからデータを抽出
-    return eventsList
+    const eventsSnapshot = await getDocs(collection(db, 'events'))
+    return eventsSnapshot.docs.map((eventDoc) => eventDoc.data())
   } catch (error) {
     console.error('Failed to get events:', error)
     throw new Error('イベント情報の取得に失敗しました')
+  }
+}
+
+/**
+ * イベントの所有者を検証する（団体IDの一致確認 + パスワード検証）
+ *
+ * @param {string} eventId イベントID
+ * @param {string} organizerId 団体ID
+ * @param {string} inputPassword ユーザーが入力したパスワード
+ * @returns {Promise<void>}
+ * @throws {Error} 団体IDが一致しない、またはパスワードが正しくない場合
+ */
+const verifyEventOwnership = async (eventId, organizerId, inputPassword) => {
+  const event = await getEventService(eventId)
+  if (event.organizerId !== organizerId) {
+    throw new Error('団体IDが一致しません')
+  }
+
+  const isPasswordValid = await verifyOrganizerPassword(organizerId, inputPassword)
+  if (!isPasswordValid) {
+    throw new Error('パスワードが正しくありません')
   }
 }
 
@@ -106,21 +115,10 @@ export const getEvents = async () => {
  * @param {string} inputPassword ユーザーが入力したパスワード
  * @returns {Promise<void>}
  */
-export const updateEvent = async (eventId, eventData, organizerId, inputPassword) => {
+export const updateEventService = async (eventId, eventData, organizerId, inputPassword) => {
   try {
-    // イベント情報を取得して団体IDを確認
-    const event = await getEvent(eventId)
-    if (event.organizerId !== organizerId) {
-      throw new Error('団体IDが一致しません')
-    }
-
-    // 団体IDとパスワードを検証
-    const isPasswordValid = await verifyOrganizerPassword(organizerId, inputPassword)
-    if (!isPasswordValid) {
-      throw new Error('パスワードが正しくありません')
-    }
-
-    const eventRef = doc(db, 'events', eventId) // コレクション参照
+    await verifyEventOwnership(eventId, organizerId, inputPassword)
+    const eventRef = doc(db, 'events', eventId)
     await updateDoc(eventRef, eventData)
   } catch (error) {
     console.error('Failed to update event:', error)
@@ -136,21 +134,10 @@ export const updateEvent = async (eventId, eventData, organizerId, inputPassword
  * @param {string} inputPassword ユーザーが入力したパスワード
  * @returns {Promise<void>}
  */
-export const deleteEvent = async (eventId, organizerId, inputPassword) => {
+export const deleteEventService = async (eventId, organizerId, inputPassword) => {
   try {
-    // イベント情報を取得して団体IDを確認
-    const event = await getEvent(eventId)
-    if (event.organizerId !== organizerId) {
-      throw new Error('団体IDが一致しません')
-    }
-
-    // 団体IDとパスワードを検証
-    const isPasswordValid = await verifyOrganizerPassword(organizerId, inputPassword)
-    if (!isPasswordValid) {
-      throw new Error('パスワードが正しくありません')
-    }
-
-    const eventRef = doc(db, 'events', eventId) // コレクション参照
+    await verifyEventOwnership(eventId, organizerId, inputPassword)
+    const eventRef = doc(db, 'events', eventId)
     await deleteDoc(eventRef)
   } catch (error) {
     console.error('Failed to delete event:', error)

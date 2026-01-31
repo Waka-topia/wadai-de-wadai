@@ -1,5 +1,5 @@
 <template>
-  <div v-show="isEditDeleteFormVisible" class="edit-delete-form">
+  <div class="edit-delete-form">
     <div class="form-group">
       <label for="organizer-id">団体ID:</label>
       <input v-model="organizerId" type="text" required />
@@ -8,23 +8,53 @@
       <label for="password">パスワード:</label>
       <input v-model="password" type="password" required />
     </div>
-    <button class="delete-button" @click="$emit('deleteEvent', organizerId, password)">削除</button>
-    <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+    <button class="delete-button" @click="onDelete">削除</button>
   </div>
+  <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
+    {{ snackbar.message }}
+  </v-snackbar>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import { useStore } from 'vuex'
 
-defineProps({
-  isEditDeleteFormVisible: Boolean,
+const snackbar = ref({
+  show: false,
+  message: '',
+  color: '',
 })
 
-defineEmits(['deleteEvent'])
-
+const store = useStore()
 const organizerId = ref('')
 const password = ref('')
-const errorMessage = ref('')
+const props = defineProps({
+  eventId: {
+    type: String,
+    required: true,
+  },
+})
+
+const onDelete = async () => {
+  try {
+    await store.dispatch('event/deleteEvent', {
+      eventId: props.eventId,
+      organizerId: organizerId.value,
+      inputPassword: password.value,
+    })
+    snackbar.value = {
+      show: true,
+      message: 'イベントが正常に削除されました。',
+      color: 'success',
+    }
+  } catch (error) {
+    snackbar.value = {
+      show: true,
+      message: error.message,
+      color: 'error',
+    }
+  }
+}
 </script>
 
 <style scoped>
@@ -71,11 +101,5 @@ input:focus {
 
 .delete-button:hover {
   background-color: #c9302c;
-}
-
-.error-message {
-  color: red;
-  font-size: 12px;
-  margin-top: 8px;
 }
 </style>

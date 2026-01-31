@@ -6,7 +6,7 @@
         v-model="newEvent.date"
         class="form-control"
         type="date"
-        max="2025-05-31"
+        max="2026-05-31"
         min="2025-04-01"
         required
       />
@@ -64,12 +64,17 @@
     </div>
     <button class="submit-btn" type="submit">イベントを登録</button>
   </form>
+
+  <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
+    {{ snackbar.message }}
+  </v-snackbar>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import { useStore } from 'vuex'
 
-const emit = defineEmits(['submitEvent'])
+const store = useStore()
 
 const newEvent = ref({
   date: '',
@@ -78,28 +83,35 @@ const newEvent = ref({
   location: '',
   description: '',
   organizerName: '',
-  class: 'custom-event',
+  organizerId: '',
+  password: '',
 })
-const organizerId = ref('')
-const password = ref('')
 
-// フォームをリセットするメソッド
-const resetForm = () => {
-  newEvent.value = {
-    date: '',
-    startTime: '',
-    endTime: '',
-    location: '',
-    description: '',
-    organizerName: '',
-    class: 'custom-event',
+const snackbar = ref({
+  show: false,
+  color: '',
+  message: '',
+})
+
+const submitEvent = async () => {
+  try {
+    await store.dispatch('event/createEvent', {
+      eventData: newEvent.value,
+      organizerId: newEvent.value.organizerId,
+      password: newEvent.value.password,
+    })
+    snackbar.value = {
+      show: true,
+      color: 'success',
+      message: 'イベントが正常に登録されました！',
+    }
+  } catch (error) {
+    snackbar.value = {
+      show: true,
+      color: 'error',
+      message: `イベントの登録に失敗しました: ${error.message}`,
+    }
   }
-}
-
-// イベントを送信するメソッド
-const submitEvent = () => {
-  emit('submitEvent', newEvent.value, organizerId.value, password.value) // 親コンポーネントにイベントを送信
-  resetForm() // 送信後にフォームをリセット
 }
 </script>
 
