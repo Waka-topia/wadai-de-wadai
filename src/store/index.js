@@ -5,9 +5,11 @@ import eventModule from './modules/event' // イベントモジュールをイ�
 import rankingModule from './modules/ranking' // ランキングモジュールをインポート
 import shinkanModule from './modules/shinkan' // 新歓モジュールをインポート
 import stampModule from './modules/stamp' // スタンプモジュールをインポート
-
 import titleModule from './modules/title' // タイトルモジュールをインポート
 import userModule from './modules/user' // ユーザーモジュールをインポート
+import locationModule from './modules/location' // 場所モジュールをインポート
+import ratingModule from './modules/rating' // 評価モジュールをインポート
+
 
 export default createStore({
   state: {
@@ -30,5 +32,7 @@ export default createStore({
       namespaced: true, // 名前空間を有効にする
       ...eventModule, // イベントモジュールを登録
     },
+    location: locationModule, // 場所モジュールを登録
+    rating: ratingModule, // 評価モジュールを登録
   },
 })

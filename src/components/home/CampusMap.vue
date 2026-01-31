@@ -15,12 +15,12 @@
 
     <!-- Map Preview Widget -->
     <v-card
+      v-ripple
       flat
       class="rounded-lg overflow-hidden border position-relative"
       height="200"
       color="#E0E0E0"
       @click="$router.push('/map')"
-      v-ripple
     >
       <!-- BaseMap with pointer-events disabled to prevent scroll hijacking -->
       <div class="map-preview-wrapper">

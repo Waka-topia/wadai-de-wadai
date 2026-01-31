@@ -3,13 +3,7 @@
     <BaseMap />
 
     <!-- Floating Back Button -->
-    <v-btn
-      icon
-      class="back-btn"
-      color="white"
-      elevation="2"
-      @click="$router.push('/')"
-    >
+    <v-btn icon class="back-btn" color="white" elevation="2" @click="$router.push('/')">
       <v-icon>mdi-arrow-left</v-icon>
     </v-btn>
   </div>
