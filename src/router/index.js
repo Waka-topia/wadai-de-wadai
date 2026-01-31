@@ -5,7 +5,7 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    component: () => import('@/pages/Home.vue'),
+    component: () => import('@/pages/HomePage.vue'),
   },
   {
     path: '/login',
@@ -35,7 +35,7 @@ const routes = [
   {
     path: '/testpage',
     name: 'testpage',
-    component: () => import('@/pages/Home.vue'),
+    component: () => import('@/pages/HomePage.vue'),
   },
   {
     path: '/eventcal',

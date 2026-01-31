@@ -12,8 +12,8 @@ src/
 │   ├── molecules/   # atomsを組み合わせたコンポーネント
 │   ├── organisms/   # moleculesを組み合わせた独立した機能を持つコンポーネント
 │   ├── templates/   # ページのレイアウトを定義するテンプレート (BottomNavigationなど)
-│   └── home/        # ホーム画面専用のコンポーネント群 (TrainInfo, BusInfoなど)
-├── pages/           # ルーティングに対応するページコンポーネント (Home.vue, LoginPage.vueなど)
+│   │   ├── HomePage.vue        # ホーム画面専用のコンポーネント群 (TrainInfo, BusInfoなど)
+├── pages/           # ルーティングに対応するページコンポーネント (HomePage.vue, LoginPage.vueなど)
 ├── router/          # Vue Routerの設定 (ルーティング定義)
 ├── store/           # Vuexストア (状態管理)
 ├── services/        # API通信やビジネスロジックを扱うサービスモジュール
@@ -29,7 +29,7 @@ src/
 
 画面単位のコンポーネントを配置します。`src/router/index.js` でURLと紐付けられます。
 
-- `Home.vue`: メインのホーム画面。
+- `HomePage.vue`: メインのホーム画面。
 - `LoginPage.vue`: ログイン画面。
 - `EventCal.vue`: 新歓日程画面。
 

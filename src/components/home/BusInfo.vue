@@ -29,11 +29,13 @@
           <div class="pa-4">
             <!-- Centered Layout -->
             <div class="d-flex flex-column align-center text-center">
-
               <!-- row 1: Badge & Time -->
               <div class="d-flex align-center flex-wrap justify-center mb-1">
-                 <!-- Bus Route Badges -->
-                <div v-if="getBusBadges(route).length > 0" class="d-flex align-center flex-wrap mr-2">
+                <!-- Bus Route Badges -->
+                <div
+                  v-if="getBusBadges(route).length > 0"
+                  class="d-flex align-center flex-wrap mr-2"
+                >
                   <v-chip
                     v-for="(badge, i) in getBusBadges(route)"
                     :key="i"
@@ -57,7 +59,10 @@
               </div>
 
               <!-- row 3: Next Bus Info (Separated & Aligned) -->
-              <div v-if="route.nextBus" class="mt-2 py-1 px-3 bg-grey-lighten-4 rounded-pill d-inline-flex align-center">
+              <div
+                v-if="route.nextBus"
+                class="mt-2 py-1 px-3 bg-grey-lighten-4 rounded-pill d-inline-flex align-center"
+              >
                 <span class="text-caption text-grey-darken-1 mr-2">次発</span>
                 <span class="text-caption font-weight-bold text-grey-darken-2">
                   {{ route.nextBus.time }}発

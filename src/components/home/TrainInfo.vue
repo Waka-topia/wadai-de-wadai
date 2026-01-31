@@ -29,7 +29,6 @@
           <div class="pa-4">
             <!-- Centered Layout -->
             <div class="d-flex flex-column align-center text-center">
-
               <!-- row 1: Badge & Time -->
               <div class="d-flex align-center mb-1">
                 <v-chip
@@ -53,7 +52,10 @@
               </div>
 
               <!-- row 3: Next Train Info (Separated & Aligned) -->
-              <div v-if="route.nextTrain" class="mt-2 py-1 px-3 bg-grey-lighten-4 rounded-pill d-inline-flex align-center">
+              <div
+                v-if="route.nextTrain"
+                class="mt-2 py-1 px-3 bg-grey-lighten-4 rounded-pill d-inline-flex align-center"
+              >
                 <span class="text-caption text-grey-darken-1 mr-2">次発</span>
                 <span class="text-caption font-weight-bold text-grey-darken-1 mr-2">
                   {{ getTypeName(route.nextTrain.type) }}
@@ -65,13 +67,9 @@
 
               <!-- row 4: Features Icons (Optional, kept small) -->
               <div v-if="route.nextDepartureFeatures.includes('women_only')" class="mb-2">
-                  <v-icon
-                    color="pink"
-                    size="small"
-                    class="mx-1"
-                    title="女性専用車両"
-                    >mdi-human-female</v-icon
-                  >
+                <v-icon color="pink" size="small" class="mx-1" title="女性専用車両"
+                  >mdi-human-female</v-icon
+                >
               </div>
 
               <!-- Link -->
