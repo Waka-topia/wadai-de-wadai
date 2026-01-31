@@ -57,6 +57,11 @@ const routes = [
     name: 'Rule',
     component: () => import('@/pages/RulePage.vue'),
   },
+  {
+    path: '/map',
+    name: 'Map',
+    component: () => import('@/pages/MapPage.vue'),
+  },
 ]
 
 const router = createRouter({
