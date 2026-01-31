@@ -9,8 +9,8 @@
       :selected-date="selectedDate"
       active-view="month"
       hide-view-selector
-      locale="ja"
-      style="height: 60vh"
+      locale="en"
+      start-week-on-sunday
       @cell-click="onCellClick"
     ></VueCal>
 
@@ -89,6 +89,11 @@ onMounted(() => {
 </script>
 
 <style>
+/* --- レイアウト（既存） --- */
+.event-list {
+  height: 100%;
+}
+
 .nav-buttons {
   display: flex;
   align-items: center;
@@ -108,37 +113,134 @@ onMounted(() => {
 .nav-btn:hover {
   color: #ff9800;
 }
-.event-list {
-  height: 100%;
-}
-.show-form-btn {
-  position: fixed;
-  bottom: calc(env(safe-area-inset-bottom) + 20px + 56px);
-  right: 20px;
-  z-index: 100;
+
+/* --- VueCal コンテナ --- */
+.vuecal {
+  border-radius: 16px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  overflow: hidden;
+  height: auto;
+  margin: 16px 16px 0;
 }
 
-.show-form-btn:hover {
-  background-color: #45a049;
+/* --- タイトルバー（月ナビゲーション） --- */
+.vuecal__title-bar {
+  background-color: transparent;
+  padding: 12px 8px;
+  min-height: 48px;
 }
 
-.show-form-btn:active {
-  background-color: #388e3c;
+.vuecal__title {
+  font-weight: 600;
+  font-size: 0.8em;
+  color: #333;
+}
+
+.vuecal__arrow {
+  color: #666;
+  padding: 4px 8px;
+  font-size: 1.1em;
+  transition: color 0.2s ease;
+}
+
+.vuecal__arrow:hover {
+  color: #ff9900;
+}
+
+/* --- 曜日ヘッダー --- */
+.vuecal__weekdays-headings {
+  padding: 0 8px;
+}
+
+.vuecal__heading {
+  color: #999;
+  font-size: 0.85em;
+  font-weight: 500;
+  height: 2.4em;
+}
+
+/* --- カレンダーグリッド --- */
+.vuecal__body {
+  padding: 0 4px 4px;
+}
+
+.vuecal__cell::before {
+  border: none !important;
+}
+
+.vuecal__cell {
+  padding: 4px 0;
+  min-height: 44px;
+}
+
+.vuecal__cell-content {
+  width: 36px;
+  height: 36px;
+  max-width: 36px;
+  max-height: 36px;
+  border-radius: 50%;
+  font-size: 0.9em;
+  color: #333;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+/* --- 今日のセル（選択されていない場合は通常表示） --- */
+.vuecal__cell--today {
+  background-color: transparent !important;
+}
+
+/* --- 選択セル（常に1つだけオレンジ円） --- */
+.vuecal__cell--selected {
+  background-color: transparent !important;
+}
+
+.vuecal__cell--selected .vuecal__cell-content {
+  border: 2px solid #ff9900;
+  background-color: #ff9900;
+  color: #fff;
+  font-weight: 600;
+}
+
+/* --- スコープ外の日付 --- */
+.vuecal__cell--out-of-scope {
+  opacity: 0.3;
+}
+
+.vuecal__cell--out-of-scope .vuecal__cell-content {
+  color: #ccc;
+}
+
+/* --- イベントインジケーター（ドット表示） --- */
+.vuecal__cell-events-count {
+  width: 6px;
+  height: 6px;
+  min-width: 6px;
+  padding: 0;
+  margin-top: 2px;
+  border-radius: 50%;
+  background-color: #ff9900;
+  color: transparent;
+  font-size: 0;
+  line-height: 0;
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .vuecal__event {
-  border: 1px solid #388e3c;
-  color: #666;
-  background-color: #f8f8f8cc;
-  position: relative;
-  box-sizing: border-box;
-  left: 0;
-  width: 100%;
-  z-index: 1;
-  transition:
-    box-shadow 0.3s,
-    left 0.3s,
-    width 0.3s;
-  overflow: hidden;
+  display: none;
+}
+
+.vuecal__no-event {
+  display: none;
 }
 </style>
