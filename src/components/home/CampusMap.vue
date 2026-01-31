@@ -4,7 +4,10 @@
       <div class="d-flex align-center">
         <span class="font-weight-bold">キャンパスマップ</span>
       </div>
-      <router-link to="/map" class="text-decoration-none text-orange d-flex align-center text-body-2">
+      <router-link
+        to="/map"
+        class="text-decoration-none text-orange d-flex align-center text-body-2"
+      >
         マップ全体を見る
         <v-icon size="small">mdi-chevron-right</v-icon>
       </router-link>

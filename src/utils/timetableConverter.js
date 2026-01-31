@@ -1,14 +1,8 @@
 /**
  * 簡易フォーマットの時刻表データを、アプリで使用する詳細オブジェクト形式に変換します。
  *
- * 入力例: "24sw" (7時台)
- * 出力例: {
- *   h: 7,
- *   m: 24,
- *   type: "limited_express",
- *   dest: "namba",
- *   features: ["reserved_seat", "women_only"]
- * }
+ * 入力例: "24sw" (7時台) 出力例: { h: 7, m: 24, type: "limited_express", dest: "namba", features:
+ * ["reserved_seat", "women_only"] }
  */
 
 export const convertTimetables = (rawData) => {
@@ -22,7 +16,7 @@ export const convertTimetables = (rawData) => {
       for (const [hourStr, minutesArr] of Object.entries(hoursMap)) {
         const hour = parseInt(hourStr)
 
-        minutesArr.forEach(rawStr => {
+        minutesArr.forEach((rawStr) => {
           const item = parseTimeItem(hour, rawStr, routeKey)
           scheduleList.push(item)
         })
@@ -100,7 +94,7 @@ const parseTimeItem = (hour, rawStr, routeKey) => {
     dest,
     features,
     // 表示用のフォーマット時刻 (デバッグや単純表示用)
-    displayTime: `${hour.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
+    displayTime: `${hour.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`,
   }
 }
 

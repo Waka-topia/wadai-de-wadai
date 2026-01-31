@@ -3,12 +3,12 @@
     <v-bottom-navigation v-model="selectedIndex" class="bottom-nav" active color="orange" grow>
       <v-btn to="/eventcal" value="eventcal">
         <v-icon>mdi-calendar-month</v-icon>
-        <span>新歓日程</span>
+        <!-- <span>新歓日程</span> -->
       </v-btn>
 
       <v-btn to="/reader" value="reader">
         <v-icon>mdi-qrcode-scan</v-icon>
-        <span>読み取る</span>
+        <!-- <span>読み取る</span> -->
       </v-btn>
 
       <div class="home-btn-wrapper">
@@ -16,18 +16,18 @@
           <div class="home-icon-bg">
             <v-icon size="32" color="white">mdi-home</v-icon>
           </div>
-          <span class="home-label">ホーム</span>
+          <!-- <span class="home-label">ホーム</span> -->
         </v-btn>
       </div>
 
       <v-btn to="/jobs" value="jobs">
         <v-icon>mdi-briefcase-search</v-icon>
-        <span>求人情報</span>
+        <!-- <span>求人情報</span> -->
       </v-btn>
 
       <v-btn to="/mypage" value="mypage">
         <v-icon>mdi-account</v-icon>
-        <span>マイページ</span>
+        <!-- <span>マイページ</span> -->
       </v-btn>
     </v-bottom-navigation>
   </v-layout>

@@ -32,44 +32,44 @@
                 <div class="text-caption text-grey">次の発車まで</div>
 
                 <!-- Bus Route Badges -->
-                <div v-if="(route.nextDepartureFeatures && route.nextDepartureFeatures.length > 0) || route.nextDepartureDest === 'station_only' || route.nextDepartureDest === 'fujitodai'" class="mb-1 d-flex align-center flex-wrap">
-                    <!-- BusUniv: Station Only -->
-                    <v-chip v-if="route.nextDepartureDest === 'station_only'" size="x-small" color="red" class="font-weight-bold mr-1 mb-1" label>
-                      駅止
-                    </v-chip>
-
-                    <!-- BusUniv: Fujitodai (Standard) -->
-                    <v-chip v-if="route.nextDepartureDest === 'fujitodai'" size="x-small" color="teal" class="font-weight-bold mr-1 mb-1" label>
-                      ふじと台 (和大前駅経由)
-                    </v-chip>
-
-                    <!-- BusJr: Via Nobutoki -->
-                    <v-chip v-if="route.nextDepartureFeatures.includes('via_nobutoki')" size="x-small" color="blue-grey" class="font-weight-bold mr-1 mb-1" label>
-                      延時・市役所
-                    </v-chip>
-
-                    <!-- BusJr: Via Jiromaru -->
-                    <v-chip v-if="route.nextDepartureFeatures.includes('via_jiromaru')" size="x-small" color="brown" class="font-weight-bold mr-1 mb-1" label>
-                      次郎丸
-                    </v-chip>
+                <!-- Bus Route Badges -->
+                <div v-if="getBusBadges(route).length > 0" class="mb-1 d-flex align-center flex-wrap">
+                  <v-chip
+                    v-for="(badge, i) in getBusBadges(route)"
+                    :key="i"
+                    size="x-small"
+                    :color="badge.color"
+                    class="font-weight-bold mr-1 mb-1"
+                    label
+                  >
+                    {{ badge.label }}
+                  </v-chip>
                 </div>
 
                 <div class="text-h4 font-weight-bold text-blue d-flex align-baseline">
                   {{ route.nextDepartureIn }}<span class="text-body-1 ml-1">分</span>
-                  <span class="text-h5 ml-2">{{ route.nextDepartureSeconds }}</span><span class="text-body-1 ml-1">秒</span>
+                  <span class="text-h5 ml-2">{{ route.nextDepartureSeconds }}</span
+                  ><span class="text-body-1 ml-1">秒</span>
                 </div>
               </div>
               <div class="text-right">
-                <div class="text-h4 font-weight-bold">{{ route.nextDepartureTime }} 発</div>
+                <div class="text-h5 font-weight-bold">{{ route.nextDepartureTime }} 発</div>
                 <div class="text-caption text-grey">次は {{ route.afterNextDepartureTime }}</div>
               </div>
             </div>
 
             <!-- Link to full timetable -->
             <div class="mt-2 text-right">
-                 <v-btn variant="text" density="compact" color="primary" class="px-0" href="https://transfer.navitime.biz/wakayamabus/pc/diagram/BusCourseSearch?busstopId=00220063" target="_blank">
-                    和歌山バス時刻表 <v-icon end size="small">mdi-open-in-new</v-icon>
-                </v-btn>
+              <v-btn
+                variant="text"
+                density="compact"
+                color="primary"
+                class="px-0"
+                href="https://transfer.navitime.biz/wakayamabus/pc/diagram/BusCourseSearch?busstopId=00220063"
+                target="_blank"
+              >
+                和歌山バス時刻表 <v-icon end size="small">mdi-open-in-new</v-icon>
+              </v-btn>
             </div>
           </div>
         </div>
@@ -109,12 +109,39 @@ const routes = ref([
   },
 ])
 
+const getBusBadges = (route) => {
+  const badges = []
+  if (!route.nextDepartureDest) return badges
+
+  // BusUniv: Station Only
+  if (route.nextDepartureDest === 'station_only') {
+    badges.push({ label: '駅止', color: 'red' })
+  }
+
+  // BusUniv: Fujitodai (Standard)
+  if (route.nextDepartureDest === 'fujitodai') {
+    badges.push({ label: 'ふじと台 (和大前駅経由)', color: 'teal' })
+  }
+
+  // BusJr: Via Nobutoki
+  if (route.nextDepartureFeatures && route.nextDepartureFeatures.includes('via_nobutoki')) {
+    badges.push({ label: '延時・市役所', color: 'blue-grey' })
+  }
+
+  // BusJr: Via Jiromaru
+  if (route.nextDepartureFeatures && route.nextDepartureFeatures.includes('via_jiromaru')) {
+    badges.push({ label: '次郎丸', color: 'brown' })
+  }
+
+  return badges
+}
+
 const toggleRoute = (index) => {
   routes.value[index].expanded = !routes.value[index].expanded
 }
 
 const updateTimetable = () => {
-  routes.value.forEach(route => {
+  routes.value.forEach((route) => {
     const departures = timetableService.getNextDepartures(route.key, 2)
 
     if (departures.length > 0) {
@@ -160,7 +187,10 @@ onUnmounted(() => {
 .expand-wrapper {
   display: grid;
   grid-template-rows: 0fr;
-  transition: grid-template-rows 0.3s ease-out, visibility 0s 0.3s, opacity 0.3s ease-out;
+  transition:
+    grid-template-rows 0.3s ease-out,
+    visibility 0s 0.3s,
+    opacity 0.3s ease-out;
   overflow: hidden;
   visibility: hidden;
   opacity: 0;
@@ -170,7 +200,10 @@ onUnmounted(() => {
   grid-template-rows: 1fr;
   visibility: visible;
   opacity: 1;
-  transition: grid-template-rows 0.3s ease-out, visibility 0s 0s, opacity 0.3s ease-out;
+  transition:
+    grid-template-rows 0.3s ease-out,
+    visibility 0s 0s,
+    opacity 0.3s ease-out;
 }
 
 .expand-inner {
@@ -186,7 +219,9 @@ onUnmounted(() => {
 }
 
 .transition-border-radius {
-  transition: border-radius 0.3s ease-out, background-color 0.2s !important;
+  transition:
+    border-radius 0.3s ease-out,
+    background-color 0.2s !important;
 }
 
 .z-10 {

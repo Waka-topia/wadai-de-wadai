@@ -34,16 +34,35 @@
 
                 <!-- Train Type Badge -->
                 <div v-if="route.nextDepartureType" class="mb-1 d-flex align-center">
-                   <v-chip size="x-small" :color="getTypeColor(route.nextDepartureType)" class="font-weight-bold mr-1" label>
-                      {{ getTypeName(route.nextDepartureType) }}
-                   </v-chip>
-                   <v-icon v-if="route.nextDepartureFeatures.includes('reserved_seat')" color="orange" size="small" title="座席指定">mdi-seat-recline-extra</v-icon>
-                   <v-icon v-if="route.nextDepartureFeatures.includes('women_only')" color="pink" size="small" class="ml-1" title="女性専用車両">mdi-human-female</v-icon>
+                  <v-chip
+                    size="x-small"
+                    :color="getTypeColor(route.nextDepartureType)"
+                    class="font-weight-bold mr-1"
+                    label
+                  >
+                    {{ getTypeName(route.nextDepartureType) }}
+                  </v-chip>
+                  <v-icon
+                    v-if="route.nextDepartureFeatures.includes('reserved_seat')"
+                    color="orange"
+                    size="small"
+                    title="座席指定"
+                    >mdi-seat-recline-extra</v-icon
+                  >
+                  <v-icon
+                    v-if="route.nextDepartureFeatures.includes('women_only')"
+                    color="pink"
+                    size="small"
+                    class="ml-1"
+                    title="女性専用車両"
+                    >mdi-human-female</v-icon
+                  >
                 </div>
 
                 <div class="text-h4 font-weight-bold text-green d-flex align-baseline">
                   {{ route.nextDepartureIn }}<span class="text-body-1 ml-1">分</span>
-                  <span class="text-h5 ml-2">{{ route.nextDepartureSeconds }}</span><span class="text-body-1 ml-1">秒</span>
+                  <span class="text-h5 ml-2">{{ route.nextDepartureSeconds }}</span
+                  ><span class="text-body-1 ml-1">秒</span>
                 </div>
               </div>
 
@@ -54,21 +73,32 @@
             </div>
 
             <!-- Next Southern Display (Only for Namba) -->
-            <div v-if="route.nextSouthern" class="mt-3 px-3 py-2 bg-orange-lighten-5 rounded-lg d-flex align-center justify-space-between">
-                <div class="d-flex align-center text-caption text-orange-darken-4 font-weight-bold">
-                    <v-icon size="small" start color="orange-darken-4">mdi-star-circle</v-icon>
-                    次発サザン
-                </div>
-                <div class="text-body-2 font-weight-bold text-orange-darken-4">
-                    {{ route.nextSouthern.time }}発 <span class="text-caption ml-1">(約{{ route.nextSouthern.minutes }}分後)</span>
-                </div>
+            <div
+              v-if="route.nextSouthern"
+              class="mt-3 px-3 py-2 bg-orange-lighten-5 rounded-lg d-flex align-center justify-space-between"
+            >
+              <div class="d-flex align-center text-caption text-orange-darken-4 font-weight-bold">
+                <v-icon size="small" start color="orange-darken-4">mdi-star-circle</v-icon>
+                次発サザン
+              </div>
+              <div class="text-body-2 font-weight-bold text-orange-darken-4">
+                {{ route.nextSouthern.time }}発
+                <span class="text-caption ml-1">(約{{ route.nextSouthern.minutes }}分後)</span>
+              </div>
             </div>
 
             <!-- Link to full timetable -->
             <div class="mt-2 text-right">
-                <v-btn variant="text" density="compact" color="primary" class="px-0" href="https://www.nankai.co.jp/traffic/jikoku-wa.html#wa" target="_blank">
-                    南海電鉄時刻表 <v-icon end size="small">mdi-open-in-new</v-icon>
-                </v-btn>
+              <v-btn
+                variant="text"
+                density="compact"
+                color="primary"
+                class="px-0"
+                href="https://www.nankai.co.jp/traffic/jikoku-wa.html#wa"
+                target="_blank"
+              >
+                南海電鉄時刻表 <v-icon end size="small">mdi-open-in-new</v-icon>
+              </v-btn>
             </div>
           </div>
         </div>
@@ -117,10 +147,9 @@ const toggleRoute = (index) => {
 }
 
 const updateTimetable = () => {
-  routes.value.forEach(route => {
-    // Fetch more items to find next Southern
-    const fetchCount = route.key === 'TrainNamba' ? 10 : 2;
-    const departures = timetableService.getNextDepartures(route.key, fetchCount)
+  routes.value.forEach((route) => {
+    // Fetch upcoming departures
+    const departures = timetableService.getNextDepartures(route.key, 2)
 
     if (departures.length > 0) {
       const next = departures[0]
@@ -134,23 +163,8 @@ const updateTimetable = () => {
 
       // Next Southern Logic for Namba
       if (route.key === 'TrainNamba') {
-          // If the *immediate* next train is Southern, we don't need extra display
-          if (next.type === 'limited_express_southern') {
-              route.nextSouthern = null
-          } else {
-              // Find the first Southern in the remaining list
-              const upcomingSouthern = departures.slice(1).find(d => d.type === 'limited_express_southern')
-              if (upcomingSouthern) {
-                  route.nextSouthern = {
-                      time: upcomingSouthern.departureTime,
-                      minutes: upcomingSouthern.timeUntil.minutes
-                  }
-              } else {
-                  route.nextSouthern = null
-              }
-          }
+        route.nextSouthern = timetableService.getNextSouthern(route.key)
       }
-
     } else {
       route.nextDepartureTime = '終了'
       route.nextDepartureIn = '--'
@@ -170,23 +184,33 @@ const updateTimetable = () => {
 
 // Helper functions for UI
 const getTypeColor = (type) => {
-    switch (type) {
-        case 'limited_express_southern': return 'orange'
-        case 'limited_express': return 'orange'
-        case 'express': return 'red'
-        case 'sub_express': return 'green'
-        default: return 'grey'
-    }
+  switch (type) {
+    case 'limited_express_southern':
+      return 'orange'
+    case 'limited_express':
+      return 'orange'
+    case 'express':
+      return 'red'
+    case 'sub_express':
+      return 'green'
+    default:
+      return 'grey'
+  }
 }
 
 const getTypeName = (type) => {
-    switch (type) {
-        case 'limited_express_southern': return '特急サザン'
-        case 'limited_express': return '特急'
-        case 'express': return '急行'
-        case 'sub_express': return '区急'
-        default: return '普通'
-    }
+  switch (type) {
+    case 'limited_express_southern':
+      return '特急サザン'
+    case 'limited_express':
+      return '特急'
+    case 'express':
+      return '急行'
+    case 'sub_express':
+      return '区急'
+    default:
+      return '普通'
+  }
 }
 
 let intervalId
@@ -206,7 +230,10 @@ onUnmounted(() => {
 .expand-wrapper {
   display: grid;
   grid-template-rows: 0fr;
-  transition: grid-template-rows 0.3s ease-out, visibility 0s 0.3s, opacity 0.3s ease-out;
+  transition:
+    grid-template-rows 0.3s ease-out,
+    visibility 0s 0.3s,
+    opacity 0.3s ease-out;
   overflow: hidden;
   visibility: hidden;
   opacity: 0;
@@ -216,7 +243,10 @@ onUnmounted(() => {
   grid-template-rows: 1fr;
   visibility: visible;
   opacity: 1;
-  transition: grid-template-rows 0.3s ease-out, visibility 0s 0s, opacity 0.3s ease-out;
+  transition:
+    grid-template-rows 0.3s ease-out,
+    visibility 0s 0s,
+    opacity 0.3s ease-out;
 }
 
 .expand-inner {
@@ -233,7 +263,9 @@ onUnmounted(() => {
 
 /* Explicitly animate border-radius to prevent jerky change */
 .transition-border-radius {
-  transition: border-radius 0.3s ease-out, background-color 0.2s !important;
+  transition:
+    border-radius 0.3s ease-out,
+    background-color 0.2s !important;
 }
 
 /* Ensure z-index layering works so content slides from under */
