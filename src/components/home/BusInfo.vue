@@ -27,13 +27,13 @@
       <div class="expand-wrapper" :class="{ expanded: route.expanded }">
         <div class="expand-inner bg-white border-s border-e border-b rounded-b-lg">
           <div class="pa-4">
-            <div class="d-flex justify-space-between align-center">
-              <div>
-                <div class="text-caption text-grey">次の発車まで</div>
+            <!-- Centered Layout -->
+            <div class="d-flex flex-column align-center text-center">
 
-                <!-- Bus Route Badges -->
-                <!-- Bus Route Badges -->
-                <div v-if="getBusBadges(route).length > 0" class="mb-1 d-flex align-center flex-wrap">
+              <!-- row 1: Badge & Time -->
+              <div class="d-flex align-center flex-wrap justify-center mb-1">
+                 <!-- Bus Route Badges -->
+                <div v-if="getBusBadges(route).length > 0" class="d-flex align-center flex-wrap mr-2">
                   <v-chip
                     v-for="(badge, i) in getBusBadges(route)"
                     :key="i"
@@ -45,31 +45,38 @@
                     {{ badge.label }}
                   </v-chip>
                 </div>
-
-                <div class="text-h4 font-weight-bold text-blue d-flex align-baseline">
-                  {{ route.nextDepartureIn }}<span class="text-body-1 ml-1">分</span>
-                  <span class="text-h5 ml-2">{{ route.nextDepartureSeconds }}</span
-                  ><span class="text-body-1 ml-1">秒</span>
-                </div>
+                <div class="text-h6 font-weight-bold">{{ route.nextDepartureTime }}発</div>
               </div>
-              <div class="text-right">
-                <div class="text-h5 font-weight-bold">{{ route.nextDepartureTime }} 発</div>
-                <div class="text-caption text-grey">次は {{ route.afterNextDepartureTime }}</div>
-              </div>
-            </div>
 
-            <!-- Link to full timetable -->
-            <div class="mt-2 text-right">
-              <v-btn
-                variant="text"
-                density="compact"
-                color="primary"
-                class="px-0"
-                href="https://transfer.navitime.biz/wakayamabus/pc/diagram/BusCourseSearch?busstopId=00220063"
-                target="_blank"
-              >
-                和歌山バス時刻表 <v-icon end size="small">mdi-open-in-new</v-icon>
-              </v-btn>
+              <!-- row 2: Countdown (Main) -->
+              <div class="text-h3 font-weight-bold text-blue mb-2">
+                <span class="text-h2">{{ route.nextDepartureIn }}</span>
+                <span class="text-h6">分</span>
+                <span class="text-h4 mx-1">{{ route.nextDepartureSeconds }}</span>
+                <span class="text-h6">秒</span>
+              </div>
+
+              <!-- row 3: Next Bus Info (Separated & Aligned) -->
+              <div v-if="route.nextBus" class="mt-2 py-1 px-3 bg-grey-lighten-4 rounded-pill d-inline-flex align-center">
+                <span class="text-caption text-grey-darken-1 mr-2">次発</span>
+                <span class="text-caption font-weight-bold text-grey-darken-2">
+                  {{ route.nextBus.time }}発
+                </span>
+              </div>
+
+              <!-- Link to full timetable -->
+              <div class="mt-2 text-right">
+                <v-btn
+                  variant="text"
+                  density="compact"
+                  color="grey"
+                  class="px-0"
+                  href="https://transfer.navitime.biz/wakayamabus/pc/diagram/BusCourseSearch?busstopId=00220063"
+                  target="_blank"
+                >
+                  時刻表を見る <v-icon end size="small">mdi-open-in-new</v-icon>
+                </v-btn>
+              </div>
             </div>
           </div>
         </div>
@@ -91,9 +98,9 @@ const routes = ref([
     nextDepartureIn: '--',
     nextDepartureSeconds: '--',
     nextDepartureTime: '--:--',
-    afterNextDepartureTime: '--:--',
     nextDepartureFeatures: [],
     nextDepartureDest: null,
+    nextBus: null,
   },
   {
     key: 'BusJr', // Correct PascalCase key
@@ -103,9 +110,9 @@ const routes = ref([
     nextDepartureIn: '--',
     nextDepartureSeconds: '--',
     nextDepartureTime: '--:--',
-    afterNextDepartureTime: '--:--',
     nextDepartureFeatures: [],
     nextDepartureDest: null,
+    nextBus: null,
   },
 ])
 
@@ -154,18 +161,23 @@ const updateTimetable = () => {
       // Rich info
       route.nextDepartureFeatures = next.features || []
       route.nextDepartureDest = next.dest
+
+      // Next Bus Logic
+      if (departures.length > 1) {
+        const nextBus = departures[1]
+        route.nextBus = {
+          time: nextBus.departureTime,
+        }
+      } else {
+        route.nextBus = null
+      }
     } else {
       route.nextDepartureTime = '終了'
       route.nextDepartureIn = '--'
       route.nextDepartureSeconds = '--'
       route.nextDepartureFeatures = []
       route.nextDepartureDest = null
-    }
-
-    if (departures.length > 1) {
-      route.afterNextDepartureTime = departures[1].departureTime
-    } else {
-      route.afterNextDepartureTime = '終了'
+      route.nextBus = null
     }
   })
 }

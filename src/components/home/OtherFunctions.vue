@@ -32,7 +32,6 @@
         </v-col>
       </v-row>
     </v-card>
-
   </div>
 </template>
 
@@ -88,6 +87,4 @@ const openLink = (item) => {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-
 </style>

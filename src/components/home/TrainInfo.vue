@@ -27,77 +27,64 @@
       <div class="expand-wrapper" :class="{ expanded: route.expanded }">
         <div class="expand-inner bg-white border-s border-e border-b rounded-b-lg">
           <div class="pa-4">
-            <!-- Next Departure Info -->
-            <div class="d-flex justify-space-between align-center">
-              <div>
-                <div class="text-caption text-grey">次の発車まで</div>
+            <!-- Centered Layout -->
+            <div class="d-flex flex-column align-center text-center">
 
-                <!-- Train Type Badge -->
-                <div v-if="route.nextDepartureType" class="mb-1 d-flex align-center">
-                  <v-chip
-                    size="x-small"
-                    :color="getTypeColor(route.nextDepartureType)"
-                    class="font-weight-bold mr-1"
-                    label
-                  >
-                    {{ getTypeName(route.nextDepartureType) }}
-                  </v-chip>
+              <!-- row 1: Badge & Time -->
+              <div class="d-flex align-center mb-1">
+                <v-chip
+                  v-if="route.nextDepartureType"
+                  size="small"
+                  :color="getTypeColor(route.nextDepartureType)"
+                  class="font-weight-bold mr-2"
+                  label
+                >
+                  {{ getTypeName(route.nextDepartureType) }}
+                </v-chip>
+                <div class="text-h6 font-weight-bold">{{ route.nextDepartureTime }}発</div>
+              </div>
+
+              <!-- row 2: Countdown (Main) -->
+              <div class="text-h3 font-weight-bold text-green mb-2">
+                <span class="text-h2">{{ route.nextDepartureIn }}</span>
+                <span class="text-h6">分</span>
+                <span class="text-h4 mx-1">{{ route.nextDepartureSeconds }}</span>
+                <span class="text-h6">秒</span>
+              </div>
+
+              <!-- row 3: Next Train Info (Separated & Aligned) -->
+              <div v-if="route.nextTrain" class="mt-2 py-1 px-3 bg-grey-lighten-4 rounded-pill d-inline-flex align-center">
+                <span class="text-caption text-grey-darken-1 mr-2">次発</span>
+                <span class="text-caption font-weight-bold text-grey-darken-1 mr-2">
+                  {{ getTypeName(route.nextTrain.type) }}
+                </span>
+                <span class="text-caption font-weight-bold text-grey-darken-2">
+                  {{ route.nextTrain.time }}発
+                </span>
+              </div>
+
+              <!-- row 4: Features Icons (Optional, kept small) -->
+              <div v-if="route.nextDepartureFeatures.includes('women_only')" class="mb-2">
                   <v-icon
-                    v-if="route.nextDepartureFeatures.includes('reserved_seat')"
-                    color="orange"
-                    size="small"
-                    title="座席指定"
-                    >mdi-seat-recline-extra</v-icon
-                  >
-                  <v-icon
-                    v-if="route.nextDepartureFeatures.includes('women_only')"
                     color="pink"
                     size="small"
-                    class="ml-1"
+                    class="mx-1"
                     title="女性専用車両"
                     >mdi-human-female</v-icon
                   >
-                </div>
-
-                <div class="text-h4 font-weight-bold text-green d-flex align-baseline">
-                  {{ route.nextDepartureIn }}<span class="text-body-1 ml-1">分</span>
-                  <span class="text-h5 ml-2">{{ route.nextDepartureSeconds }}</span
-                  ><span class="text-body-1 ml-1">秒</span>
-                </div>
               </div>
 
-              <div class="text-right">
-                <div class="text-h5 font-weight-bold">{{ route.nextDepartureTime }} 発</div>
-                <div class="text-caption text-grey">次は {{ route.afterNextDepartureTime }}</div>
-              </div>
-            </div>
-
-            <!-- Next Southern Display (Only for Namba) -->
-            <div
-              v-if="route.nextSouthern"
-              class="mt-3 px-3 py-2 bg-orange-lighten-5 rounded-lg d-flex align-center justify-space-between"
-            >
-              <div class="d-flex align-center text-caption text-orange-darken-4 font-weight-bold">
-                <v-icon size="small" start color="orange-darken-4">mdi-star-circle</v-icon>
-                次発サザン
-              </div>
-              <div class="text-body-2 font-weight-bold text-orange-darken-4">
-                {{ route.nextSouthern.time }}発
-                <span class="text-caption ml-1">(約{{ route.nextSouthern.minutes }}分後)</span>
-              </div>
-            </div>
-
-            <!-- Link to full timetable -->
-            <div class="mt-2 text-right">
+              <!-- Link -->
               <v-btn
                 variant="text"
                 density="compact"
-                color="primary"
-                class="px-0"
+                color="grey"
+                class="px-2"
+                size="small"
                 href="https://www.nankai.co.jp/traffic/jikoku-wa.html#wa"
                 target="_blank"
               >
-                南海電鉄時刻表 <v-icon end size="small">mdi-open-in-new</v-icon>
+                時刻表を見る <v-icon end size="x-small">mdi-open-in-new</v-icon>
               </v-btn>
             </div>
           </div>
@@ -124,7 +111,7 @@ const routes = ref([
     afterNextDepartureTime: '--:--',
     nextDepartureType: null,
     nextDepartureFeatures: [],
-    nextSouthern: null, // New object for next Southern info
+    nextTrain: null,
   },
   {
     key: 'TrainWakayamashi',
@@ -138,7 +125,7 @@ const routes = ref([
     afterNextDepartureTime: '--:--',
     nextDepartureType: null,
     nextDepartureFeatures: [],
-    nextSouthern: null,
+    nextTrain: null,
   },
 ])
 
@@ -161,9 +148,15 @@ const updateTimetable = () => {
       route.nextDepartureType = next.type
       route.nextDepartureFeatures = next.features || []
 
-      // Next Southern Logic for Namba
-      if (route.key === 'TrainNamba') {
-        route.nextSouthern = timetableService.getNextSouthern(route.key)
+      // Next Train Info (The one after the immediate upcoming one)
+      if (departures.length > 1) {
+        const nextTrain = departures[1]
+        route.nextTrain = {
+          time: nextTrain.departureTime,
+          type: nextTrain.type,
+        }
+      } else {
+        route.nextTrain = null
       }
     } else {
       route.nextDepartureTime = '終了'
@@ -171,13 +164,7 @@ const updateTimetable = () => {
       route.nextDepartureSeconds = '--'
       route.nextDepartureType = null
       route.nextDepartureFeatures = []
-      route.nextSouthern = null
-    }
-
-    if (departures.length > 1) {
-      route.afterNextDepartureTime = departures[1].departureTime
-    } else {
-      route.afterNextDepartureTime = '終了'
+      route.nextTrain = null
     }
   })
 }
