@@ -1,10 +1,16 @@
-import { collection, getDocs, getDoc, doc, addDoc, query, where, Timestamp } from 'firebase/firestore'
+import {
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  Timestamp,
+  where,
+} from 'firebase/firestore'
 import { db } from '@/firebase/config'
 
-/**
- * Location Service
- * 場所データのCRUD操作を提供
- */
+/** Location Service 場所データのCRUD操作を提供 */
 
 const COLLECTION_NAME = 'locations'
 
@@ -98,10 +104,7 @@ export async function addLocation(location) {
   }
 }
 
-/**
- * カテゴリー定義
- * UIで使用するカテゴリー情報
- */
+/** カテゴリー定義 UIで使用するカテゴリー情報 */
 export const LOCATION_CATEGORIES = {
   toilet: {
     id: 'toilet',

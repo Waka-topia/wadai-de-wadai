@@ -37,7 +37,7 @@ function handleGeolocate(event) {
     accuracy: event.coords.accuracy,
   }
   emit('userLocationUpdate', position)
-  console.log('User position updated:', position)
+  // console.log('User position updated:', position)
 }
 
 /**
@@ -48,7 +48,7 @@ function handleGeolocate(event) {
 function handleGeolocateError(event) {
   const error = new Error(event.message || '位置情報の取得に失敗しました')
   emit('locationError', error)
-  console.error('Location error:', error)
+  // console.error('Location error:', error)
 }
 
 onMounted(() => {
@@ -85,10 +85,10 @@ onMounted(() => {
     'bottom-right',
   )
 
-  // Add navigation controls (zoom, rotation)
-  map.value.addControl(new maplibregl.NavigationControl(), 'top-right')
+  // Add navigation controls (zoom, rotation) - 右下に配置
+  map.value.addControl(new maplibregl.NavigationControl(), 'bottom-right')
 
-  // GeolocateControlを追加(位置情報の取得・表示)
+  // GeolocateControlを追加(位置情報の取得・表示) - 右下に配置
   geolocateControl.value = new maplibregl.GeolocateControl({
     positionOptions: {
       enableHighAccuracy: true, // 高精度モード
@@ -98,7 +98,7 @@ onMounted(() => {
     showAccuracyCircle: true, // 精度円を表示
   })
 
-  map.value.addControl(geolocateControl.value, 'top-right')
+  map.value.addControl(geolocateControl.value, 'bottom-right')
 
   // イベントリスナーを追加
   geolocateControl.value.on('geolocate', handleGeolocate)

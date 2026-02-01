@@ -1,7 +1,4 @@
-/**
- * Map Helpers
- * マップ関連のユーティリティ関数
- */
+/** Map Helpers マップ関連のユーティリティ関数 */
 
 /**
  * 評価スコアから色を取得
@@ -63,7 +60,7 @@ export function createMarkerHTML(iconName, color, size = 24) {
  * 境界ボックスを計算
  *
  * @param {Array} locations - 場所データの配列
- * @returns {Array} [[minLng, minLat], [maxLng, maxLat]]
+ * @returns {Array | undefined} [minLng, minLat], [maxLng, maxLat]
  */
 export function calculateBounds(locations) {
   if (!locations || locations.length === 0) {
@@ -93,7 +90,7 @@ export function calculateBounds(locations) {
  * マップの中心座標を計算
  *
  * @param {Array} locations - 場所データの配列
- * @returns {Array} [lng, lat]
+ * @returns {Array | undefined} Lng, lat
  */
 export function calculateCenter(locations) {
   if (!locations || locations.length === 0) {

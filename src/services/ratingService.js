@@ -1,19 +1,16 @@
 import {
+  addDoc,
   collection,
   getDocs,
-  addDoc,
-  query,
-  where,
-  orderBy,
   limit,
+  orderBy,
+  query,
   Timestamp,
+  where,
 } from 'firebase/firestore'
 import { db } from '@/firebase/config'
 
-/**
- * Rating Service
- * 評価データのCRUD操作を提供
- */
+/** Rating Service 評価データのCRUD操作を提供 */
 
 const COLLECTION_NAME = 'ratings'
 
@@ -115,9 +112,7 @@ export async function fetchUserRatings(userId, limitCount = 20) {
   }
 }
 
-/**
- * 評価カテゴリー別の評価項目定義
- */
+/** 評価カテゴリー別の評価項目定義 */
 export const RATING_CRITERIA = {
   toilet: {
     cleanliness: {

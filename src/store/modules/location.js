@@ -1,9 +1,6 @@
-import { fetchLocations, fetchLocationById, addLocation } from '@/services/locationService'
+import { addLocation, fetchLocationById, fetchLocations } from '@/services/locationService'
 
-/**
- * Location Store Module
- * 場所データ(トイレ、勉強スポット等)の状態管理
- */
+/** Location Store Module 場所データ(トイレ、勉強スポット等)の状態管理 */
 
 const state = {
   locations: [], // 全場所データ

@@ -15,19 +15,17 @@
 
     <!-- Map Preview Widget -->
     <v-card
-      v-ripple
       flat
       class="rounded-lg overflow-hidden border position-relative"
       height="200"
       color="#E0E0E0"
-      @click="$router.push('/map')"
     >
       <!-- BaseMap with pointer-events disabled to prevent scroll hijacking -->
       <div class="map-preview-wrapper">
         <BaseMap />
       </div>
 
-      <!-- Overlay to make it clickable and darken slightly -->
+      <!-- Overlay to prevent map controls interaction but allow scrolling -->
       <div class="map-overlay"></div>
     </v-card>
   </div>
@@ -51,7 +49,7 @@ import BaseMap from '@/components/map/BaseMap.vue'
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.05); /* Slight tint */
-  pointer-events: auto; /* Capture clicks for the card */
-  cursor: pointer;
+  pointer-events: auto;
+  /* cursor: pointer; removed to indicate not clickable */
 }
 </style>

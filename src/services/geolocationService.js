@@ -1,11 +1,6 @@
-/**
- * Geolocation Service
- * ユーザーの位置情報を取得・監視する機能を提供
- */
+/** Geolocation Service ユーザーの位置情報を取得・監視する機能を提供 */
 
-/**
- * Geolocation APIのオプション
- */
+/** Geolocation APIのオプション */
 const DEFAULT_OPTIONS = {
   enableHighAccuracy: true, // 高精度モード
   maximumAge: 0, // キャッシュを使用しない
@@ -16,7 +11,7 @@ const DEFAULT_OPTIONS = {
  * ユーザーの現在地を取得
  *
  * @param {object} options - Geolocation APIのオプション
- * @returns {Promise<{lng: number, lat: number, accuracy: number}>} 位置情報オブジェクト
+ * @returns {Promise<{ lng: number; lat: number; accuracy: number }>} 位置情報オブジェクト
  */
 export function getCurrentPosition(options = DEFAULT_OPTIONS) {
   return new Promise((resolve, reject) => {
@@ -44,10 +39,11 @@ export function getCurrentPosition(options = DEFAULT_OPTIONS) {
 /**
  * 位置情報の監視を開始
  *
- * @param {(position: {lng: number, lat: number, accuracy: number}) => void} callback - 位置更新時のコールバック関数
+ * @param {(position: { lng: number; lat: number; accuracy: number }) => void} callback -
+ *   位置更新時のコールバック関数
  * @param {(error: Error) => void} errorCallback - エラー時のコールバック関数
  * @param {object} options - Geolocation APIのオプション
- * @returns {number} watchId - 監視ID(停止時に使用)
+ * @returns {number} WatchId - 監視ID(停止時に使用)
  */
 export function watchPosition(callback, errorCallback, options = DEFAULT_OPTIONS) {
   if (!navigator.geolocation) {

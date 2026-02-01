@@ -1,13 +1,10 @@
-/**
- * Rating Calculator
- * 評価の計算・集計ユーティリティ
- */
+/** Rating Calculator 評価の計算・集計ユーティリティ */
 
 /**
  * 評価の平均を計算
  *
  * @param {Array} ratings - 評価データの配列
- * @returns {number|null} 平均評価(1-5)
+ * @returns {number | null} 平均評価(1-5)
  */
 export function calculateAverageRating(ratings) {
   if (!ratings || ratings.length === 0) {
@@ -58,7 +55,9 @@ export function calculateCategoryAverages(ratings) {
 
   const averages = {}
   Object.keys(categoryScores).forEach((category) => {
-    averages[category] = parseFloat((categoryScores[category] / categoryCounts[category]).toFixed(1))
+    averages[category] = parseFloat(
+      (categoryScores[category] / categoryCounts[category]).toFixed(1),
+    )
   })
 
   return averages

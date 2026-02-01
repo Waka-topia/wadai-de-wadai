@@ -1,9 +1,6 @@
-import { fetchRatings, submitRating, fetchUserRatings } from '@/services/ratingService'
+import { fetchRatings, fetchUserRatings, submitRating } from '@/services/ratingService'
 
-/**
- * Rating Store Module
- * 評価データの状態管理
- */
+/** Rating Store Module 評価データの状態管理 */
 
 const state = {
   ratings: {}, // locationId別の評価配列 { locationId: [ratings] }

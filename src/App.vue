@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar color="orange">
+    <v-app-bar v-if="!isFullscreenPage" color="orange">
       <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer"> </v-app-bar-nav-icon>
 
       <v-app-bar-title class="font-weight-bold text-h5 text-white">
@@ -8,7 +8,7 @@
       </v-app-bar-title>
     </v-app-bar>
 
-    <v-navigation-drawer v-model="drawer" class="bg-white">
+    <v-navigation-drawer v-if="!isFullscreenPage" v-model="drawer" class="bg-white">
       <v-list>
         <v-list-item class="position-relative my-1" block size="large" @click="gotoshop">
           <v-icon> mdi-download </v-icon>
@@ -30,15 +30,19 @@
     </v-navigation-drawer>
 
     <v-main>
-      <router-view></router-view>
-      <div class="mb-6">
+      <router-view v-slot="{ Component }">
+        <keep-alive include="HomePage,RankingPage,MyPage,EventCal">
+          <component :is="Component" />
+        </keep-alive>
+      </router-view>
+      <div v-if="!isFullscreenPage" class="mb-6">
         <v-footer app>
           <span>&copy; 2025 和大DE話題</span>
         </v-footer>
       </div>
     </v-main>
   </v-app>
-  <BottomNavigation v-if="showBottomNavigation" />
+  <BottomNavigation v-if="showBottomNavigation && !isFullscreenPage" />
 </template>
 
 <script>
@@ -57,6 +61,7 @@ export default {
       title: 'ホーム',
       showBottomNavigation: true,
       isEventCalPage: false,
+      isFullscreenPage: false,
     }
   },
   watch: {
@@ -65,6 +70,7 @@ export default {
         this.updateTitle(route)
         this.updateBottomNavigationVisibility(route)
         this.checkEventCalPage(route)
+        this.checkFullscreenPage(route)
       },
       immediate: true,
     },
@@ -82,6 +88,7 @@ export default {
         '/titleshop': '称号ショップ',
         '/inquiry': 'お問い合わせ',
         '/rule': '利用規約',
+        '/map': 'マップ',
       }
       this.title = routeTitleMap[route.path]
     },
@@ -90,6 +97,10 @@ export default {
     },
     checkEventCalPage(route) {
       this.isEventCalPage = '/eventcal'.includes(route.path)
+    },
+    checkFullscreenPage(route) {
+      // 全画面表示が必要なページのリスト
+      this.isFullscreenPage = ['/map'].includes(route.path)
     },
     gotoshop() {
       this.$router.push('/titleshop')
