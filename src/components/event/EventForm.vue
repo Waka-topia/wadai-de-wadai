@@ -76,7 +76,7 @@
     />
 
     <v-text-field
-      v-model="organizerId"
+      v-model="newEvent.organizerId"
       label="団体ID"
       variant="outlined"
       density="comfortable"
@@ -86,7 +86,7 @@
     />
 
     <v-text-field
-      v-model="password"
+      v-model="newEvent.password"
       label="パスワード"
       type="password"
       variant="outlined"
@@ -135,7 +135,7 @@ const submitEvent = async () => {
     await store.dispatch('event/createEvent', {
       eventData: newEvent.value,
       organizerId: newEvent.value.organizerId,
-      password: newEvent.value.password,
+      inputPassword: newEvent.value.password,
     })
     snackbar.value = {
       show: true,
