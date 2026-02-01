@@ -31,6 +31,7 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 
 const snackbar = ref({
@@ -39,6 +40,7 @@ const snackbar = ref({
   color: '',
 })
 
+const router = useRouter()
 const store = useStore()
 const organizerId = ref('')
 const password = ref('')
@@ -61,6 +63,9 @@ const onDelete = async () => {
       message: 'イベントが正常に削除されました。',
       color: 'success',
     }
+    setTimeout(() => {
+      router.push('/eventcal')
+    }, 500)
   } catch (error) {
     snackbar.value = {
       show: true,
