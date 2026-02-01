@@ -1,4 +1,4 @@
-import { getJobs } from '@/services/jobsService'
+import { getJobById, getJobs } from '@/services/jobsService'
 
 const state = () => ({
   jobs: [],
@@ -54,6 +54,16 @@ const actions = {
       commit('setError', null)
       const jobs = await getJobs()
       commit('setJobs', jobs)
+    } catch (error) {
+      commit('setError', error.message)
+    }
+  },
+
+  async fetchJobById({ commit }, jobId) {
+    try {
+      commit('setError', null)
+      const job = await getJobById(jobId)
+      commit('setCurrentJob', job)
     } catch (error) {
       commit('setError', error.message)
     }
