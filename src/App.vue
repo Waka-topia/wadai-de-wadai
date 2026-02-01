@@ -82,6 +82,7 @@ export default {
         '/titleshop': '称号ショップ',
         '/inquiry': 'お問い合わせ',
         '/rule': '利用規約',
+        '/jobs': '求人情報',
       }
       this.title = routeTitleMap[route.path]
     },

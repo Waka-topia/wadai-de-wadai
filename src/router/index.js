@@ -57,6 +57,16 @@ const routes = [
     name: 'Rule',
     component: () => import('@/pages/RulePage.vue'),
   },
+  {
+    path: '/jobs',
+    name: 'RecruitPage',
+    component: () => import('@/pages/RecruitPage.vue'),
+  },
+  {
+    path: '/jobs/:id',
+    name: 'JobDetailPage',
+    component: () => import('@/pages/JobsDetailPage.vue'),
+  },
 ]
 
 const router = createRouter({
