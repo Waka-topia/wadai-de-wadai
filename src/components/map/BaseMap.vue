@@ -170,13 +170,14 @@ onMounted(() => {
       .addTo(map.value)
       .getElement()
       .addEventListener('click', () => {
-        navigator.clipboard.writeText(`Coordinates: { lat: ${lat}, lng: ${lng} }`)
+        navigator.clipboard
+          .writeText(`Coordinates: { lat: ${lat}, lng: ${lng} }`)
           .then(() => {
             console.log('Coordinates copied to clipboard')
             // 簡単なフィードバック（オプション）
             // alert('Copied!')
           })
-          .catch(err => console.error('Failed to copy:', err))
+          .catch((err) => console.error('Failed to copy:', err))
       })
   })
 })

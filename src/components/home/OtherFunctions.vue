@@ -49,13 +49,7 @@
         </div>
       </div>
 
-      <v-btn
-        block
-        color="orange"
-        variant="flat"
-        prepend-icon="mdi-map-search"
-        @click="goToMap"
-      >
+      <v-btn block color="orange" variant="flat" prepend-icon="mdi-map-search" @click="goToMap">
         マップ全体を見る
       </v-btn>
     </v-card>
@@ -111,9 +105,7 @@ const openLink = (item) => {
   }
 }
 
-/**
- * マップページに遷移
- */
+/** マップページに遷移 */
 const goToMap = () => {
   router.push('/map')
 }

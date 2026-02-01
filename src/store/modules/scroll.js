@@ -1,7 +1,4 @@
-/**
- * Scroll Position Store Module
- * ページ遷移時のスクロール位置を保存・復元
- */
+/** Scroll Position Store Module ページ遷移時のスクロール位置を保存・復元 */
 
 const state = {
   scrollPositions: {}, // { path: scrollTop }
@@ -12,7 +9,7 @@ const getters = {
    * 特定のパスのスクロール位置を取得
    *
    * @param {object} state - Vuexステート
-   * @returns {Function} パスを受け取りスクロール位置を返す関数
+   * @returns {(path: string) => number} パスを受け取りスクロール位置を返す関数
    */
   getScrollPosition: (state) => (path) => {
     return state.scrollPositions[path] || 0

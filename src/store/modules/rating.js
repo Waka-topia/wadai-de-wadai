@@ -1,121 +1,120 @@
-import { fetchRatings, fetchUserRatings, submitRating } from '@/services/ratingService'
+import { calculateAverageRating } from '@/utils/ratingCalculator'
 
-/** Rating Store Module 評価データの状態管理 */
+/**
+ * Rating Store Module
+ * 評価データの管理を行う
+ */
 
-const state = {
-  ratings: {}, // locationId別の評価配列 { locationId: [ratings] }
-  userRatings: [], // ユーザーの評価履歴
+// 初期状態
+const state = () => ({
+  ratings: {}, // locationIdをキーとした評価リスト { locationId: [rating1, rating2] }
+  userRatings: [], // ユーザー自身の評価履歴
   loading: false,
   error: null,
-}
+})
 
+// ゲッター
 const getters = {
   /**
-   * 特定場所の評価を取得
+   * 特定の場所の評価リストを取得
    *
-   * @param state
+   * @param {object} state - Vuex state
+   * @returns {(locationId: string) => Array<object>} locationIdを受け取り評価リストを返す関数
    */
-  getRatingsByLocation: (state) => (locationId) => {
+  getRatingsByLocationID: (state) => (locationId) => {
     return state.ratings[locationId] || []
   },
 
   /**
-   * 特定場所の平均評価を計算
+   * 特定の場所の平均評価を取得
    *
-   * @param state
+   * @param {object} state - Vuex state
+   * @returns {(locationId: string) => number} locationIdを受け取り平均評価（数値）を返す関数
    */
   getAverageRating: (state) => (locationId) => {
-    const locationRatings = state.ratings[locationId]
-    if (!locationRatings || locationRatings.length === 0) {
-      return null
-    }
-
-    // 全評価項目の平均を計算
-    const allScores = []
-    locationRatings.forEach((rating) => {
-      if (rating.scores) {
-        Object.values(rating.scores).forEach((score) => {
-          if (typeof score === 'number') {
-            allScores.push(score)
-          }
-        })
-      }
-    })
-
-    if (allScores.length === 0) return null
-
-    const sum = allScores.reduce((acc, score) => acc + score, 0)
-    return (sum / allScores.length).toFixed(1)
+    const ratings = state.ratings[locationId] || []
+    return calculateAverageRating(ratings)
   },
 
   /**
-   * 特定場所のカテゴリー別平均評価を計算
+   * 特定の場所の評価数を取得
    *
-   * @param state
-   */
-  getCategoryAverages: (state) => (locationId) => {
-    const locationRatings = state.ratings[locationId]
-    if (!locationRatings || locationRatings.length === 0) {
-      return {}
-    }
-
-    const categoryScores = {}
-    const categoryCounts = {}
-
-    locationRatings.forEach((rating) => {
-      if (rating.scores) {
-        Object.entries(rating.scores).forEach(([category, score]) => {
-          if (typeof score === 'number') {
-            categoryScores[category] = (categoryScores[category] || 0) + score
-            categoryCounts[category] = (categoryCounts[category] || 0) + 1
-          }
-        })
-      }
-    })
-
-    const averages = {}
-    Object.keys(categoryScores).forEach((category) => {
-      averages[category] = (categoryScores[category] / categoryCounts[category]).toFixed(1)
-    })
-
-    return averages
-  },
-
-  /**
-   * 特定場所の評価数を取得
-   *
-   * @param state
+   * @param {object} state - Vuex state
+   * @returns {(locationId: string) => number} locationIdを受け取り評価数を返す関数
    */
   getRatingCount: (state) => (locationId) => {
-    const locationRatings = state.ratings[locationId]
-    return locationRatings ? locationRatings.length : 0
+    return (state.ratings[locationId] || []).length
   },
 
   /**
    * ユーザーの評価履歴を取得
    *
-   * @param state
+   * @param {object} state - Vuex state
+   * @returns {Array} ユーザーの評価リスト
    */
   userRatings: (state) => state.userRatings,
 
   /**
-   * ローディング状態を取得
+   * 読み込み中かどうか
    *
-   * @param state
+   * @param {object} state - Vuex state
+   * @returns {boolean} 読み込み中フラグ
    */
   isLoading: (state) => state.loading,
+
+  /**
+   * エラーメッセージを取得
+   *
+   * @param {object} state - Vuex state
+   * @returns {string|null} エラーメッセージ
+   */
+  error: (state) => state.error,
+
+  /**
+   * 特定の場所の各カテゴリごとの平均スコアを取得
+   * (トイレ: 清潔さなど、勉強: 静かさなど)
+   *
+   * @param {object} state - Vuex state
+   * @returns {(locationId: string) => object|null} locationIdを受け取り項目の平均スコアオブジェクトを返す関数
+   */
+  getCategoryScores: (state) => (locationId) => {
+    const ratings = state.ratings[locationId] || []
+    if (ratings.length === 0) return null
+
+    // カテゴリごとの合計を計算
+    const totals = {}
+    const count = ratings.length
+
+    ratings.forEach((rating) => {
+      if (rating.scores) {
+        Object.keys(rating.scores).forEach((key) => {
+          totals[key] = (totals[key] || 0) + rating.scores[key]
+        })
+      }
+    })
+
+    // 平均を計算
+    const averages = {}
+    Object.keys(totals).forEach((key) => {
+      averages[key] = Math.round((totals[key] / count) * 10) / 10 // 小数点第1位まで
+    })
+
+    return averages
+  },
 }
 
+// ミューテーション
 const mutations = {
   /**
-   * 特定場所の評価をセット
+   * 特定の場所の評価リストを設定
    *
-   * @param state
-   * @param root0
-   * @param root0.locationId
-   * @param root0.ratings
+   * @param {object} state - Vuex state
+   * @param {object} payload - ペイロード
+   * @param {string} payload.locationId - 場所ID
+   * @param {Array} payload.ratings - 評価リスト
    */
   SET_RATINGS(state, { locationId, ratings }) {
+    // リアクティブ性を保つために新しいオブジェクトを作成
     state.ratings = {
       ...state.ratings,
       [locationId]: ratings,
@@ -123,45 +122,46 @@ const mutations = {
   },
 
   /**
-   * 評価を追加
+   * 特定の場所に新しい評価を追加
    *
-   * @param state
-   * @param root0
-   * @param root0.locationId
-   * @param root0.rating
+   * @param {object} state - Vuex state
+   * @param {object} payload - ペイロード
+   * @param {string} payload.locationId - 場所ID
+   * @param {object} payload.rating - 追加する評価データ
    */
   ADD_RATING(state, { locationId, rating }) {
-    if (!state.ratings[locationId]) {
-      state.ratings[locationId] = []
+    const currentRatings = state.ratings[locationId] || []
+    state.ratings = {
+      ...state.ratings,
+      [locationId]: [rating, ...currentRatings], // 新しい評価を先頭に
     }
-    state.ratings[locationId].unshift(rating) // 最新の評価を先頭に追加
   },
 
   /**
-   * ユーザーの評価履歴をセット
+   * ユーザーの評価履歴を設定
    *
-   * @param state
-   * @param ratings
+   * @param {object} state - Vuex state
+   * @param {Array} ratings - 評価リスト
    */
   SET_USER_RATINGS(state, ratings) {
     state.userRatings = ratings
   },
 
   /**
-   * ローディング状態をセット
+   * 読み込み中フラグを設定
    *
-   * @param state
-   * @param loading
+   * @param {object} state - Vuex state
+   * @param {boolean} loading - 読み込み中フラグ
    */
   SET_LOADING(state, loading) {
     state.loading = loading
   },
 
   /**
-   * エラーをセット
+   * エラーメッセージを設定
    *
-   * @param state
-   * @param error
+   * @param {object} state - Vuex state
+   * @param {string|null} error - エラーメッセージ
    */
   SET_ERROR(state, error) {
     state.error = error
@@ -170,7 +170,7 @@ const mutations = {
   /**
    * 状態をリセット
    *
-   * @param state
+   * @param {object} state - Vuex state
    */
   RESET_STATE(state) {
     state.ratings = {}
@@ -180,63 +180,66 @@ const mutations = {
   },
 }
 
+// アクション
 const actions = {
   /**
-   * 特定場所の評価を取得
+   * 特定の場所の評価を取得
    *
-   * @param root0
-   * @param root0.commit
-   * @param locationId
+   * @param {object} context - Vuex context
+   * @param {(type: string, payload?: unknown) => void} context.commit - commit function
+   * @param {string} locationId - 場所ID
    */
-  async fetchRatings({ commit }, locationId) {
+  async fetchRatingsByLocation({ commit }, locationId) {
     commit('SET_LOADING', true)
     commit('SET_ERROR', null)
-
     try {
+      // 実際の実装: ratingServiceを使用
+      // const ratings = await fetchRatings(locationId)
+
+      // 仮実装: ダミーデータ
+      const { fetchRatings } = await import('@/services/ratingService')
       const ratings = await fetchRatings(locationId)
+
       commit('SET_RATINGS', { locationId, ratings })
     } catch (error) {
-      console.error('評価データの取得に失敗しました:', error)
-      commit('SET_ERROR', error.message)
+      console.error('Error fetching ratings:', error)
+      commit('SET_ERROR', '評価データの取得に失敗しました。')
     } finally {
       commit('SET_LOADING', false)
     }
   },
 
   /**
-   * 評価を送信
+   * 新しい評価を投稿
    *
-   * @param root0
-   * @param root0.commit
-   * @param root0.rootState
-   * @param root1
-   * @param root1.locationId
-   * @param root1.ratingData
+   * @param {object} context - Vuex context
+   * @param {(type: string, payload?: unknown) => void} context.commit - commit function
+   * @param {object} context.rootState - root state
+   * @param {object} payload - ペイロード
+   * @param {string} payload.locationId - 場所ID
+   * @param {object} payload.ratingData - 評価データ(スコア, コメント等)
    */
   async submitRating({ commit, rootState }, { locationId, ratingData }) {
     commit('SET_LOADING', true)
     commit('SET_ERROR', null)
-
     try {
-      // ユーザーIDを取得(authストアから)
-      const userId = rootState.auth?.user?.uid
-      if (!userId) {
-        throw new Error('ログインが必要です')
-      }
+      const { submitRating } = await import('@/services/ratingService')
 
-      const rating = {
+      // ユーザーIDなどを付与
+      const userId = rootState.auth?.user?.uid || 'anonymous'
+      const ratingWithMeta = {
         ...ratingData,
         locationId,
         userId,
         createdAt: new Date(),
       }
 
-      const newRating = await submitRating(rating)
+      const newRating = await submitRating(ratingWithMeta)
       commit('ADD_RATING', { locationId, rating: newRating })
       return newRating
     } catch (error) {
-      console.error('評価の送信に失敗しました:', error)
-      commit('SET_ERROR', error.message)
+      console.error('Error submitting rating:', error)
+      commit('SET_ERROR', '評価の投稿に失敗しました。')
       throw error
     } finally {
       commit('SET_LOADING', false)
@@ -244,27 +247,24 @@ const actions = {
   },
 
   /**
-   * ユーザーの評価履歴を取得
+   * ユーザー自身の評価履歴を取得
    *
-   * @param root0
-   * @param root0.commit
-   * @param root0.rootState
+   * @param {object} context - Vuex context
+   * @param {(type: string, payload?: unknown) => void} context.commit - commit function
+   * @param {object} context.rootState - root state
    */
   async fetchUserRatings({ commit, rootState }) {
+    const userId = rootState.auth?.user?.uid
+    if (!userId) return
+
     commit('SET_LOADING', true)
-    commit('SET_ERROR', null)
-
     try {
-      const userId = rootState.auth?.user?.uid
-      if (!userId) {
-        throw new Error('ログインが必要です')
-      }
-
+      const { fetchUserRatings } = await import('@/services/ratingService')
       const ratings = await fetchUserRatings(userId)
       commit('SET_USER_RATINGS', ratings)
     } catch (error) {
-      console.error('ユーザー評価履歴の取得に失敗しました:', error)
-      commit('SET_ERROR', error.message)
+      console.error('Error fetching user ratings:', error)
+      commit('SET_ERROR', '評価履歴の取得に失敗しました。')
     } finally {
       commit('SET_LOADING', false)
     }

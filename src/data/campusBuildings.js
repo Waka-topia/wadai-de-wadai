@@ -1,6 +1,4 @@
-/**
- * 和歌山大学の建物・施設の位置情報データ (GeoJSON)
- */
+/** 和歌山大学の建物・施設の位置情報データ (GeoJSON) */
 export const campusBuildings = {
   type: 'FeatureCollection',
   features: [
@@ -8,12 +6,12 @@ export const campusBuildings = {
     {
       type: 'Feature',
       properties: { title: '北１号館' },
-      geometry: { type: 'Point', coordinates: [135.151190, 34.267796] },
+      geometry: { type: 'Point', coordinates: [135.15119, 34.267796] },
     },
     {
       type: 'Feature',
       properties: { title: '北２号館' },
-      geometry: { type: 'Point', coordinates: [135.151680, 34.268289] },
+      geometry: { type: 'Point', coordinates: [135.15168, 34.268289] },
     },
     {
       type: 'Feature',
@@ -43,14 +41,14 @@ export const campusBuildings = {
     {
       type: 'Feature',
       properties: { title: '多目的広場' },
-      geometry: { type: 'Point', coordinates: [135.151045, 34.270280] },
+      geometry: { type: 'Point', coordinates: [135.151045, 34.27028] },
     },
 
     // --- 東エリア (E) ---
     {
       type: 'Feature',
       properties: { title: '東１号館' },
-      geometry: { type: 'Point', coordinates: [135.151552, 34.265530] },
+      geometry: { type: 'Point', coordinates: [135.151552, 34.26553] },
     },
     {
       type: 'Feature',
@@ -127,7 +125,7 @@ export const campusBuildings = {
     {
       type: 'Feature',
       properties: { title: '西２号館' },
-      geometry: { type: 'Point', coordinates: [135.150549, 34.265610] },
+      geometry: { type: 'Point', coordinates: [135.150549, 34.26561] },
     },
     {
       type: 'Feature',

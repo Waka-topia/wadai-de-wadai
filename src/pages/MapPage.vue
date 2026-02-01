@@ -58,9 +58,7 @@ function handleLocationUpdate(position) {
   // console.log('Location updated:', position)
 }
 
-/**
- * 現在地に移動
- */
+/** 現在地に移動 */
 function goToCurrentLocation() {
   locating.value = true
   // GeolocateControlのtriggerを呼び出す
