@@ -1,15 +1,29 @@
 <template>
-  <div class="edit-delete-form">
-    <div class="form-group">
-      <label for="organizer-id">団体ID:</label>
-      <input v-model="organizerId" type="text" required />
-    </div>
-    <div class="form-group">
-      <label for="password">パスワード:</label>
-      <input v-model="password" type="password" required />
-    </div>
-    <button class="delete-button" @click="onDelete">削除</button>
-  </div>
+  <v-card variant="outlined" rounded="lg">
+    <v-card-text>
+      <v-text-field
+        v-model="organizerId"
+        label="団体ID"
+        variant="outlined"
+        density="comfortable"
+        required
+        prepend-inner-icon="mdi-identifier"
+      />
+      <v-text-field
+        v-model="password"
+        label="パスワード"
+        type="password"
+        variant="outlined"
+        density="comfortable"
+        required
+        prepend-inner-icon="mdi-lock"
+      />
+      <v-btn color="error" block variant="flat" @click="onDelete">
+        <v-icon start>mdi-delete</v-icon>
+        削除
+      </v-btn>
+    </v-card-text>
+  </v-card>
   <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
     {{ snackbar.message }}
   </v-snackbar>
@@ -56,50 +70,3 @@ const onDelete = async () => {
   }
 }
 </script>
-
-<style scoped>
-.edit-delete-form {
-  padding: 16px;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.form-group {
-  margin-bottom: 12px;
-}
-
-label {
-  display: block;
-  font-size: 14px;
-  margin-bottom: 4px;
-}
-
-input {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 14px;
-}
-
-input:focus {
-  border-color: #007bff;
-  outline: none;
-}
-
-.delete-button {
-  background-color: #d9534f;
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  font-size: 14px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.delete-button:hover {
-  background-color: #c9302c;
-}
-</style>

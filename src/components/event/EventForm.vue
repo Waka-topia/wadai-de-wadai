@@ -1,69 +1,106 @@
 <template>
-  <form class="px-2 mx-2" @submit.prevent="submitEvent">
-    <div class="form-group">
-      <label for="date">日付:</label>
-      <input
-        v-model="newEvent.date"
-        class="form-control"
-        type="date"
-        max="2026-05-31"
-        min="2025-04-01"
-        required
-      />
+  <v-form class="pa-4" @submit.prevent="submitEvent">
+    <v-text-field
+      v-model="newEvent.date"
+      label="日付"
+      type="date"
+      variant="outlined"
+      density="comfortable"
+      max="2026-05-31"
+      min="2025-04-01"
+      required
+      prepend-inner-icon="mdi-calendar"
+    />
+
+    <v-row dense>
+      <v-col cols="6">
+        <v-text-field
+          v-model="newEvent.startTime"
+          label="開始時刻"
+          type="time"
+          variant="outlined"
+          density="comfortable"
+          required
+          prepend-inner-icon="mdi-clock-start"
+        />
+      </v-col>
+      <v-col cols="6">
+        <v-text-field
+          v-model="newEvent.endTime"
+          label="終了時刻"
+          type="time"
+          variant="outlined"
+          density="comfortable"
+          required
+          prepend-inner-icon="mdi-clock-end"
+        />
+      </v-col>
+    </v-row>
+
+    <v-text-field
+      v-model="newEvent.location"
+      label="場所"
+      variant="outlined"
+      density="comfortable"
+      placeholder="イベントの場所"
+      required
+      prepend-inner-icon="mdi-map-marker"
+    />
+
+    <v-textarea
+      v-model="newEvent.description"
+      label="概要"
+      variant="outlined"
+      density="comfortable"
+      rows="4"
+      placeholder="イベントの概要を入力"
+      required
+      prepend-inner-icon="mdi-text"
+    />
+
+    <v-divider class="my-4" />
+
+    <div class="text-subtitle-1 font-weight-bold mb-3">
+      <v-icon size="small" class="mr-1">mdi-account-group</v-icon>
+      団体情報
     </div>
-    <div class="form-group">
-      <label for="start-time">開始時刻:</label>
-      <input v-model="newEvent.startTime" class="form-control" type="time" required />
-    </div>
-    <div class="form-group">
-      <label for="end-time">終了時刻:</label>
-      <input v-model="newEvent.endTime" class="form-control" type="time" required />
-    </div>
-    <div class="form-group">
-      <label for="location">場所:</label>
-      <input
-        v-model="newEvent.location"
-        class="form-control"
-        type="text"
-        placeholder="イベントの場所"
-        required
-      />
-    </div>
-    <div class="form-group">
-      <label for="description">概要:</label>
-      <textarea
-        v-model="newEvent.description"
-        class="form-control"
-        placeholder="イベントの概要を入力"
-        required
-      ></textarea>
-    </div>
-    <div class="form-group">
-      <label for="organizer-name">団体名(略称可):</label>
-      <input
-        v-model="newEvent.organizerName"
-        class="form-control"
-        type="text"
-        placeholder="団体名（略称可）"
-        required
-      />
-    </div>
-    <div class="form-group">
-      <label for="organizer-id">団体ID:</label>
-      <input v-model="organizerId" class="form-control" type="text" placeholder="団体ID" required />
-    </div>
-    <div class="form-group">
-      <label for="password">パスワード:</label>
-      <input
-        v-model="password"
-        class="form-control"
-        type="password"
-        placeholder="パスワード"
-        required
-      />
-    </div>
-    <button class="submit-btn" type="submit">イベントを登録</button>
-  </form>
+
+    <v-text-field
+      v-model="newEvent.organizerName"
+      label="団体名（略称可）"
+      variant="outlined"
+      density="comfortable"
+      placeholder="団体名（略称可）"
+      required
+      prepend-inner-icon="mdi-domain"
+    />
+
+    <v-text-field
+      v-model="organizerId"
+      label="団体ID"
+      variant="outlined"
+      density="comfortable"
+      placeholder="団体ID"
+      required
+      prepend-inner-icon="mdi-identifier"
+    />
+
+    <v-text-field
+      v-model="password"
+      label="パスワード"
+      type="password"
+      variant="outlined"
+      density="comfortable"
+      placeholder="パスワード"
+      required
+      prepend-inner-icon="mdi-lock"
+    />
+
+    <v-btn type="submit" color="orange" block size="large" class="text-white font-weight-bold mt-2">
+      <v-icon start>mdi-check-circle</v-icon>
+      イベントを登録
+    </v-btn>
+  </v-form>
 
   <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
     {{ snackbar.message }}
@@ -114,59 +151,3 @@ const submitEvent = async () => {
   }
 }
 </script>
-
-<style scoped>
-.form-group {
-  margin-bottom: 20px;
-}
-
-label {
-  display: block;
-  font-size: 16px;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 8px;
-}
-
-input,
-textarea {
-  width: 100%;
-  padding: 10px;
-  border: 2px solid #ccc;
-  border-radius: 4px;
-  font-size: 14px;
-  transition: border-color 0.3s ease;
-}
-
-input:focus,
-textarea:focus {
-  border-color: #4caf50;
-  outline: none;
-}
-
-textarea {
-  resize: vertical;
-  min-height: 100px;
-}
-
-.submit-btn {
-  display: inline-block;
-  padding: 12px 24px;
-  background-color: #4caf50;
-  color: white;
-  font-size: 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  width: 100%;
-}
-
-.submit-btn:hover {
-  background-color: #45a049;
-}
-
-.submit-btn:active {
-  background-color: #388e3c;
-}
-</style>
