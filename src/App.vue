@@ -45,77 +45,96 @@
   <BottomNavigation v-if="showBottomNavigation && !isFullscreenPage" />
 </template>
 
-<script>
+<script setup>
+import { ref, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import BottomNavigation from '@/components/templates/BottomNavigation.vue'
 import LogOutButton from '@/components/templates/LogOut.vue'
 
-export default {
-  name: 'App',
-  components: {
-    BottomNavigation,
-    LogOutButton,
-  },
-  data() {
-    return {
-      drawer: null,
-      title: 'ホーム',
-      showBottomNavigation: true,
-      isEventCalPage: false,
-      isFullscreenPage: false,
-    }
-  },
-  watch: {
-    $route: {
-      handler(route) {
-        this.updateTitle(route)
-        this.updateBottomNavigationVisibility(route)
-        this.checkEventCalPage(route)
-        this.checkFullscreenPage(route)
-      },
-      immediate: true,
-    },
-  },
-  methods: {
-    updateTitle(route) {
-      const routeTitleMap = {
-        '/': 'ホーム',
-        '/login': 'ログイン',
-        '/signup': 'サインアップ',
-        '/reader': 'スキャン',
-        '/ranking': 'ランキング',
-        '/mypage': 'マイページ',
-        '/eventcal': '新歓日程',
-        '/titleshop': '称号ショップ',
-        '/inquiry': 'お問い合わせ',
-        '/rule': '利用規約',
-        '/map': 'マップ',
-      }
-      this.title = routeTitleMap[route.path]
-    },
-    updateBottomNavigationVisibility(route) {
-      this.showBottomNavigation = !['/login', '/signup'].includes(route.path)
-    },
-    checkEventCalPage(route) {
-      this.isEventCalPage = '/eventcal'.includes(route.path)
-    },
-    checkFullscreenPage(route) {
-      // 全画面表示が必要なページのリスト
-      this.isFullscreenPage = ['/map'].includes(route.path)
-    },
-    gotoshop() {
-      this.$router.push('/titleshop')
-    },
-    gotoinquiry() {
-      window.open(
-        'https://docs.google.com/forms/d/e/1FAIpQLScqd9venqOBZYzIWlDr6EjfHaCTizqLamkFlJUMBXCJaRmHdg/viewform?usp=header',
-        '_blank',
-      )
-    },
-    gotorule() {
-      this.$router.push('/rule')
-    },
-  },
+const router = useRouter()
+const route = useRoute()
+
+const drawer = ref(null)
+const title = ref('ホーム')
+const showBottomNavigation = ref(true)
+const isEventCalPage = ref(false)
+const isFullscreenPage = ref(false)
+
+const routeTitleMap = {
+  '/': 'ホーム',
+  '/login': 'ログイン',
+  '/signup': 'サインアップ',
+  '/reader': 'スキャン',
+  '/ranking': 'ランキング',
+  '/mypage': 'マイページ',
+  '/eventcal': '新歓日程',
+  '/titleshop': '称号ショップ',
+  '/inquiry': 'お問い合わせ',
+  '/rule': '利用規約',
+  '/map': 'マップ',
 }
+
+/**
+ * タイトルを更新
+ *
+ * @param {object} currentRoute
+ */
+const updateTitle = (currentRoute) => {
+  title.value = routeTitleMap[currentRoute.path] || ''
+}
+
+/**
+ * ボトムナビゲーションの表示切替
+ *
+ * @param {object} currentRoute
+ */
+const updateBottomNavigationVisibility = (currentRoute) => {
+  showBottomNavigation.value = !['/login', '/signup'].includes(currentRoute.path)
+}
+
+/**
+ * 新歓カレンダーページの判定
+ *
+ * @param {object} currentRoute
+ */
+const checkEventCalPage = (currentRoute) => {
+  isEventCalPage.value = currentRoute.path.includes('/eventcal')
+}
+
+/**
+ * 全画面表示ページの判定
+ *
+ * @param {object} currentRoute
+ */
+const checkFullscreenPage = (currentRoute) => {
+  isFullscreenPage.value = ['/map'].includes(currentRoute.path)
+}
+
+const gotoshop = () => {
+  router.push('/titleshop')
+}
+
+const gotoinquiry = () => {
+  window.open(
+    'https://docs.google.com/forms/d/e/1FAIpQLScqd9venqOBZYzIWlDr6EjfHaCTizqLamkFlJUMBXCJaRmHdg/viewform?usp=header',
+    '_blank',
+  )
+}
+
+const gotorule = () => {
+  router.push('/rule')
+}
+
+watch(
+  route,
+  (newRoute) => {
+    updateTitle(newRoute)
+    updateBottomNavigationVisibility(newRoute)
+    checkEventCalPage(newRoute)
+    checkFullscreenPage(newRoute)
+  },
+  { immediate: true },
+)
 </script>
 
 <style>

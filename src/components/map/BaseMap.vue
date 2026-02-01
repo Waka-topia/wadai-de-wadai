@@ -8,12 +8,14 @@
 import { onMounted, onUnmounted, ref, markRaw } from 'vue'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
+import { campusBuildings } from '@/data/campusBuildings'
 
 // MapLibre GL JS Version: ^5.17.0 (Verified in package.json)
 // MapTiler API Documentation: https://docs.maptiler.com/maplibre-gl-js/
 
 const mapContainer = ref(null)
 const map = ref(null)
+const mapLoaded = ref(false)
 const geolocateControl = ref(null)
 
 // Wakayama University Coordinates
@@ -106,6 +108,35 @@ onMounted(() => {
 
   // Force attribution to be collapsed on load
   map.value.on('load', () => {
+    // 建物ラベルのソースを追加
+    map.value.addSource('building-labels', {
+      type: 'geojson',
+      data: campusBuildings,
+    })
+
+    // 建物ラベルのレイヤーを追加
+    map.value.addLayer({
+      id: 'building-labels',
+      type: 'symbol',
+      source: 'building-labels',
+      minzoom: 14, // ズームレベル14以上で表示
+      layout: {
+        'text-field': ['get', 'title'],
+        'text-size': 13,
+        'text-variable-anchor': ['center', 'top', 'bottom'],
+        'text-radial-offset': 0.5,
+        'text-justify': 'auto',
+        // 'text-font': ['Noto Sans Regular'], // 必要であればフォント指定
+      },
+      paint: {
+        'text-color': '#555555',
+        'text-halo-color': '#ffffff',
+        'text-halo-width': 2,
+      },
+    })
+
+    mapLoaded.value = true // マップロード完了
+
     const attribControl = document.querySelector('.maplibregl-ctrl-attrib')
     if (attribControl) {
       // Remove the 'maplibregl-compact-show' class if it exists
@@ -116,6 +147,37 @@ onMounted(() => {
 
     // マップ読み込み後、自動的に位置情報の取得を開始
     geolocateControl.value.trigger()
+  })
+
+  // [DEBUG] クリックした場所の座標を表示
+  map.value.on('click', (e) => {
+    const { lng, lat } = e.lngLat
+    // console.log(`Clicked: [${lng}, ${lat}]`)
+
+    // 座標を表示するポップアップ
+    new maplibregl.Popup({ closeButton: false })
+      .setLngLat(e.lngLat)
+      .setHTML(
+        `
+        <div class="coordinate-popup" style="text-align: center; cursor: pointer;">
+          <div style="font-size: 10px; color: #666; margin-bottom: 2px;">座標 (Click to Copy)</div>
+          <div style="font-family: monospace; font-weight: bold; color: #1976D2;">
+            [${lng.toFixed(6)}, ${lat.toFixed(6)}]
+          </div>
+        </div>
+        `,
+      )
+      .addTo(map.value)
+      .getElement()
+      .addEventListener('click', () => {
+        navigator.clipboard.writeText(`Coordinates: { lat: ${lat}, lng: ${lng} }`)
+          .then(() => {
+            console.log('Coordinates copied to clipboard')
+            // 簡単なフィードバック（オプション）
+            // alert('Copied!')
+          })
+          .catch(err => console.error('Failed to copy:', err))
+      })
   })
 })
 
