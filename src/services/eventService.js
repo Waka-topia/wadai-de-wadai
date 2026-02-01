@@ -37,8 +37,7 @@ export const verifyOrganizerPassword = async (organizerId, inputPassword) => {
  */
 export const addEventService = async (eventData, organizerId, inputPassword) => {
   try {
-    // await verifyOrganizerPassword(organizerId, inputPassword)
-    console.log(inputPassword)
+    await verifyOrganizerPassword(organizerId, inputPassword)
     const eventId = uuidv4()
     const eventRef = doc(db, 'events', eventId)
     await setDoc(eventRef, { ...eventData, eventId, organizerId })
