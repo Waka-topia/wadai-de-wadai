@@ -63,7 +63,7 @@ export const addEvent = async (eventData, organizerId) => {
  * Firebaseから単一のイベント情報を取得する
  *
  * @param {string} eventId イベントID
- * @returns {Promise<object>}
+ * @returns {Promise<object>} イベントデータ
  */
 export const getEvent = async (eventId) => {
   try {

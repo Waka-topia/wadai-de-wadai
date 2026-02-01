@@ -1,7 +1,4 @@
-/**
- * Locations Store Module
- * 場所データの管理を行う
- */
+/** Locations Store Module 場所データの管理を行う */
 
 // 初期状態
 const state = () => ({
@@ -23,8 +20,7 @@ const getters = {
   allLocations: (state) => state.locations,
 
   /**
-   * フィルタリング適用済みの場所データを取得
-   * activeCategoriesが空の場合は全て表示
+   * フィルタリング適用済みの場所データを取得 activeCategoriesが空の場合は全て表示
    *
    * @param {object} state - Vuex state
    * @returns {Array} フィルタリングされた場所リスト
@@ -33,16 +29,14 @@ const getters = {
     if (state.activeCategories.length === 0) {
       return state.locations
     }
-    return state.locations.filter((location) =>
-      state.activeCategories.includes(location.category),
-    )
+    return state.locations.filter((location) => state.activeCategories.includes(location.category))
   },
 
   /**
    * 選択された場所を取得
    *
    * @param {object} state - Vuex state
-   * @returns {object|null} 選択された場所
+   * @returns {object | null} 選択された場所
    */
   selectedLocation: (state) => state.selectedLocation,
 
@@ -72,7 +66,7 @@ const getters = {
    * 特定の場所IDに対応する場所データを取得
    *
    * @param {object} state - Vuex state
-   * @returns {(id: string|number) => object|undefined} 場所IDを受け取り場所データを返す関数
+   * @returns {(id: string | number) => object | undefined} 場所IDを受け取り場所データを返す関数
    */
   getLocationById: (state) => (id) => {
     return state.locations.find((l) => l.id === id)
@@ -90,7 +84,7 @@ const getters = {
    * エラーメッセージを取得
    *
    * @param {object} state - Vuex state
-   * @returns {string|null} エラーメッセージ
+   * @returns {string | null} エラーメッセージ
    */
   error: (state) => state.error,
 }
@@ -111,7 +105,7 @@ const mutations = {
    * 選択された場所を設定
    *
    * @param {object} state - Vuex state
-   * @param {object|null} location - 選択された場所
+   * @param {object | null} location - 選択された場所
    */
   SET_SELECTED_LOCATION(state, location) {
     state.selectedLocation = location
@@ -151,7 +145,7 @@ const mutations = {
    * エラーメッセージを設定
    *
    * @param {object} state - Vuex state
-   * @param {string|null} error - エラーメッセージ
+   * @param {string | null} error - エラーメッセージ
    */
   SET_ERROR(state, error) {
     state.error = error
@@ -177,8 +171,8 @@ const actions = {
    * 場所データを取得する
    *
    * @param {object} context - Vuex context
-   * @param {(type: string, payload?: unknown) => void} context.commit - commit function
-   * @param {object} context.state - state object
+   * @param {(type: string, payload?: unknown) => void} context.commit - Commit function
+   * @param {object} context.state - State object
    */
   // eslint-disable-next-line no-unused-vars
   async fetchLocations({ commit, state }) {
@@ -207,9 +201,9 @@ const actions = {
    * 場所を選択する
    *
    * @param {object} context - Vuex context
-   * @param {(type: string, payload?: unknown) => void} context.commit - commit function
-   * @param {object} context.getters - getters object
-   * @param {string|number} locationId - 場所ID
+   * @param {(type: string, payload?: unknown) => void} context.commit - Commit function
+   * @param {object} context.getters - Getters object
+   * @param {string | number} locationId - 場所ID
    */
   selectLocation({ commit, getters }, locationId) {
     const location = getters.getLocationById(locationId)
@@ -224,19 +218,19 @@ const actions = {
    * 場所の選択を解除する
    *
    * @param {object} context - Vuex context
-   * @param {(type: string, payload?: unknown) => void} context.commit - commit function
+   * @param {(type: string, payload?: unknown) => void} context.commit - Commit function
    */
   clearSelection({ commit }) {
     commit('SET_SELECTED_LOCATION', null)
   },
 
   /**
-   * アクティブなカテゴリを設定する
-   * カテゴリ変更時にフィルタリングや再取得が必要な場合はここで制御
+   * アクティブなカテゴリを設定する カテゴリ変更時にフィルタリングや再取得が必要な場合はここで制御
    *
    * @param {object} context - Vuex context
-   * @param {(type: string, payload?: unknown) => void} context.commit - commit function
-   * @param {(type: string, payload?: unknown) => Promise<unknown>} context.dispatch - dispatch function
+   * @param {(type: string, payload?: unknown) => void} context.commit - Commit function
+   * @param {(type: string, payload?: unknown) => Promise<unknown>} context.dispatch - Dispatch
+   *   function
    * @param {Array} categories - カテゴリIDリスト
    */
   // eslint-disable-next-line no-unused-vars
@@ -250,7 +244,7 @@ const actions = {
    * 新しい場所を追加する（管理機能用想定）
    *
    * @param {object} context - Vuex context
-   * @param {(type: string, payload?: unknown) => void} context.commit - commit function
+   * @param {(type: string, payload?: unknown) => void} context.commit - Commit function
    * @param {object} location - 場所データ
    */
   async addNewLocation({ commit }, location) {

@@ -10,10 +10,10 @@ import {
 import { db } from '@/firebase/config'
 
 /**
- * @param userId
- * @param displayName
- * @param groupId
- * @param stampId
+ * @param {string} userId
+ * @param {string} displayName
+ * @param {string} groupId
+ * @param {string} stampId
  */
 export async function addStampToUser(userId, displayName, groupId, stampId) {
   try {
@@ -51,7 +51,7 @@ export async function addStampToUser(userId, displayName, groupId, stampId) {
 }
 
 // Firestoreからユーザーのスタンプデータを取得
-/** @param userId */
+/** @param {string} userId */
 export async function getUserStamps(userId) {
   try {
     const querySnapshot = await getDocs(collection(db, `users/${userId}/stampsReceived`))
@@ -65,7 +65,7 @@ export async function getUserStamps(userId) {
   }
 }
 
-/** @param userId */
+/** @param {string} userId */
 export async function getUserStampImages(userId) {
   try {
     // ユーザーの stampsReceived コレクションを取得

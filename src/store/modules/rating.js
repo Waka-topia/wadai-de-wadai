@@ -1,9 +1,6 @@
 import { calculateAverageRating } from '@/utils/ratingCalculator'
 
-/**
- * Rating Store Module
- * 評価データの管理を行う
- */
+/** Rating Store Module 評価データの管理を行う */
 
 // 初期状態
 const state = () => ({
@@ -19,7 +16,7 @@ const getters = {
    * 特定の場所の評価リストを取得
    *
    * @param {object} state - Vuex state
-   * @returns {(locationId: string) => Array<object>} locationIdを受け取り評価リストを返す関数
+   * @returns {(locationId: string) => object[]} LocationIdを受け取り評価リストを返す関数
    */
   getRatingsByLocationID: (state) => (locationId) => {
     return state.ratings[locationId] || []
@@ -29,7 +26,7 @@ const getters = {
    * 特定の場所の平均評価を取得
    *
    * @param {object} state - Vuex state
-   * @returns {(locationId: string) => number} locationIdを受け取り平均評価（数値）を返す関数
+   * @returns {(locationId: string) => number} LocationIdを受け取り平均評価（数値）を返す関数
    */
   getAverageRating: (state) => (locationId) => {
     const ratings = state.ratings[locationId] || []
@@ -40,7 +37,7 @@ const getters = {
    * 特定の場所の評価数を取得
    *
    * @param {object} state - Vuex state
-   * @returns {(locationId: string) => number} locationIdを受け取り評価数を返す関数
+   * @returns {(locationId: string) => number} LocationIdを受け取り評価数を返す関数
    */
   getRatingCount: (state) => (locationId) => {
     return (state.ratings[locationId] || []).length
@@ -66,16 +63,15 @@ const getters = {
    * エラーメッセージを取得
    *
    * @param {object} state - Vuex state
-   * @returns {string|null} エラーメッセージ
+   * @returns {string | null} エラーメッセージ
    */
   error: (state) => state.error,
 
   /**
-   * 特定の場所の各カテゴリごとの平均スコアを取得
-   * (トイレ: 清潔さなど、勉強: 静かさなど)
+   * 特定の場所の各カテゴリごとの平均スコアを取得 (トイレ: 清潔さなど、勉強: 静かさなど)
    *
    * @param {object} state - Vuex state
-   * @returns {(locationId: string) => object|null} locationIdを受け取り項目の平均スコアオブジェクトを返す関数
+   * @returns {(locationId: string) => object | null} LocationIdを受け取り項目の平均スコアオブジェクトを返す関数
    */
   getCategoryScores: (state) => (locationId) => {
     const ratings = state.ratings[locationId] || []
@@ -161,7 +157,7 @@ const mutations = {
    * エラーメッセージを設定
    *
    * @param {object} state - Vuex state
-   * @param {string|null} error - エラーメッセージ
+   * @param {string | null} error - エラーメッセージ
    */
   SET_ERROR(state, error) {
     state.error = error
@@ -186,7 +182,7 @@ const actions = {
    * 特定の場所の評価を取得
    *
    * @param {object} context - Vuex context
-   * @param {(type: string, payload?: unknown) => void} context.commit - commit function
+   * @param {(type: string, payload?: unknown) => void} context.commit - Commit function
    * @param {string} locationId - 場所ID
    */
   async fetchRatingsByLocation({ commit }, locationId) {
@@ -213,8 +209,8 @@ const actions = {
    * 新しい評価を投稿
    *
    * @param {object} context - Vuex context
-   * @param {(type: string, payload?: unknown) => void} context.commit - commit function
-   * @param {object} context.rootState - root state
+   * @param {(type: string, payload?: unknown) => void} context.commit - Commit function
+   * @param {object} context.rootState - Root state
    * @param {object} payload - ペイロード
    * @param {string} payload.locationId - 場所ID
    * @param {object} payload.ratingData - 評価データ(スコア, コメント等)
@@ -250,8 +246,8 @@ const actions = {
    * ユーザー自身の評価履歴を取得
    *
    * @param {object} context - Vuex context
-   * @param {(type: string, payload?: unknown) => void} context.commit - commit function
-   * @param {object} context.rootState - root state
+   * @param {(type: string, payload?: unknown) => void} context.commit - Commit function
+   * @param {object} context.rootState - Root state
    */
   async fetchUserRatings({ commit, rootState }) {
     const userId = rootState.auth?.user?.uid
