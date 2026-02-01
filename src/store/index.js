@@ -2,6 +2,7 @@
 import { createStore } from 'vuex'
 import authModule from './modules/auth'
 import eventModule from './modules/event' // イベントモジュールをインポート
+import jobsModule from './modules/jobs' // 求人モジュールをインポート
 import rankingModule from './modules/ranking' // ランキングモジュールをインポート
 import shinkanModule from './modules/shinkan' // 新歓モジュールをインポート
 import stampModule from './modules/stamp' // スタンプモジュールをインポート
@@ -30,5 +31,6 @@ export default createStore({
       namespaced: true, // 名前空間を有効にする
       ...eventModule, // イベントモジュールを登録
     },
+    jobs: jobsModule, // 求人モジュールを登録
   },
 })
