@@ -43,6 +43,11 @@ const routes = [
     component: () => import('@/pages/EventCal.vue'),
   },
   {
+    path: '/eventcal/:id',
+    name: 'EventDetail',
+    component: () => import('@/pages/EventDetail.vue'),
+  },
+  {
     path: '/titleshop',
     name: 'TitleShop',
     component: () => import('@/pages/TitleShop.vue'),
