@@ -1,19 +1,14 @@
 <template>
   <div class="event-schedule">
-    <div class="nav-buttons">
-      <button class="nav-btn" @click="changeDate(-1)">&#x3C;</button>
-      <h3 class="title">{{ formattedSelectedDate }} の新歓イベント</h3>
-      <button class="nav-btn" @click="changeDate(1)">&#x3E;</button>
-    </div>
-
     <div v-if="filteredEvents.length === 0" class="no-events">イベントはありません</div>
 
     <div v-else class="d-flex flex-column ga-2">
       <div
         v-for="event in filteredEvents"
         :key="event.eventId"
+        :to="'/eventcal/' + event.eventId"
         class="border-md rounded-lg"
-        @click="openEventModal(event)"
+        @click="router.push('/eventcal/' + event.eventId)"
       >
         <v-row class="py-4">
           <v-col
@@ -21,17 +16,17 @@
             cols="3"
           >
             <div>
-              {{ formatTime(event.start) }}
+              {{ event.startTime }}
             </div>
             <div>〜</div>
             <div>
-              {{ formatTime(event.end) }}
+              {{ event.endTime }}
             </div>
           </v-col>
           <v-divider vertical></v-divider>
           <v-col cols="9">
             <div>
-              <p class="text-h6 font-weight-bold">{{ event.title }}</p>
+              <p class="text-h6 font-weight-bold">{{ event.organizerName }}</p>
               <p class="text-caption font-weight-bold text-grey-lighten-2 text-truncate">
                 {{ event.description }}
               </p>
@@ -46,68 +41,26 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    events: {
-      type: Array,
-      required: true,
-    },
-    selectedDate: {
-      type: [String, Date],
-      default: null,
-    },
+<script setup>
+import { computed } from 'vue'
+import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+const store = useStore()
+
+const props = defineProps({
+  selectedDate: {
+    type: String,
+    default: '',
   },
-  emits: ['openModal', 'update:selectedDate'],
-  data() {
-    return {
-      internalSelectedDate: this.selectedDate ? new Date(this.selectedDate) : new Date(),
-    }
-  },
-  computed: {
-    formattedSelectedDate() {
-      return this.internalSelectedDate
-        .toLocaleDateString('ja-JP', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-        })
-        .replace(/\//g, '-')
-    },
-    filteredEvents() {
-      return this.events.filter((event) => {
-        const eventDate = new Date(event.start)
-          .toLocaleDateString('ja-JP', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-          })
-          .replace(/\//g, '-')
-        return eventDate === this.formattedSelectedDate
-      })
-    },
-  },
-  watch: {
-    selectedDate(newVal) {
-      this.internalSelectedDate = new Date(newVal)
-    },
-  },
-  methods: {
-    formatTime(dateString) {
-      const date = new Date(dateString)
-      return date.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })
-    },
-    openEventModal(event) {
-      this.$emit('openModal', event)
-    },
-    changeDate(days) {
-      const newDate = new Date(this.internalSelectedDate)
-      newDate.setDate(newDate.getDate() + days)
-      this.internalSelectedDate = newDate
-      this.$emit('update:selectedDate', newDate.toISOString().split('T')[0])
-    },
-  },
-}
+})
+
+// TODO: Optimize filtering by date on the Vuex side if performance becomes an issue
+const filteredEvents = computed(() => {
+  const allEvents = store.getters['event/allEvents']
+  return allEvents.filter((event) => event.date === props.selectedDate)
+})
 </script>
 
 <style scoped>
@@ -115,26 +68,6 @@ export default {
   padding: 16px;
   background: #fff;
   border-radius: 12px;
-}
-
-.nav-buttons {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  margin-bottom: 10px;
-}
-
-.nav-btn {
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-
-.nav-btn:hover {
-  color: #ff9800;
 }
 
 .title {
