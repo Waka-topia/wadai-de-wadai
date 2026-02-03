@@ -65,8 +65,8 @@ const onFilterClick = (filterType) => {
   } catch (error) {
     snackbar.value = {
       show: true,
-      message: 'フィルターの選択に失敗しました',
-      color: `エラー: ${error.message}`,
+      message: `エラー: ${error.message}`,
+      color: 'error',
     }
   }
 }
@@ -81,8 +81,8 @@ const onSearch = () => {
   } catch (error) {
     snackbar.value = {
       show: true,
-      message: '検索に失敗しました',
-      color: `エラー: ${error.message}`,
+      message: `エラー: ${error.message}`,
+      color: 'error',
     }
   }
 }
