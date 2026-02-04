@@ -2,10 +2,14 @@
 import { createStore } from 'vuex'
 import authModule from './modules/auth'
 import eventModule from './modules/event' // イベントモジュールをインポート
+
+import locationModule from './modules/location' // 場所モジュールをインポート
 import rankingModule from './modules/ranking' // ランキングモジュールをインポート
+
+import ratingModule from './modules/rating' // 評価モジュールをインポート
+import scrollModule from './modules/scroll' // スクロール位置モジュールをインポート
 import shinkanModule from './modules/shinkan' // 新歓モジュールをインポート
 import stampModule from './modules/stamp' // スタンプモジュールをインポート
-
 import titleModule from './modules/title' // タイトルモジュールをインポート
 import userModule from './modules/user' // ユーザーモジュールをインポート
 
@@ -30,5 +34,8 @@ export default createStore({
       namespaced: true, // 名前空間を有効にする
       ...eventModule, // イベントモジュールを登録
     },
+    location: locationModule, // 場所モジュールを登録
+    rating: ratingModule, // 評価モジュールを登録
+    scroll: scrollModule, // スクロール位置モジュールを登録
   },
 })
