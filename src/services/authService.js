@@ -10,7 +10,7 @@ import { auth, db } from '@/firebase/config'
 import store from '@/store'
 
 // Firestore から photoURL を取得する関数
-/** @param userId */
+/** @param {string} userId */
 export async function getPhotoURL(userId) {
   try {
     // Firestore の正しいドキュメント参照を作成

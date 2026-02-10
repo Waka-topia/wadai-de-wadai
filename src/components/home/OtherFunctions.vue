@@ -32,11 +32,36 @@
         </v-col>
       </v-row>
     </v-card>
+
+    <!-- Campus Map Section -->
+    <v-card v-if="showMapSection" flat class="rounded-xl pa-4">
+      <div class="d-flex align-center justify-space-between mb-3">
+        <div class="d-flex align-center">
+          <v-icon color="grey" class="mr-2">mdi-map-marker-radius-outline</v-icon>
+          <span class="font-weight-bold">キャンパスマップ</span>
+        </div>
+      </div>
+
+      <div class="map-preview mb-3">
+        <div class="map-placeholder">
+          <v-icon size="64" color="grey-lighten-1">mdi-map</v-icon>
+          <p class="text-caption text-grey mt-2">和歌山大学キャンパスマップ</p>
+        </div>
+      </div>
+
+      <v-btn block color="orange" variant="flat" prepend-icon="mdi-map-search" @click="goToMap">
+        マップ全体を見る
+      </v-btn>
+    </v-card>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+const showMapSection = ref(false) // マップセクションの表示状態
 
 const features = ref([
   {
@@ -61,14 +86,28 @@ const features = ref([
     label: 'マップ',
     icon: 'mdi-map-marker-radius-outline',
     color: 'grey',
-    url: null, // 将来的に内部リンクなど
+    url: null,
+    isMap: true, // マップアイコンであることを示すフラグ
   },
 ])
 
+/**
+ * リンクまたはマップセクションを開く
+ *
+ * @param {object} item - 機能アイテム
+ */
 const openLink = (item) => {
-  if (item.url) {
+  if (item.isMap) {
+    // マップアイコンをクリックした場合、マップセクションを表示/非表示
+    showMapSection.value = !showMapSection.value
+  } else if (item.url) {
     window.open(item.url, '_blank')
   }
+}
+
+/** マップページに遷移 */
+const goToMap = () => {
+  router.push('/map')
 }
 </script>
 
@@ -86,5 +125,20 @@ const openLink = (item) => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.map-preview {
+  border-radius: 12px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+}
+
+.map-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
 }
 </style>

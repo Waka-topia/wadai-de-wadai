@@ -84,7 +84,7 @@ export async function addTitleToUser(userID, titleID, titleData) {
   }
 }
 
-/** @param userID */
+/** @param {string} userID */
 export async function getUserTitles(userID) {
   if (!userID || typeof userID !== 'string') {
     throw new Error('Invalid userID')
