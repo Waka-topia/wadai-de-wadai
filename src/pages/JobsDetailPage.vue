@@ -1,23 +1,19 @@
 <template>
   <v-container class="py-8">
-    <!-- 戻るボタン -->
     <v-btn variant="text" prepend-icon="mdi-arrow-left" class="mb-4" @click="$router.back()">
       求人一覧に戻る
     </v-btn>
 
-    <!-- 読み込み中 -->
     <div v-if="!job && !error" class="text-center mt-16">
       <v-progress-circular indeterminate color="orange" size="64"></v-progress-circular>
       <p class="mt-4 text-grey">求人情報を読み込み中...</p>
     </div>
 
-    <!-- エラー表示 -->
     <div v-else-if="error" class="text-center mt-16 text-error">
       <v-icon size="64" color="error">mdi-alert-circle</v-icon>
       <p class="mt-4">{{ error }}</p>
     </div>
 
-    <!-- 求人詳細カード -->
     <v-card v-else class="mx-auto" max-width="800" rounded="lg">
       <v-img
         height="250"
