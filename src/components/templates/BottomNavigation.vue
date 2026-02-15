@@ -64,6 +64,18 @@ watch(
   box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.05) !important;
 }
 
+.bottom-nav :deep(.v-btn) {
+  min-width: 0 !important;
+  padding: 0 4px !important;
+}
+
+.bottom-nav :deep(.v-btn__content) {
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  font-size: 11px !important;
+}
+
 .home-btn-wrapper {
   position: relative;
   width: 80px; /* min-widthから固定幅へ */
