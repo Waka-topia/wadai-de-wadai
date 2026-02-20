@@ -1,41 +1,38 @@
-// src/store/index.js
 import { createStore } from 'vuex'
 import authModule from './modules/auth'
-import eventModule from './modules/event' // イベントモジュールをインポート
-
-import locationModule from './modules/location' // 場所モジュールをインポート
-import rankingModule from './modules/ranking' // ランキングモジュールをインポート
-
-import ratingModule from './modules/rating' // 評価モジュールをインポート
-import scrollModule from './modules/scroll' // スクロール位置モジュールをインポート
-import shinkanModule from './modules/shinkan' // 新歓モジュールをインポート
-import stampModule from './modules/stamp' // スタンプモジュールをインポート
-import titleModule from './modules/title' // タイトルモジュールをインポート
-import userModule from './modules/user' // ユーザーモジュールをインポート
+import eventModule from './modules/event'
+import jobsModule from './modules/jobs'
+import locationModule from './modules/location'
+import rankingModule from './modules/ranking'
+import ratingModule from './modules/rating'
+import scrollModule from './modules/scroll'
+import shinkanModule from './modules/shinkan'
+import stampModule from './modules/stamp'
+import titleModule from './modules/title'
+import userModule from './modules/user'
 
 export default createStore({
-  state: {
-    // ストア全体の状態を記述（今回は空でも問題なし）
-  },
+  state: {},
   modules: {
     auth: authModule,
     stamps: {
-      namespaced: true, // 名前空間を有効にする
+      namespaced: true,
       ...stampModule,
     },
     users: {
-      namespaced: true, // 名前空間を有効にする
+      namespaced: true,
       ...userModule,
     },
-    ranking: rankingModule, // ランキングモジュールを登録
-    shinkan: shinkanModule, // 新歓モジュールを登録
-    title: titleModule, // タイトルモジュールを登録
+    ranking: rankingModule,
+    shinkan: shinkanModule,
+    title: titleModule,
     event: {
-      namespaced: true, // 名前空間を有効にする
-      ...eventModule, // イベントモジュールを登録
+      namespaced: true,
+      ...eventModule,
     },
-    location: locationModule, // 場所モジュールを登録
-    rating: ratingModule, // 評価モジュールを登録
-    scroll: scrollModule, // スクロール位置モジュールを登録
+    jobs: jobsModule,
+    location: locationModule,
+    rating: ratingModule,
+    scroll: scrollModule,
   },
 })

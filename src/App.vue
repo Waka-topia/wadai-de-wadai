@@ -72,6 +72,7 @@ const routeTitleMap = {
   '/inquiry': 'お問い合わせ',
   '/rule': '利用規約',
   '/map': 'マップ',
+  '/jobs': '求人情報', // ★ここを追加
 }
 
 /**
