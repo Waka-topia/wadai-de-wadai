@@ -1,6 +1,7 @@
 import {
   confirmPasswordReset,
   createUserWithEmailAndPassword,
+  deleteUser,
   onAuthStateChanged,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
@@ -155,6 +156,23 @@ export default {
     } catch (error) {
       console.error('Logout failed:', error)
       switch (error.code) {
+        case 'auth/network-request-failed':
+          error.message = 'ネットワークエラーが発生しました。接続を確認してください。'
+          break
+      }
+      throw error
+    }
+  },
+
+  async deleteAccount() {
+    try {
+      await deleteUser(auth.currentUser)
+    } catch (error) {
+      switch (error.code) {
+        case 'auth/requires-recent-login':
+          error.message =
+            'アカウントの削除には最近のログインが必要です。再度ログインしてからお試しください。'
+          break
         case 'auth/network-request-failed':
           error.message = 'ネットワークエラーが発生しました。接続を確認してください。'
           break
