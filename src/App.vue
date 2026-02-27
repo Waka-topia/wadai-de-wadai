@@ -73,6 +73,8 @@ const routeTitleMap = {
   '/rule': '利用規約',
   '/map': 'マップ',
   '/jobs': '求人情報', // ★ここを追加
+  '/forgot-password': 'パスワードリセット',
+  '/reset-password': 'パスワードリセット',
 }
 
 /**
