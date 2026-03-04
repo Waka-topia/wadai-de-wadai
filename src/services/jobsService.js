@@ -16,6 +16,8 @@ export const getJobs = async () => {
         endTime: '22:00',
         jobDuties: 'ホール業務・キッチン業務',
         createdAt: '2025-01-15',
+        description:
+          '仕事内容仕事内容仕事内容仕事内容仕事内容仕事内容仕事内容仕事内容仕事内容仕事内容仕事内容仕事内容仕事内容仕事内容',
       },
       {
         id: 2,
