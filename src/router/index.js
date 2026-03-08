@@ -78,6 +78,11 @@ const routes = [
     name: 'Map',
     component: () => import('@/pages/MapPage.vue'),
   },
+  {
+    path: '/timetable',
+    name: 'Timetable',
+    component: () => import('@/pages/TimetablePage.vue'),
+  },
 ]
 
 const router = createRouter({

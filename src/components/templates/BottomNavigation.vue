@@ -25,6 +25,11 @@
         <span>求人情報</span>
       </v-btn>
 
+      <v-btn to="/timetable" value="timetable">
+        <v-icon>mdi-table-clock</v-icon>
+        <span>時間割</span>
+      </v-btn>
+
       <v-btn to="/mypage" value="mypage">
         <v-icon>mdi-account</v-icon>
         <span>マイページ</span>
@@ -48,6 +53,7 @@ watch(
     else if (newPath === '/eventcal') selectedIndex.value = 'eventcal'
     else if (newPath === '/reader') selectedIndex.value = 'reader'
     else if (newPath === '/jobs') selectedIndex.value = 'jobs'
+    else if (newPath === '/timetable') selectedIndex.value = 'timetable'
     else if (newPath === '/mypage') selectedIndex.value = 'mypage'
     else selectedIndex.value = undefined
   },
