@@ -67,6 +67,9 @@
           rows="2"
           class="mb-2"
         />
+
+        <!-- ピア・アラート（編集モード時のみ表示） -->
+        <PeerAlertPanel v-if="isEditing" :lecture-name="form.name" />
       </v-card-text>
 
       <v-card-actions class="modal-actions">
@@ -85,6 +88,7 @@
 import { ref, computed, watch } from 'vue'
 import { useStore } from 'vuex'
 import { searchSuggestions } from '@/services/lectureIndexService'
+import PeerAlertPanel from '@/components/timetable/PeerAlertPanel.vue'
 
 const props = defineProps({
   modelValue: Boolean,
