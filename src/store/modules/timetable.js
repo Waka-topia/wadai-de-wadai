@@ -25,7 +25,13 @@ export default {
     },
   },
   actions: {
-    /** ログイン後に呼び出してFirestoreから時間割を取得 */
+    /**
+     * ログイン後に呼び出してFirestoreから時間割を取得
+     *
+     * @param {object} root0 - Vuexコンテキスト
+     * @param {import('vuex').Commit} root0.commit - ミューテーションをコミットする関数
+     * @param {object} root0.rootGetters - ルートのゲッター
+     */
     async fetchTimetable({ commit, rootGetters }) {
       const uid = rootGetters['auth/userId']
       if (!uid) return
@@ -40,7 +46,17 @@ export default {
       }
     },
 
-    /** 講義を保存（Firestore + ローカル状態を同時更新） */
+    /**
+     * 講義を保存（Firestore + ローカル状態を同時更新）
+     *
+     * @param {object} root0 - Vuexコンテキスト
+     * @param {import('vuex').Commit} root0.commit - ミューテーションをコミットする関数
+     * @param {object} root0.rootGetters - ルートのゲッター
+     * @param {object} root1 - ペイロード
+     * @param {string} root1.day - 曜日コード
+     * @param {number} root1.period - 時限
+     * @param {object} root1.lecture - 保存する講義データ
+     */
     async saveLecture({ commit, rootGetters }, { day, period, lecture }) {
       const uid = rootGetters['auth/userId']
       commit('SET_LOADING', true)
@@ -56,7 +72,16 @@ export default {
       }
     },
 
-    /** 講義を削除（Firestore + ローカル状態を同時更新） */
+    /**
+     * 講義を削除（Firestore + ローカル状態を同時更新）
+     *
+     * @param {object} root0 - Vuexコンテキスト
+     * @param {import('vuex').Commit} root0.commit - ミューテーションをコミットする関数
+     * @param {object} root0.rootGetters - ルートのゲッター
+     * @param {object} root1 - ペイロード
+     * @param {string} root1.day - 曜日コード
+     * @param {number} root1.period - 時限
+     */
     async removeLecture({ commit, rootGetters }, { day, period }) {
       const uid = rootGetters['auth/userId']
       try {

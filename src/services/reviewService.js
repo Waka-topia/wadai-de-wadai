@@ -1,4 +1,3 @@
-import { db } from '@/firebase/config'
 import {
   collection,
   doc,
@@ -9,8 +8,9 @@ import {
   serverTimestamp,
   setDoc,
 } from 'firebase/firestore'
+import { db } from '@/firebase/config'
 
-/**
+/*
  * 講義ごとのマイクロレビュー（回ごとの楽単度評価）を管理するサービス
  *
  * Firestore のパス:
@@ -29,6 +29,7 @@ const getReviewRef = (nameNormalized, uid) =>
 
 /**
  * レビュー一覧を取得する（新着順）
+ *
  * @param {string} nameNormalized - 正規化された講義名
  * @returns {Promise<Array>} レビューの配列
  */
@@ -41,9 +42,10 @@ export const fetchReviews = async (nameNormalized) => {
 
 /**
  * 既存のレビューを取得（uidが一致するもの）
+ *
  * @param {string} nameNormalized - 正規化された講義名
  * @param {string} uid - ユーザーUID
- * @returns {Promise<Object|null>} レビューデータまたはnull
+ * @returns {Promise<object | null>} レビューデータまたはnull
  */
 export const fetchMyReview = async (nameNormalized, uid) => {
   const snap = await getDoc(getReviewRef(nameNormalized, uid))
@@ -52,9 +54,10 @@ export const fetchMyReview = async (nameNormalized, uid) => {
 
 /**
  * レビューを保存（uidをキーにするので1人1件）
+ *
  * @param {string} nameNormalized - 正規化された講義名
  * @param {string} uid - ユーザーUID
- * @param {{ difficulty: number, comment: string, authorName: string }} data - レビュー内容
+ * @param {{ difficulty: number; comment: string; authorName: string }} data - レビュー内容
  */
 export const saveReview = async (nameNormalized, uid, data) => {
   const ref = getReviewRef(nameNormalized, uid)
@@ -68,7 +71,8 @@ export const saveReview = async (nameNormalized, uid, data) => {
 
 /**
  * 平均難易度スコアを計算する
- * @param {Array<{difficulty: number}>} reviews - レビュー配列
+ *
+ * @param {{ difficulty: number }[]} reviews - レビュー配列
  * @returns {number} 平均スコア（0なら評価なし）
  */
 export const calcAverageDifficulty = (reviews) => {
