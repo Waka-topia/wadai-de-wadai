@@ -16,10 +16,12 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
 import TimetableGrid from '@/components/timetable/TimetableGrid.vue'
 import LectureEditorModal from '@/components/timetable/LectureEditorModal.vue'
 
 const store = useStore()
+const router = useRouter()
 const showModal = ref(false)
 const selectedCell = ref(null)
 
@@ -29,6 +31,11 @@ onMounted(() => {
 })
 
 const handleCellClick = ({ day, period }) => {
+  // 未ログインの場合はログインページへ
+  if (!store.getters['auth/isAuthenticated']) {
+    router.push('/login')
+    return
+  }
   selectedCell.value = { day, period }
   showModal.value = true
 }
