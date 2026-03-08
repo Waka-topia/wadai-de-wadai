@@ -50,11 +50,17 @@ export const searchSuggestions = async (input, maxResults = 8) => {
 
   snapshot.forEach((d) => {
     const data = d.data()
+    const storedNormalized = data.nameNormalized || ''
+
+    // 前方一致（入力がインデックス名の先頭に一致）なら必ず候補に含める
+    const isPrefix = storedNormalized.startsWith(normalized)
+
     const score = calcSimilarityScore(input, data.name)
     const classification = classifyScore(score)
 
-    if (classification !== 'different') {
-      results.push({ name: data.name, count: data.count, score })
+    if (isPrefix || classification !== 'different') {
+      // prefix一致はスコアをboosted（先頭に表示）
+      results.push({ name: data.name, count: data.count, score: isPrefix ? Math.max(score, 0.8) : score })
     }
   })
 
