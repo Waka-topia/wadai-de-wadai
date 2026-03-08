@@ -14,7 +14,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import TimetableGrid from '@/components/timetable/TimetableGrid.vue'
@@ -25,10 +25,18 @@ const router = useRouter()
 const showModal = ref(false)
 const selectedCell = ref(null)
 
-// ページ表示時に Firestore から時間割を取得
-onMounted(() => {
-  store.dispatch('timetable/fetchTimetable')
-})
+const userId = computed(() => store.getters['auth/userId'])
+
+// 認証状態が確定したタイミング、またはページ表示時にデータを取得
+watch(
+  userId,
+  (newId) => {
+    if (newId) {
+      store.dispatch('timetable/fetchTimetable')
+    }
+  },
+  { immediate: true },
+)
 
 const handleCellClick = ({ day, period }) => {
   // 未ログインの場合はログインページへ
