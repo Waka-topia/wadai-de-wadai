@@ -119,7 +119,8 @@ const suggestLoading = ref(false)
 let searchTimer = null
 const onNameSearch = (val) => {
   clearTimeout(searchTimer)
-  if (!val || val.length < 2) {
+  // 1文字から検索開始（文字列以外はスキップ）
+  if (!val || typeof val !== 'string' || val.length < 1) {
     suggestions.value = []
     return
   }
@@ -160,10 +161,13 @@ watch(
 
 const handleSave = () => {
   if (!props.selectedCell || !form.value.name) return
+  // v-combobox はサジェストをオブジェクトとして返すことがあるため文字列に変換
+  const rawName = form.value.name
+  const name = typeof rawName === 'object' && rawName !== null ? rawName.name : rawName
   store.dispatch('timetable/saveLecture', {
     day: props.selectedCell.day,
     period: props.selectedCell.period,
-    lecture: { ...form.value },
+    lecture: { ...form.value, name },
   })
   close()
 }
