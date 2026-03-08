@@ -10,11 +10,13 @@ import shinkanModule from './modules/shinkan'
 import stampModule from './modules/stamp'
 import titleModule from './modules/title'
 import userModule from './modules/user'
+import timetableModule from './modules/timetable'
 
 export default createStore({
   state: {},
   modules: {
     auth: authModule,
+    timetable: timetableModule,
     stamps: {
       namespaced: true,
       ...stampModule,
