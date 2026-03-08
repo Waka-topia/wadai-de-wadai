@@ -9,20 +9,24 @@
     </main>
 
     <!-- 講義登録・編集モーダル -->
-    <LectureEditorModal
-      v-model="showModal"
-      :selected-cell="selectedCell"
-    />
+    <LectureEditorModal v-model="showModal" :selected-cell="selectedCell" />
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useStore } from 'vuex'
 import TimetableGrid from '@/components/timetable/TimetableGrid.vue'
 import LectureEditorModal from '@/components/timetable/LectureEditorModal.vue'
 
+const store = useStore()
 const showModal = ref(false)
 const selectedCell = ref(null)
+
+// ページ表示時に Firestore から時間割を取得
+onMounted(() => {
+  store.dispatch('timetable/fetchTimetable')
+})
 
 const handleCellClick = ({ day, period }) => {
   selectedCell.value = { day, period }
