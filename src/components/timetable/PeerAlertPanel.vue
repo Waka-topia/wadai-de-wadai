@@ -63,7 +63,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, computed } from 'vue'
 import { useStore } from 'vuex'
 import { fetchAlerts, postAlert, deleteAlert } from '@/services/alertService'
 import { normalizeLectureName } from '@/utils/lectureNormalizer'
@@ -80,8 +80,8 @@ const alerts = ref([])
 const isLoading = ref(false)
 const newContent = ref('')
 
-const currentUid = store.getters['auth/userId']
-const currentDisplayName = store.getters['auth/displayName']
+const currentUid = computed(() => store.getters['auth/userId'])
+const currentDisplayName = computed(() => store.getters['auth/displayName'])
 
 const nameNormalized = ref('')
 
@@ -100,8 +100,8 @@ const submitAlert = async () => {
   const content = newContent.value.trim()
   if (!content || !nameNormalized.value) return
   await postAlert(nameNormalized.value, props.lectureName, content, {
-    uid: currentUid,
-    displayName: currentDisplayName,
+    uid: currentUid.value,
+    displayName: currentDisplayName.value,
   })
   newContent.value = ''
   await loadAlerts()

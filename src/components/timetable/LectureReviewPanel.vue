@@ -12,17 +12,8 @@
     <div class="my-review-form">
       <div class="field-label">難易度（1=楽単 / 5=鬼単）</div>
       <div class="stars">
-        <v-btn
-          v-for="n in 5"
-          :key="n"
-          icon
-          variant="text"
-          size="small"
-          @click="myDifficulty = n"
-        >
-          <v-icon :color="n <= myDifficulty ? 'orange' : '#ddd'" size="22">
-            mdi-star
-          </v-icon>
+        <v-btn v-for="n in 5" :key="n" icon variant="text" size="small" @click="myDifficulty = n">
+          <v-icon :color="n <= myDifficulty ? 'orange' : '#ddd'" size="22"> mdi-star </v-icon>
         </v-btn>
       </div>
 
@@ -50,9 +41,7 @@
     <v-divider class="my-3" />
 
     <!-- レビュー一覧 -->
-    <div v-if="reviews.length === 0" class="empty-reviews">
-      まだレビューはありません
-    </div>
+    <div v-if="reviews.length === 0" class="empty-reviews">まだレビューはありません</div>
 
     <div v-else class="review-list">
       <div v-for="review in reviews" :key="review.uid" class="review-item">
@@ -62,7 +51,8 @@
             :key="n"
             size="14"
             :color="n <= review.difficulty ? 'orange' : '#ddd'"
-          >mdi-star</v-icon>
+            >mdi-star</v-icon
+          >
         </div>
         <span class="review-comment">{{ review.comment || '—' }}</span>
         <span class="review-author">{{ review.authorName }}</span>
@@ -95,8 +85,8 @@ const myDifficulty = ref(0)
 const myComment = ref('')
 const hasMyReview = ref(false)
 
-const uid = store.getters['auth/userId']
-const displayName = store.getters['auth/displayName']
+const uid = computed(() => store.getters['auth/userId'])
+const displayName = computed(() => store.getters['auth/displayName'])
 
 const nameNormalized = ref('')
 
@@ -107,11 +97,15 @@ const loadReviews = async () => {
   nameNormalized.value = normalizeLectureName(props.lectureName, { katakana: true })
   reviews.value = await fetchReviews(nameNormalized.value)
 
-  const myReview = await fetchMyReview(nameNormalized.value, uid)
-  if (myReview) {
-    hasMyReview.value = true
-    myDifficulty.value = myReview.difficulty
-    myComment.value = myReview.comment || ''
+  if (uid.value) {
+    const myReview = await fetchMyReview(nameNormalized.value, uid.value)
+    if (myReview) {
+      hasMyReview.value = true
+      myDifficulty.value = myReview.difficulty
+      myComment.value = myReview.comment || ''
+    } else {
+      hasMyReview.value = false
+    }
   }
 }
 
@@ -119,11 +113,11 @@ onMounted(loadReviews)
 watch(() => props.lectureName, loadReviews)
 
 const submitReview = async () => {
-  if (!myDifficulty.value || !nameNormalized.value) return
-  await saveReview(nameNormalized.value, uid, {
+  if (!myDifficulty.value || !nameNormalized.value || !uid.value) return
+  await saveReview(nameNormalized.value, uid.value, {
     difficulty: myDifficulty.value,
     comment: myComment.value.trim(),
-    authorName: displayName || '名無し',
+    authorName: displayName.value || '名無し',
   })
   hasMyReview.value = true
   await loadReviews()
