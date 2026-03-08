@@ -1,8 +1,8 @@
+import * as lectureService from '@/services/lectureService'
+
 export default {
   namespaced: true,
   state: () => ({
-    // ユーザーの時間割データ
-    // key: "day-period" (ex: "mon-1"), value: lecture object
     userTimetable: {},
     isLoading: false,
     error: null,
@@ -25,16 +25,47 @@ export default {
     },
   },
   actions: {
-    // 将来的に Firestore との連携ロジックをここに追加
-    async saveLecture({ commit }, payload) {
+    /** ログイン後に呼び出してFirestoreから時間割を取得 */
+    async fetchTimetable({ commit, rootGetters }) {
+      const uid = rootGetters['auth/userId']
+      if (!uid) return
       commit('SET_LOADING', true)
       try {
-        // 仮の実装（現在はローカルのみ）
-        commit('SET_LECTURE', payload)
+        const timetable = await lectureService.fetchTimetable(uid)
+        commit('SET_TIMETABLE', timetable)
       } catch (e) {
         commit('SET_ERROR', e.message)
       } finally {
         commit('SET_LOADING', false)
+      }
+    },
+
+    /** 講義を保存（Firestore + ローカル状態を同時更新） */
+    async saveLecture({ commit, rootGetters }, { day, period, lecture }) {
+      const uid = rootGetters['auth/userId']
+      commit('SET_LOADING', true)
+      try {
+        if (uid) {
+          await lectureService.saveLecture(uid, day, period, lecture)
+        }
+        commit('SET_LECTURE', { day, period, lecture })
+      } catch (e) {
+        commit('SET_ERROR', e.message)
+      } finally {
+        commit('SET_LOADING', false)
+      }
+    },
+
+    /** 講義を削除（Firestore + ローカル状態を同時更新） */
+    async removeLecture({ commit, rootGetters }, { day, period }) {
+      const uid = rootGetters['auth/userId']
+      try {
+        if (uid) {
+          await lectureService.deleteLecture(uid, day, period)
+        }
+        commit('REMOVE_LECTURE', { day, period })
+      } catch (e) {
+        commit('SET_ERROR', e.message)
       }
     },
   },
@@ -43,5 +74,6 @@ export default {
       return state.userTimetable[`${day}-${period}`] || null
     },
     fullTimetable: (state) => state.userTimetable,
+    isLoading: (state) => state.isLoading,
   },
 }
