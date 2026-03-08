@@ -42,66 +42,63 @@
 
       <div class="mx-5 my-4 border rounded-lg overflow-hidden">
         <div class="d-flex align-stretch">
-          <div class="d-flex align-center pa-2" style="width: 100px;">
-            <v-chip label size="small" color="grey-darken-4" class="font-weight-bold border">勤務地</v-chip>
+          <div class="d-flex align-center pa-2" style="width: 100px">
+            <v-chip label size="small" color="grey-darken-4" class="font-weight-bold border"
+              >勤務地</v-chip
+            >
           </div>
           <div class="pa-3 d-flex align-center border-l">{{ job.location }}</div>
         </div>
         <v-divider />
         <div class="d-flex align-stretch">
-          <div class="d-flex align-center pa-2" style="width: 100px;">
-            <v-chip label size="small" color="grey-darken-4" class="font-weight-bold border">給与</v-chip>
+          <div class="d-flex align-center pa-2" style="width: 100px">
+            <v-chip label size="small" color="grey-darken-4" class="font-weight-bold border"
+              >給与</v-chip
+            >
           </div>
           <div class="pa-3 d-flex align-center border-l">
-            {{ job.salaryType }} {{ job.salaryMin?.toLocaleString() }}円 〜 {{ job.salaryMax?.toLocaleString() }}円
+            {{ job.salaryType }} {{ job.salaryMin?.toLocaleString() }}円 〜
+            {{ job.salaryMax?.toLocaleString() }}円
           </div>
         </div>
         <v-divider />
         <div class="d-flex align-stretch">
-          <div class="d-flex align-center pa-2" style="width: 100px;">
-            <v-chip label size="small" color="grey-darken-4" class="font-weight-bold border">勤務時間</v-chip>
+          <div class="d-flex align-center pa-2" style="width: 100px">
+            <v-chip label size="small" color="grey-darken-4" class="font-weight-bold border"
+              >勤務時間</v-chip
+            >
           </div>
-          <div class="pa-3 d-flex align-center border-l">{{ job.startTime }} ~ {{ job.endTime }}</div>
+          <div class="pa-3 d-flex align-center border-l">
+            {{ job.startTime }} ~ {{ job.endTime }}
+          </div>
         </div>
       </div>
 
-      <div class="mx-5 my-4 rounded-lg text-black font-weight-bold text-wrap px-6 py-4 bg-grey-lighten-2">
+      <div
+        class="mx-5 my-4 rounded-lg text-black font-weight-bold text-wrap px-6 py-4 bg-grey-lighten-2"
+      >
         {{ job.description }}
       </div>
 
-      <div class="text-black text-h5 font-weight-bold text-wrap px-6 py-4">
-        基本情報
-      </div>
+      <div class="text-black text-h5 font-weight-bold text-wrap px-6 py-4">基本情報</div>
 
-      <div class="text-black text-h6 font-weight-bold text-wrap px-6 py-4">
-        仕事内容
-      </div>
+      <div class="text-black text-h6 font-weight-bold text-wrap px-6 py-4">仕事内容</div>
       <div class="px-6 py-4">
         {{ job.jobDuties }}
       </div>
 
-      <div class="text-h9 font-weight-bold text-wrap px-6 py-4">
-        【仕事内容】
-      </div>
+      <div class="text-h9 font-weight-bold text-wrap px-6 py-4">【仕事内容】</div>
       <div class="px-6 py-4">
         {{ job.jobDuties }}
       </div>
 
-      <div class="text-black text-h6 font-weight-bold text-wrap px-6 py-4">
-        勤務地・面接場所
-      </div>
+      <div class="text-black text-h6 font-weight-bold text-wrap px-6 py-4">勤務地・面接場所</div>
 
-      <div class="text-black text-h6 font-weight-bold text-wrap px-6 py-4">
-        勤務日数
-      </div>
+      <div class="text-black text-h6 font-weight-bold text-wrap px-6 py-4">勤務日数</div>
 
-      <div class="text-black text-h6 font-weight-bold text-wrap px-6 py-4">
-        勤務時間
-      </div>
+      <div class="text-black text-h6 font-weight-bold text-wrap px-6 py-4">勤務時間</div>
 
-      <div class="text-black text-h6 font-weight-bold text-wrap px-6 py-4">
-        休日休暇
-      </div>
+      <div class="text-black text-h6 font-weight-bold text-wrap px-6 py-4">休日休暇</div>
 
       <v-btn
         color="orange"
@@ -112,7 +109,7 @@
         max-width="300"
         rounded="pill"
         class="text-white font-weight-bold position-fixed"
-        style="z-index: 10; left: 50%; transform: translateX(-50%); bottom: calc(10% + 24px);"
+        style="z-index: 10; left: 50%; transform: translateX(-50%); bottom: calc(10% + 24px)"
       >
         応募する
       </v-btn>
