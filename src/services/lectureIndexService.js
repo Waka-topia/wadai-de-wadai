@@ -29,7 +29,7 @@ const INDEX_COL = 'lecture_index'
  *
  * @param {string} input - ユーザーの入力文字列
  * @param {number} maxResults - 最大件数
- * @returns {Promise<{ name: string; count: number }[]>}
+ * @returns {Promise<{ name: string; count: number }[]>} サジェスト候補の配列（スコア降順）
  */
 export const searchSuggestions = async (input, maxResults = 8) => {
   if (!input || input.trim().length < 1) return []
