@@ -1,6 +1,7 @@
 import { collection, deleteDoc, doc, getDoc, getDocs, setDoc } from 'firebase/firestore'
 import { db } from '@/firebase/config'
 import { normalizeLectureName } from '@/utils/lectureNormalizer'
+import { incrementLectureIndex } from '@/services/lectureIndexService'
 
 /**
  * ユーザーの時間割データを Firestore で管理するサービス
@@ -24,14 +25,21 @@ export const fetchTimetable = async (uid) => {
 /** 1コマ分の講義を保存する（新規 or 上書き）*/
 export const saveLecture = async (uid, day, period, lectureData) => {
   const ref = getLectureRef(uid, day, period)
+  const nameNormalized = normalizeLectureName(lectureData.name || '', { katakana: true })
+
   await setDoc(ref, {
     ...lectureData,
-    // 正規化された講義名を別フィールドで保存（名寄せ用）
-    nameNormalized: normalizeLectureName(lectureData.name || '', { katakana: true }),
+    nameNormalized,
     day,
     period,
     updatedAt: new Date().toISOString(),
   })
+
+  // グローバルインデックスにも登録（名寄せ・サジェスト用）
+  // エラーが出ても本体の保存には影響させない
+  incrementLectureIndex(lectureData.name, nameNormalized).catch((e) =>
+    console.warn('[lectureService] index update failed:', e),
+  )
 }
 
 /** 1コマ分の講義を削除する */

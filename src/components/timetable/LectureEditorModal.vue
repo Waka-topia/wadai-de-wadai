@@ -9,16 +9,33 @@
       </v-card-title>
 
       <v-card-text class="modal-body">
-        <!-- 講義名 -->
+        <!-- 講義名（サジェスト付き） -->
         <div class="field-label">講義名 <span class="required">*</span></div>
-        <v-text-field
+        <v-autocomplete
           v-model="form.name"
+          :items="suggestions"
+          :loading="suggestLoading"
+          item-title="name"
+          item-value="name"
           variant="outlined"
           placeholder="例：基礎プログラミング"
           density="compact"
-          :rules="[v => !!v || '講義名を入力してください']"
+          no-filter
+          hide-no-data
+          :rules="[(v) => !!v || '講義名を入力してください']"
           class="mb-3"
-        />
+          @update:search="onNameSearch"
+        >
+          <template #item="{ item, props: itemProps }">
+            <v-list-item v-bind="itemProps">
+              <template #append>
+                <v-chip size="x-small" color="orange" variant="tonal">
+                  {{ item.raw.count }}人登録済
+                </v-chip>
+              </template>
+            </v-list-item>
+          </template>
+        </v-autocomplete>
 
         <!-- 担当教員 -->
         <div class="field-label">担当教員</div>
@@ -53,22 +70,10 @@
       </v-card-text>
 
       <v-card-actions class="modal-actions">
-        <v-btn
-          v-if="isEditing"
-          variant="text"
-          color="error"
-          @click="handleDelete"
-        >
-          削除
-        </v-btn>
+        <v-btn v-if="isEditing" variant="text" color="error" @click="handleDelete"> 削除 </v-btn>
         <v-spacer />
         <v-btn variant="text" @click="close">キャンセル</v-btn>
-        <v-btn
-          color="orange"
-          variant="flat"
-          :disabled="!form.name"
-          @click="handleSave"
-        >
+        <v-btn color="orange" variant="flat" :disabled="!form.name" @click="handleSave">
           保存
         </v-btn>
       </v-card-actions>
@@ -79,6 +84,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { useStore } from 'vuex'
+import { searchSuggestions } from '@/services/lectureIndexService'
 
 const props = defineProps({
   modelValue: Boolean,
@@ -98,6 +104,22 @@ const dialog = computed({
 })
 
 const form = ref({ name: '', teacher: '', room: '', memo: '' })
+const suggestions = ref([])
+const suggestLoading = ref(false)
+
+let searchTimer = null
+const onNameSearch = (val) => {
+  clearTimeout(searchTimer)
+  if (!val || val.length < 2) {
+    suggestions.value = []
+    return
+  }
+  suggestLoading.value = true
+  searchTimer = setTimeout(async () => {
+    suggestions.value = await searchSuggestions(val)
+    suggestLoading.value = false
+  }, 300)
+}
 
 // 既存の講義があれば編集モード
 const isEditing = computed(() => {
@@ -117,7 +139,12 @@ watch(
     if (!cell) return
     const existing = store.getters['timetable/getLecture'](cell.day, cell.period)
     form.value = existing
-      ? { name: existing.name, teacher: existing.teacher || '', room: existing.room || '', memo: existing.memo || '' }
+      ? {
+          name: existing.name,
+          teacher: existing.teacher || '',
+          room: existing.room || '',
+          memo: existing.memo || '',
+        }
       : { name: '', teacher: '', room: '', memo: '' }
   },
 )
