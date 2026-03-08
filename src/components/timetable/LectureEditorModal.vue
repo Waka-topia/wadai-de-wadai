@@ -11,7 +11,7 @@
       <v-card-text class="modal-body">
         <!-- 講義名（サジェスト付き） -->
         <div class="field-label">講義名 <span class="required">*</span></div>
-        <v-autocomplete
+        <v-combobox
           v-model="form.name"
           :items="suggestions"
           :loading="suggestLoading"
@@ -22,6 +22,7 @@
           density="compact"
           no-filter
           hide-no-data
+          persistent-placeholder
           :rules="[(v) => !!v || '講義名を入力してください']"
           class="mb-3"
           @update:search="onNameSearch"
@@ -35,7 +36,7 @@
               </template>
             </v-list-item>
           </template>
-        </v-autocomplete>
+        </v-combobox>
 
         <!-- 担当教員 -->
         <div class="field-label">担当教員</div>
