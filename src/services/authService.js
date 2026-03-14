@@ -32,6 +32,36 @@ export async function getPhotoURL(userId) {
   }
 }
 
+// Firestore から bookmarkedJobIds を取得する関数
+export async function getBookmarkedJobIds(userId) {
+  try {
+    const docRef = doc(db, `users/${userId}`)
+    const docSnap = await getDoc(docRef)
+
+    if (docSnap.exists()) {
+      const data = docSnap.data()
+      return data.bookmarkedJobIds || [] // 配列を返す（存在しない場合は空配列）
+    } else {
+      return []
+    }
+  } catch (error) {
+    console.error('Error getting bookmarked jobs: ', error)
+    throw error
+  }
+}
+
+// Firestore に bookmarkedJobIds を保存・更新する関数
+export async function updateBookmarkedJobIds(userId, bookmarkedJobIds) {
+  try {
+    const docRef = doc(db, `users/${userId}`)
+    // merge: true にすることで、photoURLなどの他のユーザーデータを上書き消去せずに済む
+    await setDoc(docRef, { bookmarkedJobIds }, { merge: true })
+  } catch (error) {
+    console.error('Error updating bookmarked jobs: ', error)
+    throw error
+  }
+}
+
 export default {
   onAuthStateChanged(callback) {
     return onAuthStateChanged(auth, async (user) => {

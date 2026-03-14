@@ -1,15 +1,30 @@
 <template>
   <div>
-    <v-tabs v-model:model-value="tab" color="orange" bg-color="white" grow>
-      <v-tab
-        v-for="sortOption in sortOptions"
-        :key="sortOption.value"
-        :value="sortOption.value"
-        class="font-weight-bold"
+    <div class="d-flex align-center bg-white rounded-t">
+      <v-btn
+        icon
+        variant="text"
+        :color="showBookmarkedOnly ? 'orange' : 'grey-lighten-1'"
+        class="ml-2"
+        @click="toggleShowBookmarkedOnly"
       >
-        {{ sortOption.label }}
-      </v-tab>
-    </v-tabs>
+        <v-icon size="28">{{ showBookmarkedOnly ? 'mdi-star' : 'mdi-star-outline' }}</v-icon>
+      </v-btn>
+
+      <v-divider vertical class="mx-2 my-2"></v-divider>
+
+      <v-tabs v-model:model-value="tab" color="orange" bg-color="transparent" grow>
+        <v-tab
+          v-for="sortOption in sortOptions"
+          :key="sortOption.value"
+          :value="sortOption.value"
+          class="font-weight-bold"
+        >
+          {{ sortOption.label }}
+        </v-tab>
+      </v-tabs>
+    </div>
+
     <v-tabs-window
       v-for="sortOption in sortOptions"
       v-model:model-value="tab"
@@ -28,10 +43,18 @@ import { useStore } from 'vuex'
 import RecruitJobCard from './RecruitJobCard.vue'
 
 const store = useStore()
+
 const tab = computed({
   get: () => store.state.jobs.sortKey,
   set: (value) => store.commit('setSortKey', value),
 })
+
+// ブックマーク済みのみに絞り込み
+const showBookmarkedOnly = computed(() => store.state.jobs.showBookmarkedOnly)
+const toggleShowBookmarkedOnly = () => {
+  store.commit('setShowBookmarkedOnly', !showBookmarkedOnly.value)
+}
+
 const sortedJobs = computed(() => store.getters.sortedJobs)
 
 onMounted(() => {

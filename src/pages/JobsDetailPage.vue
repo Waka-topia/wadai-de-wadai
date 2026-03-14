@@ -22,10 +22,15 @@
         class="align-end"
         transition="false"
       >
-        <v-sheet color="rgba(255, 255, 255, 0.5)">
-          <v-card-title class="text-black text-h5 font-weight-bold">
+        <v-sheet
+          color="rgba(255, 255, 255, 0.7)"
+          class="d-flex justify-space-between align-center px-4 py-2"
+        >
+          <v-card-title class="text-black text-h5 font-weight-bold text-truncate">
             {{ job.title }}
           </v-card-title>
+
+          <BookMarkButton :job-id="job.id" :is-bookmarked="!!job.isBookmarked" />
         </v-sheet>
       </v-img>
 
@@ -52,16 +57,17 @@
         </div>
       </v-card-text>
 
-      <v-card-actions class="px-6 pb-6">
+      <v-card-actions class="px-6 pb-6 w-100">
         <v-btn
           color="orange"
           variant="elevated"
           size="large"
-          block
-          class="text-white font-weight-bold"
+          class="text-white font-weight-bold flex-grow-1 mr-4"
         >
           この求人に応募する
         </v-btn>
+
+        <BookMarkButton :job-id="job.id" :is-bookmarked="!!job.isBookmarked" />
       </v-card-actions>
     </v-card>
   </v-container>
@@ -71,13 +77,15 @@
 import { computed, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { useRoute } from 'vue-router'
+import BookMarkButton from '@/components/recruit/BookMarkButton.vue'
 
 const route = useRoute()
 const store = useStore()
 
 const jobId = Number(route.params.id)
 
-const job = computed(() => store.state.jobs.currentJob)
+const job = computed(() => store.getters.currentJobWithBookmark) 
+
 const error = computed(() => store.state.jobs.error)
 
 onMounted(() => {
