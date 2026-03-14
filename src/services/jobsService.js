@@ -1,6 +1,5 @@
 export const getJobs = async () => {
   try {
-    // 一時的にハードコーディングされた求人データを返す
     const jobList = [
       {
         id: 1,
@@ -8,6 +7,8 @@ export const getJobs = async () => {
         companyName: '〇〇株式会社',
         title: '【週1日〜/1日3h〜】サークルや授業との両立100%可能！急な予定変更も相談に乗ります！',
         location: '和歌山市 / 南海和歌山市駅（徒歩5分）',
+        lat: 34.233512, // 緯度
+        lng: 135.167814, // 経度
         salaryType: '時給',
         salaryMin: 1050,
         salaryMax: 1150,
@@ -16,6 +17,7 @@ export const getJobs = async () => {
         endTime: '22:00',
         jobDuties: 'ホール業務・キッチン業務',
         createdAt: '2025-01-15',
+        description: 'ここに長い文章を入れる',
       },
       {
         id: 2,
@@ -23,6 +25,8 @@ export const getJobs = async () => {
         companyName: '△△カフェ',
         title: '【駅チカ】おしゃれカフェスタッフ募集！未経験歓迎',
         location: '和歌山市 / 和歌山駅（徒歩3分）',
+        lat: 34.232333,
+        lng: 135.191544,
         salaryType: '時給',
         salaryMin: 1000,
         salaryMax: 1200,
@@ -31,6 +35,7 @@ export const getJobs = async () => {
         endTime: '20:00',
         jobDuties: 'カフェスタッフ',
         createdAt: '2025-01-20',
+        description: 'ここに長い文章を入れる',
       },
       {
         id: 3,
@@ -38,6 +43,8 @@ export const getJobs = async () => {
         companyName: '□□学習塾',
         title: '【高時給】大学生歓迎！個別指導の塾講師',
         location: '和歌山市 / 紀三井寺駅（徒歩10分）',
+        lat: 34.185623,
+        lng: 135.188734,
         salaryType: '時給',
         salaryMin: 1300,
         salaryMax: 1800,
@@ -46,6 +53,8 @@ export const getJobs = async () => {
         endTime: '21:00',
         jobDuties: '個別指導講師',
         createdAt: '2025-01-10',
+        description:
+          'ここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れる',
       },
     ]
     return jobList
