@@ -84,7 +84,7 @@ const store = useStore()
 
 const jobId = Number(route.params.id)
 
-const job = computed(() => store.getters.currentJobWithBookmark) 
+const job = computed(() => store.getters.currentJobWithBookmark)
 
 const error = computed(() => store.state.jobs.error)
 
