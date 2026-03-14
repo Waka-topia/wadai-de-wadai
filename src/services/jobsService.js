@@ -1,5 +1,6 @@
 export const getJobs = async () => {
   try {
+    // 一時的にハードコーディングされた求人データを返す
     const jobList = [
       {
         id: 1,
