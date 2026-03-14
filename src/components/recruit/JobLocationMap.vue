@@ -5,15 +5,6 @@
         <v-icon color="orange" class="mr-2">mdi-map-marker-radius</v-icon>
         <span class="font-weight-bold">勤務地マップ</span>
       </div>
-      <a
-        :href="googleMapsUrl"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="text-decoration-none text-orange d-flex align-center text-body-2"
-      >
-        Google Mapsで経路を見る
-        <v-icon size="small">mdi-open-in-new</v-icon>
-      </a>
     </div>
 
     <v-card
@@ -26,6 +17,11 @@
       <div ref="mapContainer" class="map-preview-wrapper" />
 
       <div class="map-overlay d-flex align-center justify-center"></div>
+
+      <div class="map-action-chip">
+        Google Mapsで開く
+        <v-icon size="small" class="ml-1">mdi-open-in-new</v-icon>
+      </div>
     </v-card>
   </div>
 </template>
@@ -54,7 +50,6 @@ const mapContainer = ref(null)
 const map = ref(null)
 const apiKey = import.meta.env.VITE_MAPTILER_API_KEY
 
-// Google Mapsの経路検索（目的地）URLを生成
 const googleMapsUrl = computed(() => {
   // destination に緯度経度を指定してルート検索モードにする
   return `https://www.google.com/maps/dir/?api=1&destination=${props.lat},${props.lng}`
@@ -73,12 +68,11 @@ onMounted(() => {
       style: `https://api.maptiler.com/maps/basic-v2/style.json?key=${apiKey}`,
       center: [props.lng, props.lat],
       zoom: 15,
-      interactive: false, // ★追加: マップの操作（ズーム・パン等）を完全に無効化
+      interactive: false,
       attributionControl: false,
     }),
   )
 
-  // マーカーを追加（オレンジ色にカスタマイズ）
   new maplibregl.Marker({ color: '#FF9800' }).setLngLat([props.lng, props.lat]).addTo(map.value)
 })
 
@@ -103,12 +97,29 @@ onUnmounted(() => {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.02); /* ほんの少しだけ暗くする */
-  pointer-events: auto; /* オーバーレイ側でクリックイベントを受け取る */
+  background-color: rgba(0, 0, 0, 0.02);
+  pointer-events: auto;
   transition: background-color 0.2s;
 }
 
 .map-overlay:hover {
-  background-color: rgba(0, 0, 0, 0.08); /* ホバー時に少し暗くして押せる感を出す */
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+.map-action-chip {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background-color: #ffffff;
+  color: orange;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  z-index: 2;
+  pointer-events: none;
 }
 </style>
