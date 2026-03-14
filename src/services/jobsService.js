@@ -1,3 +1,6 @@
+import { doc, getDoc, setDoc } from 'firebase/firestore'
+import { db } from '@/firebase/config'
+
 export const getJobs = async () => {
   try {
     // 一時的にハードコーディングされた求人データを返す
@@ -51,6 +54,47 @@ export const getJobs = async () => {
     return jobList
   } catch (error) {
     throw new Error(`求人情報の取得に失敗しました: ${error.message}`)
+  }
+}
+
+/**
+ * Firestore から bookmarkedJobIds を取得する関数
+ *
+ * @param {string} userId - ユーザーID
+ * @returns {Promise<Array>} ブックマークされた求人IDの配列
+ */
+export async function getBookmarkedJobIds(userId) {
+  try {
+    const docRef = doc(db, `users/${userId}`)
+    const docSnap = await getDoc(docRef)
+
+    if (docSnap.exists()) {
+      const data = docSnap.data()
+      return data.bookmarkedJobIds || [] // 配列を返す（存在しない場合は空配列）
+    } else {
+      return []
+    }
+  } catch (error) {
+    console.error('Error getting bookmarked jobs: ', error)
+    throw error
+  }
+}
+
+/**
+ * Firestore に bookmarkedJobIds を保存・更新する関数
+ *
+ * @param {string} userId - ユーザーID
+ * @param {Array} bookmarkedJobIds - ブックマークされた求人IDの配列
+ * @returns {Promise<void>}
+ */
+export async function updateBookmarkedJobIds(userId, bookmarkedJobIds) {
+  try {
+    const docRef = doc(db, `users/${userId}`)
+    // merge: true にすることで、photoURLなどの他のユーザーデータを上書き消去せずに済む
+    await setDoc(docRef, { bookmarkedJobIds }, { merge: true })
+  } catch (error) {
+    console.error('Error updating bookmarked jobs: ', error)
+    throw error
   }
 }
 

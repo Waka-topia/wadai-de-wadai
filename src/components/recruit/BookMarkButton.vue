@@ -1,5 +1,6 @@
 <template>
   <v-btn
+    v-if="isAuthenticated"
     icon
     :variant="isBookmarked ? 'flat' : 'elevated'"
     :color="isBookmarked ? 'orange-lighten-5' : 'white'"
@@ -14,14 +15,14 @@
   <v-snackbar v-model="snackbar" :timeout="2000" location="bottom">
     {{ snackbarMessage }}
 
-    <template v-slot:actions>
+    <template #actions>
       <v-btn color="orange" variant="text" @click="snackbar = false"> 閉じる </v-btn>
     </template>
   </v-snackbar>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useStore } from 'vuex'
 
 const props = defineProps({
@@ -36,6 +37,9 @@ const props = defineProps({
 })
 
 const store = useStore()
+
+// authモジュールからuserIdが存在するかどうか判定
+const isAuthenticated = computed(() => !!store.state.auth?.userId)
 
 const snackbar = ref(false)
 const snackbarMessage = ref('')

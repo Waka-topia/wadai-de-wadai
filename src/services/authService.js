@@ -9,8 +9,12 @@ import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { auth, db } from '@/firebase/config'
 import store from '@/store'
 
-// Firestore から photoURL を取得する関数
-/** @param {string} userId */
+/**
+ * Firestore から photoURL を取得する関数
+ *
+ * @param {string} userId - ユーザーID
+ * @returns {Promise<string | null>} PhotoURL（存在しない場合は null）
+ */
 export async function getPhotoURL(userId) {
   try {
     // Firestore の正しいドキュメント参照を作成
@@ -32,37 +36,13 @@ export async function getPhotoURL(userId) {
   }
 }
 
-// Firestore から bookmarkedJobIds を取得する関数
-export async function getBookmarkedJobIds(userId) {
-  try {
-    const docRef = doc(db, `users/${userId}`)
-    const docSnap = await getDoc(docRef)
-
-    if (docSnap.exists()) {
-      const data = docSnap.data()
-      return data.bookmarkedJobIds || [] // 配列を返す（存在しない場合は空配列）
-    } else {
-      return []
-    }
-  } catch (error) {
-    console.error('Error getting bookmarked jobs: ', error)
-    throw error
-  }
-}
-
-// Firestore に bookmarkedJobIds を保存・更新する関数
-export async function updateBookmarkedJobIds(userId, bookmarkedJobIds) {
-  try {
-    const docRef = doc(db, `users/${userId}`)
-    // merge: true にすることで、photoURLなどの他のユーザーデータを上書き消去せずに済む
-    await setDoc(docRef, { bookmarkedJobIds }, { merge: true })
-  } catch (error) {
-    console.error('Error updating bookmarked jobs: ', error)
-    throw error
-  }
-}
-
 export default {
+  /**
+   * 認証状態の変更を監視する
+   *
+   * @param {function(object|null): void} [callback] - 状態変更時に呼び出されるコールバック関数
+   * @returns {function(): void} 監視を解除するための unsubscribe 関数
+   */
   onAuthStateChanged(callback) {
     return onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -77,6 +57,14 @@ export default {
     })
   },
 
+  /**
+   * ログイン処理
+   *
+   * @param {object} params - ログイン情報
+   * @param {string} params.email - メールアドレス
+   * @param {string} params.password - パスワード
+   * @returns {Promise<object>} ログインしたユーザー情報 (User)
+   */
   async login({ email, password }) {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password)
@@ -97,6 +85,15 @@ export default {
     }
   },
 
+  /**
+   * ユーザーの新規登録（サインアップ）処理
+   *
+   * @param {object} params - 登録情報
+   * @param {string} params.email - メールアドレス
+   * @param {string} params.password - パスワード
+   * @param {string} params.username - ユーザー名 (displayName)
+   * @returns {Promise<object>} 登録されたユーザー情報 (User)
+   */
   async signup({ email, password, username }) {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password)
@@ -123,6 +120,11 @@ export default {
     }
   },
 
+  /**
+   * ログアウト処理
+   *
+   * @returns {Promise<void>}
+   */
   async logout() {
     try {
       await signOut(auth)
@@ -137,7 +139,13 @@ export default {
     }
   },
 
-  // 画像URLの更新処理
+  /**
+   * 画像URLの更新処理 (Authentication と Firestore の両方を更新)
+   *
+   * @param {object} user - Firebase Authentication のユーザーオブジェクト
+   * @param {string} photoURL - 新しい画像のURL
+   * @returns {Promise<void>}
+   */
   async updatePhotoURL(user, photoURL) {
     try {
       // Firebase Authentication のプロフィール情報を更新

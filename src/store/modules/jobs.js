@@ -1,10 +1,14 @@
-import { getBookmarkedJobIds, updateBookmarkedJobIds } from '@/services/authService'
-import { getJobById, getJobs } from '@/services/jobsService'
+import {
+  getBookmarkedJobIds,
+  getJobById,
+  getJobs,
+  updateBookmarkedJobIds,
+} from '@/services/jobsService'
 
 const state = () => ({
   jobs: [],
   currentJob: null,
-  sortKey: 'recommended',
+  sortKey: 'newest',
   showBookmarkedOnly: false,
   bookmarkedIds: [], // ブックマークされた求人のIDを格納した配列
   error: null,
@@ -46,13 +50,12 @@ const getters = {
       jobs = jobs.filter((job) => job.isBookmarked)
     }
 
-    if (state.sortKey === 'newest') {
-      return jobs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-    }
+    // 時給順でソート（最大給与の高い順）
     if (state.sortKey === 'highSalary') {
       return jobs.sort((a, b) => b.salaryMax - a.salaryMax)
     }
-    return jobs
+    // デフォルト時，新着順（作成日時の若い順）でソートする
+    return jobs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
   },
   currentJobWithBookmark(state) {
     if (!state.currentJob) return null
@@ -100,12 +103,13 @@ const actions = {
   async toggleJobBookmark({ commit, state, rootState }, jobId) {
     const userId = rootState.auth?.userId
 
+    // 未ログイン時は何もさせないようにする
     if (!userId) {
-      alert('お気に入りを登録するにはログインが必要です。')
       return
     }
 
-    let newIds = [...state.bookmarkedIds]
+    const originalIds = [...state.bookmarkedIds]
+    let newIds = [...originalIds]
     const index = newIds.indexOf(jobId)
 
     if (index === -1) {
@@ -119,7 +123,8 @@ const actions = {
     try {
       await updateBookmarkedJobIds(userId, newIds)
     } catch (error) {
-      console.error('お気に入りの保存に失敗しました:', error)
+      console.error('Error updating bookmark:', error)
+      commit('setBookmarkedIds', originalIds)
     }
   },
 }

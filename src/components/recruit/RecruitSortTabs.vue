@@ -49,7 +49,6 @@ const tab = computed({
   set: (value) => store.commit('setSortKey', value),
 })
 
-// ブックマーク済みのみに絞り込み
 const showBookmarkedOnly = computed(() => store.state.jobs.showBookmarkedOnly)
 const toggleShowBookmarkedOnly = () => {
   store.commit('setShowBookmarkedOnly', !showBookmarkedOnly.value)
@@ -62,7 +61,6 @@ onMounted(() => {
 })
 
 const sortOptions = [
-  { value: 'recommended', label: 'おすすめ順' },
   { value: 'newest', label: '新着順' },
   { value: 'highSalary', label: '時給の高い順' },
 ]
