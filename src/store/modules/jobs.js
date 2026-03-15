@@ -54,7 +54,7 @@ const getters = {
     if (state.sortKey === 'highSalary') {
       return jobs.sort((a, b) => b.salaryMax - a.salaryMax)
     }
-    // デフォルト時，新着順（作成日時の若い順）でソートする
+    // デフォルト時，新着順でソート（作成日時の若い順）
     return jobs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
   },
   currentJobWithBookmark(state) {
@@ -66,65 +66,63 @@ const getters = {
   },
 }
 
+const createToggledBookmarkIds = (bookmarkedIds, jobId) => {
+  const hasBookmark = bookmarkedIds.includes(jobId)
+
+  if (hasBookmark) {
+    return bookmarkedIds.filter((id) => id !== jobId)
+  }
+
+  return [...bookmarkedIds, jobId]
+}
+
 const actions = {
-  async fetchJobs({ commit, rootState }) {
+  async fetchJobs({ commit }) {
     try {
       commit('setError', null)
       const jobs = await getJobs()
       commit('setJobs', jobs)
-
-      // ブックマークID配列も取得してセットする
-      const userId = rootState.auth?.userId
-      if (userId) {
-        const ids = await getBookmarkedJobIds(userId)
-        commit('setBookmarkedIds', ids)
-      }
     } catch (error) {
       commit('setError', error.message)
     }
   },
 
-  async fetchJobById({ commit, rootState }, jobId) {
+  async fetchJobById({ commit }, jobId) {
     try {
       commit('setError', null)
       const job = await getJobById(jobId)
       commit('setCurrentJob', job)
-
-      const userId = rootState.auth?.userId
-      if (userId && rootState.jobs.bookmarkedIds.length === 0) {
-        const ids = await getBookmarkedJobIds(userId)
-        commit('setBookmarkedIds', ids)
-      }
     } catch (error) {
       commit('setError', error.message)
+    }
+  },
+
+  async applyUserBookmarks({ commit, rootState }) {
+    const userId = rootState.auth?.userId
+    if (userId) {
+      try {
+        const ids = await getBookmarkedJobIds(userId)
+        commit('setBookmarkedIds', ids)
+      } catch (error) {
+        console.error('Error fetching bookmarked jobs:', error)
+      }
     }
   },
 
   async toggleJobBookmark({ commit, state, rootState }, jobId) {
     const userId = rootState.auth?.userId
+    if (!userId) return
 
-    // 未ログイン時は何もさせないようにする
-    if (!userId) {
-      return
-    }
+    const previousBookmarkIds = [...state.bookmarkedIds]
+    const nextBookmarkIds = createToggledBookmarkIds(previousBookmarkIds, jobId)
 
-    const originalIds = [...state.bookmarkedIds]
-    let newIds = [...originalIds]
-    const index = newIds.indexOf(jobId)
-
-    if (index === -1) {
-      newIds.push(jobId)
-    } else {
-      newIds.splice(index, 1)
-    }
-
-    commit('setBookmarkedIds', newIds)
+    commit('setBookmarkedIds', nextBookmarkIds)
 
     try {
-      await updateBookmarkedJobIds(userId, newIds)
+      await updateBookmarkedJobIds(userId, nextBookmarkIds)
     } catch (error) {
       console.error('Error updating bookmark:', error)
-      commit('setBookmarkedIds', originalIds)
+      commit('setBookmarkedIds', previousBookmarkIds)
     }
   },
 }
