@@ -213,7 +213,6 @@ export default {
     }
   },
 
-
   /**
    * 画像URLの更新処理 (Authentication と Firestore の両方を更新)
    *
