@@ -35,6 +35,19 @@
           <div class="text-subtitle-1 text-grey-darken-1">{{ job.companyName }}</div>
         </div>
 
+        <div v-if="job.tags && job.tags.length" class="mb-4">
+          <v-chip
+            v-for="tag in job.tags"
+            :key="tag"
+            class="mr-2 mb-2"
+            color="orange"
+            variant="outlined"
+            size="small"
+          >
+            #{{ tag }}
+          </v-chip>
+        </div>
+
         <v-divider class="mb-4"></v-divider>
 
         <div class="text-body-1 mb-3">
@@ -49,6 +62,20 @@
         <div class="text-body-1 mt-4">
           <strong>業務内容:</strong><br />
           <p class="mt-2 text-grey-darken-3">{{ job.jobDuties }}</p>
+        </div>
+
+        <v-divider class="my-4"></v-divider>
+
+        <div class="text-h6 font-weight-bold mb-3">シフト情報</div>
+
+        <div class="text-body-1 mb-3">
+          <v-icon color="orange" class="mr-2">mdi-clock-outline</v-icon>
+          <strong>勤務時間:</strong> {{ job.workHours }}
+        </div>
+
+        <div class="text-body-1 mb-3">
+          <v-icon color="orange" class="mr-2">mdi-calendar</v-icon>
+          <strong>勤務日数:</strong> {{ job.workDays }}
         </div>
       </v-card-text>
 

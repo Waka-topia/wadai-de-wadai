@@ -14,7 +14,10 @@ export const getJobs = async () => {
         vacation: 'シフト制',
         startTime: '09:00',
         endTime: '22:00',
+        workHours: '09:00〜22:00の間で1日3h〜OK',
+        workDays: '週1日〜OK',
         jobDuties: 'ホール業務・キッチン業務',
+        tags: ['週1OK', '未経験歓迎', '駅チカ', '学生歓迎'],
         createdAt: '2025-01-15',
       },
       {
@@ -29,7 +32,10 @@ export const getJobs = async () => {
         vacation: 'シフト制',
         startTime: '08:00',
         endTime: '20:00',
+        workHours: '08:00〜20:00の間で4h〜OK',
+        workDays: '週2日〜OK',
         jobDuties: 'カフェスタッフ',
+        tags: ['駅チカ', 'カフェバイト', '未経験歓迎'],
         createdAt: '2025-01-20',
       },
       {
@@ -44,7 +50,10 @@ export const getJobs = async () => {
         vacation: 'シフト制',
         startTime: '14:00',
         endTime: '21:00',
+        workHours: '14:00〜21:00',
+        workDays: '週2〜3日',
         jobDuties: '個別指導講師',
+        tags: ['高時給', '塾講師', '大学生歓迎'],
         createdAt: '2025-01-10',
       },
     ]
