@@ -107,19 +107,24 @@
 
       <div class="text-black text-h6 font-weight-bold text-wrap px-6 py-4">休日休暇</div>
 
-      <v-btn
-        color="orange"
-        variant="elevated"
-        size="large"
-        width="90%"
-        height="50"
-        max-width="300"
-        rounded="pill"
-        class="text-white font-weight-bold position-fixed"
-        style="z-index: 10; left: 50%; transform: translateX(-50%); bottom: calc(10% + 24px)"
+      <div
+        class="position-fixed d-flex align-center justify-center w-100 px-4"
+        style="z-index: 10; bottom: calc(10% + 24px); left: 0"
       >
-        応募する
-      </v-btn>
+        <v-btn
+          color="orange"
+          variant="elevated"
+          size="large"
+          width="100%"
+          height="50"
+          max-width="300"
+          rounded="pill"
+          class="text-white font-weight-bold mr-4"
+        >
+          応募する
+        </v-btn>
+        <BookMarkButton :job-id="job.id" :is-bookmarked="!!job.isBookmarked" />
+      </div>
 
       <div style="height: 120px"></div>
     </div>
@@ -130,6 +135,7 @@
 import { computed, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { useRoute } from 'vue-router'
+import BookMarkButton from '@/components/recruit/BookMarkButton.vue'
 import JobLocationMap from '@/components/recruit/JobLocationMap.vue'
 
 const route = useRoute()
@@ -137,7 +143,8 @@ const store = useStore()
 
 const jobId = Number(route.params.id)
 
-const job = computed(() => store.state.jobs.currentJob)
+const job = computed(() => store.getters.currentJobWithBookmark)
+
 const error = computed(() => store.state.jobs.error)
 
 onMounted(() => {
