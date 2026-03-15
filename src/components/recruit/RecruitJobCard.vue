@@ -5,8 +5,12 @@
     elevation="1"
     @click="router.push(`/jobs/${job.id}`)"
   >
-    <div class="placeholder-image d-flex align-center justify-center">
+    <div class="placeholder-image d-flex align-center justify-center position-relative">
       <v-icon size="64" color="grey-lighten-1">mdi-image-outline</v-icon>
+
+      <div class="position-absolute" style="top: 8px; right: 8px" @click.stop>
+        <BookMarkButton :job-id="job.id" :is-bookmarked="!!job.isBookmarked" />
+      </div>
     </div>
 
     <v-card-text class="pa-4">
@@ -47,6 +51,7 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
+import BookMarkButton from './BookMarkButton.vue'
 
 const router = useRouter()
 
