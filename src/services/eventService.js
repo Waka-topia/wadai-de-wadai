@@ -1,4 +1,14 @@
-import { collection, deleteDoc, doc, getDoc, getDocs, setDoc, updateDoc } from 'firebase/firestore'
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  setDoc,
+  updateDoc,
+  where,
+} from 'firebase/firestore'
 import { v4 as uuidv4 } from 'uuid'
 import { db } from '@/firebase/config'
 
@@ -160,5 +170,95 @@ export const deleteEventService = async (eventId, userId) => {
   } catch (error) {
     console.error('Failed to delete event:', error)
     throw new Error(`イベントの削除に失敗しました。${error.message}`)
+  }
+}
+
+/**
+ * 代表者証明申請をusersコレクションに保存する
+ *
+ * @param {string} userId Firebase AuthのユーザーID
+ * @param {object} proveOwnerData 申請データ
+ * @returns {Promise<void>}
+ */
+export const proveOwnerService = async (userId, proveOwnerData) => {
+  try {
+    if (!userId) {
+      throw new Error('代表者証明を申請するにはログインが必要です')
+    }
+
+    if (!proveOwnerData) {
+      throw new Error('申請データが不足しています')
+    }
+
+    const userRef = doc(db, 'users', userId)
+    await setDoc(
+      userRef,
+      {
+        isProvePending: true,
+        proveOwnerApplication: {
+          ...proveOwnerData,
+          requestedAt: new Date().toISOString(),
+        },
+      },
+      { merge: true },
+    )
+  } catch (error) {
+    console.error('Failed to request prove owner:', error)
+    throw new Error(`代表者証明の申請に失敗しました。${error.message}`)
+  }
+}
+
+/**
+ * 代表者証明を申請したユーザー一覧を取得する
+ *
+ * @returns {Promise<Array>} 申請者一覧
+ */
+export const getProveOwnerApplicantsService = async () => {
+  try {
+    const usersRef = collection(db, 'users')
+    const applicantsQuery = query(usersRef, where('isProvePending', '==', true))
+    const usersSnapshot = await getDocs(applicantsQuery)
+
+    return usersSnapshot.docs
+      .map((userDoc) => {
+        const userData = userDoc.data()
+        return {
+          userId: userDoc.id,
+          isOfficial: Boolean(userData.isOfficial),
+          isProvePending: Boolean(userData.isProvePending),
+          proveOwnerApplication: userData.proveOwnerApplication || null,
+        }
+      })
+      .filter((user) => Boolean(user.proveOwnerApplication))
+  } catch (error) {
+    console.error('Failed to get prove owner applicants:', error)
+    throw new Error(`申請者一覧の取得に失敗しました。${error.message}`)
+  }
+}
+
+/**
+ * 代表者証明申請の承認状態を更新する
+ *
+ * @param {string} userId Firebase AuthのユーザーID
+ * @param {boolean} isApproved 承認状態
+ * @returns {Promise<void>}
+ */
+export const updateProveOwnerApprovalService = async (userId, isApproved) => {
+  try {
+    if (!userId) {
+      throw new Error('承認状態を更新するには認証が必要です')
+    }
+
+    const userRef = doc(db, 'users', userId)
+    await updateDoc(userRef, {
+      isOfficial: isApproved,
+      isProvePending: false,
+      role: isApproved ? 'official' : 'general',
+      'proveOwnerApplication.reviewedAt': new Date().toISOString(),
+      'proveOwnerApplication.reviewedStatus': isApproved ? 'approved' : 'rejected',
+    })
+  } catch (error) {
+    console.error('Failed to update prove owner approval:', error)
+    throw new Error(`承認状態の更新に失敗しました。${error.message}`)
   }
 }
