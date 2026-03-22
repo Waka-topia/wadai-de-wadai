@@ -3,27 +3,37 @@ import bcrypt from 'bcryptjs'
 import { v4 as uuidv4 } from 'uuid'
 import { db } from '@/firebase/config'
 
+// TODO: 将来的には課金ユーザは、さらに優先表示できるようにするために数字で優先度を管理
+const officialEventPriority = 10
+
 /**
- * Firebaseのorganizersコレクションから団体情報を取得し、パスワードを検証する
+ * Usersコレクションの情報から公式認証ステータスを解決する
  *
- * @param {string} organizerId 団体ID
- * @param {string} inputPassword ユーザーが入力したパスワード
- * @returns {Promise<boolean>} パスワードが一致すればtrue、それ以外はfalse
+ * @param {string} userId Firebase AuthのユーザーID
+ * @returns {Promise<object>} 公式認証フラグとロール
  */
-export const verifyOrganizerPassword = async (organizerId, inputPassword) => {
-  try {
-    const docRef = doc(db, 'organizers', organizerId)
-    const docSnap = await getDoc(docRef)
+const resolveOfficialStatus = async (userId) => {
+  if (!userId) {
+    throw new Error('イベントを登録するにはログインが必要です')
+  }
 
-    if (!docSnap.exists()) {
-      throw new Error('団体が見つかりません')
+  const userRef = doc(db, 'users', userId)
+  const userSnapshot = await getDoc(userRef)
+
+  if (!userSnapshot.exists()) {
+    return {
+      isOfficial: false,
+      role: 'general',
     }
+  }
 
-    const { passwordHash } = docSnap.data()
-    return await bcrypt.compare(inputPassword, passwordHash)
-  } catch (error) {
-    console.error('Failed to verify organizer password:', error)
-    throw new Error('パスワードの検証に失敗しました')
+  const userData = userSnapshot.data()
+  const role = userData.role || 'general'
+  const isOfficial = Boolean(userData.isOfficial) || role === 'official'
+
+  return {
+    isOfficial,
+    role,
   }
 }
 
@@ -31,16 +41,25 @@ export const verifyOrganizerPassword = async (organizerId, inputPassword) => {
  * Firebaseに新しいイベントを登録する
  *
  * @param {object} eventData イベントデータ
- * @param {string} organizerId 団体ID
- * @param {string} inputPassword ユーザーが入力したパスワード
- * @returns {Promise<void>}
+ * @param {string} userId Firebase AuthのユーザーID
+ * @returns {Promise<object>} 作成されたイベントデータ
  */
-export const addEventService = async (eventData, organizerId, inputPassword) => {
+export const addEventService = async (eventData, userId) => {
   try {
-    await verifyOrganizerPassword(organizerId, inputPassword)
+    const { isOfficial, role } = await resolveOfficialStatus(userId)
     const eventId = uuidv4()
     const eventRef = doc(db, 'events', eventId)
-    await setDoc(eventRef, { ...eventData, eventId, organizerId })
+    const createdEvent = {
+      ...eventData,
+      eventId,
+      createdBy: userId,
+      authorRole: role,
+      isOfficial,
+      eventPriority: isOfficial ? officialEventPriority : 0,
+    }
+
+    await setDoc(eventRef, createdEvent)
+    return createdEvent
   } catch (error) {
     console.error('Failed to add event:', error)
     throw new Error('イベントの登録に失敗しました')
@@ -65,7 +84,7 @@ export const getEventService = async (eventId) => {
     return docSnap.data()
   } catch (error) {
     console.error('Failed to get event:', error)
-    throw new Error('イベント情報の取得に失敗しました')
+    throw new Error(`イベント情報の取得に失敗しました。${error.message}`)
   }
 }
 

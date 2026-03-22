@@ -55,17 +55,18 @@ const actions = {
    *
    * @param {object} context Vuexのコンテキスト
    * @param {(type: string, payload?: unknown) => void} context.commit Vuexのcommit関数
-   * @param {object} payload イベントデータと団体ID
+   * @param {object} payload イベントデータと作成者情報
    * @param {object} payload.eventData イベントデータ
-   * @param {string} payload.organizerId 団体ID
-   * @param {string} payload.inputPassword パスワード
+   * @param {string} payload.currentUserId Firebase AuthのユーザーID
    */
-  async createEvent({ commit }, { eventData, organizerId, inputPassword }) {
+  async createEvent({ commit }, { eventData, currentUserId }) {
     try {
       commit('setError', null)
-      await addEventService(eventData, organizerId, inputPassword)
+      const createdEvent = await addEventService(eventData, currentUserId)
+      commit('addEvent', createdEvent)
     } catch (error) {
       commit('setError', error.message)
+      throw error
     }
   },
 

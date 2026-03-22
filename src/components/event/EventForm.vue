@@ -97,8 +97,6 @@ const newEvent = ref({
   location: '',
   description: '',
   organizerName: '',
-  organizerId: '',
-  password: '',
 })
 
 const snackbar = ref({
@@ -109,10 +107,11 @@ const snackbar = ref({
 
 const submitEvent = async () => {
   try {
+    const currentUserId = store.getters['auth/userId']
+
     await store.dispatch('event/createEvent', {
       eventData: newEvent.value,
-      organizerId: newEvent.value.organizerId,
-      inputPassword: newEvent.value.password,
+      currentUserId,
     })
     snackbar.value = {
       show: true,
@@ -123,7 +122,7 @@ const submitEvent = async () => {
     snackbar.value = {
       show: true,
       color: 'error',
-      message: `イベントの登録に失敗しました: ${error.message}`,
+      message: error.message,
     }
   }
 }
