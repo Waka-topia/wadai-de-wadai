@@ -85,23 +85,26 @@ export const getEventsService = async () => {
 }
 
 /**
- * イベントの所有者を検証する（団体IDの一致確認 + パスワード検証）
+ * イベントの所有者を検証する（createdByと認証ユーザーの一致確認）
  *
  * @param {string} eventId イベントID
- * @param {string} organizerId 団体ID
- * @param {string} inputPassword ユーザーが入力したパスワード
+ * @param {string} userId Firebase AuthのユーザーID
  * @returns {Promise<void>}
- * @throws {Error} 団体IDが一致しない、またはパスワードが正しくない場合
+ * @throws {Error} 所有者情報がない、または作成者本人でない場合
  */
-const verifyEventOwnership = async (eventId, organizerId, inputPassword) => {
-  const event = await getEventService(eventId)
-  if (event.organizerId !== organizerId) {
-    throw new Error('団体IDが一致しません')
+const verifyEventOwnership = async (eventId, userId) => {
+  if (!userId) {
+    throw new Error('イベントを操作するにはログインが必要です')
   }
 
-  const isPasswordValid = await verifyOrganizerPassword(organizerId, inputPassword)
-  if (!isPasswordValid) {
-    throw new Error('パスワードが正しくありません')
+  const event = await getEventService(eventId)
+
+  if (!event.createdBy) {
+    throw new Error('このイベントは旧方式データのため編集・削除できません')
+  }
+
+  if (event.createdBy !== userId) {
+    throw new Error('このイベントを操作する権限がありません')
   }
 }
 
@@ -129,17 +132,16 @@ export const updateEventService = async (eventId, eventData, organizerId, inputP
  * イベントを削除する
  *
  * @param {string} eventId イベントID
- * @param {string} organizerId 団体ID
- * @param {string} inputPassword ユーザーが入力したパスワード
+ * @param {string} userId Firebase AuthのユーザーID
  * @returns {Promise<void>}
  */
-export const deleteEventService = async (eventId, organizerId, inputPassword) => {
+export const deleteEventService = async (eventId, userId) => {
   try {
-    await verifyEventOwnership(eventId, organizerId, inputPassword)
+    await verifyEventOwnership(eventId, userId)
     const eventRef = doc(db, 'events', eventId)
     await deleteDoc(eventRef)
   } catch (error) {
     console.error('Failed to delete event:', error)
-    throw new Error('イベントの削除に失敗しました')
+    throw new Error(`イベントの削除に失敗しました。${error.message}`)
   }
 }
