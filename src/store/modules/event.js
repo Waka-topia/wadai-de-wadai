@@ -47,6 +47,7 @@ const actions = {
       commit('setEvents', events)
     } catch (error) {
       commit('setError', error.message)
+      throw error
     }
   },
 
@@ -54,10 +55,10 @@ const actions = {
     try {
       commit('setError', null)
       const event = await getEventService(eventId)
-      console.log('Fetched event:', event)
       commit('setEvent', event)
     } catch (error) {
       commit('setError', error.message)
+      throw error
     }
   },
 
@@ -87,18 +88,18 @@ const actions = {
    * @param {object} context Vuexのコンテキスト
    * @param {(type: string, payload?: unknown) => void} context.commit Vuexのcommit関数
    * @param {object} context.state Vuexのstate
-   * @param {object} payload 更新データ、団体ID、パスワード
+   * @param {object} payload 更新データと作成者情報
    * @param {object} payload.eventData イベントデータ
-   * @param {string} payload.organizerId 団体ID
-   * @param {string} payload.inputPassword パスワード
+   * @param {string} payload.currentUserId Firebase AuthのユーザーID
    */
-  async updateEvent({ commit, state }, { eventData, organizerId, inputPassword }) {
+  async updateEvent({ commit, state }, { eventData, currentUserId }) {
     try {
       commit('setError', null)
-      await updateEventService(state.currentEvent.eventId, eventData, organizerId, inputPassword)
+      await updateEventService(state.currentEvent.eventId, eventData, currentUserId)
       commit('setCurrentEvent', eventData)
     } catch (error) {
       commit('setError', error.message)
+      throw error
     }
   },
 
@@ -107,18 +108,18 @@ const actions = {
    *
    * @param {object} context Vuexのコンテキスト
    * @param {(type: string, payload?: unknown) => void} context.commit Vuexのcommit関数
-   * @param {object} payload イベントID、団体ID、パスワード
+   * @param {object} payload イベントIDと作成者情報
    * @param {string} payload.eventId イベントID
-   * @param {string} payload.organizerId 団体ID
-   * @param {string} payload.inputPassword パスワード
+   * @param {string} payload.currentUserId Firebase AuthのユーザーID
    */
-  async deleteEvent({ commit }, { eventId, organizerId, inputPassword }) {
+  async deleteEvent({ commit }, { eventId, currentUserId }) {
     try {
       commit('setError', null)
-      await deleteEventService(eventId, organizerId, inputPassword)
+      await deleteEventService(eventId, currentUserId)
       commit('removeEvent', eventId)
     } catch (error) {
       commit('setError', error.message)
+      throw error
     }
   },
 

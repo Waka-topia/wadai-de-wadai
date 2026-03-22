@@ -1,5 +1,4 @@
 import { collection, deleteDoc, doc, getDoc, getDocs, setDoc, updateDoc } from 'firebase/firestore'
-import bcrypt from 'bcryptjs'
 import { v4 as uuidv4 } from 'uuid'
 import { db } from '@/firebase/config'
 
@@ -62,7 +61,7 @@ export const addEventService = async (eventData, userId) => {
     return createdEvent
   } catch (error) {
     console.error('Failed to add event:', error)
-    throw new Error('イベントの登録に失敗しました')
+    throw new Error(`イベントの登録に失敗しました。${error.message}`)
   }
 }
 
@@ -99,7 +98,7 @@ export const getEventsService = async () => {
     return eventsSnapshot.docs.map((eventDoc) => eventDoc.data())
   } catch (error) {
     console.error('Failed to get events:', error)
-    throw new Error('イベント情報の取得に失敗しました')
+    throw new Error(`イベント情報の取得に失敗しました。${error.message}`)
   }
 }
 
@@ -132,18 +131,17 @@ const verifyEventOwnership = async (eventId, userId) => {
  *
  * @param {string} eventId イベントID
  * @param {object} eventData 更新データ
- * @param {string} organizerId 団体ID
- * @param {string} inputPassword ユーザーが入力したパスワード
+ * @param {string} userId Firebase AuthのユーザーID
  * @returns {Promise<void>}
  */
-export const updateEventService = async (eventId, eventData, organizerId, inputPassword) => {
+export const updateEventService = async (eventId, eventData, userId) => {
   try {
-    await verifyEventOwnership(eventId, organizerId, inputPassword)
+    await verifyEventOwnership(eventId, userId)
     const eventRef = doc(db, 'events', eventId)
     await updateDoc(eventRef, eventData)
   } catch (error) {
     console.error('Failed to update event:', error)
-    throw new Error('イベントの更新に失敗しました')
+    throw new Error(`イベントの更新に失敗しました。${error.message}`)
   }
 }
 
