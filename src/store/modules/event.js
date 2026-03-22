@@ -143,6 +143,10 @@ const mutations = {
     state.events = events
   },
 
+  addEvent(state, event) {
+    state.events = [...state.events, event]
+  },
+
   setCurrentEvent(state, event) {
     state.currentEvent = event
   },
