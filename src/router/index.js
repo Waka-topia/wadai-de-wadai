@@ -78,6 +78,16 @@ const routes = [
     name: 'Map',
     component: () => import('@/pages/MapPage.vue'),
   },
+  {
+    path: '/prove-owner',
+    name: 'ProveOwner',
+    component: () => import('@/pages/ProveOwnerPage.vue'),
+  },
+  {
+    path: '/admin',
+    name: 'Admin',
+    component: () => import('@/pages/AdminPage.vue'),
+  },
 ]
 
 const router = createRouter({

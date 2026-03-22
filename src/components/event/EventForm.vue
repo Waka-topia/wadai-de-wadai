@@ -75,6 +75,14 @@
       <v-icon start>mdi-check-circle</v-icon>
       イベントを登録
     </v-btn>
+    <div class="text-center pt-4">
+      <v-btn variant="text" class="text-button text-decoration-underline" href="/prove-owner">
+        団体の代表者であることを証明する
+      </v-btn>
+    </div>
+    <p class="text-grey text-caption">
+      代表者証明をすることでイベントが上位に表示されやすくなります
+    </p>
   </v-form>
 
   <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
