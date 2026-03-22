@@ -17,6 +17,17 @@ const state = {
 const getters = {
   event: (state) => state.event,
   allEvents: (state) => state.events, // 全てのイベントを取得
+  sortedEventsByDate: (state) => (selectedDate) => {
+    return state.events
+      .filter((event) => event.date === selectedDate)
+      .sort((firstEvent, secondEvent) => {
+        return (
+          Number(Boolean(secondEvent.isOfficial)) - Number(Boolean(firstEvent.isOfficial)) ||
+          (secondEvent.eventPriority || 0) - (firstEvent.eventPriority || 0) ||
+          (firstEvent.startTime || '').localeCompare(secondEvent.startTime || '')
+        )
+      })
+  },
   currentEvent: (state) => state.currentEvent,
   isEditing: (state) => state.isEditing,
   eventError: (state) => state.error,
