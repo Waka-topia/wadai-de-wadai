@@ -8,8 +8,28 @@
 </template>
 
 <script setup>
+import { onMounted, watch, computed } from 'vue'
+import { useStore } from 'vuex'
 import RecruitSearchFilter from '@/components/recruit/RecruitSearchFilter.vue'
 import RecruitSortTabs from '@/components/recruit/RecruitSortTabs.vue'
+
+const store = useStore()
+const userId = computed(() => store.state.auth?.userId)
+
+onMounted(async () => {
+  await store.dispatch('fetchJobs')
+})
+
+// onMountedに置くとuserIdがまだない状態で実行される可能性がある
+watch(
+  userId,
+  (id) => {
+    if (id) {
+      store.dispatch('applyUserBookmarks')
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <style scoped>
