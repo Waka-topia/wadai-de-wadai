@@ -8,15 +8,18 @@ import ratingModule from './modules/rating'
 import scrollModule from './modules/scroll'
 import shinkanModule from './modules/shinkan'
 import stampModule from './modules/stamp'
+import timetableModule from './modules/timetable'
 import titleModule from './modules/title'
 import userModule from './modules/user'
-import timetableModule from './modules/timetable'
 
 export default createStore({
   state: {},
   modules: {
     auth: authModule,
-    timetable: timetableModule,
+    timetable: {
+      namespaced: true,
+      ...timetableModule,
+    },
     stamps: {
       namespaced: true,
       ...stampModule,

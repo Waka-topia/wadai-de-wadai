@@ -31,7 +31,7 @@
 
     <v-main>
       <router-view v-slot="{ Component }">
-        <keep-alive include="HomePage,RankingPage,MyPage,EventCal">
+        <keep-alive include="HomePage,RankingPage,MyPage,EventCal,TimetablePage">
           <component :is="Component" />
         </keep-alive>
       </router-view>
@@ -72,7 +72,8 @@ const routeTitleMap = {
   '/inquiry': 'お問い合わせ',
   '/rule': '利用規約',
   '/map': 'マップ',
-  '/jobs': '求人情報', // ★ここを追加
+  '/jobs': '求人情報',
+  '/timetable': '時間割',
 }
 
 /**

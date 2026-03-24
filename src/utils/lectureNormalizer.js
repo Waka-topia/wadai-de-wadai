@@ -129,7 +129,7 @@ const levenshtein = (a, b) => {
 /**
  * スコアから名寄せの判定を行う
  *
- * @param {number} score - calcSimilarityScore の結果
+ * @param {number} score - CalcSimilarityScore の結果
  * @returns {'same' | 'maybe' | 'different'} 判定結果
  */
 export const classifyScore = (score) => {

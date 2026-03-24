@@ -1,23 +1,33 @@
 /**
  * 全ユーザーの講義データを集約した「マスターインデックス」を管理するサービス
  *
- * Firestore のパス: lecture_index/{nameNormalized} ← 正規化名がドキュメントID - name: string 最もよく使われる表示名（マスター） -
- * nameNormalized: string - aliases: string[] エイリアス（別表記の一覧） - count: number 登録人数 - updatedAt:
- * string
+ * Firestore のパス: lecture_index/{nameNormalized}
+ *   - name: string          最もよく使われる表示名（マスター）
+ *   - nameNormalized: string 正規化名（ドキュメントID）
+ *   - aliases: string[]     別表記の一覧
+ *   - aliasCounts: object   表示名ごとの出現回数
+ *   - count: number         登録ユーザー数（FieldValue.increment で競合なく更新）
+ *   - updatedAt: string
  *
- * フロー: ユーザーが講義を保存 → saveLecture が nameNormalized を生成 → incrementLectureIndex を呼んでインデックスに登録 or
- * カウントアップ → count が多い表示名が自動的に「マスター」になる
+ * フロー:
+ *   ユーザーが講義を保存
+ *   → saveLecture が nameNormalized を生成
+ *   → incrementLectureIndex を呼んでインデックスに登録 or カウントアップ
+ *   → count が多い表示名が自動的に「マスター」になる
  */
 
 import {
   collection,
   doc,
+  getDoc,
   getDocs,
+  increment,
   limit,
   orderBy,
   query,
-  runTransaction,
+  setDoc,
   startAt,
+  updateDoc,
 } from 'firebase/firestore'
 import { db } from '@/firebase/config'
 import { calcSimilarityScore, classifyScore, normalizeLectureName } from '@/utils/lectureNormalizer'
@@ -36,8 +46,6 @@ export const searchSuggestions = async (input, maxResults = 8) => {
 
   const normalized = normalizeLectureName(input, { katakana: true })
 
-  // Firestore: nameNormalized が入力に似ているドキュメントを検索
-  // （prefix検索の近似として、辞書順で startAt を使う）
   const q = query(
     collection(db, INDEX_COL),
     orderBy('nameNormalized'),
@@ -51,69 +59,70 @@ export const searchSuggestions = async (input, maxResults = 8) => {
   snapshot.forEach((d) => {
     const data = d.data()
     const storedNormalized = data.nameNormalized || ''
-
-    // 前方一致（入力がインデックス名の先頭に一致）なら必ず候補に含める
     const isPrefix = storedNormalized.startsWith(normalized)
-
     const score = calcSimilarityScore(input, data.name)
     const classification = classifyScore(score)
 
     if (isPrefix || classification !== 'different') {
-      // prefix一致はスコアをboosted（先頭に表示）
-      results.push({ name: data.name, count: data.count, score: isPrefix ? Math.max(score, 0.8) : score })
+      results.push({
+        name: data.name,
+        count: data.count,
+        score: isPrefix ? Math.max(score, 0.8) : score,
+      })
     }
   })
 
-  // スコア降順でソート
   results.sort((a, b) => b.score - a.score)
   return results.slice(0, maxResults)
 }
 
 /**
- * 講義をインデックスに登録（または既存エントリのカウントアップ） Transactionで安全に更新する。
+ * 講義をインデックスに登録（または既存エントリのカウントアップ）
+ *
+ * count の更新には FieldValue.increment() を使用。
+ * これにより Transaction なしでアトミックに更新でき、
+ * 同時アクセスによる競合・リトライが発生しない。
+ * aliasCounts の更新のみ getDoc が必要。
  *
  * @param {string} name - ユーザーが入力した表示名
  * @param {string} nameNormalized - 正規化済み名称
  */
 export const incrementLectureIndex = async (name, nameNormalized) => {
   const ref = doc(db, INDEX_COL, nameNormalized)
+  const snap = await getDoc(ref)
 
-  await runTransaction(db, async (tx) => {
-    const snap = await tx.get(ref)
+  if (!snap.exists()) {
+    // 新規登録（この名称で初めての登録）
+    await setDoc(ref, {
+      name,
+      nameNormalized,
+      aliases: [],
+      aliasCounts: { [name]: 1 },
+      count: 1,
+      updatedAt: new Date().toISOString(),
+    })
+    return
+  }
 
-    if (!snap.exists()) {
-      // 新規登録：この名称が最初のマスター
-      tx.set(ref, {
-        name,
-        nameNormalized,
-        aliases: [],
-        aliasCounts: { [name]: 1 }, // 表示名ごとの出現回数
-        count: 1,
-        updatedAt: new Date().toISOString(),
-      })
-    } else {
-      const data = snap.data()
-      const aliasCounts = { ...(data.aliasCounts || {}) }
+  // 既存エントリの更新
+  const data = snap.data()
+  const aliasCounts = { ...(data.aliasCounts || {}) }
+  aliasCounts[name] = (aliasCounts[name] || 0) + 1
 
-      // 各表示名の出現カウントを更新
-      aliasCounts[name] = (aliasCounts[name] || 0) + 1
+  // 最も出現回数が多い名称をマスターに昇格
+  const masterName = Object.entries(aliasCounts).reduce(
+    (best, [n, c]) => (c > best[1] ? [n, c] : best),
+    ['', 0],
+  )[0]
 
-      // 最も出現回数が多い名称をマスターに昇格させる
-      const masterName = Object.entries(aliasCounts).reduce(
-        (best, [n, c]) => (c > best[1] ? [n, c] : best),
-        ['', 0],
-      )[0]
+  const aliases = Object.keys(aliasCounts).filter((n) => n !== masterName)
 
-      // エイリアス一覧（マスター以外）
-      const aliases = Object.keys(aliasCounts).filter((n) => n !== masterName)
-
-      tx.update(ref, {
-        name: masterName,
-        aliases,
-        aliasCounts,
-        count: (data.count || 0) + 1,
-        updatedAt: new Date().toISOString(),
-      })
-    }
+  // count は FieldValue.increment() でアトミックに更新（競合なし）
+  await updateDoc(ref, {
+    name: masterName,
+    aliases,
+    aliasCounts,
+    count: increment(1),
+    updatedAt: new Date().toISOString(),
   })
 }
