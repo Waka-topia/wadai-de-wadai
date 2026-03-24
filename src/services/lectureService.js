@@ -1,10 +1,4 @@
-import {
-  deleteField,
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc,
-} from 'firebase/firestore'
+import { deleteField, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore'
 import { db } from '@/firebase/config'
 import { incrementLectureIndex } from '@/services/lectureIndexService'
 import { normalizeLectureName } from '@/utils/lectureNormalizer'
@@ -33,12 +27,10 @@ import { normalizeLectureName } from '@/utils/lectureNormalizer'
  * @param {string} semester - 学期キー (例: '1-first')
  * @returns {import('firebase/firestore').DocumentReference} ドキュメント参照
  */
-const getSemesterDocRef = (uid, semester) =>
-  doc(db, 'user_timetables', uid, 'semesters', semester)
+const getSemesterDocRef = (uid, semester) => doc(db, 'user_timetables', uid, 'semesters', semester)
 
 /**
- * ユーザーの1学期分の全講義を取得する
- * （1回のReadで全コマを取得するコスト最適化モデル）
+ * ユーザーの1学期分の全講義を取得する （1回のReadで全コマを取得するコスト最適化モデル）
  *
  * @param {string} uid - ユーザーUID
  * @param {string} semester - 学期キー
@@ -47,12 +39,11 @@ const getSemesterDocRef = (uid, semester) =>
 export const fetchTimetable = async (uid, semester) => {
   const ref = getSemesterDocRef(uid, semester)
   const snap = await getDoc(ref)
-  return snap.exists() ? (snap.data().lectures || {}) : {}
+  return snap.exists() ? snap.data().lectures || {} : {}
 }
 
 /**
- * 1コマ分の講義を保存する（新規 or 上書き）
- * 1つの学期ドキュメント内にマージする形式で保存する。
+ * 1コマ分の講義を保存する（新規 or 上書き） 1つの学期ドキュメント内にマージする形式で保存する。
  *
  * @param {string} uid - ユーザーUID
  * @param {string} semester - 学期キー
@@ -92,8 +83,7 @@ export const saveLecture = async (uid, semester, day, period, lectureData) => {
 }
 
 /**
- * 1コマ分の講義を削除する
- * 対象のフィールドのみ deleteField() で削除し、同じ学期の他データは保護する。
+ * 1コマ分の講義を削除する 対象のフィールドのみ deleteField() で削除し、同じ学期の他データは保護する。
  *
  * @param {string} uid - ユーザーUID
  * @param {string} semester - 学期キー
@@ -126,5 +116,7 @@ export const getLecture = async (uid, semester, day, period) => {
   const snap = await getDoc(ref)
   if (!snap.exists()) return null
   const data = snap.data()
-  return data.lectures && data.lectures[`${day}-${period}`] ? data.lectures[`${day}-${period}`] : null
+  return data.lectures && data.lectures[`${day}-${period}`]
+    ? data.lectures[`${day}-${period}`]
+    : null
 }

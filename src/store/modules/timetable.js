@@ -16,24 +16,30 @@ const makeSemesterKey = (grade, semester) => `${grade}-${semester}`
 export default {
   namespaced: true,
   state: () => ({
-    userTimetable: {},
+    // すべての学期の時間割データを保持する
+    // { "1-first": { "mon-1": {...} }, "2-second": { ... } }
+    timetables: {},
     semester: localStorage.getItem(SEMESTER_KEY) || 'first',
     grade: Number(localStorage.getItem(GRADE_KEY)) || 1,
     isLoading: false,
     error: null,
     /**
      * フェッチ済みキーのセット。keep-alive でキャッシュが生きている間は
-     * 同じキーの再フェッチをスキップする。
-     * Set<string>  例: Set{'1-first', '2-second'}
+     * 同じキーのAPI再フェッチをスキップする。
      */
     fetchedKeys: new Set(),
   }),
   mutations: {
-    SET_LECTURE(state, { day, period, lecture }) {
-      state.userTimetable[`${day}-${period}`] = lecture
+    SET_LECTURE(state, { key, day, period, lecture }) {
+      if (!state.timetables[key]) {
+        state.timetables[key] = {}
+      }
+      state.timetables[key][`${day}-${period}`] = lecture
     },
-    REMOVE_LECTURE(state, { day, period }) {
-      delete state.userTimetable[`${day}-${period}`]
+    REMOVE_LECTURE(state, { key, day, period }) {
+      if (state.timetables[key]) {
+        delete state.timetables[key][`${day}-${period}`]
+      }
     },
     SET_LOADING(state, loading) {
       state.isLoading = loading
@@ -41,8 +47,8 @@ export default {
     SET_ERROR(state, error) {
       state.error = error
     },
-    SET_TIMETABLE(state, timetable) {
-      state.userTimetable = { ...timetable }
+    SET_TIMETABLE(state, { key, timetable }) {
+      state.timetables[key] = { ...timetable }
     },
     SET_SEMESTER(state, semester) {
       state.semester = semester
@@ -57,12 +63,14 @@ export default {
     },
     RESET_FETCH_CACHE(state) {
       state.fetchedKeys = new Set()
+      state.timetables = {}
     },
   },
   actions: {
     /**
      * 時間割を取得する（getDocs ベース）
-     * keep-alive キャッシュが有効な場合はスキップする。
+     * keep-alive キャッシュが有効な場合はAPI通信をスキップする。
+     * UI向けのデータ自体は `timetables` に保持されているため即時表示される。
      *
      * @param {object} root0 - Vuexコンテキスト
      * @param {import('vuex').Commit} root0.commit - ミューテーション
@@ -75,15 +83,16 @@ export default {
 
       const key = makeSemesterKey(state.grade, state.semester)
 
-      // keep-alive キャッシュが有効ならスキップ
+      // メモリ上のキャッシュがあればAPIリクエストをスキップ
       if (state.fetchedKeys.has(key)) return
 
       commit('SET_LOADING', true)
-      commit('SET_TIMETABLE', {})
 
+      // APIフェッチが走る場合は過去の古いデータを消さず、上書きする方針にする
+      // なぜなら空にするとロード中にグリッドがチラつくため。
       try {
         const timetable = await fetchTimetable(uid, key)
-        commit('SET_TIMETABLE', timetable)
+        commit('SET_TIMETABLE', { key, timetable })
         commit('MARK_FETCHED', key)
       } catch (e) {
         commit('SET_ERROR', e.message)
@@ -100,7 +109,6 @@ export default {
      */
     resetCache({ commit }) {
       commit('RESET_FETCH_CACHE')
-      commit('SET_TIMETABLE', {})
     },
 
     /**
@@ -143,12 +151,12 @@ export default {
      */
     async saveLecture({ commit, state, rootGetters }, { day, period, lecture }) {
       const uid = rootGetters['auth/userId']
+      const key = makeSemesterKey(state.grade, state.semester)
       // 楽観的UI更新：Firestore完了前にローカル反映
-      commit('SET_LECTURE', { day, period, lecture })
+      commit('SET_LECTURE', { key, day, period, lecture })
       try {
         if (uid) {
           const { saveLecture: save } = await import('@/services/lectureService')
-          const key = makeSemesterKey(state.grade, state.semester)
           await save(uid, key, day, period, lecture)
         }
       } catch (e) {
@@ -169,12 +177,12 @@ export default {
      */
     async removeLecture({ commit, state, rootGetters }, { day, period }) {
       const uid = rootGetters['auth/userId']
+      const key = makeSemesterKey(state.grade, state.semester)
       // 楽観的UI更新
-      commit('REMOVE_LECTURE', { day, period })
+      commit('REMOVE_LECTURE', { key, day, period })
       try {
         if (uid) {
           const { deleteLecture } = await import('@/services/lectureService')
-          const key = makeSemesterKey(state.grade, state.semester)
           await deleteLecture(uid, key, day, period)
         }
       } catch (e) {
@@ -183,10 +191,19 @@ export default {
     },
   },
   getters: {
-    getLecture: (state) => (day, period) => {
-      return state.userTimetable[`${day}-${period}`] || null
+    /**
+     * 現在選択中の学期の時間割データを返す
+     *
+     * @param state
+     */
+    currentTimetable: (state) => {
+      const key = `${state.grade}-${state.semester}`
+      return state.timetables[key] || {}
     },
-    fullTimetable: (state) => state.userTimetable,
+    getLecture: (state, getters) => (day, period) => {
+      return getters.currentTimetable[`${day}-${period}`] || null
+    },
+    fullTimetable: (state, getters) => getters.currentTimetable,
     isLoading: (state) => state.isLoading,
     semester: (state) => state.semester,
     grade: (state) => state.grade,
@@ -194,15 +211,16 @@ export default {
      * 今日の授業リスト
      *
      * @param {object} state - ストアのstate
+     * @param {object} getters - ゲッター
      * @returns {Array} 今日の講義の配列
      */
-    todayLectures: (state) => {
+    todayLectures: (state, getters) => {
       const dayMap = { 0: null, 1: 'mon', 2: 'tue', 3: 'wed', 4: 'thu', 5: 'fri', 6: null }
       const todayCode = dayMap[new Date().getDay()]
       if (!todayCode) return []
-      return [1, 2, 3, 4, 5]
+      return [1, 2, 3, 4, 5, 6]
         .map((period) => {
-          const lecture = state.userTimetable[`${todayCode}-${period}`]
+          const lecture = getters.currentTimetable[`${todayCode}-${period}`]
           return lecture ? { ...lecture, period } : null
         })
         .filter(Boolean)
@@ -211,10 +229,11 @@ export default {
      * 合計単位数
      *
      * @param {object} state - ストアのstate
+     * @param {object} getters - ゲッター
      * @returns {number} 取得単位の合計
      */
-    totalCredits: (state) => {
-      return Object.values(state.userTimetable).reduce((sum, l) => sum + (Number(l.credits) || 0), 0)
+    totalCredits: (state, getters) => {
+      return Object.values(getters.currentTimetable).reduce((sum, l) => sum + (Number(l.credits) || 0), 0)
     },
   },
 }

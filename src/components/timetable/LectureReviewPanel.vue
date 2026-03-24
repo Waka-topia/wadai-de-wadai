@@ -1,216 +1,214 @@
 <template>
-  <div class="review-panel">
-    <div class="review-panel-header">
-      <v-icon size="18" color="orange">mdi-star</v-icon>
-      <span class="panel-title">楽単レビュー</span>
-      <span v-if="averageDifficulty > 0" class="avg-chip">
-        平均 {{ averageDifficulty.toFixed(1) }} / 5（{{ reviews.length }}件）
-      </span>
+  <div class="review-panel mt-4">
+    <div class="review-header mb-2">
+      <v-icon color="orange" size="20" class="mr-2">mdi-star</v-icon>
+      <span class="review-title">楽単度評価</span>
+      <v-spacer></v-spacer>
     </div>
 
-    <!-- 自分のレビュー投稿エリア -->
-    <div class="my-review-form">
-      <div class="field-label">難易度（1=楽単 / 5=鬼単）</div>
-      <div class="stars">
-        <v-btn v-for="n in 5" :key="n" icon variant="text" size="small" @click="myDifficulty = n">
-          <v-icon :color="n <= myDifficulty ? 'orange' : '#ddd'" size="22"> mdi-star </v-icon>
-        </v-btn>
-      </div>
-
-      <v-text-field
-        v-model="myComment"
-        variant="outlined"
-        density="compact"
-        placeholder="一言コメント（任意）"
-        hide-details
-        class="mt-2"
-      />
-
-      <v-btn
-        color="orange"
-        variant="flat"
-        size="small"
-        :disabled="myDifficulty === 0"
-        class="mt-2"
-        @click="submitReview"
-      >
-        {{ hasMyReview ? '更新する' : '投稿する' }}
-      </v-btn>
+    <div v-if="loading" class="text-center py-2">
+      <v-progress-circular indeterminate size="20" color="orange"></v-progress-circular>
     </div>
-
-    <v-divider class="my-3" />
-
-    <!-- レビュー一覧 -->
-    <div v-if="reviews.length === 0" class="empty-reviews">まだレビューはありません</div>
-
-    <div v-else class="review-list">
-      <div v-for="review in reviews" :key="review.uid" class="review-item">
-        <div class="review-stars">
-          <v-icon
-            v-for="n in 5"
-            :key="n"
-            size="14"
-            :color="n <= review.difficulty ? 'orange' : '#ddd'"
-            >mdi-star</v-icon
-          >
+    <div v-else class="review-body">
+      <!-- 統計表示 -->
+      <div class="stats-box mb-3" :class="{'mb-0': readonly}">
+        <div class="stats-average">
+          <span class="average-num">{{ averageRating.toFixed(1) }}</span>
+          <v-rating
+            :model-value="averageRating"
+            color="orange-lighten-1"
+            active-color="orange"
+            size="small"
+            density="compact"
+            half-increments
+            readonly
+          ></v-rating>
         </div>
-        <span class="review-comment">{{ review.comment || '—' }}</span>
-        <span class="review-author">{{ review.authorName }}</span>
+        <div class="stats-count">評価 {{ reviewCount }} 件</div>
       </div>
+
+      <template v-if="!readonly">
+        <v-divider class="mb-3"></v-divider>
+
+        <!-- ユーザーの評価入力 -->
+        <div v-if="isLoggedIn" class="user-rating-box">
+          <div class="user-rating-label mb-1">あなたの評価</div>
+          <v-rating
+            v-model="userRating"
+            color="orange-lighten-1"
+            active-color="orange"
+            size="small"
+            density="compact"
+            hover
+            @update:model-value="submitRating"
+          ></v-rating>
+          <div class="user-rating-hint text-caption mt-1 text-center" :class="{ 'text-success': submitSuccess }">
+            {{ submitMessage }}
+          </div>
+        </div>
+        <div v-else class="text-caption text-grey text-center py-2">
+          評価を投稿するにはログインが必要です。
+        </div>
+      </template>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, watch, onMounted, computed } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import {
-  fetchReviews,
-  fetchMyReview,
-  saveReview,
-  calcAverageDifficulty,
+  getLectureReviewStats,
+  getUserRating,
+  submitUserRating,
 } from '@/services/reviewService'
-import { normalizeLectureName } from '@/utils/lectureNormalizer'
 
 const props = defineProps({
   lectureName: {
     type: String,
-    default: '',
+    required: true,
+  },
+  readonly: {
+    type: Boolean,
+    default: false,
   },
 })
 
 const store = useStore()
-const reviews = ref([])
-const myDifficulty = ref(0)
-const myComment = ref('')
-const hasMyReview = ref(false)
-
+const isLoggedIn = computed(() => store.getters['auth/isAuthenticated'])
 const uid = computed(() => store.getters['auth/userId'])
-const displayName = computed(() => store.getters['auth/displayName'])
 
-const nameNormalized = ref('')
+const loading = ref(true)
+const averageRating = ref(0)
+const reviewCount = ref(0)
+const userRating = ref(0)
+const submitMessage = ref('星をタップして評価を投稿')
+const submitSuccess = ref(false)
 
-const averageDifficulty = computed(() => calcAverageDifficulty(reviews.value))
-
-const loadReviews = async () => {
+const loadStats = async () => {
   if (!props.lectureName) return
-  nameNormalized.value = normalizeLectureName(props.lectureName, { katakana: true })
-  reviews.value = await fetchReviews(nameNormalized.value)
-
-  if (uid.value) {
-    const myReview = await fetchMyReview(nameNormalized.value, uid.value)
-    if (myReview) {
-      hasMyReview.value = true
-      myDifficulty.value = myReview.difficulty
-      myComment.value = myReview.comment || ''
+  loading.value = true
+  submitSuccess.value = false
+  try {
+    const stats = await getLectureReviewStats(props.lectureName)
+    if (stats) {
+      averageRating.value = stats.average || 0
+      reviewCount.value = stats.count || 0
     } else {
-      hasMyReview.value = false
+      averageRating.value = 0
+      reviewCount.value = 0
     }
+
+    if (isLoggedIn.value) {
+      const myRating = await getUserRating(props.lectureName, uid.value)
+      userRating.value = myRating || 0
+      if (myRating) {
+        submitMessage.value = '評価済みです（タップで変更）'
+      } else {
+        submitMessage.value = '星をタップして評価を投稿'
+      }
+    }
+  } catch (error) {
+    console.error('楽単評価の取得に失敗:', error)
+  } finally {
+    loading.value = false
   }
 }
 
-onMounted(loadReviews)
-watch(() => props.lectureName, loadReviews)
+watch(() => props.lectureName, loadStats)
 
-const submitReview = async () => {
-  if (!myDifficulty.value || !nameNormalized.value || !uid.value) return
-  await saveReview(nameNormalized.value, uid.value, {
-    difficulty: myDifficulty.value,
-    comment: myComment.value.trim(),
-    authorName: displayName.value || '名無し',
-  })
-  hasMyReview.value = true
-  await loadReviews()
+onMounted(() => {
+  loadStats()
+})
+
+const submitRating = async (newVal) => {
+  if (!newVal || !isLoggedIn.value || !props.lectureName) return
+  try {
+    submitMessage.value = '送信中...'
+    submitSuccess.value = false
+    await submitUserRating(props.lectureName, uid.value, newVal)
+    submitMessage.value = '評価を投稿しました！'
+    submitSuccess.value = true
+
+    // 統計を再取得
+    const stats = await getLectureReviewStats(props.lectureName)
+    if (stats) {
+      averageRating.value = stats.average || 0
+      reviewCount.value = stats.count || 0
+    }
+  } catch (err) {
+    console.error('評価の投稿に失敗しました:', err)
+    submitMessage.value = '投稿に失敗しました'
+  }
 }
 </script>
 
 <style scoped>
 .review-panel {
-  background: #fff;
-  border-radius: 12px;
-  padding: 14px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  margin-top: 12px;
+  background: #fffdf5;
+  border: 1px solid #ffe0b2;
+  border-radius: 8px;
+  padding: 12px 16px;
 }
 
-.review-panel-header {
+.review-header {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-bottom: 10px;
 }
 
-.panel-title {
+.review-title {
   font-size: 0.9rem;
   font-weight: bold;
-  color: #444;
+  color: #e65100;
 }
 
-.avg-chip {
-  font-size: 0.75rem;
-  background: #fff3e0;
-  color: #ff9800;
-  border-radius: 20px;
-  padding: 2px 10px;
-  margin-left: auto;
-  font-weight: bold;
-}
-
-.my-review-form {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.field-label {
-  font-size: 0.8rem;
-  color: #666;
-  font-weight: 600;
-}
-
-.stars {
-  display: flex;
-  gap: 2px;
-}
-
-.empty-reviews {
-  font-size: 0.85rem;
-  color: #bbb;
-  text-align: center;
-  padding: 12px 0;
-}
-
-.review-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  max-height: 200px;
-  overflow-y: auto;
-}
-
-.review-item {
+.stats-box {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
   gap: 8px;
-  font-size: 0.82rem;
 }
 
-.review-stars {
+.stats-average {
   display: flex;
-  gap: 1px;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
 }
 
-.review-comment {
-  flex: 1;
-  color: #444;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.average-num {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #ef6c00;
+  line-height: 1;
 }
 
-.review-author {
-  font-size: 0.72rem;
-  color: #aaa;
-  white-space: nowrap;
+.stats-count {
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.user-rating-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: white;
+  padding: 8px;
+  border-radius: 6px;
+}
+
+.user-rating-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #555;
+}
+
+.user-rating-hint {
+  color: #999;
+}
+
+.text-success {
+  color: #4caf50 !important;
 }
 </style>

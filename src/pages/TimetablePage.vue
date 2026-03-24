@@ -2,14 +2,6 @@
   <div class="timetable-page">
     <!-- ページヘッダー -->
     <header class="page-header">
-      <div class="header-row">
-        <h1>時間割</h1>
-        <span v-if="isLoggedIn" class="total-credits">
-          <v-icon size="14" color="orange">mdi-school</v-icon>
-          合計 {{ totalCredits }} 単位
-        </span>
-      </div>
-
       <!-- 学年セレクタ -->
       <div v-if="isLoggedIn" class="grade-selector">
         <button
@@ -40,6 +32,23 @@
           後期
         </button>
       </div>
+
+      <!-- 必修区分の凡例 -->
+      <!-- 凡例と取得単位数 -->
+      <div v-if="isLoggedIn" class="d-flex justify-space-between align-center mt-3 flex-wrap" style="gap: 8px;">
+        <div class="lecture-legend mt-0">
+          <div class="legend-item"><span class="legend-color required"></span>必修</div>
+          <div class="legend-item"><span class="legend-color semi-required"></span>選択必修</div>
+          <div class="legend-item"><span class="legend-color elective"></span>その他</div>
+        </div>
+
+        <div class="credits-info text-caption d-flex align-center bg-teal-lighten-5 px-2 py-1 rounded border">
+          <v-icon size="14" color="teal" class="mr-1">mdi-school</v-icon>
+          <span class="font-weight-bold text-teal-darken-3">登録: {{ totalCredits }}単位</span>
+          <span v-if="earnedCredits > 0" class="ml-2 font-weight-bold text-teal-darken-1">(取得: {{ earnedCredits }})</span>
+          <span v-if="failedCredits > 0" class="ml-2 font-weight-bold text-error">(落単: {{ failedCredits }})</span>
+        </div>
+      </div>
     </header>
 
     <!-- 今日の授業カード -->
@@ -61,7 +70,7 @@
             <div class="today-card-name">{{ lecture.name }}</div>
             <div class="today-card-meta">
               <span v-if="lecture.room">
-                <v-icon size="11" style="opacity:0.7">mdi-map-marker</v-icon>{{ lecture.room }}
+                <v-icon size="11" style="opacity: 0.7">mdi-map-marker</v-icon>{{ lecture.room }}
               </span>
               <span v-if="lecture.teacher">{{ lecture.teacher }}</span>
             </div>
@@ -135,7 +144,21 @@ const isLoggedIn = computed(() => store.getters['auth/isAuthenticated'])
 const semester = computed(() => store.getters['timetable/semester'])
 const grade = computed(() => store.getters['timetable/grade'])
 const todayLectures = computed(() => store.getters['timetable/todayLectures'])
+const currentTimetable = computed(() => store.getters['timetable/currentTimetable'])
 const totalCredits = computed(() => store.getters['timetable/totalCredits'])
+
+const earnedCredits = computed(() => {
+  return Object.values(currentTimetable.value || {}).reduce((sum, lec) => {
+    return lec.creditStatus === 'earned' ? sum + (Number(lec.credits) || 0) : sum
+  }, 0)
+})
+
+const failedCredits = computed(() => {
+  return Object.values(currentTimetable.value || {}).reduce((sum, lec) => {
+    return lec.creditStatus === 'failed' ? sum + (Number(lec.credits) || 0) : sum
+  }, 0)
+})
+
 const userId = computed(() => store.getters['auth/userId'])
 
 /** 今日の授業カードスタイル */
@@ -226,30 +249,7 @@ const handleCellClick = ({ day, period }) => {
   margin-bottom: 0.5rem;
 }
 
-.header-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-
-.header-row h1 {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #333;
-}
-
-.total-credits {
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: #ff9800;
-  background: #fff3e0;
-  border-radius: 20px;
-  padding: 4px 12px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
+/* total-credits deleted */
 
 /* 学年セレクタ */
 .grade-selector {
@@ -400,5 +400,39 @@ const handleCellClick = ({ day, period }) => {
 
 .page-content {
   margin-top: 0;
+}
+
+/* 凡例 */
+.lecture-legend {
+  display: flex;
+  gap: 12px;
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.legend-color.required {
+  background-color: #e53935;
+}
+
+.legend-color.semi-required {
+  background-color: #8e24aa;
+}
+
+.legend-color.elective {
+  background-color: #ff9800;
+  opacity: 0.5;
 }
 </style>

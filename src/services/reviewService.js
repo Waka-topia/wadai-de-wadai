@@ -1,81 +1,77 @@
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  orderBy,
-  query,
-  serverTimestamp,
-  setDoc,
-} from 'firebase/firestore'
-import { db } from '@/firebase/config'
-
-/*
- * 講義ごとのマイクロレビュー（回ごとの楽単度評価）を管理するサービス
- *
- * Firestore のパス:
- *   lecture_reviews/{nameNormalized}/reviews/{uid}
- *     - difficulty: number   1（楽）〜 5（難）
- *     - comment: string      短いコメント（任意）
- *     - authorName: string
- *     - createdAt: Timestamp
- *     - updatedAt: Timestamp
- */
-const getReviewsRef = (nameNormalized) =>
-  collection(db, 'lecture_reviews', nameNormalized, 'reviews')
-
-const getReviewRef = (nameNormalized, uid) =>
-  doc(db, 'lecture_reviews', nameNormalized, 'reviews', uid)
+import { getFirestore, doc, getDoc, runTransaction } from 'firebase/firestore'
 
 /**
- * レビュー一覧を取得する（新着順）
+ * 講義の平均評価とレビュー件数を取得する
  *
- * @param {string} nameNormalized - 正規化された講義名
- * @returns {Promise<Array>} レビューの配列
+ * @param {string} lectureName - 講義名
+ * @returns {Promise<{average: number, count: number}|null>} セッション情報
  */
-export const fetchReviews = async (nameNormalized) => {
-  if (!nameNormalized) return []
-  const q = query(getReviewsRef(nameNormalized), orderBy('updatedAt', 'desc'))
-  const snapshot = await getDocs(q)
-  return snapshot.docs.map((d) => ({ uid: d.id, ...d.data() }))
+export const getLectureReviewStats = async (lectureName) => {
+  if (!lectureName) return null
+  const db = getFirestore()
+  const docRef = doc(db, 'lecture_reviews', lectureName)
+  const snap = await getDoc(docRef)
+  if (!snap.exists()) return { average: 0, count: 0 }
+  return snap.data()
 }
 
 /**
- * 既存のレビューを取得（uidが一致するもの）
+ * ユーザー自身の評価を取得する
  *
- * @param {string} nameNormalized - 正規化された講義名
- * @param {string} uid - ユーザーUID
- * @returns {Promise<object | null>} レビューデータまたはnull
+ * @param {string} lectureName - 講義名
+ * @param {string} uid - ユーザーID
+ * @returns {Promise<number>} 星の数(0-5)
  */
-export const fetchMyReview = async (nameNormalized, uid) => {
-  const snap = await getDoc(getReviewRef(nameNormalized, uid))
-  return snap.exists() ? snap.data() : null
+export const getUserRating = async (lectureName, uid) => {
+  if (!lectureName || !uid) return null
+  const db = getFirestore()
+  const docRef = doc(db, 'lecture_reviews', lectureName, 'ratings', uid)
+  const snap = await getDoc(docRef)
+  return snap.exists() ? snap.data().rating : 0
 }
 
 /**
- * レビューを保存（uidをキーにするので1人1件）
+ * ユーザーの評価を送信・更新する（トランザクション処理）
  *
- * @param {string} nameNormalized - 正規化された講義名
- * @param {string} uid - ユーザーUID
- * @param {{ difficulty: number; comment: string; authorName: string }} data - レビュー内容
+ * @param {string} lectureName - 講義名
+ * @param {string} uid - ユーザーID
+ * @param {number} rating - 新しい星の数
+ * @returns {Promise<void>} なし
  */
-export const saveReview = async (nameNormalized, uid, data) => {
-  const ref = getReviewRef(nameNormalized, uid)
-  const existing = await getDoc(ref)
-  await setDoc(ref, {
-    ...data,
-    updatedAt: serverTimestamp(),
-    createdAt: existing.exists() ? existing.data().createdAt : serverTimestamp(),
+export const submitUserRating = async (lectureName, uid, rating) => {
+  if (!lectureName || !uid || !rating) return
+  const db = getFirestore()
+  const statsRef = doc(db, 'lecture_reviews', lectureName)
+  const ratingRef = doc(db, 'lecture_reviews', lectureName, 'ratings', uid)
+
+  await runTransaction(db, async (transaction) => {
+    const statsDoc = await transaction.get(statsRef)
+    const ratingDoc = await transaction.get(ratingRef)
+
+    let totalRatings = 0
+    let currentAverage = 0
+
+    if (statsDoc.exists()) {
+      totalRatings = statsDoc.data().count || 0
+      currentAverage = statsDoc.data().average || 0
+    }
+
+    const previousRating = ratingDoc.exists() ? ratingDoc.data().rating : null
+
+    let newTotalRatings = totalRatings
+    let sum = currentAverage * totalRatings
+
+    if (previousRating !== null) {
+      if (previousRating === rating) return // 変更なし
+      sum = sum - previousRating + rating
+    } else {
+      newTotalRatings += 1
+      sum += rating
+    }
+
+    const newAverage = newTotalRatings > 0 ? sum / newTotalRatings : 0
+
+    transaction.set(statsRef, { average: newAverage, count: newTotalRatings }, { merge: true })
+    transaction.set(ratingRef, { rating, updatedAt: new Date() }, { merge: true })
   })
-}
-
-/**
- * 平均難易度スコアを計算する
- *
- * @param {{ difficulty: number }[]} reviews - レビュー配列
- * @returns {number} 平均スコア（0なら評価なし）
- */
-export const calcAverageDifficulty = (reviews) => {
-  if (!reviews.length) return 0
-  return reviews.reduce((sum, r) => sum + r.difficulty, 0) / reviews.length
 }

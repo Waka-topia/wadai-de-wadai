@@ -60,14 +60,6 @@
           >
             <!-- 必修バッジ + 講義名 -->
             <div class="lecture-header">
-              <span
-                v-if="getLecture(day.value, period).required === 'required'"
-                class="badge badge-required"
-              >必</span>
-              <span
-                v-else-if="getLecture(day.value, period).required === 'semi-required'"
-                class="badge badge-semi"
-              >選必</span>
               <div class="lecture-name">{{ getLecture(day.value, period).name }}</div>
             </div>
             <div class="lecture-detail">
@@ -75,10 +67,9 @@
                 <v-icon size="10" style="opacity: 0.7">mdi-map-marker</v-icon>
                 {{ getLecture(day.value, period).room }}
               </span>
-              <span
-                v-if="getLecture(day.value, period).year"
-                class="lecture-year"
-              >{{ getLecture(day.value, period).year }}年</span>
+              <span v-if="getLecture(day.value, period).year" class="lecture-year"
+                >{{ getLecture(day.value, period).year }}年</span
+              >
             </div>
           </div>
           <div v-else class="add-icon">
@@ -107,7 +98,7 @@ defineProps({
   },
   periods: {
     type: Array,
-    default: () => [1, 2, 3, 4, 5],
+    default: () => [1, 2, 3, 4, 5, 6],
   },
 })
 
@@ -124,11 +115,12 @@ const getLecture = (day, period) => {
 
 /** 時限の開始・終了時刻 */
 const periodTimes = {
-  1: { start: '09:00', end: '10:30' },
+  1: { start: '09:10', end: '10:40' },
   2: { start: '10:40', end: '12:10' },
-  3: { start: '13:00', end: '14:30' },
-  4: { start: '14:40', end: '16:10' },
+  3: { start: '13:10', end: '14:40' },
+  4: { start: '14:50', end: '16:20' },
   5: { start: '16:20', end: '17:50' },
+  6: { start: '18:00', end: '19:30' },
 }
 
 const getPeriodStart = (period) => periodTimes[period]?.start || ''
@@ -172,9 +164,22 @@ const getLectureCardStyle = (day, period) => {
   const lecture = getLecture(day, period)
   if (!lecture) return {}
   const color = colorPalette[lecture.color] || colorPalette.orange
+
+  let leftBorderColor = color.border
+  let leftBorderWidth = '4px'
+
+  if (lecture.required === 'req' || lecture.required === 'required') {
+    leftBorderColor = '#e53935' // 赤
+    leftBorderWidth = '6px'
+  } else if (lecture.required === 'semi' || lecture.required === 'semi-required') {
+    leftBorderColor = '#8e24aa' // 紫
+    leftBorderWidth = '6px'
+  }
+
   return {
     backgroundColor: color.bg,
-    borderLeftColor: color.border,
+    borderLeftColor: leftBorderColor,
+    borderLeftWidth: leftBorderWidth,
     '--lecture-text': color.text,
     '--lecture-sub': color.sub,
   }
@@ -183,7 +188,7 @@ const getLectureCardStyle = (day, period) => {
 
 <style scoped>
 .timetable-grid-container {
-  overflow-x: auto;
+  overflow-x: hidden;
   border-radius: 12px;
   background: white;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
@@ -222,8 +227,8 @@ const getLectureCardStyle = (day, period) => {
 
 .timetable-grid {
   display: grid;
-  grid-template-columns: 54px repeat(5, 1fr);
-  min-width: 340px;
+  grid-template-columns: 48px repeat(5, 1fr);
+  width: 100%;
   border: 1px solid #eee;
   border-radius: 12px;
   overflow: hidden;
@@ -377,6 +382,7 @@ const getLectureCardStyle = (day, period) => {
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   line-height: 1.25;
+  word-break: break-all;
 }
 
 .lecture-detail {
@@ -425,26 +431,6 @@ const getLectureCardStyle = (day, period) => {
   overflow: hidden;
 }
 
-/* 必修バッジ */
-.badge {
-  flex-shrink: 0;
-  font-size: 0.5rem;
-  font-weight: bold;
-  border-radius: 3px;
-  padding: 1px 3px;
-  line-height: 1.4;
-  margin-top: 1px;
-}
-
-.badge-required {
-  background: #e53935;
-  color: white;
-}
-
-.badge-semi {
-  background: #7b1fa2;
-  color: white;
-}
 
 /* 年次ラベル */
 .lecture-year {

@@ -2,18 +2,16 @@
  * 全ユーザーの講義データを集約した「マスターインデックス」を管理するサービス
  *
  * Firestore のパス: lecture_index/{nameNormalized}
- *   - name: string          最もよく使われる表示名（マスター）
- *   - nameNormalized: string 正規化名（ドキュメントID）
- *   - aliases: string[]     別表記の一覧
- *   - aliasCounts: object   表示名ごとの出現回数
- *   - count: number         登録ユーザー数（FieldValue.increment で競合なく更新）
- *   - updatedAt: string
  *
- * フロー:
- *   ユーザーが講義を保存
- *   → saveLecture が nameNormalized を生成
- *   → incrementLectureIndex を呼んでインデックスに登録 or カウントアップ
- *   → count が多い表示名が自動的に「マスター」になる
+ * - Name: string 最もよく使われる表示名（マスター）
+ * - NameNormalized: string 正規化名（ドキュメントID）
+ * - Aliases: string[] 別表記の一覧
+ * - AliasCounts: object 表示名ごとの出現回数
+ * - Count: number 登録ユーザー数（FieldValue.increment で競合なく更新）
+ * - UpdatedAt: string
+ *
+ * フロー: ユーザーが講義を保存 → saveLecture が nameNormalized を生成 → incrementLectureIndex を呼んでインデックスに登録 or
+ * カウントアップ → count が多い表示名が自動的に「マスター」になる
  */
 
 import {
@@ -79,9 +77,7 @@ export const searchSuggestions = async (input, maxResults = 8) => {
 /**
  * 講義をインデックスに登録（または既存エントリのカウントアップ）
  *
- * count の更新には FieldValue.increment() を使用。
- * これにより Transaction なしでアトミックに更新でき、
- * 同時アクセスによる競合・リトライが発生しない。
+ * Count の更新には FieldValue.increment() を使用。 これにより Transaction なしでアトミックに更新でき、 同時アクセスによる競合・リトライが発生しない。
  * aliasCounts の更新のみ getDoc が必要。
  *
  * @param {string} name - ユーザーが入力した表示名
