@@ -2,7 +2,9 @@
   <div class="recruit-container">
     <RecruitSearchFilter />
     <v-container class="px-0 pb-16 pt-0">
-      <RecruitSortTabs class="mb-4" />
+      <BookMarkFilterTabs class="mb-4" />
+      <RecruitSortButtons />
+      <RecruitJobCard v-for="job in sortedJobs" :key="job.id" :job="job" />
     </v-container>
   </div>
 </template>
@@ -11,10 +13,13 @@
 import { onMounted, watch, computed } from 'vue'
 import { useStore } from 'vuex'
 import RecruitSearchFilter from '@/components/recruit/RecruitSearchFilter.vue'
-import RecruitSortTabs from '@/components/recruit/RecruitSortTabs.vue'
+import BookMarkFilterTabs from '@/components/recruit/BookMarkFilterTabs.vue'
+import RecruitSortButtons from '@/components/recruit/RecruitSortButtons.vue'
+import RecruitJobCard from '@/components/recruit/RecruitJobCard.vue'
 
 const store = useStore()
 const userId = computed(() => store.state.auth?.userId)
+const sortedJobs = computed(() => store.getters.sortedJobs)
 
 onMounted(async () => {
   await store.dispatch('fetchJobs')
