@@ -22,6 +22,11 @@ export const getJobs = async () => {
         jobDuties: 'ホール業務・キッチン業務',
         createdAt: '2025-01-15',
         description: 'ここに長い文章を入れる',
+        media: [
+          'https://images.pexels.com/photos/417074/pexels-photo-417074.jpeg',
+          'https://images.pexels.com/photos/50594/sea-bay-waterfront-beach-50594.jpeg',
+          'https://images.pexels.com/photos/443446/pexels-photo-443446.jpeg',
+        ],
       },
       {
         id: 2,
@@ -40,6 +45,11 @@ export const getJobs = async () => {
         jobDuties: 'カフェスタッフ',
         createdAt: '2025-01-20',
         description: 'ここに長い文章を入れる',
+        media: [
+          'https://images.pexels.com/photos/417074/pexels-photo-417074.jpeg',
+          'https://images.pexels.com/photos/50594/sea-bay-waterfront-beach-50594.jpeg',
+          'https://images.pexels.com/photos/443446/pexels-photo-443446.jpeg',
+        ],
       },
       {
         id: 3,
@@ -59,6 +69,7 @@ export const getJobs = async () => {
         createdAt: '2025-01-10',
         description:
           'ここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れる',
+        media: ['https://images.pexels.com/photos/417074/pexels-photo-417074.jpeg'],
       },
     ]
     return jobList
