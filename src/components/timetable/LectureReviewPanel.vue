@@ -11,7 +11,7 @@
     </div>
     <div v-else class="review-body">
       <!-- 統計表示 -->
-      <div class="stats-box mb-3" :class="{'mb-0': readonly}">
+      <div class="stats-box mb-3" :class="{ 'mb-0': readonly }">
         <div class="stats-average">
           <span class="average-num">{{ averageRating.toFixed(1) }}</span>
           <v-rating
@@ -42,7 +42,10 @@
             hover
             @update:model-value="submitRating"
           ></v-rating>
-          <div class="user-rating-hint text-caption mt-1 text-center" :class="{ 'text-success': submitSuccess }">
+          <div
+            class="user-rating-hint text-caption mt-1 text-center"
+            :class="{ 'text-success': submitSuccess }"
+          >
             {{ submitMessage }}
           </div>
         </div>
@@ -57,11 +60,7 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import { useStore } from 'vuex'
-import {
-  getLectureReviewStats,
-  getUserRating,
-  submitUserRating,
-} from '@/services/reviewService'
+import { getLectureReviewStats, getUserRating, submitUserRating } from '@/services/reviewService'
 
 const props = defineProps({
   lectureName: {

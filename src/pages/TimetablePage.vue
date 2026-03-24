@@ -35,18 +35,28 @@
 
       <!-- 必修区分の凡例 -->
       <!-- 凡例と取得単位数 -->
-      <div v-if="isLoggedIn" class="d-flex justify-space-between align-center mt-3 flex-wrap" style="gap: 8px;">
+      <div
+        v-if="isLoggedIn"
+        class="d-flex justify-space-between align-center mt-3 flex-wrap"
+        style="gap: 8px"
+      >
         <div class="lecture-legend mt-0">
           <div class="legend-item"><span class="legend-color required"></span>必修</div>
           <div class="legend-item"><span class="legend-color semi-required"></span>選択必修</div>
           <div class="legend-item"><span class="legend-color elective"></span>その他</div>
         </div>
 
-        <div class="credits-info text-caption d-flex align-center bg-teal-lighten-5 px-2 py-1 rounded border">
+        <div
+          class="credits-info text-caption d-flex align-center bg-teal-lighten-5 px-2 py-1 rounded border"
+        >
           <v-icon size="14" color="teal" class="mr-1">mdi-school</v-icon>
           <span class="font-weight-bold text-teal-darken-3">登録: {{ totalCredits }}単位</span>
-          <span v-if="earnedCredits > 0" class="ml-2 font-weight-bold text-teal-darken-1">(取得: {{ earnedCredits }})</span>
-          <span v-if="failedCredits > 0" class="ml-2 font-weight-bold text-error">(落単: {{ failedCredits }})</span>
+          <span v-if="earnedCredits > 0" class="ml-2 font-weight-bold text-teal-darken-1"
+            >(取得: {{ earnedCredits }})</span
+          >
+          <span v-if="failedCredits > 0" class="ml-2 font-weight-bold text-error"
+            >(落単: {{ failedCredits }})</span
+          >
         </div>
       </div>
     </header>

@@ -23,10 +23,7 @@ export default {
     grade: Number(localStorage.getItem(GRADE_KEY)) || 1,
     isLoading: false,
     error: null,
-    /**
-     * フェッチ済みキーのセット。keep-alive でキャッシュが生きている間は
-     * 同じキーのAPI再フェッチをスキップする。
-     */
+    /** フェッチ済みキーのセット。keep-alive でキャッシュが生きている間は 同じキーのAPI再フェッチをスキップする。 */
     fetchedKeys: new Set(),
   }),
   mutations: {
@@ -68,9 +65,8 @@ export default {
   },
   actions: {
     /**
-     * 時間割を取得する（getDocs ベース）
-     * keep-alive キャッシュが有効な場合はAPI通信をスキップする。
-     * UI向けのデータ自体は `timetables` に保持されているため即時表示される。
+     * 時間割を取得する（getDocs ベース） keep-alive キャッシュが有効な場合はAPI通信をスキップする。 UI向けのデータ自体は `timetables`
+     * に保持されているため即時表示される。
      *
      * @param {object} root0 - Vuexコンテキスト
      * @param {import('vuex').Commit} root0.commit - ミューテーション
@@ -233,7 +229,10 @@ export default {
      * @returns {number} 取得単位の合計
      */
     totalCredits: (state, getters) => {
-      return Object.values(getters.currentTimetable).reduce((sum, l) => sum + (Number(l.credits) || 0), 0)
+      return Object.values(getters.currentTimetable).reduce(
+        (sum, l) => sum + (Number(l.credits) || 0),
+        0,
+      )
     },
   },
 }

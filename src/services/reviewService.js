@@ -1,10 +1,10 @@
-import { getFirestore, doc, getDoc, runTransaction } from 'firebase/firestore'
+import { doc, getDoc, getFirestore, runTransaction } from 'firebase/firestore'
 
 /**
  * 講義の平均評価とレビュー件数を取得する
  *
  * @param {string} lectureName - 講義名
- * @returns {Promise<{average: number, count: number}|null>} セッション情報
+ * @returns {Promise<{ average: number; count: number } | null>} セッション情報
  */
 export const getLectureReviewStats = async (lectureName) => {
   if (!lectureName) return null

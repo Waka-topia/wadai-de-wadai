@@ -431,7 +431,6 @@ const getLectureCardStyle = (day, period) => {
   overflow: hidden;
 }
 
-
 /* 年次ラベル */
 .lecture-year {
   font-size: 0.58rem;

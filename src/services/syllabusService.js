@@ -1,10 +1,10 @@
-import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
+import { doc, getDoc, getFirestore, serverTimestamp, setDoc } from 'firebase/firestore'
 
 /**
  * シラバス情報を取得する
  *
  * @param {string} lectureName - 講義名
- * @returns {Promise<object|null>} シラバス情報データ
+ * @returns {Promise<object | null>} シラバス情報データ
  */
 export const getSyllabus = async (lectureName) => {
   if (!lectureName) return null
@@ -56,6 +56,6 @@ export const saveSyllabus = async (lectureName, syllabusData, uid, displayName) 
   if (previousVersion) {
     updateData.previousVersion = previousVersion
   }
-  
+
   await setDoc(docRef, updateData, { merge: true })
 }

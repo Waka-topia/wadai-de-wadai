@@ -31,44 +31,46 @@
             <v-list density="compact" class="detail-info-list mb-4" bg-color="transparent">
               <v-list-item>
                 <template #prepend>
-                <v-icon color="grey-darken-1" size="20" class="mr-3">mdi-account</v-icon>
-              </template>
-              <v-list-item-title class="text-body-2">{{
-                form.teacher || '未設定'
-              }}</v-list-item-title>
-            </v-list-item>
+                  <v-icon color="grey-darken-1" size="20" class="mr-3">mdi-account</v-icon>
+                </template>
+                <v-list-item-title class="text-body-2">{{
+                  form.teacher || '未設定'
+                }}</v-list-item-title>
+              </v-list-item>
 
-            <v-list-item>
-              <template #prepend>
-                <v-icon color="grey-darken-1" size="20" class="mr-3">mdi-map-marker</v-icon>
-              </template>
-              <v-list-item-title class="text-body-2">{{ form.room || '未設定' }}</v-list-item-title>
-            </v-list-item>
+              <v-list-item>
+                <template #prepend>
+                  <v-icon color="grey-darken-1" size="20" class="mr-3">mdi-map-marker</v-icon>
+                </template>
+                <v-list-item-title class="text-body-2">{{
+                  form.room || '未設定'
+                }}</v-list-item-title>
+              </v-list-item>
 
-            <v-list-item>
-              <template #prepend>
-                <v-icon color="grey-darken-1" size="20" class="mr-3">mdi-school-outline</v-icon>
-              </template>
-              <v-list-item-title class="text-body-2 d-flex align-center">
-                取得状況：
-                <v-chip
-                  size="x-small"
-                  :variant="form.creditStatus === 'taking' ? 'tonal' : 'flat'"
-                  :color="creditStatusColor"
-                  class="ml-2 font-weight-bold"
-                >
-                  {{ creditStatusLabel }}
-                </v-chip>
-              </v-list-item-title>
-            </v-list-item>
+              <v-list-item>
+                <template #prepend>
+                  <v-icon color="grey-darken-1" size="20" class="mr-3">mdi-school-outline</v-icon>
+                </template>
+                <v-list-item-title class="text-body-2 d-flex align-center">
+                  取得状況：
+                  <v-chip
+                    size="x-small"
+                    :variant="form.creditStatus === 'taking' ? 'tonal' : 'flat'"
+                    :color="creditStatusColor"
+                    class="ml-2 font-weight-bold"
+                  >
+                    {{ creditStatusLabel }}
+                  </v-chip>
+                </v-list-item-title>
+              </v-list-item>
 
-            <v-list-item v-if="form.memo">
-              <template #prepend>
-                <v-icon color="grey-darken-1" size="20" class="mr-3">mdi-note-text</v-icon>
-              </template>
-              <v-list-item-title class="text-body-2" style="white-space: pre-wrap">{{
-                form.memo
-              }}</v-list-item-title>
+              <v-list-item v-if="form.memo">
+                <template #prepend>
+                  <v-icon color="grey-darken-1" size="20" class="mr-3">mdi-note-text</v-icon>
+                </template>
+                <v-list-item-title class="text-body-2" style="white-space: pre-wrap">{{
+                  form.memo
+                }}</v-list-item-title>
               </v-list-item>
             </v-list>
           </div>
@@ -209,7 +211,10 @@
             class="mb-2"
           />
 
-          <LectureReviewPanel v-if="currentLectureName && !isEditMode" :lecture-name="currentLectureName" />
+          <LectureReviewPanel
+            v-if="currentLectureName && !isEditMode"
+            :lecture-name="currentLectureName"
+          />
         </v-card-text>
 
         <v-card-actions class="modal-actions">
