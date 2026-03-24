@@ -1,6 +1,6 @@
 <template>
   <v-card
-    class="recruit-job-card mb-4 mx-5 mt-8"
+    class="recruit-job-card mb-4 mx-5 mt-5"
     rounded="lg"
     elevation="1"
     @click="router.push(`/jobs/${job.id}`)"

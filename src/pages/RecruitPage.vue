@@ -2,7 +2,7 @@
   <div class="recruit-container">
     <RecruitSearchFilter />
     <v-container class="px-0 pb-16 pt-0">
-      <BookMarkFilterTabs class="mb-4" />
+      <BookMarkFilterTabs />
       <RecruitSortButtons />
       <RecruitJobCard v-for="job in sortedJobs" :key="job.id" :job="job" />
     </v-container>
