@@ -25,6 +25,9 @@ export const getJobs = async () => {
         tags: ['週1OK', '未経験歓迎', '駅チカ', '学生歓迎'],
         createdAt: '2025-01-15',
         description: 'ここに長い文章を入れる',
+        contactNumber: '0120-12-3456',
+        personName: '和歌山 花子',
+        responseHours: '10:00 ~ 23:00',
       },
       {
         id: 2,
@@ -46,6 +49,9 @@ export const getJobs = async () => {
         tags: ['駅チカ', 'カフェバイト', '未経験歓迎'],
         createdAt: '2025-01-20',
         description: 'ここに長い文章を入れる',
+        contactNumber: '0120-65-4321',
+        personName: '大阪 太郎',
+        responseHours: '10:00 ~ 22:00',
       },
       {
         id: 3,
@@ -68,6 +74,10 @@ export const getJobs = async () => {
         createdAt: '2025-01-10',
         description:
           'ここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れる',
+
+        contactNumber: '090-12-3456',
+        personName: '奈良 太郎',
+        responseHours: '10:00 ~ 21:00',
       },
     ]
     return jobList
