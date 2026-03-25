@@ -1,6 +1,15 @@
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { db } from '@/firebase/config'
 
+const workplaceImages = import.meta.glob('../assets/workplaces/*.{png,jpg,jpeg,svg}', {
+  eager: true,
+  import: 'default',
+})
+
+const getImageUrl = (filename) => {
+  return workplaceImages[`../assets/workplaces/${filename}`]
+}
+
 export const getJobs = async () => {
   try {
     // 一時的にハードコーディングされた求人データを返す
@@ -23,9 +32,9 @@ export const getJobs = async () => {
         createdAt: '2025-01-15',
         description: 'ここに長い文章を入れる',
         media: [
-          'https://images.pexels.com/photos/417074/pexels-photo-417074.jpeg',
-          'https://images.pexels.com/photos/50594/sea-bay-waterfront-beach-50594.jpeg',
-          'https://images.pexels.com/photos/443446/pexels-photo-443446.jpeg',
+          getImageUrl('workplace_example1.jpeg'),
+          getImageUrl('workplace_example2.jpeg'),
+          getImageUrl('workplace_example3.jpeg'),
         ],
       },
       {
@@ -46,9 +55,10 @@ export const getJobs = async () => {
         createdAt: '2025-01-20',
         description: 'ここに長い文章を入れる',
         media: [
-          'https://images.pexels.com/photos/417074/pexels-photo-417074.jpeg',
-          'https://images.pexels.com/photos/50594/sea-bay-waterfront-beach-50594.jpeg',
-          'https://images.pexels.com/photos/443446/pexels-photo-443446.jpeg',
+          // 👇 3. ヘルパー関数を使ってファイル名だけを指定する
+          getImageUrl('workplace_example1.jpeg'),
+          getImageUrl('workplace_example2.jpeg'),
+          getImageUrl('workplace_example3.jpeg'),
         ],
       },
       {
@@ -69,7 +79,7 @@ export const getJobs = async () => {
         createdAt: '2025-01-10',
         description:
           'ここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れる',
-        media: ['https://images.pexels.com/photos/417074/pexels-photo-417074.jpeg'],
+        media: [getImageUrl('workplace_example1.jpeg'), getImageUrl('workplace_example2.jpeg')],
       },
     ]
     return jobList
