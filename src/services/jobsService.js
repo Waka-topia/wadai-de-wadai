@@ -1,6 +1,16 @@
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { db } from '@/firebase/config'
 
+// サムネイル画像を一括インポート
+const thumbnailImages = import.meta.glob('../assets/thumbnails/*.{png,jpg,jpeg,svg}', {
+  eager: true,
+  import: 'default',
+})
+
+const getImageUrl = (filename) => {
+  return thumbnailImages[`../assets/thumbnails/${filename}`]
+}
+
 export const getJobs = async () => {
   try {
     // 一時的にハードコーディングされた求人データを返す
@@ -22,6 +32,7 @@ export const getJobs = async () => {
         jobDuties: 'ホール業務・キッチン業務',
         createdAt: '2025-01-15',
         description: 'ここに長い文章を入れる',
+        cardThumbnail: getImageUrl('thumbnail_example1.jpg'),
       },
       {
         id: 2,
@@ -40,6 +51,7 @@ export const getJobs = async () => {
         jobDuties: 'カフェスタッフ',
         createdAt: '2025-01-20',
         description: 'ここに長い文章を入れる',
+        cardThumbnail: getImageUrl('thumbnail_example1.jpg'),
       },
       {
         id: 3,
@@ -59,6 +71,7 @@ export const getJobs = async () => {
         createdAt: '2025-01-10',
         description:
           'ここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れる',
+        cardThumbnail: getImageUrl('thumbnail_example1.jpg'),
       },
     ]
     return jobList
