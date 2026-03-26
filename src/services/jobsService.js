@@ -6,8 +6,17 @@ const workplaceImages = import.meta.glob('../assets/workplaces/*.{png,jpg,jpeg,s
   import: 'default',
 })
 
-const getImageUrl = (filename) => {
+const thumbnailImages = import.meta.glob('../assets/thumbnails/*.{png,jpg,jpeg,svg}', {
+  eager: true,
+  import: 'default',
+})
+
+const getWorkPlaceImageUrl = (filename) => {
   return workplaceImages[`../assets/workplaces/${filename}`]
+}
+
+const getThumbnailImageUrl = (filename) => {
+  return thumbnailImages[`../assets/thumbnails/${filename}`]
 }
 
 export const getJobs = async () => {
@@ -38,10 +47,11 @@ export const getJobs = async () => {
         personName: '和歌山 花子',
         responseHours: '10:00 ~ 23:00',
         media: [
-          getImageUrl('workplace_example1.jpeg'),
-          getImageUrl('workplace_example2.jpeg'),
-          getImageUrl('workplace_example3.jpeg'),
+          getWorkPlaceImageUrl('workplace_example1.jpeg'),
+          getWorkPlaceImageUrl('workplace_example2.jpeg'),
+          getWorkPlaceImageUrl('workplace_example3.jpeg'),
         ],
+        cardThumbnail: getThumbnailImageUrl('thumbnail_example1.jpg'),
       },
       {
         id: 2,
@@ -67,10 +77,11 @@ export const getJobs = async () => {
         personName: '大阪 太郎',
         responseHours: '10:00 ~ 22:00',
         media: [
-          getImageUrl('workplace_example1.jpeg'),
-          getImageUrl('workplace_example2.jpeg'),
-          getImageUrl('workplace_example3.jpeg'),
+          getWorkPlaceImageUrl('workplace_example1.jpeg'),
+          getWorkPlaceImageUrl('workplace_example2.jpeg'),
+          getWorkPlaceImageUrl('workplace_example3.jpeg'),
         ],
+        cardThumbnail: getThumbnailImageUrl('thumbnail_example1.jpg'),
       },
       {
         id: 3,
@@ -96,7 +107,11 @@ export const getJobs = async () => {
         contactNumber: '090-12-3456',
         personName: '奈良 太郎',
         responseHours: '10:00 ~ 21:00',
-        media: [getImageUrl('workplace_example1.jpeg'), getImageUrl('workplace_example2.jpeg')],
+        media: [
+          getWorkPlaceImageUrl('workplace_example1.jpeg'),
+          getWorkPlaceImageUrl('workplace_example2.jpeg'),
+        ],
+        cardThumbnail: getThumbnailImageUrl('thumbnail_example1.jpg'),
       },
     ]
     return jobList
