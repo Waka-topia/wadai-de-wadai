@@ -1,6 +1,15 @@
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { db } from '@/firebase/config'
 
+const workplaceImages = import.meta.glob('../assets/workplaces/*.{png,jpg,jpeg,svg}', {
+  eager: true,
+  import: 'default',
+})
+
+const getImageUrl = (filename) => {
+  return workplaceImages[`../assets/workplaces/${filename}`]
+}
+
 export const getJobs = async () => {
   try {
     // 一時的にハードコーディングされた求人データを返す
@@ -28,6 +37,11 @@ export const getJobs = async () => {
         contactNumber: '0120-12-3456',
         personName: '和歌山 花子',
         responseHours: '10:00 ~ 23:00',
+        media: [
+          getImageUrl('workplace_example1.jpeg'),
+          getImageUrl('workplace_example2.jpeg'),
+          getImageUrl('workplace_example3.jpeg'),
+        ],
       },
       {
         id: 2,
@@ -52,6 +66,11 @@ export const getJobs = async () => {
         contactNumber: '0120-65-4321',
         personName: '大阪 太郎',
         responseHours: '10:00 ~ 22:00',
+        media: [
+          getImageUrl('workplace_example1.jpeg'),
+          getImageUrl('workplace_example2.jpeg'),
+          getImageUrl('workplace_example3.jpeg'),
+        ],
       },
       {
         id: 3,
@@ -74,10 +93,10 @@ export const getJobs = async () => {
         createdAt: '2025-01-10',
         description:
           'ここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れる',
-
         contactNumber: '090-12-3456',
         personName: '奈良 太郎',
         responseHours: '10:00 ~ 21:00',
+        media: [getImageUrl('workplace_example1.jpeg'), getImageUrl('workplace_example2.jpeg')],
       },
     ]
     return jobList
