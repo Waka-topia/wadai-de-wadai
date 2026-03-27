@@ -163,7 +163,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version-file: '.node-version'
       - run: npm ci
       - run: npm run lint
 
@@ -173,7 +173,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version-files: '.node-version'
       - run: npm ci
       - run: npm run build
 ```
