@@ -28,8 +28,8 @@
 
     <v-tabs-window
       v-for="sortOption in sortOptions"
-      :key="sortOption.value"
       v-model:model-value="tab"
+      :key="sortOption.value"
     >
       <v-tabs-window-item :value="sortOption.value">
         <RecruitJobCard v-for="job in sortedJobs" :key="job.id" :job="job" />
