@@ -10,24 +10,23 @@
       <p class="mt-4">{{ error }}</p>
     </div>
 
-    <div v-else class="bg-white">
-      <v-img
-        height="250"
-        src="https://cdn.vuetifyjs.com/images/cards/cooking.png"
-        cover
-        class="align-end"
-        transition="false"
+    <div v-else class="bg-white position-relative">
+      <v-btn
+        icon
+        variant="text"
+        color="white"
+        class="position-absolute top-0 left-0"
+        style="z-index: 10"
+        @click="$router.back()"
       >
-        <v-btn
-          icon
-          variant="text"
-          color="white"
-          class="position-absolute top-0 left-0"
-          @click="$router.back()"
-        >
-          <v-icon>mdi-arrow-left</v-icon>
-        </v-btn>
-      </v-img>
+        <v-icon>mdi-arrow-left</v-icon>
+      </v-btn>
+
+      <v-carousel height="250" hide-delimiter-background show-arrows="hover">
+        <v-carousel-item v-for="(imageUrl, index) in job.media" :key="index">
+          <v-img :src="imageUrl" height="100%" cover></v-img>
+        </v-carousel-item>
+      </v-carousel>
 
       <div class="pt-6 px-6 pb-4">
         <div class="d-flex align-center">
@@ -36,6 +35,20 @@
         </div>
       </div>
 
+      <div v-if="job.tags && job.tags.length" class="mb-4">
+        <v-chip
+          v-for="tag in job.tags"
+          :key="tag"
+          class="mr-2 mb-2"
+          color="orange"
+          variant="outlined"
+          size="small"
+        >
+          #{{ tag }}
+        </v-chip>
+      </div>
+
+      <v-divider class="mb-4"></v-divider>
       <div class="text-black text-h5 font-weight-bold text-wrap px-6 py-4">
         {{ job.title }}
       </div>
@@ -143,11 +156,11 @@ const store = useStore()
 
 const jobId = Number(route.params.id)
 
-const job = computed(() => store.getters.currentJobWithBookmark)
-
 const error = computed(() => store.state.jobs.error)
 
 onMounted(() => {
   store.dispatch('fetchJobById', jobId)
 })
+
+const job = computed(() => store.getters.currentJobWithBookmark)
 </script>

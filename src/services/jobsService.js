@@ -2,12 +2,15 @@ import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { db } from '@/firebase/config'
 
 const thumbnailImages = import.meta.glob('@/assets/thumbnails/*.{png,jpg,jpeg,svg}', {
+const workplaceImages = import.meta.glob('@/assets/workplaces/*.{png,jpg,jpeg,svg}', {
   eager: true,
   import: 'default',
 })
 
 const getThumbnailImageUrl = (filename) => {
   return thumbnailImages[`/src/assets/thumbnails/${filename}`]
+const getWorkPlaceImageUrl = (filename) => {
+  return workplaceImages[`/src/assets/workplaces/${filename}`]
 }
 
 export const getJobs = async () => {
@@ -28,10 +31,18 @@ export const getJobs = async () => {
         vacation: 'シフト制',
         startTime: '09:00',
         endTime: '22:00',
+        workHours: '09:00〜22:00の間で1日3h〜OK',
+        workDays: '週1日〜OK',
         jobDuties: 'ホール業務・キッチン業務',
+        tags: ['週1OK', '未経験歓迎', '駅チカ', '学生歓迎'],
         createdAt: '2025-01-15',
         description: 'ここに長い文章を入れる',
         cardThumbnail: getThumbnailImageUrl('thumbnail_example1.jpg'),
+        media: [
+          getWorkPlaceImageUrl('workplace_example1.jpeg'),
+          getWorkPlaceImageUrl('workplace_example2.jpeg'),
+          getWorkPlaceImageUrl('workplace_example3.jpeg'),
+        ],
       },
       {
         id: 2,
@@ -47,10 +58,18 @@ export const getJobs = async () => {
         vacation: 'シフト制',
         startTime: '08:00',
         endTime: '20:00',
+        workHours: '08:00〜20:00の間で4h〜OK',
+        workDays: '週2日〜OK',
         jobDuties: 'カフェスタッフ',
+        tags: ['駅チカ', 'カフェバイト', '未経験歓迎'],
         createdAt: '2025-01-20',
         description: 'ここに長い文章を入れる',
         cardThumbnail: getThumbnailImageUrl('thumbnail_example1.jpg'),
+        media: [
+          getWorkPlaceImageUrl('workplace_example1.jpeg'),
+          getWorkPlaceImageUrl('workplace_example2.jpeg'),
+          getWorkPlaceImageUrl('workplace_example3.jpeg'),
+        ],
       },
       {
         id: 3,
@@ -66,11 +85,19 @@ export const getJobs = async () => {
         vacation: 'シフト制',
         startTime: '14:00',
         endTime: '21:00',
+        workHours: '14:00〜21:00',
+        workDays: '週2〜3日',
         jobDuties: '個別指導講師',
+        tags: ['高時給', '塾講師', '大学生歓迎'],
         createdAt: '2025-01-10',
         description:
           'ここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れる',
         cardThumbnail: getThumbnailImageUrl('thumbnail_example1.jpg'),
+        media: [
+          getWorkPlaceImageUrl('workplace_example1.jpeg'),
+          getWorkPlaceImageUrl('workplace_example2.jpeg'),
+          getWorkPlaceImageUrl('workplace_example3.jpeg'),
+        ],
       },
     ]
     return jobList
