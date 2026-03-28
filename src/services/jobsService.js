@@ -7,7 +7,7 @@ const thumbnailImages = import.meta.glob('@/assets/thumbnails/*.{png,jpg,jpeg,sv
   import: 'default',
 })
 
-const getImageUrl = (filename) => {
+const getThumbnailImageUrl = (filename) => {
   return thumbnailImages[`@/assets/thumbnails/${filename}`]
 }
 
@@ -32,7 +32,7 @@ export const getJobs = async () => {
         jobDuties: 'ホール業務・キッチン業務',
         createdAt: '2025-01-15',
         description: 'ここに長い文章を入れる',
-        cardThumbnail: getImageUrl('thumbnail_example1.jpg'),
+        cardThumbnail: getThumbnailImageUrl('thumbnail_example1.jpg'),
       },
       {
         id: 2,
@@ -51,7 +51,7 @@ export const getJobs = async () => {
         jobDuties: 'カフェスタッフ',
         createdAt: '2025-01-20',
         description: 'ここに長い文章を入れる',
-        cardThumbnail: getImageUrl('thumbnail_example1.jpg'),
+        cardThumbnail: getThumbnailImageUrl('thumbnail_example1.jpg'),
       },
       {
         id: 3,
@@ -71,7 +71,7 @@ export const getJobs = async () => {
         createdAt: '2025-01-10',
         description:
           'ここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れる',
-        cardThumbnail: getImageUrl('thumbnail_example1.jpg'),
+        cardThumbnail: getThumbnailImageUrl('thumbnail_example1.jpg'),
       },
     ]
     return jobList
