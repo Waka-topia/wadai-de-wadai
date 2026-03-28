@@ -43,6 +43,7 @@
             color="orange"
             variant="outlined"
             size="small"
+            @click="goToTagFilter(tag)"
           >
             #{{ tag }}
           </v-chip>
@@ -97,15 +98,23 @@
 <script setup>
 import { computed, onMounted } from 'vue'
 import { useStore } from 'vuex'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
+const router = useRouter()
 const store = useStore()
 
 const jobId = Number(route.params.id)
 
 const job = computed(() => store.state.jobs.currentJob)
 const error = computed(() => store.state.jobs.error)
+
+const goToTagFilter = (tag) =>{
+  router.push({
+    path:'/jobs',
+    query:{tag},
+  })
+}
 
 onMounted(() => {
   store.dispatch('fetchJobById', jobId)
