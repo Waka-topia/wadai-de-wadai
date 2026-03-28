@@ -1,14 +1,13 @@
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { db } from '@/firebase/config'
 
-// サムネイル画像を一括インポート
 const thumbnailImages = import.meta.glob('@/assets/thumbnails/*.{png,jpg,jpeg,svg}', {
   eager: true,
   import: 'default',
 })
 
 const getThumbnailImageUrl = (filename) => {
-  return thumbnailImages[`@/assets/thumbnails/${filename}`]
+  return thumbnailImages[`/src/assets/thumbnails/${filename}`]
 }
 
 export const getJobs = async () => {
