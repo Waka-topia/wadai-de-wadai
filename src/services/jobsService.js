@@ -1,6 +1,15 @@
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { db } from '@/firebase/config'
 
+const workplaceImages = import.meta.glob('@/assets/workplaces/*.{png,jpg,jpeg,svg}', {
+  eager: true,
+  import: 'default',
+})
+
+const getWorkPlaceImageUrl = (filename) => {
+  return workplaceImages[`/src/assets/workplaces/${filename}`]
+}
+
 export const getJobs = async () => {
   try {
     // 一時的にハードコーディングされた求人データを返す
@@ -25,6 +34,11 @@ export const getJobs = async () => {
         tags: ['週1OK', '未経験歓迎', '駅チカ', '学生歓迎'],
         createdAt: '2025-01-15',
         description: 'ここに長い文章を入れる',
+        media: [
+          getWorkPlaceImageUrl('workplace_example1.jpeg'),
+          getWorkPlaceImageUrl('workplace_example2.jpeg'),
+          getWorkPlaceImageUrl('workplace_example3.jpeg'),
+        ],
       },
       {
         id: 2,
@@ -46,6 +60,11 @@ export const getJobs = async () => {
         tags: ['駅チカ', 'カフェバイト', '未経験歓迎'],
         createdAt: '2025-01-20',
         description: 'ここに長い文章を入れる',
+        media: [
+          getWorkPlaceImageUrl('workplace_example1.jpeg'),
+          getWorkPlaceImageUrl('workplace_example2.jpeg'),
+          getWorkPlaceImageUrl('workplace_example3.jpeg'),
+        ],
       },
       {
         id: 3,
@@ -68,6 +87,11 @@ export const getJobs = async () => {
         createdAt: '2025-01-10',
         description:
           'ここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れる',
+        media: [
+          getWorkPlaceImageUrl('workplace_example1.jpeg'),
+          getWorkPlaceImageUrl('workplace_example2.jpeg'),
+          getWorkPlaceImageUrl('workplace_example3.jpeg'),
+        ],
       },
     ]
     return jobList
