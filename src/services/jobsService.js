@@ -2,6 +2,9 @@ import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { db } from '@/firebase/config'
 
 const thumbnailImages = import.meta.glob('@/assets/thumbnails/*.{png,jpg,jpeg,svg}', {
+  eager: true,
+  import: 'default',
+})
 const workplaceImages = import.meta.glob('@/assets/workplaces/*.{png,jpg,jpeg,svg}', {
   eager: true,
   import: 'default',
@@ -9,6 +12,7 @@ const workplaceImages = import.meta.glob('@/assets/workplaces/*.{png,jpg,jpeg,sv
 
 const getThumbnailImageUrl = (filename) => {
   return thumbnailImages[`/src/assets/thumbnails/${filename}`]
+}
 const getWorkPlaceImageUrl = (filename) => {
   return workplaceImages[`/src/assets/workplaces/${filename}`]
 }
