@@ -53,5 +53,8 @@
     "prettier-plugin-packagejson": "^2.5.20",
     "vite": "^7.3.1",
     "vite-plugin-vue-devtools": "^8.0.5"
+  },
+  "engines": {
+    "node": ">=24.0.0"
   }
 }
