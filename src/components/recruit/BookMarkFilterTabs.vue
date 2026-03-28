@@ -32,7 +32,7 @@ const filterTab = computed({
   set: (value) => store.commit('setShowBookmarkedOnly', value),
 })
 
-const isAuthenticated = computed(() => !!store.state.auth?.userId)
+const isAuthenticated = computed(() => store.getters['auth/isAuthenticated'])
 
 const filterOptions = computed(() => {
   const options = [{ value: false, label: 'すべて' }]
