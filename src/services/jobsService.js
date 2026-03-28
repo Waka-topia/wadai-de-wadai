@@ -1,13 +1,13 @@
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { db } from '@/firebase/config'
 
-const workplaceImages = import.meta.glob('../assets/workplaces/*.{png,jpg,jpeg,svg}', {
+const workplaceImages = import.meta.glob('@/assets/workplaces/*.{png,jpg,jpeg,svg}', {
   eager: true,
   import: 'default',
 })
 
 const getWorkPlaceImageUrl = (filename) => {
-  return workplaceImages[`@/assets/workplaces/${filename}`]
+  return workplaceImages[`/src/assets/workplaces/${filename}`]
 }
 
 export const getJobs = async () => {
