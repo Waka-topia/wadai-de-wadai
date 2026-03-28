@@ -1,11 +1,18 @@
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { db } from '@/firebase/config'
 
+const thumbnailImages = import.meta.glob('@/assets/thumbnails/*.{png,jpg,jpeg,svg}', {
+  eager: true,
+  import: 'default',
+})
 const workplaceImages = import.meta.glob('@/assets/workplaces/*.{png,jpg,jpeg,svg}', {
   eager: true,
   import: 'default',
 })
 
+const getThumbnailImageUrl = (filename) => {
+  return thumbnailImages[`/src/assets/thumbnails/${filename}`]
+}
 const getWorkPlaceImageUrl = (filename) => {
   return workplaceImages[`/src/assets/workplaces/${filename}`]
 }
@@ -34,6 +41,7 @@ export const getJobs = async () => {
         tags: ['週1OK', '未経験歓迎', '駅チカ', '学生歓迎'],
         createdAt: '2025-01-15',
         description: 'ここに長い文章を入れる',
+        cardThumbnail: getThumbnailImageUrl('thumbnail_example1.jpg'),
         media: [
           getWorkPlaceImageUrl('workplace_example1.jpeg'),
           getWorkPlaceImageUrl('workplace_example2.jpeg'),
@@ -60,6 +68,7 @@ export const getJobs = async () => {
         tags: ['駅チカ', 'カフェバイト', '未経験歓迎'],
         createdAt: '2025-01-20',
         description: 'ここに長い文章を入れる',
+        cardThumbnail: getThumbnailImageUrl('thumbnail_example1.jpg'),
         media: [
           getWorkPlaceImageUrl('workplace_example1.jpeg'),
           getWorkPlaceImageUrl('workplace_example2.jpeg'),
@@ -87,6 +96,7 @@ export const getJobs = async () => {
         createdAt: '2025-01-10',
         description:
           'ここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れる',
+        cardThumbnail: getThumbnailImageUrl('thumbnail_example1.jpg'),
         media: [
           getWorkPlaceImageUrl('workplace_example1.jpeg'),
           getWorkPlaceImageUrl('workplace_example2.jpeg'),
