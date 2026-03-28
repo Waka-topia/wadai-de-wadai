@@ -7,7 +7,7 @@ const workplaceImages = import.meta.glob('../assets/workplaces/*.{png,jpg,jpeg,s
 })
 
 const getImageUrl = (filename) => {
-  return workplaceImages[`../assets/workplaces/${filename}`]
+  return workplaceImages[`@/assets/workplaces/${filename}`]
 }
 
 export const getJobs = async () => {
