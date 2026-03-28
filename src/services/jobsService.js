@@ -6,7 +6,7 @@ const workplaceImages = import.meta.glob('../assets/workplaces/*.{png,jpg,jpeg,s
   import: 'default',
 })
 
-const getImageUrl = (filename) => {
+const getWorkPlaceImageUrl = (filename) => {
   return workplaceImages[`@/assets/workplaces/${filename}`]
 }
 
@@ -32,9 +32,9 @@ export const getJobs = async () => {
         createdAt: '2025-01-15',
         description: 'ここに長い文章を入れる',
         media: [
-          getImageUrl('workplace_example1.jpeg'),
-          getImageUrl('workplace_example2.jpeg'),
-          getImageUrl('workplace_example3.jpeg'),
+          getWorkPlaceImageUrl('workplace_example1.jpeg'),
+          getWorkPlaceImageUrl('workplace_example2.jpeg'),
+          getWorkPlaceImageUrl('workplace_example3.jpeg'),
         ],
       },
       {
@@ -55,10 +55,9 @@ export const getJobs = async () => {
         createdAt: '2025-01-20',
         description: 'ここに長い文章を入れる',
         media: [
-          // 👇 3. ヘルパー関数を使ってファイル名だけを指定する
-          getImageUrl('workplace_example1.jpeg'),
-          getImageUrl('workplace_example2.jpeg'),
-          getImageUrl('workplace_example3.jpeg'),
+          getWorkPlaceImageUrl('workplace_example1.jpeg'),
+          getWorkPlaceImageUrl('workplace_example2.jpeg'),
+          getWorkPlaceImageUrl('workplace_example3.jpeg'),
         ],
       },
       {
@@ -79,7 +78,11 @@ export const getJobs = async () => {
         createdAt: '2025-01-10',
         description:
           'ここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れるここに長い文章を入れる',
-        media: [getImageUrl('workplace_example1.jpeg'), getImageUrl('workplace_example2.jpeg')],
+        media: [
+          getWorkPlaceImageUrl('workplace_example1.jpeg'),
+          getWorkPlaceImageUrl('workplace_example2.jpeg'),
+          getWorkPlaceImageUrl('workplace_example3.jpeg'),
+        ],
       },
     ]
     return jobList
