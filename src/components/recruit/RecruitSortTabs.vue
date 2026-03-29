@@ -15,6 +15,7 @@
         :key="sortOption.value"
         :value="sortOption.value"
         class="font-weight-bold"
+      >
     <div class="d-flex align-center bg-white rounded-t">
       <v-btn
         v-if="isAuthenticated"
