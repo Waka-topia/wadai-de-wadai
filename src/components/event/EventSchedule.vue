@@ -67,7 +67,6 @@ const props = defineProps({
   },
 })
 
-
 const filteredEvents = computed(() => {
   return store.getters['event/sortedEventsByDate'](props.selectedDate)
 })
