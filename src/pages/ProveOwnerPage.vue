@@ -3,32 +3,44 @@
   <v-sheet class="pa-12" rounded>
     <v-card class="py-8">
       <v-form v-model="form" @submit.prevent="onSubmit">
-        <v-text-field
+        <v-select
           v-model="orgName"
-          class="mb-2"
-          :rules="[required, nameCheck]"
-          clearable
-          hint="団体名を入力してください。"
-          label="Organization Name"
-          placeholder="サッカー部"
+          :items="allGroups"
+          :rules="[required]"
+          item-title="name"
+          item-value="name"
+          label="団体名"
+          variant="outlined"
+          density="comfortable"
+          required
+          persistent-hint
+          prepend-inner-icon="mdi-domain"
         />
         <v-text-field
-          v-model="userName"
-          class="mb-2"
-          :rules="[required, nameCheck]"
+          v-model="password"
+          :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
+          :rules="[required, passwordRule]"
+          :type="visible ? 'text' : 'password'"
           clearable
-          hint="本名を入力してください。"
+          hint="8文字以上にしてください。"
+          label="Password"
+          placeholder="Xa4%j87d"
+          prepend-inner-icon="mdi-lock-outline"
+          @click:append-inner="visible = !visible"
+        ></v-text-field>
+        <v-text-field
+          :model-value="userName"
+          class="mb-2"
+          disabled
+          hint="アカウント情報から自動入力されます。"
           label="User Name"
-          placeholder="山田太郎"
         />
         <v-text-field
-          v-model="email"
+          :model-value="email"
           class="mb-2"
-          :rules="[required, emailDomainCheck]"
-          clearable
-          hint="大学のメールアドレスを入力してください。"
+          disabled
+          hint="アカウント情報から自動入力されます。"
           label="Email"
-          placeholder="sxxxxxx@wakayama-u.ac.jp"
           prepend-inner-icon="mdi-email-outline"
         ></v-text-field>
 
@@ -54,12 +66,13 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { proveOwnerService } from '@/services/eventService'
+import { createRandomId, proveOwnerService } from '@/services/eventService'
 import { useStore } from 'vuex'
+import { allGroups } from '@/data/groups'
 
 const orgName = ref('')
-const userName = ref('')
-const email = ref('')
+const password = ref('')
+const visible = ref(false)
 const form = ref(false)
 const isLoading = ref(false)
 const snackbar = ref({
@@ -72,30 +85,28 @@ const router = useRouter()
 const store = useStore()
 
 const userId = computed(() => store.getters['auth/userId'])
+const userName = computed(() => store.getters['auth/displayName'])
+const email = computed(() => store.getters['auth/email'])
 
 const required = (value) => !!value || 'このフィールドは必須です。'
-
-const nameCheck = (value) => {
-  if (value && value.length < 2) {
-    return '名前は2文字以上で入力してください'
+const passwordRule = (value) => {
+  if (value && value.length < 8) {
+    return 'パスワードは8文字以上で入力してください'
   }
   return true
-}
-
-const emailDomainCheck = (value) => {
-  if (value && value.endsWith('@wakayama-u.ac.jp')) {
-    return true
-  }
-  return '有効な和歌山大学のメールアドレスを入力してください'
 }
 
 const onSubmit = async () => {
   try {
     isLoading.value = true
+
+    const tempId = createRandomId()
     await proveOwnerService(userId.value, {
       organizationName: orgName.value,
+      password: password.value,
       userName: userName.value,
       email: email.value,
+      tempId,
     })
 
     snackbar.value = {
@@ -105,7 +116,7 @@ const onSubmit = async () => {
     }
 
     setTimeout(() => {
-      router.push('/eventcal')
+      router.push('/prove-owner/description')
     }, 1000)
   } catch (error) {
     snackbar.value = {

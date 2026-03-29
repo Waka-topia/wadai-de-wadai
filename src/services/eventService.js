@@ -224,6 +224,10 @@ export const getProveOwnerApplicantsService = async () => {
         const userData = userDoc.data()
         return {
           userId: userDoc.id,
+          tempId: userData.proveOwnerApplication?.tempId || null,
+          userName: userData.proveOwnerApplication?.userName || null,
+          organizationName: userData.proveOwnerApplication?.organizationName || null,
+          email: userData.proveOwnerApplication?.email || null,
           isOfficial: Boolean(userData.isOfficial),
           isProvePending: Boolean(userData.isProvePending),
           proveOwnerApplication: userData.proveOwnerApplication || null,

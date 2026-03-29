@@ -10,6 +10,7 @@
           <thead>
             <tr>
               <th class="text-left">ユーザID</th>
+              <th class="text-left">一時ID</th>
               <th class="text-left">団体名</th>
               <th class="text-left">申請者名</th>
               <th class="text-left">メール</th>
@@ -20,6 +21,7 @@
           <tbody>
             <tr v-for="applicant in applicants" :key="applicant.userId">
               <td class="text-body-2 text-break">{{ applicant.userId }}</td>
+              <td class="text-body-2 text-break">{{ applicant.tempId }}</td>
               <td>{{ applicant.proveOwnerApplication.organizationName || '-' }}</td>
               <td>{{ applicant.proveOwnerApplication.userName || '-' }}</td>
               <td>{{ applicant.proveOwnerApplication.email || '-' }}</td>
@@ -40,7 +42,7 @@
             </tr>
 
             <tr v-if="!isLoading && applicants.length === 0">
-              <td class="text-center py-6" colspan="6">申請データはありません</td>
+              <td class="text-center py-6" colspan="7">申請データはありません</td>
             </tr>
           </tbody>
         </v-table>
@@ -55,6 +57,9 @@
           <v-card class="pa-4" variant="outlined">
             <p class="text-subtitle-2 mb-1">ユーザID</p>
             <p class="mb-3 text-body-2 text-break">{{ applicant.userId }}</p>
+
+            <p class="text-subtitle-2 mb-1">一時ID</p>
+            <p class="mb-3 text-body-2 text-break">{{ applicant.tempId }}</p>
 
             <p class="text-subtitle-2 mb-1">団体名</p>
             <p class="mb-3 text-body-2">

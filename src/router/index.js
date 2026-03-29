@@ -84,6 +84,11 @@ const routes = [
     component: () => import('@/pages/ProveOwnerPage.vue'),
   },
   {
+    path: '/prove-owner/description',
+    name: 'ProveOwnerDescription',
+    component: () => import('@/pages/ProveOwnerDescriptionPage.vue'),
+  },
+  {
     path: '/admin',
     name: 'Admin',
     component: () => import('@/pages/AdminPage.vue'),
