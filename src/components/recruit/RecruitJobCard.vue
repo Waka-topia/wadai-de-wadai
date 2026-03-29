@@ -1,12 +1,23 @@
 <template>
   <v-card
-    class="recruit-job-card mb-4 mx-5 mt-8"
+    class="recruit-job-card mb-4 mx-5 mt-5"
     rounded="lg"
     elevation="1"
     @click="router.push(`/jobs/${job.id}`)"
   >
-    <div class="placeholder-image d-flex align-center justify-center">
-      <v-icon size="64" color="grey-lighten-1">mdi-image-outline</v-icon>
+    <div class="placeholder-image d-flex align-center justify-center position-relative">
+      <v-img
+        v-if="job.cardThumbnail"
+        :src="job.cardThumbnail"
+        width="100%"
+        height="100%"
+        cover
+      ></v-img>
+      <v-icon v-else size="64" color="grey-lighten-1">mdi-image-outline</v-icon>
+
+      <div class="position-absolute" style="top: 8px; right: 8px" @click.stop>
+        <BookMarkButton :job-id="job.id" :is-bookmarked="!!job.isBookmarked" />
+      </div>
     </div>
 
     <v-card-text class="pa-4">
@@ -47,6 +58,7 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
+import BookMarkButton from './BookMarkButton.vue'
 
 const router = useRouter()
 
