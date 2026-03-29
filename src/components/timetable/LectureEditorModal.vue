@@ -107,8 +107,12 @@
           >
             <div class="d-flex align-center justify-space-between">
               <div>
-                <div class="text-caption font-weight-bold text-teal-darken-3">📚 みんなのシラバスから探す</div>
-                <div class="text-teal-darken-1" style="font-size: 0.65rem">楽単度や過去のレビューが見れます！</div>
+                <div class="text-caption font-weight-bold text-teal-darken-3">
+                  📚 みんなのシラバスから探す
+                </div>
+                <div class="text-teal-darken-1" style="font-size: 0.65rem">
+                  楽単度や過去のレビューが見れます！
+                </div>
               </div>
               <v-btn
                 color="teal"
@@ -124,7 +128,11 @@
 
           <!-- 講義名（手動入力） -->
           <div class="field-label">講義名 <span class="required">*</span></div>
-          <p v-if="!isExistingLecture" class="text-caption text-grey mb-1" style="font-size: 0.7rem">
+          <p
+            v-if="!isExistingLecture"
+            class="text-caption text-grey mb-1"
+            style="font-size: 0.7rem"
+          >
             ※検索せずに直接追加する場合は以下に入力してください
           </p>
           <v-text-field
@@ -358,10 +366,7 @@ const currentLectureName = computed(() => {
   return typeof raw === 'object' && raw !== null ? raw.name : raw
 })
 
-/**
- * シラバスパネルに渡す講義名（currentLectureNameの別名 alias）
- * テンプレート内で v-if / :lecture-name に使用
- */
+/** シラバスパネルに渡す講義名（currentLectureNameの別名 alias） テンプレート内で v-if / :lecture-name に使用 */
 const selectedLectureName = computed(() => currentLectureName.value)
 
 const requiredLabel = computed(() => {
@@ -422,9 +427,7 @@ watch(
   },
 )
 
-/**
- * 保存ボタン押下時の処理
- */
+/** 保存ボタン押下時の処理 */
 const handleSave = () => {
   if (!props.selectedCell || !form.value.name) return
   executeFinalSave()
@@ -450,7 +453,7 @@ const executeFinalSave = () => {
   close()
 }
 
-/** 
+/**
  * シラバスパネルから紐付け（名寄せ）が完了した際の処理
  *
  * @param {string} masterName - 正式講義名

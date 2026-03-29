@@ -1,21 +1,15 @@
 /**
  * 全ユーザーの講義データを集約した「マスターインデックス」を管理するサービス
  *
- * 【アプローチA】
- * 検索用のメタデータを search_index/master という1つのドキュメントに集約し、
- * ブラウザ側で超高速なフィルタリング・ソートを実現します。
+ * 【アプローチA】 検索用のメタデータを search_index/master という1つのドキュメントに集約し、 ブラウザ側で超高速なフィルタリング・ソートを実現します。
  *
  * Firestore のパス:
+ *
  * - 詳細データ: lecture_syllabuses/{name}
  * - インデックス: lecture_search/all_lectures_index
  */
 
-import {
-  doc,
-  getDoc,
-  runTransaction,
-  serverTimestamp,
-} from 'firebase/firestore'
+import { doc, getDoc, runTransaction, serverTimestamp } from 'firebase/firestore'
 import { db } from '@/firebase/config'
 import { normalizeLectureName } from '@/utils/lectureNormalizer'
 

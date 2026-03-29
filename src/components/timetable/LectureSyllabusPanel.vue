@@ -59,7 +59,10 @@
             <div class="section-title">教室</div>
             <div class="section-body">{{ syllabus.room }}</div>
           </div>
-          <div v-if="syllabus.categories && syllabus.categories.length > 0" class="syllabus-section">
+          <div
+            v-if="syllabus.categories && syllabus.categories.length > 0"
+            class="syllabus-section"
+          >
             <div class="section-title">授業区分</div>
             <div class="section-body d-flex flex-wrap gap-1 bg-transparent border-0 pa-0">
               <v-chip
@@ -148,16 +151,16 @@
             <div class="text-caption text-grey">
               まだシラバス情報がありません。<br />あなたが最初の編集者になりませんか？
             </div>
-              <v-btn
-                v-if="isLoggedIn"
-                variant="outlined"
-                color="teal"
-                size="small"
-                class="mt-3"
-                @click="handleCreateClick"
-              >
-                シラバスを作成
-              </v-btn>
+            <v-btn
+              v-if="isLoggedIn"
+              variant="outlined"
+              color="teal"
+              size="small"
+              class="mt-3"
+              @click="handleCreateClick"
+            >
+              シラバスを作成
+            </v-btn>
           </div>
         </template>
 
@@ -173,8 +176,13 @@
             </p>
 
             <div v-if="suggestedMatches.length > 0" class="mb-4">
-              <div class="text-caption font-weight-bold mb-2 text-teal-darken-1">もしかしてこれですか？</div>
-              <v-list density="compact" class="pa-0 bg-transparent rounded-lg border overflow-hidden">
+              <div class="text-caption font-weight-bold mb-2 text-teal-darken-1">
+                もしかしてこれですか？
+              </div>
+              <v-list
+                density="compact"
+                class="pa-0 bg-transparent rounded-lg border overflow-hidden"
+              >
                 <v-list-item
                   v-for="match in suggestedMatches"
                   :key="match.name"
@@ -200,7 +208,10 @@
                 hide-details
                 class="mb-2 bg-white"
               ></v-text-field>
-              <p v-if="formalNameInput === lectureName && lectureName.length < 4" class="text-error text-caption mb-2">
+              <p
+                v-if="formalNameInput === lectureName && lectureName.length < 4"
+                class="text-error text-caption mb-2"
+              >
                 ※略称ではなく正式名称を入力してください。
               </p>
               <v-btn
@@ -208,13 +219,15 @@
                 color="teal"
                 variant="flat"
                 size="small"
-                :disabled="!formalNameInput || (formalNameInput === lectureName && lectureName.length < 3)"
+                :disabled="
+                  !formalNameInput || (formalNameInput === lectureName && lectureName.length < 3)
+                "
                 @click="proceedToCreate"
               >
                 次へ（内容入力）
               </v-btn>
             </div>
-            
+
             <v-btn block variant="text" size="small" class="mt-2" @click="cancelEdit">
               キャンセル
             </v-btn>
@@ -451,10 +464,7 @@ const startEdit = () => {
   isEditing.value = true
 }
 
-/**
- * シラバス作成ボタンクリック時のハンドラ
- * 手動入力（private）の場合はまず名寄せ画面へ
- */
+/** シラバス作成ボタンクリック時のハンドラ 手動入力（private）の場合はまず名寄せ画面へ */
 const handleCreateClick = async () => {
   if (props.isPrivate) {
     isLinkingMode.value = true
@@ -526,7 +536,7 @@ const saveEdition = async () => {
   const saveName = formalNameInput.value || props.lectureName
   try {
     await saveSyllabus(saveName, editForm.value, uid.value, userName.value)
-    
+
     // もし新しい正式名称で作成した場合は、親に紐付けを通知
     if (saveName !== props.lectureName) {
       emit('linked', saveName)
@@ -654,7 +664,13 @@ onMounted(() => {
   animation: fadeIn 0.3s ease-out;
 }
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(5px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>

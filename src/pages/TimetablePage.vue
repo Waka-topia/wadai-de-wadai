@@ -243,7 +243,7 @@ const handleCellClick = ({ day, period }) => {
     router.push('/login')
     return
   }
-  
+
   // 常にモーダルを開き、サクサク入力を担保する
   selectedCell.value = { day, period }
   showModal.value = true

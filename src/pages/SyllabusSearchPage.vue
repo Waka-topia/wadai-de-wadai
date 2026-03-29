@@ -65,15 +65,19 @@
         <v-avatar color="amber-lighten-4" size="80" class="mb-4">
           <v-icon size="48" color="amber-darken-2">mdi-party-popper</v-icon>
         </v-avatar>
-        <p class="text-h6 font-weight-bold text-amber-darken-4 mb-2">
-          最初の発見者です！
-        </p>
-        <p class="text-caption text-grey-darken-2 mb-5 px-4" style="line-height: 1.5;">
-          誰のシラバスにもまだ登録されていない授業です。<br>
-          あなたが今この授業を追加すれば、<br>
+        <p class="text-h6 font-weight-bold text-amber-darken-4 mb-2">最初の発見者です！</p>
+        <p class="text-caption text-grey-darken-2 mb-5 px-4" style="line-height: 1.5">
+          誰のシラバスにもまだ登録されていない授業です。<br />
+          あなたが今この授業を追加すれば、<br />
           <strong>和歌山大学で最初のマスターデータ</strong>として刻まれます！
         </p>
-        <v-btn color="orange" variant="flat" size="large" class="font-weight-bold px-8 rounded-pill" @click="openNewLectureNameDialog">
+        <v-btn
+          color="orange"
+          variant="flat"
+          size="large"
+          class="font-weight-bold px-8 rounded-pill"
+          @click="openNewLectureNameDialog"
+        >
           <v-icon left>mdi-crown</v-icon>
           自分が最初の登録者になる
         </v-btn>
@@ -126,8 +130,16 @@
     <!-- 手動入力セクション（常に画面下部に表示） -->
     <v-divider class="my-6"></v-divider>
     <div class="text-center pb-6">
-      <p class="text-caption text-grey mb-2">検索せずに、直接自分の時間割に書き込みたい場合はこちら</p>
-      <v-btn variant="tonal" color="blue-grey" size="small" class="font-weight-bold" @click="openDirectAddDialog">
+      <p class="text-caption text-grey mb-2">
+        検索せずに、直接自分の時間割に書き込みたい場合はこちら
+      </p>
+      <v-btn
+        variant="tonal"
+        color="blue-grey"
+        size="small"
+        class="font-weight-bold"
+        @click="openDirectAddDialog"
+      >
         <v-icon left>mdi-pencil</v-icon>
         直接手動で入力する
       </v-btn>
@@ -220,17 +232,21 @@
     <!-- 新規シラバス登録 / 手動追加ダイアログ -->
     <v-dialog v-model="showNewLectureNameDialog" max-width="440">
       <v-card class="rounded-xl pa-2">
-        <v-card-title class="text-subtitle-1 font-weight-bold" :class="isManualAddOnly ? 'text-blue-grey-darken-2' : 'text-teal-darken-2'">
+        <v-card-title
+          class="text-subtitle-1 font-weight-bold"
+          :class="isManualAddOnly ? 'text-blue-grey-darken-2' : 'text-teal-darken-2'"
+        >
           {{ isManualAddOnly ? '時間割に手動で追加' : 'みんなのシラバスに登録' }}
         </v-card-title>
         <v-card-text class="pt-2">
           <p class="text-caption text-grey-darken-1 mb-3">
-            {{ isManualAddOnly 
-              ? 'マスターデータには登録せず、自分専用のメモとして時間割に追加します。' 
-              : 'あなたが最初の登録者です！正式な情報を入力して、みんなが検索できるようにしましょう。' 
+            {{
+              isManualAddOnly
+                ? 'マスターデータには登録せず、自分専用のメモとして時間割に追加します。'
+                : 'あなたが最初の登録者です！正式な情報を入力して、みんなが検索できるようにしましょう。'
             }}
           </p>
-          
+
           <div class="field-label mb-1">授業名</div>
           <v-text-field
             v-model="newLectureName"
@@ -306,13 +322,19 @@
           </template>
         </v-card-text>
         <v-card-actions class="d-flex justify-end pt-0">
-          <v-btn variant="text" size="small" @click="showNewLectureNameDialog = false">キャンセル</v-btn>
+          <v-btn variant="text" size="small" @click="showNewLectureNameDialog = false"
+            >キャンセル</v-btn
+          >
           <v-btn
             :color="isManualAddOnly ? 'blue-grey' : 'teal'"
             variant="flat"
             size="small"
             class="font-weight-bold px-4"
-            :disabled="isManualAddOnly ? !newLectureName : (!newLectureName || !newTeacher || !newRoom || !newCredits || !newDescription)"
+            :disabled="
+              isManualAddOnly
+                ? !newLectureName
+                : !newLectureName || !newTeacher || !newRoom || !newCredits || !newDescription
+            "
             :loading="saving"
             @click="proceedToNextStep"
           >
@@ -362,7 +384,7 @@ onMounted(async () => {
   if (history.state && history.state.targetDay) {
     targetDay.value = history.state.targetDay
     targetPeriod.value = Number(history.state.targetPeriod)
-    
+
     // ダイアログ用のフォームにも初期セット
     addForm.value.day = targetDay.value
     addForm.value.period = targetPeriod.value
@@ -519,7 +541,7 @@ const openNewLectureNameDialog = () => {
 // 新規作成ダイアログから、次のステップへ進む
 const proceedToNextStep = () => {
   if (!newLectureName.value) return
-  
+
   if (isManualAddOnly.value) {
     // 自分専用の追加（マスター登録スキップ）
     showNewLectureNameDialog.value = false
@@ -531,11 +553,16 @@ const proceedToNextStep = () => {
   }
 }
 
-/**
- * 新規シラバスをマスターデータとして登録する
- */
+/** 新規シラバスをマスターデータとして登録する */
 const registerSyllabus = async () => {
-  if (!newLectureName.value || !newTeacher.value || !newRoom.value || !newCredits.value || !newDescription.value) return
+  if (
+    !newLectureName.value ||
+    !newTeacher.value ||
+    !newRoom.value ||
+    !newCredits.value ||
+    !newDescription.value
+  )
+    return
   if (!isLoggedIn.value) {
     alert('シラバスを登録するにはログインが必要です。')
     return
@@ -561,7 +588,7 @@ const registerSyllabus = async () => {
     // 完了フィードバック
     successMessage.value = `「${lectureName}」をみんなのシラバスに登録しました！`
     showSuccessSnackbar.value = true
-    
+
     // ダイアログを閉じてリセット
     showNewLectureNameDialog.value = false
     newLectureName.value = ''
@@ -570,7 +597,7 @@ const registerSyllabus = async () => {
     newCredits.value = 2
     newCategories.value = []
     newDescription.value = ''
-    
+
     // インデックスを再起動して検索結果に反映
     await loadMasterIndex()
     searchQuery.value = lectureName

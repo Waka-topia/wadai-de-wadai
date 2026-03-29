@@ -25,6 +25,8 @@ export default {
     error: null,
     /** フェッチ済みキーのセット。keep-alive でキャッシュが生きている間は 同じキーのAPI再フェッチをスキップする。 */
     fetchedKeys: new Set(),
+    /** 現在表示中のデータの所有者 UID。ユーザー切り替え検知に使用。 */
+    currentUid: null,
   }),
   mutations: {
     SET_LECTURE(state, { key, day, period, lecture }) {
@@ -61,6 +63,10 @@ export default {
     RESET_FETCH_CACHE(state) {
       state.fetchedKeys = new Set()
       state.timetables = {}
+      state.currentUid = null
+    },
+    SET_CURRENT_UID(state, uid) {
+      state.currentUid = uid
     },
   },
   actions: {
@@ -76,6 +82,12 @@ export default {
     async fetchTimetable({ commit, state, rootGetters }) {
       const uid = rootGetters['auth/userId']
       if (!uid) return
+
+      // 【最重要】ユーザーの切り替えを検知した場合、全キャッシュを破棄する
+      if (state.currentUid !== uid) {
+        commit('RESET_FETCH_CACHE')
+        commit('SET_CURRENT_UID', uid)
+      }
 
       const key = makeSemesterKey(state.grade, state.semester)
 
@@ -190,18 +202,45 @@ export default {
     /**
      * 現在選択中の学期の時間割データを返す
      *
-     * @param state
+     * @param {object} state - ストアのstate
      */
     currentTimetable: (state) => {
       const key = `${state.grade}-${state.semester}`
       return state.timetables[key] || {}
     },
+    /**
+     * 1コマの講義データを取得する
+     *
+     * @param {object} state - ストアのstate
+     * @param {object} getters - ゲッター
+     */
     getLecture: (state, getters) => (day, period) => {
       return getters.currentTimetable[`${day}-${period}`] || null
     },
+    /**
+     * 現在の学期の全時間割データを取得する
+     *
+     * @param {object} state - ストアのstate
+     * @param {object} getters - ゲッター
+     */
     fullTimetable: (state, getters) => getters.currentTimetable,
+    /**
+     * ロード中フラグを取得する
+     *
+     * @param {object} state - ストアのstate
+     */
     isLoading: (state) => state.isLoading,
+    /**
+     * 現在の学期を取得する
+     *
+     * @param {object} state - ストアのstate
+     */
     semester: (state) => state.semester,
+    /**
+     * 現在の学年を取得する
+     *
+     * @param {object} state - ストアのstate
+     */
     grade: (state) => state.grade,
     /**
      * 今日の授業リスト

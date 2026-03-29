@@ -29,7 +29,7 @@ export default {
     },
   },
   actions: {
-    initializeAuth({ commit }) {
+    initializeAuth({ commit, dispatch }) {
       return new Promise((resolve) => {
         authService.onAuthStateChanged((user) => {
           if (user) {
@@ -42,6 +42,7 @@ export default {
             })
           } else {
             commit('clearAuthState')
+            dispatch('timetable/resetCache', null, { root: true }) // キャッシュをリセット
             console.log('No user logged in')
             resolve()
           }
@@ -74,10 +75,11 @@ export default {
         throw error
       }
     },
-    async logout({ commit }) {
+    async logout({ commit, dispatch }) {
       try {
         await authService.logout()
         commit('clearAuthState')
+        dispatch('timetable/resetCache', null, { root: true }) // キャッシュをリセット
         console.log('User logged out')
       } catch (error) {
         console.error('Logout failed:', error)
