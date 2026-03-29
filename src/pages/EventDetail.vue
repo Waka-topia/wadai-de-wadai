@@ -5,7 +5,17 @@
       <v-icon>mdi-arrow-left</v-icon>
     </v-btn>
 
-    <v-card rounded="lg" elevation="2">
+    <v-alert
+      v-if="fetchErrorMessage"
+      type="error"
+      variant="tonal"
+      class="mb-4"
+      icon="mdi-alert-circle"
+    >
+      {{ fetchErrorMessage }}
+    </v-alert>
+
+    <v-card v-else-if="event.eventId" rounded="lg" elevation="2">
       <!-- Title -->
       <v-card-title class="text-h5 font-weight-bold pa-5 pb-2">
         {{ event.title }}
@@ -85,56 +95,40 @@
       </v-card-text>
 
       <!-- Danger action -->
-      <v-card-actions class="px-5 pb-5 flex-column">
-        <!-- <v-btn variant="tonal" color="primary" block @click="toggleEditDeleteForm">
-          <v-icon start>mdi-pencil</v-icon>
-          編集
-          </v-btn> -->
-        <v-btn variant="tonal" color="error" block @click="toggleEditDeleteForm">
-          <v-icon start>mdi-delete</v-icon>
-          削除フォーム
-        </v-btn>
+      <EditDeleteForm :event-id="eventId" />
+    </v-card>
 
-        <v-expand-transition>
-          <div v-if="isEditDeleteFormVisible" class="mt-4" style="width: 100%">
-            <EditDeleteForm :event-id="eventId" />
-          </div>
-        </v-expand-transition>
-      </v-card-actions>
+    <v-card v-else rounded="lg" elevation="2" class="pa-6 text-center">
+      <v-progress-circular indeterminate color="orange" size="28" class="mr-2" />
+      読み込み中...
     </v-card>
   </v-container>
 </template>
 
 <script setup>
 import { useStore } from 'vuex'
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import EditDeleteForm from '@/components/event/EditDeleteForm.vue'
 
 const route = useRoute()
 const router = useRouter()
 const store = useStore()
-
-const isEditDeleteFormVisible = ref(false)
+const fetchErrorMessage = ref('')
 
 const eventId = computed(() => String(route.params.id || ''))
 
-// If store has no events yet (direct navigation), fetch them
-if (
-  !Array.isArray(store.getters['event/allEvents']) ||
-  store.getters['event/allEvents'].length === 0
-) {
-  store.dispatch('event/fetchEvents')
-}
-
-const event = computed(() => {
-  const allEvents = store.getters['event/allEvents']
-  return allEvents.find((evt) => String(evt.eventId) === eventId.value)
+onMounted(async () => {
+  try {
+    await store.dispatch('event/fetchEvent', eventId.value)
+  } catch (error) {
+    fetchErrorMessage.value = error.message
+  }
 })
 
-const toggleEditDeleteForm = () => {
-  isEditDeleteFormVisible.value = !isEditDeleteFormVisible.value
-}
+const event = computed(() => {
+  return store.getters['event/event'] || {}
+})
 </script>
 
 <style scoped>

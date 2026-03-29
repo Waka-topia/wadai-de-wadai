@@ -6,6 +6,7 @@ export default {
     user: null,
     idToken: null,
     userId: null,
+    belongingOrgs: [],
   },
   mutations: {
     setUser(state, user) {
@@ -17,10 +18,14 @@ export default {
     setUserId(state, uid) {
       state.userId = uid
     },
+    setUserOrgs(state, orgs) {
+      state.belongingOrgs = orgs
+    },
     clearAuthState(state) {
       state.user = null
       state.idToken = null
       state.userId = null
+      state.belongingOrgs = []
     },
     setPhotoURL(state, photoURL) {
       if (state.user) {
@@ -29,7 +34,7 @@ export default {
     },
   },
   actions: {
-    initializeAuth({ commit }) {
+    initializeAuth({ commit, dispatch }) {
       return new Promise((resolve) => {
         authService.onAuthStateChanged((user) => {
           if (user) {
@@ -42,6 +47,7 @@ export default {
             })
           } else {
             commit('clearAuthState')
+            dispatch('timetable/resetCache', null, { root: true }) // キャッシュをリセット
             console.log('No user logged in')
             resolve()
           }
@@ -68,16 +74,18 @@ export default {
         commit('setUser', user)
         commit('setIdToken', idToken)
         commit('setUserId', user.uid)
+        commit('setUserOrgs', user.belongingOrgs || [])
         console.log('User signed up:', user)
       } catch (error) {
         console.error('Sign-up failed:', error)
         throw error
       }
     },
-    async logout({ commit }) {
+    async logout({ commit, dispatch }) {
       try {
         await authService.logout()
         commit('clearAuthState')
+        dispatch('timetable/resetCache', null, { root: true }) // キャッシュをリセット
         console.log('User logged out')
       } catch (error) {
         console.error('Logout failed:', error)
@@ -104,6 +112,20 @@ export default {
         throw error
       }
     },
+    async saveUserOrgs({ commit, state }, orgs) {
+      try {
+        await authService.saveUserOrgs(state.userId, orgs)
+        commit('setUserOrgs', orgs)
+        console.log('User organizations updated:', orgs)
+      } catch (error) {
+        console.error('Error saving user organizations:', error)
+        throw error
+      }
+    },
+    async fetchUserOrgs({ commit, state }) {
+      const orgs = await authService.fetchUserOrgs(state.userId)
+      commit('setUserOrgs', orgs)
+    },
   },
 
   getters: {
@@ -111,9 +133,10 @@ export default {
     user: (state) => state.user,
     idToken: (state) => state.idToken,
     userId: (state) => state.userId,
-    email: (state) => state.user.email,
-    providerData: (state) => state.user.providerData,
-    photoURL: (state) => state.user.photoURL,
+    email: (state) => state.user?.email || '',
+    providerData: (state) => state.user?.providerData || [],
+    photoURL: (state) => state.user?.photoURL || null,
+
     photoURLResolved: (state) => {
       if (state.user?.photoURL) {
         return `/src/assets/${state.user?.photoURL}`
@@ -124,5 +147,6 @@ export default {
     displayName: (state) => {
       return state.user?.displayName || 'ゲスト'
     },
+    belongingOrgs: (state) => state.belongingOrgs,
   },
 }
