@@ -21,9 +21,7 @@ const store = useStore()
 const userId = computed(() => store.getters['auth/userId'])
 const userTitles = computed(() => store.getters['title/getUserTitles'](userId.value))
 
-/**
- * ユーザーの称号を取得する
- */
+/** ユーザーの称号を取得する */
 const fetchUserTitles = async () => {
   try {
     await store.dispatch('title/fetchUserTitles', userId.value)

@@ -27,7 +27,7 @@ const titles = computed(() => store.getters['title/allTitles'])
 /**
  * ユーザーIDを取得する
  *
- * @returns {string|null} ユーザーID
+ * @returns {string | null} ユーザーID
  */
 const getUserId = () => {
   return store.getters['auth/userId']
@@ -60,9 +60,7 @@ const claimTitle = async (title) => {
   }
 }
 
-/**
- * 称号データを読み込む
- */
+/** 称号データを読み込む */
 const loadTitles = async () => {
   try {
     await store.dispatch('title/fetchAllTitles')
