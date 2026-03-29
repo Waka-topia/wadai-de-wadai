@@ -153,9 +153,20 @@ export default {
    */
   async signup({ email, password, username }) {
     try {
+      // Firebase Authentication でユーザーを作成
       const userCredential = await createUserWithEmailAndPassword(auth, email, password)
       const user = userCredential.user
       await updateProfile(user, { displayName: username })
+
+      // Firestore にユーザードキュメントを作成
+      await setDoc(doc(db, 'users', user.uid), {
+        email,
+        displayName: username,
+        isOfficial: false,
+        isProvePending: false,
+        proveOwnerApplication: null,
+        belongingOrgs: [],
+      })
       return user
     } catch (error) {
       switch (error.code) {
@@ -233,6 +244,33 @@ export default {
       console.log('User photo URL updated in Firestore and Authentication:', photoURL)
     } catch (error) {
       console.error('Error updating photo URL:', error)
+      throw error
+    }
+  },
+
+  async saveUserOrgs(userId, orgs) {
+    try {
+      const userRef = doc(db, 'users', userId)
+      await setDoc(userRef, { belongingOrgs: orgs }, { merge: true })
+    } catch (error) {
+      console.error('Error saving user organizations:', error)
+      throw error
+    }
+  },
+
+  async fetchUserOrgs(userId) {
+    try {
+      const userRef = doc(db, 'users', userId)
+      const userSnap = await getDoc(userRef)
+      if (userSnap.exists()) {
+        const data = userSnap.data()
+        return data.belongingOrgs || []
+      } else {
+        console.log('No such document!')
+        return []
+      }
+    } catch (error) {
+      console.error('Error fetching user organizations:', error)
       throw error
     }
   },
