@@ -208,6 +208,10 @@ export const proveOwnerService = async (userId, proveOwnerData) => {
   }
 }
 
+export const createRandomId = () => {
+  return uuidv4()
+}
+
 /**
  * 代表者証明を申請したユーザー一覧を取得する
  *
