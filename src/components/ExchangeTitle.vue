@@ -13,64 +13,68 @@
   </div>
 </template>
 
-<script>
-import { mapActions, mapGetters } from 'vuex'
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { useStore } from 'vuex'
 
-export default {
-  data() {
-    return {
-      error: null, // エラーメッセージを保存
-    }
-  },
-  computed: {
-    // Vuexストアからタイトルデータを取得
-    ...mapGetters('title', ['allTitles']),
-    titles() {
-      return this.allTitles
-    },
-  },
-  methods: {
-    ...mapActions('title', ['fetchAllTitles', 'addTitleToUser']),
+const store = useStore()
 
-    userId() {
-      return this.$store.getters['auth/userId']
-    },
+const error = ref(null) // エラーメッセージを保存
 
-    async claimTitle(title) {
-      try {
-        this.error = null
-        const userId = this.userId()
-        if (!userId) {
-          throw new Error('ログインしてください。')
-        }
+// Vuexストアからタイトルデータを取得
+const titles = computed(() => store.getters['title/allTitles'])
 
-        await this.addTitleToUser({
-          userID: userId,
-          titleID: title.id,
-          titleData: title,
-        })
-      } catch (err) {
-        console.error('Error claiming title:', err)
-        this.error =
-          err.message === 'User does not meet the criteria for this title'
-            ? '条件を満たしていません。'
-            : err.message
-      }
-    },
-
-    async loadTitles() {
-      try {
-        await this.fetchAllTitles()
-      } catch (error) {
-        console.error('Error loading titles:', error)
-        this.error = '称号データの取得に失敗しました。'
-      }
-    },
-  },
-  mounted() {
-    this.loadTitles()
-  },
+/**
+ * ユーザーIDを取得する
+ *
+ * @returns {string|null} ユーザーID
+ */
+const getUserId = () => {
+  return store.getters['auth/userId']
 }
+
+/**
+ * 称号を獲得する
+ *
+ * @param {object} title - 獲得する称号データ
+ */
+const claimTitle = async (title) => {
+  try {
+    error.value = null
+    const userId = getUserId()
+    if (!userId) {
+      throw new Error('ログインしてください。')
+    }
+
+    await store.dispatch('title/addTitleToUser', {
+      userID: userId,
+      titleID: title.id,
+      titleData: title,
+    })
+  } catch (err) {
+    console.error('Error claiming title:', err)
+    error.value =
+      err.message === 'User does not meet the criteria for this title'
+        ? '条件を満たしていません。'
+        : err.message
+  }
+}
+
+/**
+ * 称号データを読み込む
+ */
+const loadTitles = async () => {
+  try {
+    await store.dispatch('title/fetchAllTitles')
+  } catch (err) {
+    console.error('Error loading titles:', err)
+    error.value = '称号データの取得に失敗しました。'
+  }
+}
+
+onMounted(() => {
+  loadTitles()
+})
 </script>
 
 <style scoped>

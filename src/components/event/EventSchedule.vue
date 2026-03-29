@@ -56,7 +56,7 @@ const props = defineProps({
   },
 })
 
-// TODO: Optimize filtering by date on the Vuex side if performance becomes an issue
+// Note: Optimize filtering by date on the Vuex side if performance becomes an issue
 const filteredEvents = computed(() => {
   const allEvents = store.getters['event/allEvents']
   return allEvents.filter((event) => event.date === props.selectedDate)
