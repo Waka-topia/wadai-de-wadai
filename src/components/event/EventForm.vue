@@ -1,5 +1,18 @@
 <template>
   <v-form class="pa-4" @submit.prevent="submitEvent">
+    <v-select
+      v-model="newEvent.organizerName"
+      :items="allGroups"
+      item-title="name"
+      item-value="name"
+      label="団体名"
+      variant="outlined"
+      density="comfortable"
+      required
+      persistent-hint
+      prepend-inner-icon="mdi-domain"
+    />
+
     <v-text-field
       v-model="newEvent.date"
       label="日付"
@@ -58,48 +71,18 @@
       prepend-inner-icon="mdi-text"
     />
 
-    <v-divider class="my-4" />
-
-    <div class="text-subtitle-1 font-weight-bold mb-3">
-      <v-icon size="small" class="mr-1">mdi-account-group</v-icon>
-      団体情報
-    </div>
-
-    <v-text-field
-      v-model="newEvent.organizerName"
-      label="団体名（略称可）"
-      variant="outlined"
-      density="comfortable"
-      placeholder="団体名（略称可）"
-      required
-      prepend-inner-icon="mdi-domain"
-    />
-
-    <v-text-field
-      v-model="newEvent.organizerId"
-      label="団体ID"
-      variant="outlined"
-      density="comfortable"
-      placeholder="団体ID"
-      required
-      prepend-inner-icon="mdi-identifier"
-    />
-
-    <v-text-field
-      v-model="newEvent.password"
-      label="パスワード"
-      type="password"
-      variant="outlined"
-      density="comfortable"
-      placeholder="パスワード"
-      required
-      prepend-inner-icon="mdi-lock"
-    />
-
     <v-btn type="submit" color="orange" block size="large" class="text-white font-weight-bold mt-2">
       <v-icon start>mdi-check-circle</v-icon>
       イベントを登録
     </v-btn>
+    <div class="text-center pt-4">
+      <v-btn variant="text" class="text-button text-decoration-underline" href="/prove-owner">
+        団体の代表者であることを証明する
+      </v-btn>
+    </div>
+    <p class="text-grey text-caption">
+      代表者証明をすることでイベントが上位に表示されやすくなります
+    </p>
   </v-form>
 
   <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
@@ -111,6 +94,8 @@
 import { ref } from 'vue'
 import { useStore } from 'vuex'
 
+import { allGroups } from '@/data/groups'
+
 const store = useStore()
 
 const newEvent = ref({
@@ -120,8 +105,6 @@ const newEvent = ref({
   location: '',
   description: '',
   organizerName: '',
-  organizerId: '',
-  password: '',
 })
 
 const snackbar = ref({
@@ -132,10 +115,11 @@ const snackbar = ref({
 
 const submitEvent = async () => {
   try {
+    const currentUserId = store.getters['auth/userId']
+
     await store.dispatch('event/createEvent', {
       eventData: newEvent.value,
-      organizerId: newEvent.value.organizerId,
-      inputPassword: newEvent.value.password,
+      currentUserId,
     })
     snackbar.value = {
       show: true,
@@ -146,7 +130,7 @@ const submitEvent = async () => {
     snackbar.value = {
       show: true,
       color: 'error',
-      message: `イベントの登録に失敗しました: ${error.message}`,
+      message: error.message,
     }
   }
 }
