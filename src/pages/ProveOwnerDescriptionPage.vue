@@ -50,7 +50,12 @@
           </h3>
 
           <div class="space-y-2">
-            <v-card class="pa-4 mb-3" variant="outlined" style="cursor: pointer" @click="openLink('https://x.com/wakatopia_off')">
+            <v-card
+              class="pa-4 mb-3"
+              variant="outlined"
+              style="cursor: pointer"
+              @click="openLink('https://x.com/wakatopia_off')"
+            >
               <div class="d-flex align-center justify-space-between">
                 <div class="d-flex align-center">
                   <v-icon size="24" color="blue">mdi-twitter</v-icon>
@@ -63,7 +68,12 @@
               </div>
             </v-card>
 
-            <v-card class="pa-4" variant="outlined" style="cursor: pointer" @click="openLink('https://instagram.com/wakatopia_official')">
+            <v-card
+              class="pa-4"
+              variant="outlined"
+              style="cursor: pointer"
+              @click="openLink('https://instagram.com/wakatopia_official')"
+            >
               <div class="d-flex align-center justify-space-between">
                 <div class="d-flex align-center">
                   <v-icon size="24" color="pink">mdi-instagram</v-icon>
@@ -94,9 +104,7 @@
         <v-icon size="48" color="grey-lighten-1" class="mb-4">mdi-information-outline</v-icon>
         <p class="text-h6 mb-2">代表者証明を申請していません</p>
         <p class="text-body-2 text-grey-darken-1 mb-4">まずは代表者証明の申請を完了してください</p>
-        <v-btn color="orange" to="/prove-owner">
-          代表者証明を申請する
-        </v-btn>
+        <v-btn color="orange" to="/prove-owner"> 代表者証明を申請する </v-btn>
       </div>
     </v-card>
   </v-sheet>
