@@ -7,6 +7,22 @@
       </v-btn>
     </div>
 
+    <div class="d-flex align-center bg-white rounded-t">
+      <v-btn
+        v-if="isAuthenticated"
+        icon
+        variant="text"
+        :color="showBookmarkedOnly ? 'orange' : 'grey-lighten-1'"
+        class="ml-2"
+        @click="toggleShowBookmarkedOnly"
+      >
+        <v-icon size="28">
+          {{ showBookmarkedOnly ? 'mdi-star' : 'mdi-star-outline' }}
+        </v-icon>
+      </v-btn>
+    
+    <v-divider v-if="isAuthenticated" vertical class="mx-2 my-2" />
+
     <v-tabs v-model:model-value="tab" color="orange" bg-color="white" grow>
       <v-tab
         v-for="sortOption in sortOptions"
@@ -17,6 +33,7 @@
         {{ sortOption.label }}
       </v-tab>
     </v-tabs>
+  </div>
     <v-tabs-window
       v-for="sortOption in sortOptions"
       v-model:model-value="tab"
@@ -26,7 +43,7 @@
         <RecruitJobCard v-for="job in filteredJobs" :key="job.id" :job="job" />
       </v-tabs-window-item>
     </v-tabs-window>
-  </div>
+ </div>
 </template>
 
 <script setup>
