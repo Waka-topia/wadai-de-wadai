@@ -97,6 +97,8 @@ const routes = [
     path: '/syllabus-search',
     name: 'SyllabusSearch',
     component: () => import('@/pages/SyllabusSearchPage.vue'),
+  },
+  {
     path: '/prove-owner',
     name: 'ProveOwner',
     component: () => import('@/pages/ProveOwnerPage.vue'),
