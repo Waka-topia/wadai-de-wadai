@@ -89,6 +89,14 @@ const routes = [
     component: () => import('@/pages/MapPage.vue'),
   },
   {
+    path: '/timetable',
+    name: 'Timetable',
+    component: () => import('@/pages/TimetablePage.vue'),
+  },
+  {
+    path: '/syllabus-search',
+    name: 'SyllabusSearch',
+    component: () => import('@/pages/SyllabusSearchPage.vue'),
     path: '/prove-owner',
     name: 'ProveOwner',
     component: () => import('@/pages/ProveOwnerPage.vue'),
