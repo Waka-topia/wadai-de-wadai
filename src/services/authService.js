@@ -1,6 +1,9 @@
 import {
+  confirmPasswordReset,
   createUserWithEmailAndPassword,
+  deleteUser,
   onAuthStateChanged,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
   updateProfile,
@@ -8,6 +11,60 @@ import {
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { auth, db } from '@/firebase/config'
 import store from '@/store'
+
+/**
+ * パスワードリセットメールを送信する
+ *
+ * @param {string} email - 送信先メールアドレス
+ * @returns {Promise<void>}
+ */
+export const sendPasswordReset = async (email) => {
+  try {
+    await sendPasswordResetEmail(auth, email)
+  } catch (error) {
+    switch (error.code) {
+      case 'auth/user-not-found':
+        error.message = 'このメールアドレスのアカウントが見つかりません。'
+        break
+      case 'auth/invalid-email':
+        error.message = 'メールアドレスの形式が正しくありません。'
+        break
+      case 'auth/network-request-failed':
+        error.message = 'ネットワークエラーが発生しました。接続を確認してください。'
+        break
+    }
+    throw error
+  }
+}
+
+/**
+ * パスワードリセットを確定する
+ *
+ * @param {string} oobCode - メールリンクに含まれるアクションコード
+ * @param {string} newPassword - 新しいパスワード
+ * @returns {Promise<void>}
+ */
+export const resetPassword = async (oobCode, newPassword) => {
+  try {
+    await confirmPasswordReset(auth, oobCode, newPassword)
+  } catch (error) {
+    switch (error.code) {
+      case 'auth/expired-action-code':
+        error.message = 'リセットリンクの有効期限が切れています。再度お試しください。'
+        break
+      case 'auth/invalid-action-code':
+        error.message = '無効なリセットリンクです。再度お試しください。'
+        break
+      case 'auth/weak-password':
+        error.message = 'パスワードが弱すぎます。8文字以上の強力なパスワードを使用してください。'
+        break
+      case 'auth/network-request-failed':
+        error.message = 'ネットワークエラーが発生しました。接続を確認してください。'
+        break
+    }
+    throw error
+  }
+}
 
 /**
  * Firestore から photoURL を取得する関数
@@ -131,6 +188,23 @@ export default {
     } catch (error) {
       console.error('Logout failed:', error)
       switch (error.code) {
+        case 'auth/network-request-failed':
+          error.message = 'ネットワークエラーが発生しました。接続を確認してください。'
+          break
+      }
+      throw error
+    }
+  },
+
+  async deleteAccount() {
+    try {
+      await deleteUser(auth.currentUser)
+    } catch (error) {
+      switch (error.code) {
+        case 'auth/requires-recent-login':
+          error.message =
+            'アカウントの削除には最近のログインが必要です。再度ログインしてからお試しください。'
+          break
         case 'auth/network-request-failed':
           error.message = 'ネットワークエラーが発生しました。接続を確認してください。'
           break

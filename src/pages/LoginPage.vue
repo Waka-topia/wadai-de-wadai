@@ -41,6 +41,7 @@
       <v-divider class="mt-10"></v-divider>
       <v-btn variant="text" @click="onSignUp"> アカウントを作成する </v-btn>
       <v-btn variant="text" @click="onStart"> ログインせずに開始する </v-btn>
+      <v-btn variant="text" @click="onForgotPassword"> パスワードを忘れた場合 </v-btn>
     </v-card>
     <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
       {{ snackbar.message }}
@@ -82,6 +83,10 @@ const onSignUp = () => {
 
 const onStart = () => {
   router.push('/')
+}
+
+const onForgotPassword = () => {
+  router.push('/forgot-password')
 }
 
 const onSubmit = async () => {

@@ -26,6 +26,7 @@
           <v-icon class="position-absolute right-0 mx-2"> mdi-chevron-right </v-icon>
         </v-list-item>
         <LogOutButton />
+        <DeleteAccountButton />
       </v-list>
     </v-navigation-drawer>
 
@@ -49,6 +50,7 @@
 import { ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import BottomNavigation from '@/components/templates/BottomNavigation.vue'
+import DeleteAccountButton from '@/components/templates/DeleteAccountButton.vue'
 import LogOutButton from '@/components/templates/LogOut.vue'
 
 const router = useRouter()
@@ -73,6 +75,8 @@ const routeTitleMap = {
   '/rule': '利用規約',
   '/map': 'マップ',
   '/jobs': '求人情報', // ★ここを追加
+  '/forgot-password': 'パスワードリセット',
+  '/reset-password': 'パスワードリセット',
 }
 
 /**
