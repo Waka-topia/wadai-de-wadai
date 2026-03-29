@@ -1,9 +1,7 @@
 <template>
   <div>
     <div v-if="route.query.tag" class="px-4 py-3 d-flex align-center">
-      <v-chip color="orange" variant="outlined" class="mr-2">
-        #{{ route.query.tag }}
-      </v-chip>
+      <v-chip color="orange" variant="outlined" class="mr-2"> #{{ route.query.tag }} </v-chip>
       <v-btn size="small" variant="text" color="orange" @click="clearTagFilter">
         絞り込み解除
       </v-btn>

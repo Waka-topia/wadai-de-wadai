@@ -10,7 +10,7 @@
       <p class="mt-4">{{ error }}</p>
     </div>
 
-     <div v-else class="bg-white position-relative">
+    <div v-else class="bg-white position-relative">
       <v-btn
         icon
         variant="text"
@@ -160,10 +160,10 @@ const jobId = Number(route.params.id)
 
 const error = computed(() => store.state.jobs.error)
 
-const goToTagFilter = (tag) =>{
+const goToTagFilter = (tag) => {
   router.push({
-    path:'/jobs',
-    query:{tag},
+    path: '/jobs',
+    query: { tag },
   })
 }
 
