@@ -189,7 +189,7 @@ const getTodayCardStyle = (lecture) => {
 }
 
 /** 時限の開始時刻 */
-const periodStartMap = { 1: '09:00', 2: '10:40', 3: '13:00', 4: '14:40', 5: '16:20' }
+const periodStartMap = { 1: '09:10', 2: '10:40', 3: '13:10', 4: '14:50', 5: '16:20', 6: '18:00' }
 const getPeriodStart = (period) => periodStartMap[period] || ''
 
 /** 今日の日付ラベル */
@@ -243,6 +243,8 @@ const handleCellClick = ({ day, period }) => {
     router.push('/login')
     return
   }
+  
+  // 常にモーダルを開き、サクサク入力を担保する
   selectedCell.value = { day, period }
   showModal.value = true
 }

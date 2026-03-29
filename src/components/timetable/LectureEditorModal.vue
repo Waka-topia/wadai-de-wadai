@@ -76,13 +76,14 @@
           </div>
 
           <LectureSyllabusPanel
-            :lecture-name="currentLectureName"
+            v-if="selectedLectureName"
+            class="mt-0"
+            :lecture-name="form.originalName || selectedLectureName"
+            :is-private="!form.isFromSyllabus"
+            :default-expanded="isSyllabusExpanded"
             @update:expanded="isSyllabusExpanded = $event"
+            @linked="handleSyllabusLinked"
           />
-
-          <div v-show="!isSyllabusExpanded">
-            <LectureReviewPanel :lecture-name="currentLectureName" readonly />
-          </div>
         </v-card-text>
 
         <v-card-actions v-show="!isSyllabusExpanded" class="modal-actions">
@@ -95,34 +96,45 @@
       <!-- 編集フォーム -->
       <template v-else>
         <v-card-text class="modal-body">
-          <!-- 講義名（サジェスト付き） -->
-          <div class="field-label">講義名 <span class="required">*</span></div>
-          <v-combobox
-            v-model="form.name"
-            :items="suggestions"
-            :loading="suggestLoading"
-            item-title="name"
-            item-value="name"
-            variant="outlined"
-            placeholder="例：基礎プログラミング"
+          <!-- シラバス検索への誘導バナー（新規作成時のみ） -->
+          <v-alert
+            v-if="!isExistingLecture"
+            color="teal-lighten-5"
+            border="start"
+            border-color="teal"
+            class="mb-4 pb-2 pt-3 px-3"
             density="compact"
-            no-filter
-            hide-no-data
-            persistent-placeholder
+          >
+            <div class="d-flex align-center justify-space-between">
+              <div>
+                <div class="text-caption font-weight-bold text-teal-darken-3">📚 みんなのシラバスから探す</div>
+                <div class="text-teal-darken-1" style="font-size: 0.65rem">楽単度や過去のレビューが見れます！</div>
+              </div>
+              <v-btn
+                color="teal"
+                variant="flat"
+                size="small"
+                class="font-weight-bold px-3"
+                @click="jumpToSyllabusSearch"
+              >
+                検索する
+              </v-btn>
+            </div>
+          </v-alert>
+
+          <!-- 講義名（手動入力） -->
+          <div class="field-label">講義名 <span class="required">*</span></div>
+          <p v-if="!isExistingLecture" class="text-caption text-grey mb-1" style="font-size: 0.7rem">
+            ※検索せずに直接追加する場合は以下に入力してください
+          </p>
+          <v-text-field
+            v-model="form.name"
+            placeholder="例：基礎プログラミング"
+            variant="outlined"
+            density="compact"
             :rules="[(v) => !!v || '講義名を入力してください']"
             class="mb-2"
-            @update:search="onNameSearch"
-          >
-            <template #item="{ item, props: itemProps }">
-              <v-list-item v-bind="itemProps">
-                <template #append>
-                  <v-chip size="x-small" color="orange" variant="tonal">
-                    {{ item.raw.count }}人登録済
-                  </v-chip>
-                </template>
-              </v-list-item>
-            </template>
-          </v-combobox>
+          ></v-text-field>
 
           <!-- カラー選択 -->
           <div class="field-label">カラー</div>
@@ -248,10 +260,10 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
-import { searchSuggestions } from '@/services/lectureIndexService'
-import LectureReviewPanel from '@/components/timetable/LectureReviewPanel.vue'
 import LectureSyllabusPanel from '@/components/timetable/LectureSyllabusPanel.vue'
+import LectureReviewPanel from '@/components/timetable/LectureReviewPanel.vue'
 
 const props = defineProps({
   modelValue: Boolean,
@@ -297,6 +309,7 @@ const creditStatusItems = [
 
 const form = ref({
   name: '',
+  originalName: '',
   color: 'orange',
   room: '',
   memo: '',
@@ -304,11 +317,13 @@ const form = ref({
   credits: 2,
   required: 'none',
   creditStatus: 'taking',
+  isFromSyllabus: false,
 })
 
 const resetForm = () => {
   form.value = {
     name: '',
+    originalName: '',
     color: 'orange',
     room: '',
     memo: '',
@@ -316,19 +331,38 @@ const resetForm = () => {
     credits: 2,
     required: 'none',
     creditStatus: 'taking',
+    isFromSyllabus: false,
   }
 }
 
-const suggestions = ref([])
-const suggestLoading = ref(false)
-const showDeleteConfirm = ref(false)
 const isEditMode = ref(false)
 const isSyllabusExpanded = ref(false)
+const showDeleteConfirm = ref(false)
+
+const router = useRouter()
+
+const jumpToSyllabusSearch = () => {
+  if (!props.selectedCell) return
+  emit('update:modelValue', false) // モーダルを閉じる
+  router.push({
+    path: '/syllabus-search',
+    state: {
+      targetDay: props.selectedCell.day,
+      targetPeriod: props.selectedCell.period,
+    },
+  })
+}
 
 const currentLectureName = computed(() => {
   const raw = form.value.name
   return typeof raw === 'object' && raw !== null ? raw.name : raw
 })
+
+/**
+ * シラバスパネルに渡す講義名（currentLectureNameの別名 alias）
+ * テンプレート内で v-if / :lecture-name に使用
+ */
+const selectedLectureName = computed(() => currentLectureName.value)
 
 const requiredLabel = computed(() => {
   const item = requiredItems.find((i) => i.value === form.value.required)
@@ -345,20 +379,6 @@ const creditStatusColor = computed(() => {
   if (form.value.creditStatus === 'failed') return 'error'
   return 'grey'
 })
-
-let searchTimer = null
-const onNameSearch = (val) => {
-  clearTimeout(searchTimer)
-  if (!val || typeof val !== 'string' || val.length < 1) {
-    suggestions.value = []
-    return
-  }
-  suggestLoading.value = true
-  searchTimer = setTimeout(async () => {
-    suggestions.value = await searchSuggestions(val)
-    suggestLoading.value = false
-  }, 300)
-}
 
 const isExistingLecture = computed(() => {
   if (!props.selectedCell) return false
@@ -386,6 +406,7 @@ watch(
     if (lecture) {
       form.value = {
         name: lecture.name || '',
+        originalName: lecture.originalName || lecture.name || '',
         color: lecture.color || 'orange',
         room: lecture.room || '',
         memo: lecture.memo || '',
@@ -393,6 +414,7 @@ watch(
         credits: lecture.credits !== undefined ? lecture.credits : 2,
         required: lecture.required || 'none',
         creditStatus: lecture.creditStatus || 'taking',
+        isFromSyllabus: !!lecture.isFromSyllabus,
       }
     } else {
       resetForm()
@@ -400,19 +422,44 @@ watch(
   },
 )
 
+/**
+ * 保存ボタン押下時の処理
+ */
 const handleSave = () => {
   if (!props.selectedCell || !form.value.name) return
+  executeFinalSave()
+}
+
+/** 最終的な保存実行ロジック */
+const executeFinalSave = () => {
   const name =
     typeof form.value.name === 'object' && form.value.name !== null
       ? form.value.name.name
       : form.value.name
+
   store.dispatch('timetable/saveLecture', {
     day: props.selectedCell.day,
     period: props.selectedCell.period,
-    lecture: { ...form.value, name },
+    lecture: {
+      ...form.value,
+      name,
+      originalName: form.value.originalName || name,
+    },
   })
   emit('saved', name)
   close()
+}
+
+/** 
+ * シラバスパネルから紐付け（名寄せ）が完了した際の処理
+ *
+ * @param {string} masterName - 正式講義名
+ */
+const handleSyllabusLinked = (masterName) => {
+  form.value.originalName = masterName
+  form.value.isFromSyllabus = true
+  // 紐付け後は即座に保存して反映させる
+  executeFinalSave()
 }
 
 const confirmDelete = () => {

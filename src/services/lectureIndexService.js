@@ -1,124 +1,104 @@
 /**
  * 全ユーザーの講義データを集約した「マスターインデックス」を管理するサービス
  *
- * Firestore のパス: lecture_index/{nameNormalized}
+ * 【アプローチA】
+ * 検索用のメタデータを search_index/master という1つのドキュメントに集約し、
+ * ブラウザ側で超高速なフィルタリング・ソートを実現します。
  *
- * - Name: string 最もよく使われる表示名（マスター）
- * - NameNormalized: string 正規化名（ドキュメントID）
- * - Aliases: string[] 別表記の一覧
- * - AliasCounts: object 表示名ごとの出現回数
- * - Count: number 登録ユーザー数（FieldValue.increment で競合なく更新）
- * - UpdatedAt: string
- *
- * フロー: ユーザーが講義を保存 → saveLecture が nameNormalized を生成 → incrementLectureIndex を呼んでインデックスに登録 or
- * カウントアップ → count が多い表示名が自動的に「マスター」になる
+ * Firestore のパス:
+ * - 詳細データ: lecture_syllabuses/{name}
+ * - インデックス: lecture_search/all_lectures_index
  */
 
 import {
-  collection,
   doc,
   getDoc,
-  getDocs,
-  increment,
-  limit,
-  orderBy,
-  query,
-  setDoc,
-  startAt,
-  updateDoc,
+  runTransaction,
+  serverTimestamp,
 } from 'firebase/firestore'
 import { db } from '@/firebase/config'
-import { calcSimilarityScore, classifyScore, normalizeLectureName } from '@/utils/lectureNormalizer'
+import { normalizeLectureName } from '@/utils/lectureNormalizer'
 
-const INDEX_COL = 'lecture_index'
+const INDEX_DOC_PATH = 'lecture_search/all_lectures_index'
 
 /**
- * 講義名でインデックスを検索してサジェスト候補を返す
+ * マスターインデックス（全件データ）を取得する
  *
- * @param {string} input - ユーザーの入力文字列
- * @param {number} maxResults - 最大件数
- * @returns {Promise<{ name: string; count: number }[]>} サジェスト候補の配列（スコア降順）
+ * @returns {Promise<object>} インデックスデータ { l: Array, updatedAt: Timestamp }
  */
-export const searchSuggestions = async (input, maxResults = 8) => {
-  if (!input || input.trim().length < 1) return []
-
-  const normalized = normalizeLectureName(input, { katakana: true })
-
-  const q = query(
-    collection(db, INDEX_COL),
-    orderBy('nameNormalized'),
-    startAt(normalized),
-    limit(20),
-  )
-
-  const snapshot = await getDocs(q)
-  const results = []
-
-  snapshot.forEach((d) => {
-    const data = d.data()
-    const storedNormalized = data.nameNormalized || ''
-    const isPrefix = storedNormalized.startsWith(normalized)
-    const score = calcSimilarityScore(input, data.name)
-    const classification = classifyScore(score)
-
-    if (isPrefix || classification !== 'different') {
-      results.push({
-        name: data.name,
-        count: data.count,
-        score: isPrefix ? Math.max(score, 0.8) : score,
-      })
-    }
-  })
-
-  results.sort((a, b) => b.score - a.score)
-  return results.slice(0, maxResults)
+export const fetchMasterIndex = async () => {
+  const ref = doc(db, INDEX_DOC_PATH)
+  const snap = await getDoc(ref)
+  if (!snap.exists()) {
+    return { l: [], updatedAt: null }
+  }
+  return snap.data()
 }
 
 /**
- * 講義をインデックスに登録（または既存エントリのカウントアップ）
+ * シラバス詳細の保存と検索インデックスの更新を一つのトランザクションで行う
  *
- * Count の更新には FieldValue.increment() を使用。 これにより Transaction なしでアトミックに更新でき、 同時アクセスによる競合・リトライが発生しない。
- * aliasCounts の更新のみ getDoc が必要。
- *
- * @param {string} name - ユーザーが入力した表示名
- * @param {string} nameNormalized - 正規化済み名称
+ * @param {string} lectureName - 講義名
+ * @param {object} syllabusData - シラバスのメタデータ (teacher, room, credits, description)
+ * @param {string} uid - ユーザーID
+ * @param {string} displayName - ユーザー表示名
+ * @returns {Promise<void>}
  */
-export const incrementLectureIndex = async (name, nameNormalized) => {
-  const ref = doc(db, INDEX_COL, nameNormalized)
-  const snap = await getDoc(ref)
+export const saveSyllabusWithIndex = async (lectureName, syllabusData, uid, displayName) => {
+  if (!lectureName || !uid) throw new Error('講義名とユーザーIDは必須です')
 
-  if (!snap.exists()) {
-    // 新規登録（この名称で初めての登録）
-    await setDoc(ref, {
-      name,
-      nameNormalized,
-      aliases: [],
-      aliasCounts: { [name]: 1 },
-      count: 1,
-      updatedAt: new Date().toISOString(),
+  const syllabusRef = doc(db, 'lecture_syllabuses', lectureName)
+  const indexRef = doc(db, INDEX_DOC_PATH)
+  const normalized = normalizeLectureName(lectureName)
+
+  await runTransaction(db, async (transaction) => {
+    // 1. マスターインデックスを読み込む
+    const indexSnap = await transaction.get(indexRef)
+    let indexData = indexSnap.exists() ? indexSnap.data() : { l: [] }
+    let lectures = indexData.l || []
+
+    // 2. 詳細データの保存内容を準備
+    const now = serverTimestamp()
+    const detailData = {
+      ...syllabusData,
+      lastEditedBy: displayName || '匿名ユーザー',
+      lastEditedById: uid,
+      updatedAt: now,
+    }
+
+    // 3. インデックス用データの準備（極限まで軽量化）
+    const indexEntry = {
+      id: lectureName,
+      n: normalized,
+      t: syllabusData.teacher || '',
+      b: syllabusData.room || '', // 建物・場所
+      c: Number(syllabusData.credits) || 2,
+      g: syllabusData.categories || [], // 授業区分（配列）
+    }
+
+    // 4. 配列を更新（既存なら上書き、なければPush）
+    const existingIndex = lectures.findIndex((item) => item.id === lectureName)
+    if (existingIndex >= 0) {
+      lectures[existingIndex] = indexEntry
+    } else {
+      lectures.push(indexEntry)
+    }
+
+    // 5. 書き込み（一件シラバス詳細 ＋ インデックス全体）
+    transaction.set(syllabusRef, detailData, { merge: true })
+    transaction.set(indexRef, {
+      l: lectures,
+      updatedAt: now,
     })
-    return
-  }
-
-  // 既存エントリの更新
-  const data = snap.data()
-  const aliasCounts = { ...(data.aliasCounts || {}) }
-  aliasCounts[name] = (aliasCounts[name] || 0) + 1
-
-  // 最も出現回数が多い名称をマスターに昇格
-  const masterName = Object.entries(aliasCounts).reduce(
-    (best, [n, c]) => (c > best[1] ? [n, c] : best),
-    ['', 0],
-  )[0]
-
-  const aliases = Object.keys(aliasCounts).filter((n) => n !== masterName)
-
-  // count は FieldValue.increment() でアトミックに更新（競合なし）
-  await updateDoc(ref, {
-    name: masterName,
-    aliases,
-    aliasCounts,
-    count: increment(1),
-    updatedAt: new Date().toISOString(),
   })
+}
+
+// 互換性のためのスタブ（将来的に廃止予定）
+export const searchSuggestions = async () => {
+  console.warn('searchSuggestions is deprecated. Use fetchMasterIndex and local filtering.')
+  return []
+}
+
+export const incrementLectureIndex = async () => {
+  console.warn('incrementLectureIndex is deprecated. Use saveSyllabusWithIndex.')
 }

@@ -76,10 +76,13 @@ export const saveLecture = async (uid, semester, day, period, lectureData) => {
     { merge: true },
   )
 
-  // グローバルインデックスにも登録（名寄せ・サジェスト用）
-  incrementLectureIndex(lectureData.name, nameNormalized).catch((e) =>
-    console.warn('[lectureService] index update failed:', e),
-  )
+  // グローバルインデックスへの登録（名寄せ・サジェスト用）
+  // ユーザーの意向により、シラバス経由 (isFromSyllabus: true) の場合のみ登録する
+  if (lectureData.isFromSyllabus) {
+    incrementLectureIndex(lectureData.name, nameNormalized).catch((e) =>
+      console.warn('[lectureService] index update failed:', e),
+    )
+  }
 }
 
 /**

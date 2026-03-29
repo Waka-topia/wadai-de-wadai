@@ -83,6 +83,11 @@ const routes = [
     name: 'Timetable',
     component: () => import('@/pages/TimetablePage.vue'),
   },
+  {
+    path: '/syllabus-search',
+    name: 'SyllabusSearch',
+    component: () => import('@/pages/SyllabusSearchPage.vue'),
+  },
 ]
 
 const router = createRouter({

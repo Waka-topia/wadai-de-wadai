@@ -4,13 +4,6 @@
       <div class="d-flex align-center">
         <span class="font-weight-bold">その他の機能</span>
       </div>
-      <router-link
-        to="/functions"
-        class="text-decoration-none text-orange d-flex align-center text-body-2"
-      >
-        機能一覧
-        <v-icon size="small">mdi-chevron-right</v-icon>
-      </router-link>
     </div>
 
     <!-- Features Grid -->

@@ -227,11 +227,14 @@ const getLectureCardStyle = (day, period) => {
 
 .timetable-grid {
   display: grid;
-  grid-template-columns: 48px repeat(5, 1fr);
+  grid-template-columns: 44px repeat(5, 1fr); /* 時間軸を少しスリムに */
+  grid-auto-rows: auto; /* 高さはセルの比率に任せる */
   width: 100%;
   border: 1px solid #eee;
   border-radius: 12px;
   overflow: hidden;
+  background-color: #eee;
+  gap: 1px;
 }
 
 /* ヘッダー共通 */
@@ -279,8 +282,8 @@ const getLectureCardStyle = (day, period) => {
   align-items: center;
   gap: 1px;
   background-color: #f8f9fa;
-  border-right: 2px solid #eee;
-  padding: 6px 4px;
+  padding: 4px 2px;
+  height: 100%; /* セルの高さに合わせる */
 }
 
 .grid-header-cell.period.current-period-header {
@@ -318,16 +321,18 @@ const getLectureCardStyle = (day, period) => {
 
 /* セル */
 .grid-cell {
-  aspect-ratio: 1 / 1.3;
-  border-right: 1px solid #eee;
-  border-bottom: 1px solid #eee;
-  padding: 4px;
+  background-color: white;
+  aspect-ratio: 1 / 1.35; /* 端末の横幅に応じて動的に高さを決定 */
+  min-height: 0;
+  padding: 2px;
   cursor: pointer;
   transition: background-color 0.15s;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch; /* 中身を横幅一杯に広げる */
+  justify-content: stretch; /* 中身を縦幅一杯に広げる */
   position: relative;
+  overflow: hidden;
 }
 
 .grid-cell:hover {
@@ -357,13 +362,13 @@ const getLectureCardStyle = (day, period) => {
 /* 講義カード */
 .lecture-card {
   width: 100%;
-  height: 100%;
+  height: 100%; /* セル一杯に広げる */
   border-left: 4px solid #ff9800;
-  border-radius: 5px;
-  padding: 5px 4px;
+  border-radius: 4px;
+  padding: 4px 3px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   overflow: hidden;
   transition: box-shadow 0.15s;
 }
@@ -373,16 +378,17 @@ const getLectureCardStyle = (day, period) => {
 }
 
 .lecture-name {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: bold;
   color: var(--lecture-text, #e65100);
   overflow: hidden;
   display: -webkit-box;
-  line-clamp: 3;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 4; /* 最大4行まで表示可能に */
+  line-clamp: 4;
   -webkit-box-orient: vertical;
   line-height: 1.25;
   word-break: break-all;
+  margin-bottom: 2px;
 }
 
 .lecture-detail {
