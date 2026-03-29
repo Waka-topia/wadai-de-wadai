@@ -101,9 +101,9 @@ export default {
     user: (state) => state.user,
     idToken: (state) => state.idToken,
     userId: (state) => state.userId,
-    email: (state) => state.user.email,
-    providerData: (state) => state.user.providerData,
-    photoURL: (state) => state.user.photoURL,
+    email: (state) => state.user?.email,
+    providerData: (state) => state.user?.providerData,
+    photoURL: (state) => state.user?.photoURL,
     photoURLResolved: (state) => {
       if (state.user?.photoURL) {
         return `/src/assets/${state.user?.photoURL}`
