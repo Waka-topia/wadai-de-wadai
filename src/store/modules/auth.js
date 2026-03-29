@@ -6,6 +6,7 @@ export default {
     user: null,
     idToken: null,
     userId: null,
+    belongingOrgs: [],
   },
   mutations: {
     setUser(state, user) {
@@ -17,10 +18,14 @@ export default {
     setUserId(state, uid) {
       state.userId = uid
     },
+    setUserOrgs(state, orgs) {
+      state.belongingOrgs = orgs
+    },
     clearAuthState(state) {
       state.user = null
       state.idToken = null
       state.userId = null
+      state.belongingOrgs = []
     },
     setPhotoURL(state, photoURL) {
       if (state.user) {
@@ -68,6 +73,7 @@ export default {
         commit('setUser', user)
         commit('setIdToken', idToken)
         commit('setUserId', user.uid)
+        commit('setUserOrgs', user.belongingOrgs || [])
         console.log('User signed up:', user)
       } catch (error) {
         console.error('Sign-up failed:', error)
@@ -94,6 +100,20 @@ export default {
         throw error
       }
     },
+    async saveUserOrgs({ commit, state }, orgs) {
+      try {
+        await authService.saveUserOrgs(state.userId, orgs)
+        commit('setUserOrgs', orgs)
+        console.log('User organizations updated:', orgs)
+      } catch (error) {
+        console.error('Error saving user organizations:', error)
+        throw error
+      }
+    },
+    async fetchUserOrgs({ commit, state }) {
+      const orgs = await authService.fetchUserOrgs(state.userId)
+      commit('setUserOrgs', orgs)
+    },
   },
 
   getters: {
@@ -114,5 +134,6 @@ export default {
     displayName: (state) => {
       return state.user?.displayName || 'ゲスト'
     },
+    belongingOrgs: (state) => state.belongingOrgs,
   },
 }
