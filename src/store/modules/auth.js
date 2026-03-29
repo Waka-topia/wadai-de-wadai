@@ -86,6 +86,16 @@ export default {
         throw error
       }
     },
+    async deleteAccount({ commit }) {
+      try {
+        await authService.deleteAccount()
+        commit('clearAuthState')
+        console.log('User account deleted')
+      } catch (error) {
+        console.error('Delete account failed:', error)
+        throw error
+      }
+    },
     async updatePhotoURL({ commit, state }, photoURL) {
       try {
         await authService.updatePhotoURL(state.user, photoURL)

@@ -19,6 +19,16 @@ const routes = [
     component: () => import('@/pages/SignupPage.vue'),
   },
   {
+    path: '/forgot-password',
+    name: 'ForgotPasswordPage',
+    component: () => import('@/pages/ForgotPasswordPage.vue'),
+  },
+  {
+    path: '/reset-password',
+    name: 'ResetPasswordPage',
+    component: () => import('@/pages/ResetPasswordPage.vue'),
+  },
+  {
     path: '/reader',
     name: 'Reader',
     component: () => import('@/pages/ReaderPage.vue'),
