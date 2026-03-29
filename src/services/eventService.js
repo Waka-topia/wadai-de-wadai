@@ -245,6 +245,46 @@ export const getProveOwnerApplicantsService = async () => {
 }
 
 /**
+ * 代表者証明を申請したユーザーの情報を取得する
+ *
+ * @param {string} userId Firebase AuthのユーザーID
+ * @returns {Promise<object>} 申請者情報
+ */
+export const getProveOwnerApplicantService = async (userId) => {
+  try {
+    if (!userId) {
+      throw new Error('申請者情報を取得するにはユーザーIDが必要です')
+    }
+
+    const userRef = doc(db, 'users', userId)
+    const userSnapshot = await getDoc(userRef)
+
+    if (!userSnapshot.exists()) {
+      throw new Error('申請者が見つかりません')
+    }
+
+    const userData = userSnapshot.data()
+
+    if (!userData.proveOwnerApplication) {
+      throw new Error('このユーザーは代表者証明を申請していません')
+    }
+
+    return {
+      userId,
+      tempId: userData.proveOwnerApplication?.tempId || null,
+      userName: userData.proveOwnerApplication?.userName || null,
+      organizationName: userData.proveOwnerApplication?.organizationName || null,
+      email: userData.proveOwnerApplication?.email || null,
+      isOfficial: Boolean(userData.isOfficial),
+      isProvePending: Boolean(userData.isProvePending),
+      proveOwnerApplication: userData.proveOwnerApplication || null,
+    }
+  } catch (error) {
+    throw new Error(`申請者情報の取得に失敗しました。${error.message}`)
+  }
+}
+
+/**
  * 代表者証明申請の承認状態を更新する
  *
  * @param {string} userId Firebase AuthのユーザーID
