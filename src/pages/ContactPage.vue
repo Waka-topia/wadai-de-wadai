@@ -15,8 +15,8 @@
           <p class="text-grey-darken-1 text-subtitle-2 mt-1">{{ job?.companyName || '会社名' }}</p>
         </div>
 
-        <v-container class="bg-grey rounded-xl p-6 mb-3">
-          <h3 class="text-grey-darken-3">こちらの電話番号からご自身でお申し込みください。</h3>
+        <v-container class="bg-grey-lighten-3 rounded-xl p-6 mb-3">
+          <h3 class="text-grey-darken-3">こちらの電話番号から、ご自身でご連絡ください。</h3>
         </v-container>
 
         <div class="d-flex justify-center mb-6">
@@ -32,7 +32,7 @@
 
         <div class="mb-6">
           <div class="mb-2 text-subtitle-1 font-weight-bold d-flex align-center text-grey-darken-3">
-            <v-icon color="orange" class="mr-2">mdi-clock-outline</v-icon>営業時間・受付時間
+            <v-icon color="orange" class="mr-2">mdi-clock-outline</v-icon>連絡可能時間
           </div>
           <div class="pl-8 text-body-1 text-grey-darken-3">
             {{ job?.responseHours || '営業時間・受付時間' }}
@@ -63,7 +63,7 @@ const store = useStore()
 
 const jobId = Number(route.params.id)
 
-const job = computed(() => store.getters.currentJobWithBookmark)
+const job = computed(() => store.getters['jobs/currentJobWithBookmark'])
 
 onMounted(() => {
   store.dispatch('fetchJobById', jobId)

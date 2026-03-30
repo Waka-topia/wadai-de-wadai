@@ -160,8 +160,8 @@ const jobId = Number(route.params.id)
 const error = computed(() => store.state.jobs.error)
 
 onMounted(() => {
-  store.dispatch('fetchJobById', jobId)
+  store.dispatch('jobs/fetchJobById', jobId)
 })
 
-const job = computed(() => store.getters.currentJobWithBookmark)
+const job = computed(() => store.getters['jobs/currentJobWithBookmark'])
 </script>

@@ -19,10 +19,10 @@ import RecruitJobCard from '@/components/recruit/RecruitJobCard.vue'
 
 const store = useStore()
 const userId = computed(() => store.state.auth?.userId)
-const sortedJobs = computed(() => store.getters.sortedJobs)
+const sortedJobs = computed(() => store.getters['jobs/sortedJobs'])
 
 onMounted(async () => {
-  await store.dispatch('fetchJobs')
+  await store.dispatch('jobs/fetchJobs')
 })
 
 // onMountedに置くとuserIdがまだない状態で実行される可能性がある
@@ -30,7 +30,7 @@ watch(
   userId,
   (id) => {
     if (id) {
-      store.dispatch('applyUserBookmarks')
+      store.dispatch('jobs/applyUserBookmarks')
     }
   },
   { immediate: true },
