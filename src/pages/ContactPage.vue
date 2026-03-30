@@ -8,13 +8,16 @@
       class="pt-16 pb-8 d-flex flex-column align-center justify-center"
       style="max-width: 600px"
     >
-
       <v-card width="100%" elevation="2" rounded="xl" class="pa-6 mt-4">
         <div class="text-center mb-6">
           <v-icon size="48" color="orange" class="mb-2">mdi-card-account-phone-outline</v-icon>
           <h2 class="font-weight-bold text-grey-darken-3">ご応募・お問い合わせ</h2>
           <p class="text-grey-darken-1 text-subtitle-2 mt-1">{{ job?.companyName || '会社名' }}</p>
         </div>
+
+        <v-container class="bg-grey rounded-xl p-6 mb-3">
+          <h3 class="text-grey-darken-3">こちらの電話番号からご自身でお申し込みください。</h3>
+        </v-container>
 
         <div class="d-flex justify-center mb-6">
           <div
@@ -32,7 +35,7 @@
             <v-icon color="orange" class="mr-2">mdi-clock-outline</v-icon>営業時間・受付時間
           </div>
           <div class="pl-8 text-body-1 text-grey-darken-3">
-            {{ job?.responseHours || '営業時間・受付時間'}}
+            {{ job?.responseHours || '営業時間・受付時間' }}
           </div>
         </div>
 
@@ -41,7 +44,7 @@
             <v-icon color="orange" class="mr-2">mdi-information-outline</v-icon>担当者名
           </div>
           <div class="pl-8 text-body-1 text-grey-darken-3">
-            {{ job?.personName || '担当者名'}}
+            {{ job?.personName || '担当者名' }}
           </div>
         </div>
       </v-card>
