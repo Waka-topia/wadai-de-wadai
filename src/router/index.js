@@ -19,6 +19,16 @@ const routes = [
     component: () => import('@/pages/SignupPage.vue'),
   },
   {
+    path: '/forgot-password',
+    name: 'ForgotPasswordPage',
+    component: () => import('@/pages/ForgotPasswordPage.vue'),
+  },
+  {
+    path: '/reset-password',
+    name: 'ResetPasswordPage',
+    component: () => import('@/pages/ResetPasswordPage.vue'),
+  },
+  {
     path: '/reader',
     name: 'Reader',
     component: () => import('@/pages/ReaderPage.vue'),
@@ -77,6 +87,31 @@ const routes = [
     path: '/map',
     name: 'Map',
     component: () => import('@/pages/MapPage.vue'),
+  },
+  {
+    path: '/timetable',
+    name: 'Timetable',
+    component: () => import('@/pages/TimetablePage.vue'),
+  },
+  {
+    path: '/syllabus-search',
+    name: 'SyllabusSearch',
+    component: () => import('@/pages/SyllabusSearchPage.vue'),
+  },
+  {
+    path: '/prove-owner',
+    name: 'ProveOwner',
+    component: () => import('@/pages/ProveOwnerPage.vue'),
+  },
+  {
+    path: '/prove-owner/description',
+    name: 'ProveOwnerDescription',
+    component: () => import('@/pages/ProveOwnerDescriptionPage.vue'),
+  },
+  {
+    path: '/admin',
+    name: 'Admin',
+    component: () => import('@/pages/AdminPage.vue'),
   },
 ]
 

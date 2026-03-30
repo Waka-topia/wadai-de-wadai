@@ -6,9 +6,9 @@
         <span>新歓日程</span>
       </v-btn>
 
-      <v-btn to="/reader" value="reader">
-        <v-icon>mdi-qrcode-scan</v-icon>
-        <span>読み取る</span>
+      <v-btn to="/timetable" value="timetable">
+        <v-icon>mdi-table-clock</v-icon>
+        <span>時間割</span>
       </v-btn>
 
       <div class="home-btn-wrapper">
@@ -46,8 +46,9 @@ watch(
   (newPath) => {
     if (newPath === '/') selectedIndex.value = 'home'
     else if (newPath === '/eventcal') selectedIndex.value = 'eventcal'
-    else if (newPath === '/reader') selectedIndex.value = 'reader'
+    // else if (newPath === '/reader') selectedIndex.value = 'reader' // QR読み取り機能はフッターから非表示化
     else if (newPath === '/jobs') selectedIndex.value = 'jobs'
+    else if (newPath === '/timetable') selectedIndex.value = 'timetable'
     else if (newPath === '/mypage') selectedIndex.value = 'mypage'
     else selectedIndex.value = undefined
   },

@@ -76,7 +76,7 @@
                   density="compact"
                   color="grey"
                   class="px-0"
-                  href="https://transfer.navitime.biz/wakayamabus/pc/diagram/BusCourseSearch?busstopId=00220063"
+                  href="https://transfer-cloud.navitime.biz/wakayamabus/courses?busstop=00220063"
                   target="_blank"
                 >
                   時刻表を見る <v-icon end size="small">mdi-open-in-new</v-icon>

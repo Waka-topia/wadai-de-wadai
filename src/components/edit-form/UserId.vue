@@ -18,7 +18,6 @@
 const props = defineProps({
   userId: {
     type: String,
-    default: '',
     required: true,
   },
 })

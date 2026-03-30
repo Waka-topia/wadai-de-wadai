@@ -2,49 +2,6 @@
 export const campusBuildings = {
   type: 'FeatureCollection',
   features: [
-    // --- 北エリア (N) ---
-    {
-      type: 'Feature',
-      properties: { title: '北１号館' },
-      geometry: { type: 'Point', coordinates: [135.15119, 34.267796] },
-    },
-    {
-      type: 'Feature',
-      properties: { title: '北２号館' },
-      geometry: { type: 'Point', coordinates: [135.15168, 34.268289] },
-    },
-    {
-      type: 'Feature',
-      properties: { title: '北３号館' },
-      geometry: { type: 'Point', coordinates: [135.152246, 34.268086] },
-    },
-    {
-      type: 'Feature',
-      properties: { title: '北４号館' },
-      geometry: { type: 'Point', coordinates: [135.153342, 34.268014] },
-    },
-    {
-      type: 'Feature',
-      properties: { title: '多目的グラウンド' },
-      geometry: { type: 'Point', coordinates: [135.151732, 34.268887] },
-    },
-    {
-      type: 'Feature',
-      properties: { title: '課外活動施設Ⅳ' },
-      geometry: { type: 'Point', coordinates: [135.152672, 34.269065] },
-    },
-    {
-      type: 'Feature',
-      properties: { title: '実験農場' },
-      geometry: { type: 'Point', coordinates: [135.151595, 34.269467] },
-    },
-    {
-      type: 'Feature',
-      properties: { title: '多目的広場' },
-      geometry: { type: 'Point', coordinates: [135.151045, 34.27028] },
-    },
-
-    // --- 東エリア (E) ---
     {
       type: 'Feature',
       properties: { title: '東１号館' },
@@ -70,6 +27,79 @@ export const campusBuildings = {
       properties: { title: '東５号館' },
       geometry: { type: 'Point', coordinates: [135.152453, 34.267519] },
     },
+    {
+      type: 'Feature',
+      properties: { title: '西１号館' },
+      geometry: { type: 'Point', coordinates: [135.150719, 34.265283] },
+    },
+    {
+      type: 'Feature',
+      properties: { title: '西２号館' },
+      geometry: { type: 'Point', coordinates: [135.150549, 34.26561] },
+    },
+    {
+      type: 'Feature',
+      properties: { title: '西３号館' },
+      geometry: { type: 'Point', coordinates: [135.150759, 34.265957] },
+    },
+    {
+      type: 'Feature',
+      properties: { title: '西４号館' },
+      geometry: { type: 'Point', coordinates: [135.150725, 34.266249] },
+    },
+    {
+      type: 'Feature',
+      properties: { title: '西５号館' },
+      geometry: { type: 'Point', coordinates: [135.150768, 34.266821] },
+    },
+    {
+      type: 'Feature',
+      properties: { title: '南１号館' },
+      geometry: { type: 'Point', coordinates: [135.150523, 34.264656] },
+    },
+    {
+      type: 'Feature',
+      properties: { title: '北１号館' },
+      geometry: { type: 'Point', coordinates: [135.15119, 34.267796] },
+    },
+    {
+      type: 'Feature',
+      properties: { title: '北２号館' },
+      geometry: { type: 'Point', coordinates: [135.15168, 34.268289] },
+    },
+    {
+      type: 'Feature',
+      properties: { title: '北３号館' },
+      geometry: { type: 'Point', coordinates: [135.152246, 34.268086] },
+    },
+    {
+      type: 'Feature',
+      properties: { title: '北４号館' },
+      geometry: { type: 'Point', coordinates: [135.153342, 34.268014] },
+    },
+    // --- 北エリア (N) ---
+    {
+      type: 'Feature',
+      properties: { title: '多目的グラウンド' },
+      geometry: { type: 'Point', coordinates: [135.151732, 34.268887] },
+    },
+    {
+      type: 'Feature',
+      properties: { title: '課外活動施設Ⅳ' },
+      geometry: { type: 'Point', coordinates: [135.152672, 34.269065] },
+    },
+    {
+      type: 'Feature',
+      properties: { title: '実験農場' },
+      geometry: { type: 'Point', coordinates: [135.151595, 34.269467] },
+    },
+    {
+      type: 'Feature',
+      properties: { title: '多目的広場' },
+      geometry: { type: 'Point', coordinates: [135.151045, 34.27028] },
+    },
+
+    // --- 東エリア (E) ---
     {
       type: 'Feature',
       properties: { title: '体育館・武道場' },
@@ -119,41 +149,11 @@ export const campusBuildings = {
     // --- 西エリア (W) ---
     {
       type: 'Feature',
-      properties: { title: '西１号館' },
-      geometry: { type: 'Point', coordinates: [135.150719, 34.265283] },
-    },
-    {
-      type: 'Feature',
-      properties: { title: '西２号館' },
-      geometry: { type: 'Point', coordinates: [135.150549, 34.26561] },
-    },
-    {
-      type: 'Feature',
-      properties: { title: '西３号館' },
-      geometry: { type: 'Point', coordinates: [135.150759, 34.265957] },
-    },
-    {
-      type: 'Feature',
-      properties: { title: '西４号館' },
-      geometry: { type: 'Point', coordinates: [135.150725, 34.266249] },
-    },
-    {
-      type: 'Feature',
-      properties: { title: '西５号館' },
-      geometry: { type: 'Point', coordinates: [135.150768, 34.266821] },
-    },
-    {
-      type: 'Feature',
       properties: { title: 'ふれあい会館' },
       geometry: { type: 'Point', coordinates: [135.151041, 34.267425] },
     },
 
     // --- 南エリア (S) ---
-    {
-      type: 'Feature',
-      properties: { title: '南１号館' },
-      geometry: { type: 'Point', coordinates: [135.150523, 34.264656] },
-    },
     {
       type: 'Feature',
       properties: { title: '大学会館' },

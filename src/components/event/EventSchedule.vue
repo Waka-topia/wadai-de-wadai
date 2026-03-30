@@ -26,7 +26,18 @@
           <v-divider vertical></v-divider>
           <v-col cols="9">
             <div>
-              <p class="text-h6 font-weight-bold">{{ event.organizerName }}</p>
+              <div class="d-flex align-center ga-2">
+                <v-chip
+                  v-if="event.isOfficial"
+                  size="x-small"
+                  color="blue"
+                  variant="flat"
+                  class="font-weight-bold"
+                >
+                  公式
+                </v-chip>
+                <p class="text-h6 font-weight-bold">{{ event.organizerName }}</p>
+              </div>
               <p class="text-caption font-weight-bold text-grey-lighten-2 text-truncate">
                 {{ event.description }}
               </p>
@@ -56,10 +67,8 @@ const props = defineProps({
   },
 })
 
-// TODO: Optimize filtering by date on the Vuex side if performance becomes an issue
 const filteredEvents = computed(() => {
-  const allEvents = store.getters['event/allEvents']
-  return allEvents.filter((event) => event.date === props.selectedDate)
+  return store.getters['event/sortedEventsByDate'](props.selectedDate)
 })
 </script>
 

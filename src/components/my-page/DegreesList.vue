@@ -11,34 +11,31 @@
   </div>
 </template>
 
-<script>
-export default {
-  computed: {
-    // Vuex の getter を使用してユーザーの称号を取得
-    userId() {
-      return this.$store.getters['auth/userId'] // authモジュールのuserIdを取得
-    },
-    userTitles() {
-      return this.$store.getters['title/getUserTitles'](this.userId)
-    },
-  },
-  created() {
-    // コンポーネント作成時に、ユーザーの称号を取得するアクションを呼び出す
-    this.fetchUserTitles()
-  },
-  methods: {
-    async fetchUserTitles() {
-      try {
-        await this.$store.dispatch('title/fetchUserTitles', this.userId)
+<script setup>
+import { computed, onMounted } from 'vue'
+import { useStore } from 'vuex'
 
-        // userTitles をコンソールに出力
-        console.log('取得したユーザーの称号:', this.userTitles)
-      } catch (error) {
-        console.error('称号の取得に失敗しました:', error)
-      }
-    },
-  },
+const store = useStore()
+
+// Vuex の getter を使用してユーザーの称号を取得
+const userId = computed(() => store.getters['auth/userId'])
+const userTitles = computed(() => store.getters['title/getUserTitles'](userId.value))
+
+/** ユーザーの称号を取得する */
+const fetchUserTitles = async () => {
+  try {
+    await store.dispatch('title/fetchUserTitles', userId.value)
+    // userTitles をコンソールに出力
+    console.log('取得したユーザーの称号:', userTitles.value)
+  } catch (error) {
+    console.error('称号の取得に失敗しました:', error)
+  }
 }
+
+onMounted(() => {
+  // コンポーネント作成時に、ユーザーの称号を取得するアクションを呼び出す
+  fetchUserTitles()
+})
 </script>
 
 <style scoped>

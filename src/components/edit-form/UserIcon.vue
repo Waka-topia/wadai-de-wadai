@@ -8,7 +8,6 @@
 const props = defineProps({
   photoUrlResolved: {
     type: String,
-    default: '',
     required: true,
   },
 })

@@ -18,7 +18,6 @@
 const props = defineProps({
   displayName: {
     type: String,
-    default: '',
     required: true,
   },
 })

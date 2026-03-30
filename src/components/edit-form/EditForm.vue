@@ -42,23 +42,24 @@
             <UserName :display-name="displayName" />
             <UserAddress :email="email" />
             <UserId :user-id="userId" />
+            <MyOrg />
           </v-row>
 
-          <div class="py-4 mt-5">
+          <!-- <div class="py-4 mt-5">
             <v-row align="center">
-              <v-col cols="auto">
-                <v-icon color="orange" large>mdi-map-marker</v-icon>
-              </v-col>
-              <v-col>
-                <h3 class="text-h5 font-weight-bold">次に行く新歓設定</h3>
-              </v-col>
+            <v-col cols="auto">
+            <v-icon color="orange" large>mdi-map-marker</v-icon>
+            </v-col>
+            <v-col>
+            <h3 class="text-h5 font-weight-bold">次に行く新歓設定</h3>
+            </v-col>
             </v-row>
-          </div>
+            </div>
 
-          <v-card class="elevation-2 pa-4" outlined>
+            <v-card class="elevation-2 pa-4" outlined>
             <NextShinkan />
             <NextShinkanView />
-          </v-card>
+            </v-card> -->
         </v-card-text>
 
         <v-divider />
@@ -75,8 +76,9 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useStore } from 'vuex'
-import NextShinkan from './NextShinkan.vue'
-import NextShinkanView from './NextShinkanView.vue'
+// import NextShinkan from './NextShinkan.vue'
+// import NextShinkanView from './NextShinkanView.vue'
+import MyOrg from './MyOrg.vue'
 import ProfileImage from './ProfileImage.vue'
 import UserAddress from './UserAddress.vue'
 import UserIcon from './UserIcon.vue'
