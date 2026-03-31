@@ -21,7 +21,7 @@
     </div>
 
     <v-card-text class="pa-4">
-      <v-chip size="small" color="orange" variant="outlined" class="mb-2 font-weight-bold">
+      <v-chip size="small" color="orange" class="mb-2 font-weight-bold">
         {{ job.employmentType }}
       </v-chip>
 
@@ -31,6 +31,19 @@
 
       <div class="text-body-1 font-weight-bold mb-3">
         {{ job.title }}
+      </div>
+
+      <div v-if="job.tags && job.tags.length" class="mb-3">
+        <v-chip
+          v-for="tag in job.tags"
+          :key="tag"
+          size="x-small"
+          color="orange"
+          variant="outlined"
+          class="mr-2 mb-2"
+        >
+          #{{ tag }}
+        </v-chip>
       </div>
 
       <div class="d-flex align-center mb-1">

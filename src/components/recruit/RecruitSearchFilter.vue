@@ -1,95 +1,142 @@
 <template>
   <div class="search-filter-bg pa-4">
     <v-card class="mx-1" rounded="xl">
-      <div class="d-flex align-center">
-        <v-list class="flex-grow-1 pa-0" bg-color="transparent">
-          <v-list-item class="px-2" @click="onFilterClick('area')">
-            <template #prepend>
-              <v-icon color="orange" size="20">mdi-map-marker</v-icon>
-            </template>
-            <v-list-item-title class="text-body-2 text-grey">
-              駅・エリアを選択してください
-            </v-list-item-title>
-          </v-list-item>
+      <div class="d-flex align-center px-4 py-3">
+        <div class="flex-grow-1" @click="dialog = true">
+          <div class="d-flex align-center">
+            <v-icon color="orange" size="20" class="mr-2">mdi-tag</v-icon>
 
-          <v-divider class="mx-2" />
+            <div v-if="selectedTags.length" class="d-flex align-center flex-wrap" style="gap: 6px">
+              <v-chip
+                v-for="tag in selectedTags"
+                :key="tag"
+                size="small"
+                color="orange"
+                variant="flat"
+                class="text-white custom-tag"
+              >
+                {{ tag }}
+              </v-chip>
+            </div>
 
-          <v-list-item class="px-2" @click="onFilterClick('jobType')">
-            <template #prepend>
-              <v-icon color="orange" size="20">mdi-domain</v-icon>
-            </template>
-            <v-list-item-title class="text-body-2 text-grey">
-              職種を選択してください
-            </v-list-item-title>
-          </v-list-item>
+            <span v-else class="text-body-2 text-grey">タグを選択してください</span>
+          </div>
+        </div>
 
-          <v-divider class="mx-2" />
-
-          <v-list-item class="px-2" @click="onFilterClick('features')">
-            <template #prepend>
-              <v-icon color="orange" size="20">mdi-heart</v-icon>
-            </template>
-            <v-list-item-title class="text-body-2 text-grey">
-              給与/雇用形態/その他特徴を選択してください
-            </v-list-item-title>
-          </v-list-item>
-        </v-list>
-
-        <v-btn icon variant="text" color="orange" size="large" @click="onSearch">
+        <v-btn icon variant="text" color="orange" size="large" @click="applyTagFilter">
           <v-icon>mdi-magnify</v-icon>
         </v-btn>
       </div>
     </v-card>
-    <v-snackbar v-model="snackbar.show" :color="snackbar.color">
-      {{ snackbar.message }}
-    </v-snackbar>
+
+    <v-dialog v-model="dialog" max-width="500">
+      <v-card rounded="xl">
+        <v-card-title class="font-weight-bold">タグ検索</v-card-title>
+
+        <v-card-text>
+          <div class="d-flex flex-wrap" style="gap: 8px">
+            <v-chip
+              v-for="tag in allTags"
+              :key="tag"
+              :color="selectedTags.includes(tag) ? 'orange' : ''"
+              :variant="selectedTags.includes(tag) ? 'flat' : 'outlined'"
+              :class="{ 'text-white': selectedTags.includes(tag) }"
+              @click="toggleTag(tag)"
+            >
+              #{{ tag }}
+            </v-chip>
+          </div>
+        </v-card-text>
+
+        <v-card-actions class="justify-space-between px-4 pb-4">
+          <v-btn variant="text" @click="clearTags">クリア</v-btn>
+          <div>
+            <v-btn variant="text" @click="dialog = false">閉じる</v-btn>
+            <v-btn color="orange" class="text-white" @click="applyTagFilter">検索する</v-btn>
+          </div>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, watch } from 'vue'
+import { useStore } from 'vuex'
+import { useRoute, useRouter } from 'vue-router'
 
-const snackbar = ref({
-  show: false,
-  message: '',
-  color: 'success',
+const store = useStore()
+const route = useRoute()
+const router = useRouter()
+
+const dialog = ref(false)
+
+const jobs = computed(() => store.state.jobs.jobs || [])
+
+const allTags = computed(() => {
+  const tagSet = new Set()
+  jobs.value.forEach((job) => {
+    ;(job.tags || []).forEach((tag) => tagSet.add(tag))
+  })
+  return [...tagSet]
 })
 
-const onFilterClick = (filterType) => {
-  try {
-    snackbar.value = {
-      show: true,
-      message: `${filterType}の絞り込み機能は現在準備中です`,
-      color: 'warning',
+const selectedTags = ref([])
+
+watch(
+  () => route.query.tags,
+  (tags) => {
+    if (!tags) {
+      selectedTags.value = []
+    } else {
+      selectedTags.value = Array.isArray(tags) ? tags : [tags]
     }
-  } catch (error) {
-    snackbar.value = {
-      show: true,
-      message: `エラー: ${error.message}`,
-      color: 'error',
-    }
+  },
+  { immediate: true },
+)
+
+const toggleTag = (tag) => {
+  if (selectedTags.value.includes(tag)) {
+    selectedTags.value = selectedTags.value.filter((t) => t !== tag)
+  } else {
+    selectedTags.value = [...selectedTags.value, tag]
   }
 }
 
-const onSearch = () => {
-  try {
-    snackbar.value = {
-      show: true,
-      message: '検索機能は現在準備中です',
-      color: 'warning',
-    }
-  } catch (error) {
-    snackbar.value = {
-      show: true,
-      message: `エラー: ${error.message}`,
-      color: 'error',
-    }
-  }
+const clearTags = () => {
+  selectedTags.value = []
+}
+
+const applyTagFilter = () => {
+  router.push({
+    path: '/jobs',
+    query: selectedTags.value.length ? { tags: selectedTags.value } : {},
+  })
+  dialog.value = false
 }
 </script>
 
 <style scoped>
 .search-filter-bg {
   background-color: #ff9800;
+}
+
+.custom-tag {
+  position: relative;
+  padding: 6px 12px 6px 18px;
+  clip-path: polygon(10px 0%, 100% 0%, 100% 100%, 10px 100%, 0% 50%);
+  border-radius: 6px;
+}
+
+.custom-tag::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  background: white;
+  border-radius: 50%;
 }
 </style>

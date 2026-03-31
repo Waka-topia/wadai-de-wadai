@@ -1,12 +1,5 @@
 <template>
   <div>
-    <div v-if="route.query.tag" class="px-4 py-3 d-flex align-center">
-      <v-chip color="orange" variant="outlined" class="mr-2"> #{{ route.query.tag }} </v-chip>
-      <v-btn size="small" variant="text" color="orange" @click="clearTagFilter">
-        絞り込み解除
-      </v-btn>
-    </div>
-
     <div class="d-flex align-center bg-white rounded-t">
       <v-btn
         v-if="isAuthenticated"
@@ -20,20 +13,9 @@
           {{ showBookmarkedOnly ? 'mdi-star' : 'mdi-star-outline' }}
         </v-icon>
       </v-btn>
-    
-    <v-divider v-if="isAuthenticated" vertical class="mx-2 my-2" />
 
-    <v-tabs v-model:model-value="tab" color="orange" bg-color="white" grow>
-      <v-tab
-        v-for="sortOption in sortOptions"
-        :key="sortOption.value"
-        :value="sortOption.value"
-        class="font-weight-bold"
-      >
-        {{ sortOption.label }}
-      </v-tab>
-    </v-tabs>
-  </div>
+      <v-divider v-if="isAuthenticated" vertical class="mx-2 my-2" />
+    </div>
     <v-tabs-window
       v-for="sortOption in sortOptions"
       v-model:model-value="tab"
@@ -43,7 +25,7 @@
         <RecruitJobCard v-for="job in filteredJobs" :key="job.id" :job="job" />
       </v-tabs-window-item>
     </v-tabs-window>
- </div>
+  </div>
 </template>
 
 <script setup>
