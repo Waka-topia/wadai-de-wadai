@@ -174,45 +174,6 @@ export const deleteEventService = async (eventId, userId) => {
 }
 
 /**
- * 代表者証明申請をusersコレクションに保存する
- *
- * @param {string} userId Firebase AuthのユーザーID
- * @param {object} proveOwnerData 申請データ
- * @returns {Promise<void>}
- */
-export const proveOwnerService = async (userId, proveOwnerData) => {
-  try {
-    if (!userId) {
-      throw new Error('代表者証明を申請するにはログインが必要です')
-    }
-
-    if (!proveOwnerData) {
-      throw new Error('申請データが不足しています')
-    }
-
-    const userRef = doc(db, 'users', userId)
-    await setDoc(
-      userRef,
-      {
-        isProvePending: true,
-        proveOwnerApplication: {
-          ...proveOwnerData,
-          requestedAt: new Date().toISOString(),
-        },
-      },
-      { merge: true },
-    )
-  } catch (error) {
-    console.error('Failed to request prove owner:', error)
-    throw new Error(`代表者証明の申請に失敗しました。${error.message}`)
-  }
-}
-
-export const createRandomId = () => {
-  return uuidv4()
-}
-
-/**
  * 代表者証明を申請したユーザー一覧を取得する
  *
  * @returns {Promise<Array>} 申請者一覧
@@ -293,10 +254,10 @@ export const getProveOwnerApplicantService = async (userId) => {
  */
 export const updateProveOwnerApprovalService = async (userId, isApproved) => {
   try {
-    if (!userId) {
-      throw new Error('承認状態を更新するには認証が必要です')
-    }
+    // 値の存在を確認
+    if (!userId) throw new Error('承認状態を更新するには認証が必要です')
 
+    // 申請状態を更新
     const userRef = doc(db, 'users', userId)
     await updateDoc(userRef, {
       isOfficial: isApproved,
@@ -306,7 +267,6 @@ export const updateProveOwnerApprovalService = async (userId, isApproved) => {
       'proveOwnerApplication.reviewedStatus': isApproved ? 'approved' : 'rejected',
     })
   } catch (error) {
-    console.error('Failed to update prove owner approval:', error)
     throw new Error(`承認状態の更新に失敗しました。${error.message}`)
   }
 }
