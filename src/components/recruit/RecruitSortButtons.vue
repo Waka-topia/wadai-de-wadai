@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex align-center my-2 mx-5" style="gap: 10px">
+  <div v-if="!showBookmarkedOnly" class="d-flex align-center my-2 mx-5" style="gap: 10px">
     <v-btn
       v-for="option in sortOptions"
       :key="option.value"
@@ -20,6 +20,8 @@ import { computed } from 'vue'
 import { useStore } from 'vuex'
 
 const store = useStore()
+
+const showBookmarkedOnly = computed(() => store.state.jobs.showBookmarkedOnly)
 
 const currentSortKey = computed({
   get: () => store.state.jobs.sortKey,
