@@ -21,12 +21,17 @@
 
           <v-card class="pa-4 mb-4" color="orange-lighten-2" variant="outlined">
             <div class="d-flex align-center justify-space-between">
-              <p class="text-body-2 text-md-body-1 mb-0 font-weight-bold text-grey-darken-4">
+              <p
+                class="text-body-2 text-md-body-1 mb-0 font-weight-bold text-grey-darken-4 text-break"
+              >
                 {{ applicant.proveOwnerApplication?.tempId }}
               </p>
-              <v-btn icon size="small" color="orange" @click="copyTempId">
-                <v-icon>{{ copied ? 'mdi-check' : 'mdi-content-copy' }}</v-icon>
-              </v-btn>
+              <div class="d-flex flex-column align-center">
+                <v-btn icon size="small" color="orange" @click="copyTempId">
+                  <v-icon>{{ copied ? 'mdi-check' : 'mdi-content-copy' }}</v-icon>
+                </v-btn>
+                <p class="text-caption font-weight-bold mb-0">コピー</p>
+              </div>
             </div>
           </v-card>
 
