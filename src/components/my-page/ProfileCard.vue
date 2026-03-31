@@ -15,38 +15,6 @@
     <v-row class="mb-3">
       <span class="font-weight-bold text-h4 mx-auto text-truncate">{{ props.name }}</span>
     </v-row>
-
-    <!-- スタンプとアイコン情報 -->
-    <v-row class="my-2" align="center" justify="center">
-      <!-- スタンプ情報 -->
-      <v-col class="pa-0" cols="12" sm="5">
-        <div class="d-flex align-center justify-end">
-          <v-icon class="mr-2" color="red" size="x-large">mdi-stamper</v-icon>
-          <div class="stats-text">
-            <span class="text-h6 text-red font-weight-bold">{{ props.count }}</span>
-            <span class="text-subtitle-2 text-red font-weight-bold">スタンプ</span>
-          </div>
-        </div>
-      </v-col>
-
-      <!-- 区切り線 -->
-      <v-col class="px-3" cols="auto">
-        <v-divider vertical></v-divider>
-      </v-col>
-
-      <!-- アイコン情報 -->
-      <!-- <v-col cols="12" sm="5" class="pa-0">
-        <div class="d-flex align-center justify-start">
-        <v-icon size="x-large" color="orange" class="mr-2">mdi-webcam</v-icon>
-        <div class="stats-text">
-        <span class="text-h6 text-orange font-weight-bold">0</span>
-        <span class="text-subtitle-2 text-orange font-weight-bold">個</span>
-        </div>
-        </div>
-        </v-col> -->
-    </v-row>
-
-    <v-spacer class="my-2"></v-spacer>
   </v-card>
 </template>
 
@@ -54,10 +22,6 @@
 const props = defineProps({
   name: {
     type: String,
-    required: true,
-  },
-  count: {
-    type: Number,
     required: true,
   },
   photoUrlResolved: {
