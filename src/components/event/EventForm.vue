@@ -116,9 +116,19 @@ const snackbar = ref({
 const submitEvent = async () => {
   try {
     const currentUserId = store.getters['auth/userId']
+    const selectedGroup = allGroups.find((group) => group.name === newEvent.value.organizerName)
+
+    if (!selectedGroup) {
+      throw new Error('団体の選択が不正です。もう一度選択してください。')
+    }
+
+    const eventData = {
+      ...newEvent.value,
+      organizationId: String(selectedGroup.id),
+    }
 
     await store.dispatch('event/createEvent', {
-      eventData: newEvent.value,
+      eventData,
       currentUserId,
     })
     snackbar.value = {

@@ -122,7 +122,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { useStore } from 'vuex'
-import { getProveOwnerApplicantService } from '@/services/eventService'
+import { getProveOwnerApplicantService } from '@/services/proveService'
 
 const store = useStore()
 const applicant = ref(null)

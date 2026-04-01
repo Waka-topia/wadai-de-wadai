@@ -1,8 +1,9 @@
-import { fetchOrganizationData } from '@/services/proveService'
+import { fetchOrganizationData, submitOwnership } from '@/services/proveService'
 
 const state = {
   organizationId: '',
   proveOwnerStatusCache: {},
+  applicants: [],
 }
 
 const getCurrentStatus = (state) => {
@@ -22,6 +23,9 @@ const mutations = {
         provedPassword,
       },
     }
+  },
+  setApplicants(state, applicants) {
+    state.applicants = applicants
   },
 }
 
@@ -53,6 +57,15 @@ const actions = {
       throw new Error(`代表者証明の状態の取得に失敗しました。${error.message}`)
     }
   },
+  async submitOwnerApprove({ commit }, applicationData) {
+    try {
+      await submitOwnership(applicationData)
+
+      commit('setCachedProveOwnerStatus', applicationData)
+    } catch (error) {
+      throw new Error(`代表者証明の申請に失敗しました。${error.message}`)
+    }
+  },
 }
 
 const getters = {
@@ -74,6 +87,7 @@ const getters = {
   },
   isFetched: (state) => Boolean(getCurrentStatus(state)),
   organizationId: (state) => state.organizationId,
+  applicants: (state) => state.applicants,
 }
 
 export default {

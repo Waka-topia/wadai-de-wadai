@@ -1,48 +1,31 @@
-import {
-  collection,
-  deleteDoc,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  setDoc,
-  updateDoc,
-  where,
-} from 'firebase/firestore'
+import { collection, deleteDoc, doc, getDoc, getDocs, setDoc, updateDoc } from 'firebase/firestore'
 import { v4 as uuidv4 } from 'uuid'
 import { db } from '@/firebase/config'
 
-// TODO: 将来的には課金ユーザは、さらに優先表示できるようにするために数字で優先度を管理
+// Note: 将来的には課金ユーザをさらに優先表示できるよう、数字で優先度を管理する
 const officialEventPriority = 10
 
 /**
- * Usersコレクションの情報から公式認証ステータスを解決する
+ * GroupRepresentativesコレクションから公式認証ステータスを解決する
  *
  * @param {string} userId Firebase AuthのユーザーID
+ * @param {string} organizationId 団体ID
  * @returns {Promise<object>} 公式認証フラグとロール
  */
-const resolveOfficialStatus = async (userId) => {
-  if (!userId) {
-    throw new Error('イベントを登録するにはログインが必要です')
-  }
+const resolveOfficialStatus = async (userId, organizationId) => {
+  if (!userId) throw new Error('イベントを登録するにはログインが必要です')
+  if (!organizationId) throw new Error('イベントを登録するには団体IDが必要です')
 
-  const userRef = doc(db, 'users', userId)
-  const userSnapshot = await getDoc(userRef)
+  // 他ユーザのデータにアクセスしないよう、ユーザIDと団体IDの組み合わせの粒度でデータを取得する
+  const representativeRef = doc(db, 'groupRepresentatives', `${organizationId}_${userId}`)
+  const representativeSnapshot = await getDoc(representativeRef)
+  const data = representativeSnapshot.data()
 
-  if (!userSnapshot.exists()) {
-    return {
-      isOfficial: false,
-      role: 'general',
-    }
-  }
-
-  const userData = userSnapshot.data()
-  const role = userData.role || 'general'
-  const isOfficial = Boolean(userData.isOfficial) || role === 'official'
+  const isOfficial = !!(representativeSnapshot.exists() && data?.isActive === true)
 
   return {
     isOfficial,
-    role,
+    role: isOfficial ? 'official' : 'general',
   }
 }
 
@@ -54,15 +37,20 @@ const resolveOfficialStatus = async (userId) => {
  * @returns {Promise<object>} 作成されたイベントデータ
  */
 export const addEventService = async (eventData, userId) => {
+  if (!eventData) throw new Error('イベントデータが提供されていません')
+  if (!userId) throw new Error('イベントを登録するにはログインが必要です')
+
   try {
-    const { isOfficial, role } = await resolveOfficialStatus(userId)
+    const { isOfficial, role } = await resolveOfficialStatus(userId, eventData.organizationId)
+
+    // FireBaseに保存するイベントデータに必要なフィールドを追加
     const eventId = uuidv4()
     const eventRef = doc(db, 'events', eventId)
     const createdEvent = {
       ...eventData,
       eventId,
       createdBy: userId,
-      authorRole: role,
+      role,
       isOfficial,
       eventPriority: isOfficial ? officialEventPriority : 0,
     }
@@ -170,103 +158,5 @@ export const deleteEventService = async (eventId, userId) => {
   } catch (error) {
     console.error('Failed to delete event:', error)
     throw new Error(`イベントの削除に失敗しました。${error.message}`)
-  }
-}
-
-/**
- * 代表者証明を申請したユーザー一覧を取得する
- *
- * @returns {Promise<Array>} 申請者一覧
- */
-export const getProveOwnerApplicantsService = async () => {
-  try {
-    const usersRef = collection(db, 'users')
-    const applicantsQuery = query(usersRef, where('isProvePending', '==', true))
-    const usersSnapshot = await getDocs(applicantsQuery)
-
-    return usersSnapshot.docs
-      .map((userDoc) => {
-        const userData = userDoc.data()
-        return {
-          userId: userDoc.id,
-          tempId: userData.proveOwnerApplication?.tempId || null,
-          userName: userData.proveOwnerApplication?.userName || null,
-          organizationName: userData.proveOwnerApplication?.organizationName || null,
-          email: userData.proveOwnerApplication?.email || null,
-          isOfficial: Boolean(userData.isOfficial),
-          isProvePending: Boolean(userData.isProvePending),
-          proveOwnerApplication: userData.proveOwnerApplication || null,
-        }
-      })
-      .filter((user) => Boolean(user.proveOwnerApplication))
-  } catch (error) {
-    console.error('Failed to get prove owner applicants:', error)
-    throw new Error(`申請者一覧の取得に失敗しました。${error.message}`)
-  }
-}
-
-/**
- * 代表者証明を申請したユーザーの情報を取得する
- *
- * @param {string} userId Firebase AuthのユーザーID
- * @returns {Promise<object>} 申請者情報
- */
-export const getProveOwnerApplicantService = async (userId) => {
-  try {
-    if (!userId) {
-      throw new Error('申請者情報を取得するにはユーザーIDが必要です')
-    }
-
-    const userRef = doc(db, 'users', userId)
-    const userSnapshot = await getDoc(userRef)
-
-    if (!userSnapshot.exists()) {
-      throw new Error('申請者が見つかりません')
-    }
-
-    const userData = userSnapshot.data()
-
-    if (!userData.proveOwnerApplication) {
-      throw new Error('このユーザーは代表者証明を申請していません')
-    }
-
-    return {
-      userId,
-      tempId: userData.proveOwnerApplication?.tempId || null,
-      userName: userData.proveOwnerApplication?.userName || null,
-      organizationName: userData.proveOwnerApplication?.organizationName || null,
-      email: userData.proveOwnerApplication?.email || null,
-      isOfficial: Boolean(userData.isOfficial),
-      isProvePending: Boolean(userData.isProvePending),
-      proveOwnerApplication: userData.proveOwnerApplication || null,
-    }
-  } catch (error) {
-    throw new Error(`申請者情報の取得に失敗しました。${error.message}`)
-  }
-}
-
-/**
- * 代表者証明申請の承認状態を更新する
- *
- * @param {string} userId Firebase AuthのユーザーID
- * @param {boolean} isApproved 承認状態
- * @returns {Promise<void>}
- */
-export const updateProveOwnerApprovalService = async (userId, isApproved) => {
-  try {
-    // 値の存在を確認
-    if (!userId) throw new Error('承認状態を更新するには認証が必要です')
-
-    // 申請状態を更新
-    const userRef = doc(db, 'users', userId)
-    await updateDoc(userRef, {
-      isOfficial: isApproved,
-      isProvePending: false,
-      role: isApproved ? 'official' : 'general',
-      'proveOwnerApplication.reviewedAt': new Date().toISOString(),
-      'proveOwnerApplication.reviewedStatus': isApproved ? 'approved' : 'rejected',
-    })
-  } catch (error) {
-    throw new Error(`承認状態の更新に失敗しました。${error.message}`)
   }
 }

@@ -81,12 +81,12 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { required, passwordRule, confirmPasswordRule } from '@/utils/forms/validate'
 import { useStore } from 'vuex'
 import { allGroups } from '@/data/groups'
-import { updateProveOwnerApprovalService, submitOwnership } from '@/services/proveService'
+import { submitOwnership } from '@/services/proveService'
 
 const selectedGroup = ref(null)
 const password = ref('')
@@ -104,19 +104,6 @@ const snackbar = ref({
 const router = useRouter()
 const store = useStore()
 
-const userId = computed(() => store.getters['auth/userId'])
-const isProved = computed(() => store.getters['prove/isProved'])
-
-const flowMessageMap = {
-  submitted: '申請が完了しました',
-  approved: '代表者認証が完了しました',
-}
-
-const flowRouteMap = {
-  submitted: '/prove-owner/description',
-  approved: '/mypage',
-}
-
 const onSubmit = async (validationPromise) => {
   try {
     isLoading.value = true
@@ -126,28 +113,25 @@ const onSubmit = async (validationPromise) => {
 
     const selected = selectedGroup.value
 
-    let result = null
-    if (isProved.value) {
-      // 代表者証明を認証する
-      const isVerifiedPassword = store.getters['prove/isVerifiedPassword'](password.value)
-      if (!isVerifiedPassword) throw new Error('パスワードが一致しません。')
-
-      // TODO: 本来はstoreで管理しているユーザデータを更新する
-      result = await updateProveOwnerApprovalService(userId.value, true)
-    } else {
-      // 代表者証明の申請フローを実行
-      // TODO: 本来はstoreで管理しているユーザデータを更新する
-      result = await submitOwnership(String(selected.id), userId.value, password.value)
-    }
+    // 代表者証明の申請フローを実行
+    // Note: 本来はstoreで管理しているユーザデータも同期更新する
+    await submitOwnership({
+      organizationId: selected.id,
+      password: password.value,
+      userId: store.getters['auth/userId'],
+      userNameSnapshot: store.getters['auth/displayName'],
+      emailSnapshot: store.getters['auth/email'],
+      groupNameSnapshot: selected.name,
+    })
 
     snackbar.value = {
       show: true,
       color: 'success',
-      message: flowMessageMap[result.flow],
+      message: '申請を受け付けました',
     }
 
     setTimeout(() => {
-      router.push(flowRouteMap[result.flow])
+      router.push('/prove-owner/description')
     }, 1000)
   } catch (error) {
     snackbar.value = {
@@ -159,12 +143,4 @@ const onSubmit = async (validationPromise) => {
     isLoading.value = false
   }
 }
-
-watch(
-  () => selectedGroup.value?.id,
-  (organizationId) => {
-    if (!organizationId) return
-    store.dispatch('prove/fetchProveOwnerStatus', String(organizationId))
-  },
-)
 </script>

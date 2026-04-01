@@ -3,7 +3,6 @@ import authModule from './modules/auth'
 import eventModule from './modules/event'
 import jobsModule from './modules/jobs'
 import locationModule from './modules/location'
-import proveModule from './modules/prove'
 import rankingModule from './modules/ranking'
 import ratingModule from './modules/rating'
 import scrollModule from './modules/scroll'
@@ -40,6 +39,5 @@ export default createStore({
     location: locationModule,
     rating: ratingModule,
     scroll: scrollModule,
-    prove: proveModule,
   },
 })
