@@ -70,11 +70,12 @@ const actions = {
    * @param {object} payload イベントデータと作成者情報
    * @param {object} payload.eventData イベントデータ
    * @param {string} payload.currentUserId Firebase AuthのユーザーID
+   * @param {string} payload.currentUserName Firebase Authのユーザー名
    */
-  async createEvent({ commit }, { eventData, currentUserId }) {
+  async createEvent({ commit }, { eventData, currentUserId, currentUserName }) {
     try {
       commit('setError', null)
-      const createdEvent = await addEventService(eventData, currentUserId)
+      const createdEvent = await addEventService(eventData, currentUserId, currentUserName)
       commit('addEvent', createdEvent)
     } catch (error) {
       commit('setError', error.message)

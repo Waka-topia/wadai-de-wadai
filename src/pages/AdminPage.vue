@@ -19,21 +19,23 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="applicant in applicants" :key="applicant.userId">
+            <tr v-for="applicant in applicants" :key="applicant.applicationId">
               <td class="text-body-2 text-break">{{ applicant.userId }}</td>
-              <td class="text-body-2 text-break">{{ applicant.tempId }}</td>
-              <td>{{ applicant.proveOwnerApplication.organizationName || '-' }}</td>
-              <td>{{ applicant.proveOwnerApplication.userName || '-' }}</td>
-              <td>{{ applicant.proveOwnerApplication.email || '-' }}</td>
-              <td>{{ formatDate(applicant.proveOwnerApplication.requestedAt) }}</td>
+              <td class="text-body-2 text-break">
+                {{ applicant.tempId }}
+              </td>
+              <td>{{ applicant.organizationName }}</td>
+              <td>{{ applicant.userName }}</td>
+              <td>{{ applicant.email }}</td>
+              <td>{{ formatDate(applicant.requestedAt) }}</td>
               <td class="d-flex align-center">
                 <v-switch
-                  :disabled="updatingUserId === applicant.userId"
+                  :disabled="updatingUserId === applicant.applicationId"
                   :model-value="applicant.isOfficial"
                   color="success"
                   hide-details
                   inset
-                  @update:model-value="(value) => toggleApproval(applicant.userId, value)"
+                  @update:model-value="(value) => toggleApproval(applicant.applicationId, value)"
                 />
                 <span class="text-caption ml-2">
                   {{ applicant.isOfficial ? '承認' : '非承認' }}
@@ -53,41 +55,43 @@
       </div>
 
       <v-row v-else class="d-md-none" dense>
-        <v-col v-for="applicant in applicants" :key="applicant.userId" cols="12">
+        <v-col v-for="applicant in applicants" :key="applicant.applicationId" cols="12">
           <v-card class="pa-4" variant="outlined">
             <p class="text-subtitle-2 mb-1">ユーザID</p>
             <p class="mb-3 text-body-2 text-break">{{ applicant.userId }}</p>
 
             <p class="text-subtitle-2 mb-1">一時ID</p>
-            <p class="mb-3 text-body-2 text-break">{{ applicant.tempId }}</p>
+            <p class="mb-3 text-body-2 text-break">
+              {{ applicant.tempId }}
+            </p>
 
             <p class="text-subtitle-2 mb-1">団体名</p>
             <p class="mb-3 text-body-2">
-              {{ applicant.proveOwnerApplication.organizationName || '-' }}
+              {{ applicant.organizationName }}
             </p>
 
             <p class="text-subtitle-2 mb-1">申請者名</p>
-            <p class="mb-3 text-body-2">{{ applicant.proveOwnerApplication.userName || '-' }}</p>
+            <p class="mb-3 text-body-2">{{ applicant.userName }}</p>
 
             <p class="text-subtitle-2 mb-1">メール</p>
             <p class="mb-3 text-body-2 text-break">
-              {{ applicant.proveOwnerApplication.email || '-' }}
+              {{ applicant.email }}
             </p>
 
             <p class="text-subtitle-2 mb-1">申請日時</p>
             <p class="mb-3 text-body-2">
-              {{ formatDate(applicant.proveOwnerApplication.requestedAt) }}
+              {{ formatDate(applicant.requestedAt) }}
             </p>
 
             <div class="d-flex align-center justify-space-between">
               <span class="text-caption">{{ applicant.isOfficial ? '承認' : '非承認' }}</span>
               <v-switch
-                :disabled="updatingUserId === applicant.userId"
+                :disabled="updatingUserId === applicant.applicationId"
                 :model-value="applicant.isOfficial"
                 color="success"
                 hide-details
                 inset
-                @update:model-value="(value) => toggleApproval(applicant.userId, value)"
+                @update:model-value="(value) => toggleApproval(applicant.applicationId, value)"
               />
             </div>
           </v-card>
@@ -106,7 +110,7 @@ import { onMounted, ref } from 'vue'
 import {
   getProveOwnerApplicantsService,
   updateProveOwnerApprovalService,
-} from '@/services/eventService'
+} from '@/services/proveService'
 
 const applicants = ref([])
 const isLoading = ref(false)
@@ -149,8 +153,10 @@ const loadApplicants = async () => {
   }
 }
 
-const toggleApproval = async (userId, nextValue) => {
-  const targetApplicant = applicants.value.find((applicant) => applicant.userId === userId)
+const toggleApproval = async (applicationId, nextValue) => {
+  const targetApplicant = applicants.value.find(
+    (applicant) => applicant.applicationId === applicationId,
+  )
 
   if (!targetApplicant) {
     return
@@ -160,8 +166,8 @@ const toggleApproval = async (userId, nextValue) => {
   targetApplicant.isOfficial = nextValue
 
   try {
-    updatingUserId.value = userId
-    await updateProveOwnerApprovalService(userId, nextValue)
+    updatingUserId.value = applicationId
+    await updateProveOwnerApprovalService(applicationId, nextValue)
     showSnackbar('success', nextValue ? '承認しました' : '非承認に変更しました')
   } catch (error) {
     targetApplicant.isOfficial = previousValue
