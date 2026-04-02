@@ -44,7 +44,7 @@ const closeFormDialog = () => {
 <style scoped>
 .fab-btn {
   position: fixed;
-  bottom: 80px;
+  bottom: 100px;
   right: 24px;
   z-index: 1000;
 }
