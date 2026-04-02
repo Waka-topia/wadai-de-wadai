@@ -29,16 +29,6 @@ const routes = [
     component: () => import('@/pages/ResetPasswordPage.vue'),
   },
   {
-    path: '/reader',
-    name: 'Reader',
-    component: () => import('@/pages/ReaderPage.vue'),
-  },
-  {
-    path: '/ranking',
-    name: 'Ranking',
-    component: () => import('@/pages/RankingPage.vue'),
-  },
-  {
     path: '/mypage',
     name: 'MyPage',
     component: () => import('@/pages/MyPage.vue'),
@@ -57,11 +47,6 @@ const routes = [
     path: '/eventcal/:id',
     name: 'EventDetail',
     component: () => import('@/pages/EventDetail.vue'),
-  },
-  {
-    path: '/titleshop',
-    name: 'TitleShop',
-    component: () => import('@/pages/TitleShop.vue'),
   },
   {
     path: '/inquiry',

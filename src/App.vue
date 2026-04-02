@@ -10,11 +10,6 @@
 
     <v-navigation-drawer v-if="!isFullscreenPage" v-model="drawer" class="bg-white">
       <v-list>
-        <v-list-item class="position-relative my-1" block size="large" @click="gotoshop">
-          <v-icon> mdi-download </v-icon>
-          称号を受け取る
-          <v-icon class="position-absolute right-0 mx-2"> mdi-chevron-right </v-icon>
-        </v-list-item>
         <v-list-item class="position-relative my-1" block size="large" @click="gotoinquiry">
           <v-icon> mdi-email-outline </v-icon>
           お問い合わせ
@@ -66,11 +61,8 @@ const routeTitleMap = {
   '/': 'ホーム',
   '/login': 'ログイン',
   '/signup': 'サインアップ',
-  '/reader': 'スキャン',
-  '/ranking': 'ランキング',
   '/mypage': 'マイページ',
   '/eventcal': '新歓日程',
-  '/titleshop': '称号ショップ',
   '/inquiry': 'お問い合わせ',
   '/rule': '利用規約',
   '/map': 'マップ',
@@ -114,10 +106,6 @@ const checkEventCalPage = (currentRoute) => {
  */
 const checkFullscreenPage = (currentRoute) => {
   isFullscreenPage.value = ['/map'].includes(currentRoute.path)
-}
-
-const gotoshop = () => {
-  router.push('/titleshop')
 }
 
 const gotoinquiry = () => {
