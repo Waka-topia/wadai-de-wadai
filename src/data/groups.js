@@ -104,7 +104,7 @@ export const allGroups = [
   { id: 79, name: '剣道部', mainCategory: 'club', subCategory: 'sports' },
   { id: 80, name: '弓道部', mainCategory: 'club', subCategory: 'sports' },
   { id: 81, name: '空手道部', mainCategory: 'club', subCategory: 'sports' },
-  { id: 82, name: '合氣道部', mainCategory: 'club', subCategory: 'sports' },
+  { id: 82, name: '男子合気道部', mainCategory: 'club', subCategory: 'sports' },
   { id: 83, name: '少林寺拳法部', mainCategory: 'club', subCategory: 'sports' },
   { id: 84, name: '陸上ホッケー部', mainCategory: 'club', subCategory: 'sports' },
   { id: 85, name: 'ヨット部', mainCategory: 'club', subCategory: 'sports' },
@@ -207,6 +207,18 @@ export const allGroups = [
   {
     id: 112,
     name: '良い旅プロジェクトBon Voyage（ボンボヤージュ）',
+    mainCategory: 'project',
+    subCategory: 'culture',
+  },
+  {
+    id: 113,
+    name: 'すきとほ',
+    mainCategory: 'circle',
+    subCategory: 'culture',
+  },
+  {
+    id: 114,
+    name: 'きの活',
     mainCategory: 'project',
     subCategory: 'culture',
   },
