@@ -91,11 +91,24 @@
           </v-list-item>
 
           <v-divider inset />
+
+          <v-list-item class="px-0">
+            <template #prepend>
+              <v-avatar color="blue-grey" size="40" rounded="lg">
+                <v-icon color="white" size="20">mdi-account-edit</v-icon>
+              </v-avatar>
+            </template>
+            <v-list-item-subtitle class="text-caption text-uppercase"> 作成者 </v-list-item-subtitle>
+            <v-list-item-title class="font-weight-medium">
+              {{ event.createdByName || '匿名ユーザー' }}
+            </v-list-item-title>
+          </v-list-item>
         </v-list>
       </v-card-text>
 
       <!-- Danger action -->
       <EditDeleteForm :event-id="eventId" />
+
     </v-card>
 
     <v-card v-else rounded="lg" elevation="2" class="pa-6 text-center">

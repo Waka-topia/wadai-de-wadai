@@ -34,11 +34,13 @@ const resolveOfficialStatus = async (userId, organizationId) => {
  *
  * @param {object} eventData イベントデータ
  * @param {string} userId Firebase AuthのユーザーID
+ * @param {string} userName Firebase Authのユーザー名
  * @returns {Promise<object>} 作成されたイベントデータ
  */
-export const addEventService = async (eventData, userId) => {
+export const addEventService = async (eventData, userId, userName) => {
   if (!eventData) throw new Error('イベントデータが提供されていません')
   if (!userId) throw new Error('イベントを登録するにはログインが必要です')
+  if (!userName) throw new Error('イベントを登録するにはユーザー名が必要です')
 
   try {
     const { isOfficial, role } = await resolveOfficialStatus(userId, eventData.organizationId)
@@ -50,6 +52,7 @@ export const addEventService = async (eventData, userId) => {
       ...eventData,
       eventId,
       createdBy: userId,
+      createdByName: userName || '匿名ユーザー',
       role,
       isOfficial,
       eventPriority: isOfficial ? officialEventPriority : 0,

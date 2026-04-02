@@ -42,7 +42,6 @@
             <UserName :display-name="displayName" />
             <UserAddress :email="email" />
             <UserId :user-id="userId" />
-            <MyOrg />
           </v-row>
 
           <!-- <div class="py-4 mt-5">
@@ -78,7 +77,6 @@ import { ref, computed } from 'vue'
 import { useStore } from 'vuex'
 // import NextShinkan from './NextShinkan.vue'
 // import NextShinkanView from './NextShinkanView.vue'
-import MyOrg from './MyOrg.vue'
 import ProfileImage from './ProfileImage.vue'
 import UserAddress from './UserAddress.vue'
 import UserIcon from './UserIcon.vue'

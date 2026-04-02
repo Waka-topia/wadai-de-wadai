@@ -116,6 +116,7 @@ const snackbar = ref({
 const submitEvent = async () => {
   try {
     const currentUserId = store.getters['auth/userId']
+    const currentUserName = store.getters['auth/displayName']
     const selectedGroup = allGroups.find((group) => group.name === newEvent.value.organizerName)
 
     if (!selectedGroup) {
@@ -130,6 +131,7 @@ const submitEvent = async () => {
     await store.dispatch('event/createEvent', {
       eventData,
       currentUserId,
+      currentUserName,
     })
     snackbar.value = {
       show: true,
