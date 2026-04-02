@@ -76,7 +76,9 @@ const routes = [
   {
     path: '/jobs',
     name: 'RecruitPage',
-    component: () => import('@/pages/RecruitPage.vue'),
+    // component: () => import('@/pages/RecruitPage.vue'),
+    // リリースに向け，開発途中ページを代わりに表示
+    component: () => import('@/pages/WorkInProgressPage.vue'),
   },
   {
     path: '/jobs/:id',
