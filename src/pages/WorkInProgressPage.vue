@@ -21,7 +21,6 @@
 <style scoped>
 .work-in-progress-container {
   background-color: #f9f8f4;
-  /* margin-top: 50px; */
   min-height: 86vh;
   display: flex;
   flex-direction: column;
