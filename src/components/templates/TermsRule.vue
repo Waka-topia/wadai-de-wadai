@@ -1,10 +1,10 @@
 <template>
   <div class="rules-container">
-    <!-- <h1>和大DE話題 利用規約</h1>
+    <!-- <h1>ワダイdeワダイ 利用規約</h1>
     -->
     <div class="rule-section">
       <h2>1. 適用範囲</h2>
-      <p>本利用規約は、和大DE話題（以下「本アプリ」）の利用に関するルールを定めるものです。</p>
+      <p>本利用規約は、ワダイdeワダイ（以下「本アプリ」）の利用に関するルールを定めるものです。</p>
     </div>
 
     <div class="rule-section">
