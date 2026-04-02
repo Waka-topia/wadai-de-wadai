@@ -116,11 +116,11 @@ const getLecture = (day, period) => {
 /** 時限の開始・終了時刻 */
 const periodTimes = {
   1: { start: '09:10', end: '10:40' },
-  2: { start: '10:40', end: '12:10' },
+  2: { start: '10:50', end: '12:20' },
   3: { start: '13:10', end: '14:40' },
   4: { start: '14:50', end: '16:20' },
-  5: { start: '16:20', end: '17:50' },
-  6: { start: '18:00', end: '19:30' },
+  5: { start: '16:30', end: '18:00' },
+  6: { start: '18:10', end: '19:40' },
 }
 
 const getPeriodStart = (period) => periodTimes[period]?.start || ''

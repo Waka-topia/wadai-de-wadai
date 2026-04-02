@@ -210,4 +210,16 @@ export const allGroups = [
     mainCategory: 'project',
     subCategory: 'culture',
   },
+  {
+    id: 113,
+    name: 'すきとほ',
+    mainCategory: 'circle',
+    subCategory: 'culture',
+  },
+  {
+    id: 114,
+    name: 'きの活',
+    mainCategory: 'project',
+    subCategory: 'culture',
+  },
 ]
