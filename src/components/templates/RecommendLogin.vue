@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex flex-column justify-center align-center my-10">
     <p class="text-center text-emphasis pb-6">
-      \ <span class="font-weight-bold">和大DE話題</span>でみんなと新歓に行こう /
+      \ <span class="font-weight-bold">ワダイdeワダイ</span>でみんなと新歓に行こう /
     </p>
     <p class="text-center text-medium-emphasis pb-6">
       自分のプロフィールを作成し、<br />新歓に行くことでスタンプが貯められます
