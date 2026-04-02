@@ -21,7 +21,7 @@
     </div>
 
     <v-card-text class="pa-4">
-      <v-chip size="small" color="orange" class="mb-2 font-weight-bold">
+      <v-chip size="small" color="orange" variant="outlined" class="mb-2 font-weight-bold">
         {{ job.employmentType }}
       </v-chip>
 
@@ -39,10 +39,10 @@
           :key="tag"
           size="x-small"
           color="orange"
-          variant="outlined"
-          class="mr-2 mb-2"
+          variant="flat"
+          class="mr-2 mb-2 custom-tag text-white"
         >
-          #{{ tag }}
+          {{ tag }}
         </v-chip>
       </div>
 
@@ -88,5 +88,25 @@ defineProps({
   width: 100%;
   height: 200px;
   background-color: #e0e0e0;
+}
+
+.custom-tag {
+  position: relative;
+  padding: 6px 12px 6px 18px;
+  clip-path: polygon(10px 0%, 100% 0%, 100% 100%, 10px 100%, 0% 50%);
+  overflow: visible !important;
+  border-radius: 6px;
+}
+
+.custom-tag::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  background: white;
+  border-radius: 50%;
 }
 </style>

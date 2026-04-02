@@ -38,12 +38,16 @@
             <v-chip
               v-for="tag in allTags"
               :key="tag"
-              :color="selectedTags.includes(tag) ? 'orange' : ''"
-              :variant="selectedTags.includes(tag) ? 'flat' : 'outlined'"
-              :class="{ 'text-white': selectedTags.includes(tag) }"
+              :color="selectedTags.includes(tag) ? 'orange' : '#f0f0f0'"
+              :variant="selectedTags.includes(tag) ? 'flat' : 'flat'"
+              :class="
+                selectedTags.includes(tag)
+                  ? 'custom-tag selected-tag text-white'
+                  : 'custom-tag-outlined'
+              "
               @click="toggleTag(tag)"
             >
-              #{{ tag }}
+              {{ tag }}
             </v-chip>
           </div>
         </v-card-text>
@@ -137,6 +141,25 @@ const applyTagFilter = () => {
   width: 4px;
   height: 4px;
   background: white;
+  border-radius: 50%;
+}
+
+.custom-tag-outlined {
+  position: relative;
+  padding: 6px 12px 6px 18px;
+  clip-path: polygon(10px 0%, 100% 0%, 100% 100%, 10px 100%, 0% 50%);
+  border-radius: 6px;
+}
+
+.custom-tag-outlined::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  background: black;
   border-radius: 50%;
 }
 </style>
