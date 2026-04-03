@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import vuetify from '@/plugins/vuetify'
 import App from './App.vue'
 import './registerServiceWorker'
+import { setupFirebaseAnalyticsRouter } from '@/services/analyticsService'
 import router from './router'
 import authService from './services/authService'
 import { getNextShinkan } from './services/nextShinkanService'
@@ -14,6 +15,7 @@ app.use(router)
 app.use(store)
 app.config.globalProperties.$authService = authService // authServiceを登録（任意）
 app.use(vuetify)
+setupFirebaseAnalyticsRouter(router) // ルート計測の登録
 app.mount('#app')
 
 // 認証状態を監視

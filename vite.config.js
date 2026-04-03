@@ -38,7 +38,13 @@ export default defineConfig({
           // Vuetifyを別チャンクに分離
           vuetify: ['vuetify', 'vuetify/components', 'vuetify/directives'],
           // Firebaseを別チャンクに分離
-          firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore', 'firebase/storage'],
+          firebase: [
+            'firebase/app',
+            'firebase/auth',
+            'firebase/firestore',
+            'firebase/storage',
+            'firebase/analytics',
+          ],
           // Vue関連を別チャンクに分離
           'vue-vendor': ['vue', 'vue-router', 'vuex'],
         },
