@@ -39,6 +39,8 @@ import VueCal from 'vue-cal'
 import 'vue-cal/dist/vuecal.css'
 import EventSchedule from '@/components/event/EventSchedule.vue'
 import EditEventFormButton from '@/components/event/EditEventFormButton.vue'
+// Analytics用に追加
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 
 const store = useStore()
 
@@ -70,21 +72,43 @@ const minDate = ref(new Date('2025-04-01'))
 const maxDate = ref(new Date('2026-05-31'))
 
 const onCellClick = (date) => {
-  selectedDate.value = toDateString(date)
+  const dateString = toDateString(date)
+  selectedDate.value = dateString
+
+  logFirebaseAnalyticsEvent('calendar_date_click', {
+    selectedDate: dateString,
+  })
 }
 
 const setToday = () => {
-  selectedDate.value = toDateString(new Date())
+  const todayString = toDateString(new Date())
+  selectedDate.value = todayString
+
+  logFirebaseAnalyticsEvent('calendar_set_today', {
+    currentDate: todayString,
+  })
 }
 
 const changeDate = (days) => {
   const currentDate = new Date(selectedDate.value)
   currentDate.setDate(currentDate.getDate() + days)
-  selectedDate.value = toDateString(currentDate)
+  const newDateString = toDateString(currentDate)
+  selectedDate.value = newDateString
+
+  ;(logFirebaseAnalyticsEvent('calendar_nav_click'),
+    {
+      direction: days > 0 ? 'next' : 'prev',
+      targeDate: newDateString,
+    })
 }
 
 onMounted(() => {
   store.dispatch('event/fetchEvents')
+
+  ;(logFirebaseAnalyticsEvent('view_event_calendar'),
+    {
+      initialDate: selectedDate.value,
+    })
 })
 </script>
 

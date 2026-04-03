@@ -15,7 +15,7 @@ app.use(router)
 app.use(store)
 app.config.globalProperties.$authService = authService // authServiceを登録（任意）
 app.use(vuetify)
-setupFirebaseAnalyticsRouter(router) // ルート計測の登録
+setupFirebaseAnalyticsRouter(router) // analyticsのためのルート計測の登録
 app.mount('#app')
 
 // 認証状態を監視
