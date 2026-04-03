@@ -1,10 +1,12 @@
 <template>
   <div class="d-flex flex-column justify-center align-center my-10">
     <p class="text-center text-emphasis pb-6">
-      \ <span class="font-weight-bold">ワダイdeワダイ</span>でみんなと新歓に行こう /
+      &#92; <span class="font-weight-bold">ワダイdeワダイ</span>でみんなと新歓に行こう &frasl;
     </p>
     <p class="text-center text-medium-emphasis pb-6">
-      自分のプロフィールを作成し、<br />新歓に行くことでスタンプが貯められます
+      自分のアカウントを作成し <br />
+      ログインすることで<br />
+      たくさんの便利機能が利用できます!
     </p>
     <v-btn
       class="mx-3 px-3 my-6 font-weight-bold text-white"
