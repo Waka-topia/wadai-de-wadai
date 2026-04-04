@@ -16,6 +16,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useStore } from 'vuex'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 
 const store = useStore()
 
@@ -51,7 +52,9 @@ const claimTitle = async (title) => {
       titleID: title.id,
       titleData: title,
     })
+    void logFirebaseAnalyticsEvent('title_claim_success', { titleId: title.id })
   } catch (err) {
+    void logFirebaseAnalyticsEvent('title_claim_error', { titleId: title?.id })
     console.error('Error claiming title:', err)
     error.value =
       err.message === 'User does not meet the criteria for this title'

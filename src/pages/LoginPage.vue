@@ -53,6 +53,8 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
+import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 
 const email = ref('')
 const password = ref('')
@@ -68,6 +70,8 @@ const snackbar = ref({
 const router = useRouter()
 const store = useStore()
 
+useFirebasePageView('view_login', {})
+
 const required = (value) => !!value || 'このフィールドは必須です。'
 
 const emailDomainCheck = (value) => {
@@ -78,14 +82,17 @@ const emailDomainCheck = (value) => {
 }
 
 const onSignUp = () => {
+  void logFirebaseAnalyticsEvent('login_signup_link_click', {})
   router.push('/signup')
 }
 
 const onStart = () => {
+  void logFirebaseAnalyticsEvent('login_guest_start_click', {})
   router.push('/')
 }
 
 const onForgotPassword = () => {
+  void logFirebaseAnalyticsEvent('login_forgot_password_click', {})
   router.push('/forgot-password')
 }
 
@@ -93,6 +100,8 @@ const onSubmit = async () => {
   try {
     isLoading.value = true
     await store.dispatch('auth/login', { email: email.value, password: password.value })
+
+    void logFirebaseAnalyticsEvent('login_submit_success', {})
 
     snackbar.value = {
       show: true,
@@ -104,6 +113,9 @@ const onSubmit = async () => {
       router.push('/')
     }, 1000)
   } catch (error) {
+    void logFirebaseAnalyticsEvent('login_submit_error', {
+      errorCode: String(error?.code || 'unknown'),
+    })
     snackbar.value = {
       show: true,
       color: 'error',

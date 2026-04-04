@@ -8,7 +8,7 @@
         :key="event.eventId"
         :to="'/eventcal/' + event.eventId"
         class="border-md rounded-lg"
-        @click="router.push('/eventcal/' + event.eventId)"
+        @click="goToEventDetail(event.eventId)"
       >
         <v-row class="py-4">
           <v-col
@@ -56,9 +56,15 @@
 import { computed } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 
 const router = useRouter()
 const store = useStore()
+
+const goToEventDetail = (eventId) => {
+  void logFirebaseAnalyticsEvent('event_schedule_item_click', { eventId: String(eventId) })
+  router.push(`/eventcal/${eventId}`)
+}
 
 const props = defineProps({
   selectedDate: {

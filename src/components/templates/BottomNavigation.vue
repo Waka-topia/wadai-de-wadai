@@ -1,18 +1,18 @@
 <template>
   <v-layout>
     <v-bottom-navigation v-model="selectedIndex" class="bottom-nav" active color="orange" grow>
-      <v-btn to="/eventcal" value="eventcal">
+      <v-btn to="/eventcal" value="eventcal" @click="logBottomNav('eventcal')">
         <v-icon>mdi-calendar-month</v-icon>
         <span>新歓日程</span>
       </v-btn>
 
-      <v-btn to="/timetable" value="timetable">
+      <v-btn to="/timetable" value="timetable" @click="logBottomNav('timetable')">
         <v-icon>mdi-table-clock</v-icon>
         <span>時間割</span>
       </v-btn>
 
       <div class="home-btn-wrapper">
-        <v-btn to="/" value="home" class="home-btn" :ripple="false">
+        <v-btn to="/" value="home" class="home-btn" :ripple="false" @click="logBottomNav('home')">
           <div class="home-icon-bg">
             <v-icon size="32" color="white">mdi-home</v-icon>
             <span class="home-label-in-circle">ホーム</span>
@@ -20,12 +20,12 @@
         </v-btn>
       </div>
 
-      <v-btn to="/jobs" value="jobs">
+      <v-btn to="/jobs" value="jobs" @click="logBottomNav('jobs')">
         <v-icon>mdi-briefcase-search</v-icon>
         <span>求人情報</span>
       </v-btn>
 
-      <v-btn to="/mypage" value="mypage">
+      <v-btn to="/mypage" value="mypage" @click="logBottomNav('mypage')">
         <v-icon>mdi-account</v-icon>
         <span>マイページ</span>
       </v-btn>
@@ -36,8 +36,13 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 
 const route = useRoute()
+
+const logBottomNav = (destination) => {
+  void logFirebaseAnalyticsEvent('bottom_nav_click', { destination })
+}
 const selectedIndex = ref('home')
 
 // ルート変更時に selectedIndex を更新

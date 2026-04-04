@@ -51,7 +51,7 @@
             'current-period-row': isCurrentPeriod(period),
             'today-current': isToday(day.value) && isCurrentPeriod(period),
           }"
-          @click="$emit('cellClick', { day: day.value, period })"
+          @click="onCellClick(day.value, period)"
         >
           <div
             v-if="getLecture(day.value, period)"
@@ -84,6 +84,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useStore } from 'vuex'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 
 defineProps({
   days: {
@@ -102,9 +103,16 @@ defineProps({
   },
 })
 
-defineEmits(['cellClick'])
+const emit = defineEmits(['cellClick'])
 
 const store = useStore()
+
+const onCellClick = (day, period) => {
+  if (isLoggedIn.value) {
+    void logFirebaseAnalyticsEvent('timetable_grid_cell_click', { day, period })
+  }
+  emit('cellClick', { day, period })
+}
 
 const isLoading = computed(() => store.getters['timetable/isLoading'])
 const isLoggedIn = computed(() => store.getters['auth/isAuthenticated'])

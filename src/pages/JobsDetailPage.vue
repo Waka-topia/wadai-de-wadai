@@ -148,6 +148,7 @@
 import { computed, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { useRoute } from 'vue-router'
+import { useFirebasePageView } from '@/composables/useFirebasePageView'
 import BookMarkButton from '@/components/recruit/BookMarkButton.vue'
 import JobLocationMap from '@/components/recruit/JobLocationMap.vue'
 
@@ -155,6 +156,10 @@ const route = useRoute()
 const store = useStore()
 
 const jobId = Number(route.params.id)
+
+useFirebasePageView('view_job_detail', () => ({
+  jobId,
+}))
 
 const error = computed(() => store.state.jobs.error)
 

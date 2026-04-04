@@ -52,6 +52,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 
 const router = useRouter()
 const showMapSection = ref(false) // マップセクションの表示状態
@@ -91,15 +92,20 @@ const features = ref([
  */
 const openLink = (item) => {
   if (item.isMap) {
+    void logFirebaseAnalyticsEvent('home_other_functions_map_toggle', {
+      visible: !showMapSection.value,
+    })
     // マップアイコンをクリックした場合、マップセクションを表示/非表示
     showMapSection.value = !showMapSection.value
   } else if (item.url) {
+    void logFirebaseAnalyticsEvent('home_other_functions_external_link', { label: item.label })
     window.open(item.url, '_blank')
   }
 }
 
 /** マップページに遷移 */
 const goToMap = () => {
+  void logFirebaseAnalyticsEvent('home_other_functions_go_map', {})
   router.push('/map')
 }
 </script>

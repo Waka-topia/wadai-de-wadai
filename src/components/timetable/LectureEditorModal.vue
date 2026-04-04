@@ -270,6 +270,7 @@
 import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import LectureSyllabusPanel from '@/components/timetable/LectureSyllabusPanel.vue'
 import LectureReviewPanel from '@/components/timetable/LectureReviewPanel.vue'
 
@@ -351,6 +352,10 @@ const router = useRouter()
 
 const jumpToSyllabusSearch = () => {
   if (!props.selectedCell) return
+  void logFirebaseAnalyticsEvent('lecture_editor_syllabus_search_jump', {
+    day: props.selectedCell.day,
+    period: props.selectedCell.period,
+  })
   emit('update:modelValue', false) // モーダルを閉じる
   router.push({
     path: '/syllabus-search',
@@ -440,6 +445,12 @@ const executeFinalSave = () => {
       ? form.value.name.name
       : form.value.name
 
+  void logFirebaseAnalyticsEvent('lecture_editor_save', {
+    day: props.selectedCell?.day,
+    period: props.selectedCell?.period,
+    isExisting: isExistingLecture.value,
+  })
+
   store.dispatch('timetable/saveLecture', {
     day: props.selectedCell.day,
     period: props.selectedCell.period,
@@ -471,6 +482,10 @@ const confirmDelete = () => {
 
 const handleDelete = () => {
   if (!props.selectedCell) return
+  void logFirebaseAnalyticsEvent('lecture_editor_delete', {
+    day: props.selectedCell.day,
+    period: props.selectedCell.period,
+  })
   store.dispatch('timetable/removeLecture', {
     day: props.selectedCell.day,
     period: props.selectedCell.period,

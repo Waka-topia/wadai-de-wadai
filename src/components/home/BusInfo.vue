@@ -92,6 +92,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import timetableService from '@/services/timetableService'
 
 const routes = ref([
@@ -149,7 +150,12 @@ const getBusBadges = (route) => {
 }
 
 const toggleRoute = (index) => {
-  routes.value[index].expanded = !routes.value[index].expanded
+  const route = routes.value[index]
+  void logFirebaseAnalyticsEvent('home_bus_route_toggle', {
+    routeKey: route.key,
+    expanded: !route.expanded,
+  })
+  route.expanded = !route.expanded
 }
 
 const updateTimetable = () => {

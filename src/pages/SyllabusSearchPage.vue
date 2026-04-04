@@ -364,6 +364,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { fetchMasterIndex, saveSyllabusWithIndex } from '@/services/lectureIndexService'
 import { getSyllabus } from '@/services/syllabusService'
 import LectureSyllabusPanel from '@/components/timetable/LectureSyllabusPanel.vue'
@@ -389,6 +390,10 @@ onMounted(async () => {
     addForm.value.day = targetDay.value
     addForm.value.period = targetPeriod.value
   }
+
+  void logFirebaseAnalyticsEvent('view_syllabus_search', {
+    hasTimetableTarget: !!(targetDay.value && targetPeriod.value),
+  })
 })
 
 const getDayName = (code) => {
@@ -482,6 +487,11 @@ const executeSearch = async () => {
   const normalizedQuery = normalizeLectureName(queryText)
   const filtered = masterIndex.value.l.filter((item) => {
     return item.id.includes(queryText) || item.n.includes(normalizedQuery)
+  })
+
+  void logFirebaseAnalyticsEvent('syllabus_search_execute', {
+    queryLength: queryText.length,
+    resultCount: filtered.length,
   })
 
   // テンプレートの互換性のためにマッピング

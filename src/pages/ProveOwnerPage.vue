@@ -85,6 +85,8 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { required, passwordRule, confirmPasswordRule } from '@/utils/forms/validate'
 import { useStore } from 'vuex'
+import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { allGroups } from '@/data/groups'
 import { submitOwnership } from '@/services/proveService'
 
@@ -103,6 +105,8 @@ const snackbar = ref({
 
 const router = useRouter()
 const store = useStore()
+
+useFirebasePageView('view_prove_owner', {})
 
 const onSubmit = async (validationPromise) => {
   try {
@@ -124,6 +128,10 @@ const onSubmit = async (validationPromise) => {
       groupNameSnapshot: selected.name,
     })
 
+    void logFirebaseAnalyticsEvent('prove_owner_submit_success', {
+      organizationId: String(selected.id),
+    })
+
     snackbar.value = {
       show: true,
       color: 'success',
@@ -134,6 +142,7 @@ const onSubmit = async (validationPromise) => {
       router.push('/prove-owner/description')
     }, 1000)
   } catch (error) {
+    void logFirebaseAnalyticsEvent('prove_owner_submit_error', {})
     snackbar.value = {
       show: true,
       color: 'error',

@@ -76,7 +76,11 @@
       イベントを登録
     </v-btn>
     <div class="text-center pt-4">
-      <v-btn variant="text" class="text-button text-decoration-underline" href="/prove-owner">
+      <v-btn
+        variant="text"
+        class="text-button text-decoration-underline"
+        @click="goProveOwnerFromEventForm"
+      >
         団体の代表者であることを証明する
       </v-btn>
     </div>
@@ -92,11 +96,18 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
-
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { allGroups } from '@/data/groups'
 
 const store = useStore()
+const router = useRouter()
+
+const goProveOwnerFromEventForm = () => {
+  void logFirebaseAnalyticsEvent('event_form_prove_owner_link_click', {})
+  router.push('/prove-owner')
+}
 
 const newEvent = ref({
   date: '',
@@ -133,12 +144,16 @@ const submitEvent = async () => {
       currentUserId,
       currentUserName,
     })
+    void logFirebaseAnalyticsEvent('event_form_submit_success', {
+      organizationId: eventData.organizationId,
+    })
     snackbar.value = {
       show: true,
       color: 'success',
       message: 'イベントが正常に登録されました！',
     }
   } catch (error) {
+    void logFirebaseAnalyticsEvent('event_form_submit_error', {})
     snackbar.value = {
       show: true,
       color: 'error',
