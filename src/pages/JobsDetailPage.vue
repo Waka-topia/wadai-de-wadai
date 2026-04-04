@@ -30,21 +30,24 @@
 
       <div class="pt-6 px-6 pb-4">
         <div class="d-flex align-center">
-          <v-chip color="orange" class="font-weight-bold mr-3">{{ job.employmentType }}</v-chip>
+          <v-chip color="orange" variant="outlined" class="font-weight-bold mr-3">{{
+            job.employmentType
+          }}</v-chip>
           <div class="text-subtitle-1 text-grey-darken-1">{{ job.companyName }}</div>
         </div>
       </div>
 
-      <div v-if="job.tags && job.tags.length" class="mb-4">
+      <div v-if="job.tags && job.tags.length" class="mb-4 px-6 d-flex flex-wrap" style="gap: 8px">
         <v-chip
           v-for="tag in job.tags"
           :key="tag"
-          class="mr-2 mb-2"
+          class="mr-2 mb-2 text-white custom-tag"
           color="orange"
-          variant="outlined"
+          variant="flat"
           size="small"
+          @click="goToTagFilter(tag)"
         >
-          #{{ tag }}
+          {{ tag }}
         </v-chip>
       </div>
 
@@ -147,16 +150,24 @@
 <script setup>
 import { computed, onMounted } from 'vue'
 import { useStore } from 'vuex'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import BookMarkButton from '@/components/recruit/BookMarkButton.vue'
 import JobLocationMap from '@/components/recruit/JobLocationMap.vue'
 
 const route = useRoute()
+const router = useRouter()
 const store = useStore()
 
 const jobId = Number(route.params.id)
 
 const error = computed(() => store.state.jobs.error)
+
+const goToTagFilter = (tag) => {
+  router.push({
+    path: '/jobs',
+    query: { tags: [tag] },
+  })
+}
 
 onMounted(() => {
   store.dispatch('fetchJobById', jobId)
@@ -164,3 +175,25 @@ onMounted(() => {
 
 const job = computed(() => store.getters.currentJobWithBookmark)
 </script>
+
+<style scoped>
+.custom-tag {
+  position: relative;
+  padding: 6px 12px 6px 18px;
+  clip-path: polygon(10px 0%, 100% 0%, 100% 100%, 10px 100%, 0% 50%);
+  overflow: visible !important;
+  border-radius: 6px;
+}
+
+.custom-tag::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  background: white;
+  border-radius: 50%;
+}
+</style>
