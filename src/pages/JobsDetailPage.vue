@@ -36,17 +36,18 @@
       </div>
 
       <div v-if="job.tags && job.tags.length" class="mb-4">
-        <v-chip
-          v-for="tag in job.tags"
-          :key="tag"
-          class="mr-2 mb-2"
-          color="orange"
-          variant="outlined"
-          size="small"
-        >
-          #{{ tag }}
-        </v-chip>
-      </div>
+          <v-chip
+            v-for="tag in job.tags"
+            :key="tag"
+            class="mr-2 mb-2"
+            color="orange"
+            variant="outlined"
+            size="small"
+            @click="goToTagFilter(tag)"
+          >
+            #{{ tag }}
+          </v-chip>
+       </div>        
 
       <v-divider class="mb-4"></v-divider>
       <div class="text-black text-h5 font-weight-bold text-wrap px-6 py-4">
@@ -147,16 +148,24 @@
 <script setup>
 import { computed, onMounted } from 'vue'
 import { useStore } from 'vuex'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import BookMarkButton from '@/components/recruit/BookMarkButton.vue'
 import JobLocationMap from '@/components/recruit/JobLocationMap.vue'
 
 const route = useRoute()
+const router = useRouter()
 const store = useStore()
 
 const jobId = Number(route.params.id)
 
 const error = computed(() => store.state.jobs.error)
+
+const goToTagFilter = (tag) => {
+  router.push({
+    path: '/jobs',
+    query: { tag },
+  })
+}
 
 onMounted(() => {
   store.dispatch('fetchJobById', jobId)
