@@ -247,7 +247,7 @@
               <v-btn variant="text" @click="isExistingLecture ? (isEditMode = false) : close()"
                 >キャンセル</v-btn
               >
-              <v-btn color="orange" variant="flat" :disabled="!form.name" @click="handleSave">
+              <v-btn color="orange" variant="flat" @click="onSubmit">
                 保存
               </v-btn>
             </v-card-actions>
@@ -445,7 +445,7 @@ watch(
   },
 )
 
-const handleSave = async (validationPromise) => {
+const onSubmit = async (validationPromise) => {
   const { valid } = await validationPromise
   if (!valid) throw new Error('入力に誤りがあります。')
 
