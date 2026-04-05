@@ -72,16 +72,9 @@
 
     <v-divider class="my-4"></v-divider>
 
-    <v-btn
-      class="font-weight-bold set-today-btn my-4 mx-auto d-flex"
-      rounded
-      color="primary"
-      variant="elevated"
-      elevation="2"
-      @click="setToday"
-    >
+    <v-btn class="font-weight-bold set-today-btn" rounded variant="outlined" @click="setToday">
       <v-icon start size="18">mdi-calendar-today</v-icon>
-      今日の新歓イベントを表示
+      今日の新歓イベント
     </v-btn>
 
     <!-- 改善された日付ナビゲーション -->
@@ -99,9 +92,6 @@
     </div>
 
     <EventSchedule v-model:selected-date="selectedDate" />
-
-    <!-- フローティングボタンと重ならないための底上げスペーサー -->
-    <div class="bottom-spacer"></div>
 
     <EditEventFormButton />
   </div>
@@ -224,10 +214,6 @@ onMounted(() => {
 /* --- レイアウト --- */
 .event-list {
   height: 100%;
-}
-
-.bottom-spacer {
-  height: 80px;
 }
 
 /* --- バナーステップ --- */

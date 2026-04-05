@@ -80,6 +80,20 @@ export default {
         store.commit('auth/setUser', user)
         store.commit('auth/setIdToken', idToken)
         store.commit('auth/setUserId', user.uid)
+
+        // 孤立ユーザー対策: signup 途中の失敗で Firestore ドキュメントが未作成の場合に補完
+        const userRef = doc(db, 'users', user.uid)
+        const userSnap = await getDoc(userRef)
+        if (!userSnap.exists()) {
+          await setDoc(userRef, {
+            email: user.email,
+            displayName: user.displayName,
+            isOfficial: false,
+            isProvePending: false,
+            proveOwnerApplication: null,
+            belongingOrgs: [],
+          })
+        }
       } else {
         store.commit('auth/clearAuthState')
       }
