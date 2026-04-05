@@ -1,13 +1,6 @@
 <template>
-  <v-dialog
-    v-model="dialog"
-    persistent
-    no-click-animation
-    max-width="90vw"
-    width="90vw"
-  >
+  <v-dialog v-model="dialog" persistent no-click-animation max-width="90vw" width="90vw">
     <v-card class="rounded-xl overflow-hidden" height="90vh">
-
       <v-carousel
         v-model="currentStep"
         height="100%"
@@ -27,11 +20,13 @@
 
         <v-carousel-item>
           <div class="tutorial-container d-flex flex-column">
-            <div class="flex-grow-1 pa-10 d-flex flex-column justify-center align-center text-center">
+            <div
+              class="flex-grow-1 pa-10 d-flex flex-column justify-center align-center text-center"
+            >
               <v-icon size="80" color="success" class="mb-6">mdi-check-decagram</v-icon>
               <h3 class="text-h4 font-weight-bold mb-4">準備が整いました</h3>
 
-              <div class="action-section w-100" style="max-width: 400px;">
+              <div class="action-section w-100" style="max-width: 400px">
                 <v-checkbox
                   v-model="tutorialDontShowAgain"
                   label="これ以降表示しない"
@@ -54,7 +49,6 @@
           </div>
         </v-carousel-item>
       </v-carousel>
-
     </v-card>
   </v-dialog>
 </template>
