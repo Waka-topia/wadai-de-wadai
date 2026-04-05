@@ -28,6 +28,7 @@
     <BusInfo />
     <CampusMap />
     <OtherFunctions />
+    <IntroductionModal />
     <!-- <WakayamaMatch /> -->
   </v-container>
 </template>
@@ -39,6 +40,7 @@ import TrainInfo from '@/components/home/TrainInfo.vue'
 import BusInfo from '@/components/home/BusInfo.vue'
 import CampusMap from '@/components/home/CampusMap.vue'
 import OtherFunctions from '@/components/home/OtherFunctions.vue'
+import IntroductionModal from '@/components/home/IntroductionModal.vue'
 // import WakayamaMatch from '@/components/home/WakayamaMatch.vue'
 
 useFirebasePageView('view_home', {})
