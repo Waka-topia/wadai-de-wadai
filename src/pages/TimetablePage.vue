@@ -3,7 +3,7 @@
     <!-- ページヘッダー -->
     <header class="page-header">
       <!-- 学年セレクタ -->
-      <div v-if="isLoggedIn" class="grade-selector">
+      <div v-if="isAuthenticated" class="grade-selector">
         <button
           v-for="g in [1, 2, 3, 4]"
           :key="g"
@@ -16,7 +16,7 @@
       </div>
 
       <!-- 学期切り替えタブ -->
-      <div v-if="isLoggedIn" class="semester-tabs">
+      <div v-if="isAuthenticated" class="semester-tabs">
         <button
           class="semester-tab"
           :class="{ active: semester === 'first' }"
@@ -36,7 +36,7 @@
       <!-- 必修区分の凡例 -->
       <!-- 凡例と取得単位数 -->
       <div
-        v-if="isLoggedIn"
+        v-if="isAuthenticated"
         class="d-flex justify-space-between align-center mt-3 flex-wrap"
         style="gap: 8px"
       >
@@ -62,7 +62,7 @@
     </header>
 
     <!-- 今日の授業カード -->
-    <section v-if="isLoggedIn && todayLectures.length > 0" class="today-section">
+    <section v-if="isAuthenticated && todayLectures.length > 0" class="today-section">
       <div class="today-section-title">
         <v-icon size="16" color="orange">mdi-calendar-today</v-icon>
         今日の授業
@@ -156,7 +156,7 @@ const onLectureDeleted = () => {
   showSnackbar('講義を削除しました', 'grey', 'mdi-trash-can-outline')
 }
 
-const isLoggedIn = computed(() => store.getters['auth/isAuthenticated'])
+const isAuthenticated = computed(() => store.getters['auth/isAuthenticated'])
 const semester = computed(() => store.getters['timetable/semester'])
 const grade = computed(() => store.getters['timetable/grade'])
 const todayLectures = computed(() => store.getters['timetable/todayLectures'])
@@ -247,7 +247,7 @@ onActivated(() => {
 // ページ離脱時の処理は不要（keep-alive でキャッシュが維持されるため）
 
 const handleCellClick = ({ day, period }) => {
-  if (!isLoggedIn.value) {
+  if (!isAuthenticated.value) {
     void logFirebaseAnalyticsEvent('timetable_cell_click_guest', { day, period })
     router.push('/login')
     return
