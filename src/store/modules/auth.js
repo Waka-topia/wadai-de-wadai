@@ -67,9 +67,9 @@ export default {
         throw error
       }
     },
-    async signup({ commit }, { email, password, username }) {
+    async signup({ commit }, { email, password, userName }) {
       try {
-        const user = await authService.signup({ email, password, username })
+        const user = await authService.signup({ email, password, userName })
         const idToken = await user.getIdToken()
         commit('setUser', user)
         commit('setIdToken', idToken)
