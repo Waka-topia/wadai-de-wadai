@@ -136,8 +136,10 @@ const isAuthenticated = computed(() => store.getters['auth/isAuthenticated'])
 const userId = computed(() => store.getters['auth/userId'])
 
 watch(
-  [isAuthenticated, userId],
-  ([auth, id]) => {
+  [isAuthenticated, userId, () => route.path],
+  ([auth, id, currentPath]) => {
+    if (currentPath === '/signup') return
+
     if (auth && id) {
       // 認証復元のタイミング差を吸収して、ID確定後に取得する
       store.dispatch('users/getCurrentUserData', id)
