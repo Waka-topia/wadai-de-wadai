@@ -5,7 +5,6 @@ import {
   getDocs,
   serverTimestamp,
   setDoc,
-  updateDoc,
 } from 'firebase/firestore'
 import { db } from '@/firebase/config'
 
@@ -32,16 +31,9 @@ export async function addStampToUser(userId, displayName, groupId, stampId) {
     }
     await setDoc(stampRef, stampData)
 
-    // ユーザードキュメントに displayName を保存
+    // ユーザードキュメントに displayName を保存（merge: true で他フィールドを保護）
     const userRef = doc(db, `users/${userId}`)
-    const userDoc = await getDoc(userRef)
-    if (!userDoc.exists()) {
-      // ユーザードキュメントが存在しない場合は作成
-      await setDoc(userRef, { displayName })
-    } else {
-      // 既存のユーザードキュメントがある場合は更新
-      await updateDoc(userRef, { displayName })
-    }
+    await setDoc(userRef, { displayName }, { merge: true })
 
     return { exists: false, stampId } // 正常に追加された場合の情報を返す
   } catch (error) {
