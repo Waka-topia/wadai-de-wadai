@@ -47,6 +47,9 @@ export const getJobs = async () => {
           getWorkPlaceImageUrl('workplace_example2.jpeg'),
           getWorkPlaceImageUrl('workplace_example3.jpeg'),
         ],
+        contactNumber: '0120-12-3456',
+        personName: '和歌山 花子',
+        responseHours: '10:00 ~ 23:00',
       },
       {
         id: 2,
@@ -74,6 +77,9 @@ export const getJobs = async () => {
           getWorkPlaceImageUrl('workplace_example2.jpeg'),
           getWorkPlaceImageUrl('workplace_example3.jpeg'),
         ],
+        contactNumber: '0120-65-4321',
+        personName: '大阪 太郎',
+        responseHours: '10:00 ~ 22:00',
       },
       {
         id: 3,
@@ -102,6 +108,10 @@ export const getJobs = async () => {
           getWorkPlaceImageUrl('workplace_example2.jpeg'),
           getWorkPlaceImageUrl('workplace_example3.jpeg'),
         ],
+
+        contactNumber: '090-12-3456',
+        personName: '奈良 太郎',
+        responseHours: '10:00 ~ 21:00',
       },
     ]
     return jobList

@@ -28,7 +28,10 @@ export default createStore({
       namespaced: true,
       ...eventModule,
     },
-    jobs: jobsModule,
+    jobs: {
+      namespaced: true,
+      ...jobsModule,
+    },
     location: locationModule,
     rating: ratingModule,
     scroll: scrollModule,

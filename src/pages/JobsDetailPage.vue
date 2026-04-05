@@ -133,8 +133,9 @@
           max-width="300"
           rounded="pill"
           class="text-white font-weight-bold mr-4"
+          @click="$router.push('/jobs/contact')"
         >
-          応募する
+          応募情報へ
         </v-btn>
         <BookMarkButton :job-id="job.id" :is-bookmarked="!!job.isBookmarked" />
       </div>
@@ -164,8 +165,8 @@ useFirebasePageView('view_job_detail', () => ({
 const error = computed(() => store.state.jobs.error)
 
 onMounted(() => {
-  store.dispatch('fetchJobById', jobId)
+  store.dispatch('jobs/fetchJobById', jobId)
 })
 
-const job = computed(() => store.getters.currentJobWithBookmark)
+const job = computed(() => store.getters['jobs/currentJobWithBookmark'])
 </script>
