@@ -1,8 +1,8 @@
 import {
   addEventService,
   deleteEventService,
-  getEventService,
   getEventsByMonthService, // getEventsServiceから変更
+  getEventService,
   updateEventService,
 } from '@/services/eventService'
 
@@ -172,7 +172,7 @@ const actions = {
 const mutations = {
   addMonthlyEvents(state, { monthKey, events }) {
     const otherMonthEvents = state.events.filter(
-      (e) => (e.date && e.date.substring(0, 7)) !== monthKey
+      (e) => (e.date && e.date.substring(0, 7)) !== monthKey,
     )
 
     state.events = [...otherMonthEvents, ...events]
