@@ -1,18 +1,7 @@
 <template>
-  <v-dialog
-    v-model="dialog"
-    persistent
-    no-click-animation
-    max-width="90vw"
-    width="90vw"
-  >
+  <v-dialog v-model="dialog" persistent no-click-animation max-width="90vw" width="90vw">
     <v-card class="rounded-xl overflow-hidden" height="90vh">
-      <v-carousel
-        height="100%"
-        hide-delimiter-background
-        :show-arrows="false"
-        color="primary"
-      >
+      <v-carousel height="100%" hide-delimiter-background :show-arrows="false" color="primary">
         <v-carousel-item v-for="n in 4" :key="n">
           <div class="tutorial-container pa-10">
             <div class="text-h2 font-weight-black text-blue-lighten-4 mb-6">0{{ n }}</div>
@@ -33,14 +22,16 @@
 
         <v-carousel-item>
           <div class="tutorial-container d-flex flex-column">
-            <div class="flex-grow-1 pa-10 d-flex flex-column justify-center align-center text-center">
+            <div
+              class="flex-grow-1 pa-10 d-flex flex-column justify-center align-center text-center"
+            >
               <v-icon size="80" color="success" class="mb-6">mdi-check-decagram</v-icon>
               <h3 class="text-h4 font-weight-bold mb-4">準備が整いました</h3>
               <p class="text-body-1 mb-10 text-grey-darken-1">
                 「これ以降表示しない」にチェックを入れると、次回から表示されません。
               </p>
 
-              <div class="action-section w-100" style="max-width: 400px;">
+              <div class="action-section w-100" style="max-width: 400px">
                 <v-checkbox
                   v-model="tutorialDontShowAgain"
                   label="これ以降表示しない"
@@ -84,9 +75,7 @@ onMounted(() => {
   }
 })
 
-/**
- * チュートリアル終了およびフラグの永続化
- */
+/** チュートリアル終了およびフラグの永続化 */
 const handleTutorialFinish = async () => {
   if (tutorialDontShowAgain.value) {
     // 1. ローカルストレージに保存
@@ -100,7 +89,7 @@ const handleTutorialFinish = async () => {
       try {
         const userRef = doc(db, 'users', currentUser.uid)
         await updateDoc(userRef, {
-          tutorialDontShowAgain: true
+          tutorialDontShowAgain: true,
         })
         console.log(`[Firebase] Write success for user: ${currentUser.uid}`)
       } catch (e) {
