@@ -10,8 +10,8 @@ import {
 import { v4 as uuidv4 } from 'uuid'
 import { adminUserId, officialEventPriority } from '@/config/constants'
 import { db } from '@/firebase/config'
-import { hashValue } from '@/utils/crypto'
 import { isUserRepresentative } from '@/services/groupService'
+import { hashValue } from '@/utils/crypto'
 
 /**
  * Groupsコレクションの代表者リストから公式認証ステータスを解決する

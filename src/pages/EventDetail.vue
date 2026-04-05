@@ -139,9 +139,7 @@
             <v-avatar color="orange" size="32" class="mr-3">
               <v-icon color="white" size="18">mdi-hand-wave</v-icon>
             </v-avatar>
-            <p class="text-body-1 font-weight-bold mb-0">
-              このイベントを引き継ぎませんか？
-            </p>
+            <p class="text-body-1 font-weight-bold mb-0">このイベントを引き継ぎませんか？</p>
           </div>
 
           <!-- 3ステップ -->
@@ -315,8 +313,6 @@ onMounted(async () => {
     fetchErrorMessage.value = error.message
   }
 })
-
-
 </script>
 
 <style scoped>
