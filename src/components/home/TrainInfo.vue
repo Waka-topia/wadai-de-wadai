@@ -100,7 +100,7 @@ import timetableService from '@/services/timetableService'
 const routes = ref([
   {
     key: 'TrainNamba',
-    label: '和歌山大学駅→なんば駅行き',
+    label: '和歌山大学前駅→なんば駅行き',
     color: '#4CAF50',
     theme: 'light',
     expanded: false,
@@ -114,7 +114,7 @@ const routes = ref([
   },
   {
     key: 'TrainWakayamashi',
-    label: '和歌山大学駅→和歌山市駅行き',
+    label: '和歌山大学前駅→和歌山市駅行き',
     color: '#1B5E20',
     theme: 'dark',
     expanded: false,
