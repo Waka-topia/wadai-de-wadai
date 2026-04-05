@@ -356,13 +356,23 @@ const loadEventData = async (id) => {
     fetchErrorMessage.value = ''
     // 前のイベント情報をクリアするために null をセット
     store.commit('event/setEvent', null)
-    await store.dispatch('event/fetchEvent', id)
+    await store.dispatch('event/fetchEvent', { eventId: id })
     // イベント取得後に代表者ステータスを確認
     await checkRepresentativeStatus()
   } catch (error) {
     fetchErrorMessage.value = error.message
   }
-})
+}
+
+// route.params.id の変更を監視してデータを再取得
+// これにより、同じコンポーネント内での遷移（ラグビー部→アメフト部など）でも正しくリセットされる
+watch(
+  () => route.params.id,
+  (newId) => {
+    loadEventData(newId)
+  },
+  { immediate: true },
+)
 </script>
 
 <style scoped>
