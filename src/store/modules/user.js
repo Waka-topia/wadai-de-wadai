@@ -6,6 +6,7 @@ const state = () => ({
     email: 'メールアドレスが設定されていません',
     userId: 'ユーザーIDが設定されていません',
     userIconUrl: '/src/assets/userIcon/defaultIcon.png',
+    belongingOrgs: [],
   },
   isFetchedCurrentUserData: false,
   userId: '',

@@ -1,4 +1,5 @@
 import {
+  arrayUnion,
   collection,
   doc,
   getDoc,
@@ -8,6 +9,7 @@ import {
   query,
   runTransaction,
   setDoc,
+  updateDoc,
   where,
 } from 'firebase/firestore'
 import { v4 as uuidv4 } from 'uuid'
@@ -210,6 +212,12 @@ export const updateProveOwnerApprovalService = async (applicationId, isApproved)
         targetApplicationData.userNameSnapshot,
         targetApplicationData.password,
       )
+
+      // ユーザードキュメントの belongingOrgs に団体IDを追加
+      const userRef = doc(db, 'users', targetApplicationData.userId)
+      await updateDoc(userRef, {
+        belongingOrgs: arrayUnion(String(targetApplicationData.groupId)),
+      })
     }
   } catch (error) {
     throw new Error(`承認状態の更新に失敗しました。${error.message}`)
