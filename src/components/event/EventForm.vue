@@ -135,9 +135,7 @@
     >
       <div class="d-flex align-center justify-center mb-1">
         <v-icon size="18" class="mr-2">mdi-shield-check-outline</v-icon>
-        <span class="text-body-2 font-weight-bold">
-          団体の代表者の証明はお済みですか？
-        </span>
+        <span class="text-body-2 font-weight-bold"> 団体の代表者の証明はお済みですか？ </span>
       </div>
       <p class="text-caption mb-2 opacity-80">
         証明を完了すると「公式マーク」が付与され、優先的に表示されます
@@ -304,7 +302,9 @@ const submitEvent = async (validationPromise) => {
 
 .submit-btn {
   height: 56px !important;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .submit-btn:active {

@@ -75,8 +75,7 @@ const actions = {
   },
 
   /**
-   * Firebaseから単一のイベント情報を取得し、ステートに保存する
-   * メモリ上にすでにデータが存在する場合は通信をスキップする
+   * Firebaseから単一のイベント情報を取得し、ステートに保存する メモリ上にすでにデータが存在する場合は通信をスキップする
    *
    * @param {object} context - Vuexのコンテキストオブジェクト
    * @param {(type: string, payload?: unknown) => void} context.commit - Mutationをコミットするための関数
