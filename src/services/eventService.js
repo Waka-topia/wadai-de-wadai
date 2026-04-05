@@ -115,6 +115,30 @@ export const getEventsService = async () => {
 }
 
 /**
+ * Firebaseから特定の月のイベント情報を取得する
+ *
+ * @param {string} monthKey - 取得したい月のキー (例: "2026-04")
+ * @returns {Promise<object[]>} 指定された月のイベント情報のリスト
+ */
+export const getEventsByMonthService = async (monthKey) => {
+  try {
+    const docRef = doc(db, 'events_monthly', monthKey)
+    const docSnap = await getDoc(docRef)
+
+    if (docSnap.exists()) {
+      const data = docSnap.data()
+      return Array.isArray(data.events) ? data.events : []
+    }
+
+    // ドキュメントが存在しない（その月のイベントが0件）場合は空配列を返す
+    return []
+  } catch (error) {
+    console.error(`Failed to get events for ${monthKey}:`, error)
+    throw new Error(`${monthKey}のイベント情報の取得に失敗しました。${error.message}`)
+  }
+}
+
+/**
  * Firebaseから単一のイベント情報を取得する（月別コレクションから検索）
  *
  * @param {string} eventId イベントID

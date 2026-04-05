@@ -33,7 +33,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useStore } from 'vuex'
 import VueCal from 'vue-cal'
 import 'vue-cal/dist/vuecal.css'
@@ -67,6 +67,11 @@ const toDateString = (date) => {
 }
 
 const selectedDate = ref(toDateString(new Date()))
+
+watch(selectedDate, (newDate) => {
+  const monthKey = newDate.substring(0, 7)
+  store.dispatch('event/fetchEvents', { monthKey })
+})
 
 useFirebasePageView('view_event_calendar', () => ({
   initialDate: selectedDate.value,
@@ -105,7 +110,8 @@ const changeDate = (days) => {
 }
 
 onMounted(() => {
-  store.dispatch('event/fetchEvents')
+  const monthKey = selectedDate.value.substring(0, 7)
+  store.dispatch('event/fetchEvents', { monthKey })
 })
 </script>
 

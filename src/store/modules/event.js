@@ -2,13 +2,14 @@ import {
   addEventService,
   deleteEventService,
   getEventService,
-  getEventsService,
+  getEventsByMonthService, // getEventsServiceから変更
   updateEventService,
 } from '@/services/eventService'
 
 const state = {
   event: null,
   events: [], // 全イベントデータを格納
+  fetchedMonths: [], // 取得済みの月キー（例: ["2026-03", "2026-04"]）を記録
   error: null, // エラーメッセージ
   currentEvent: null, // 編集・表示中の詳細イベント
   isEditing: false, // 編集モードのフラグ
@@ -42,25 +43,30 @@ const getters = {
 
 const actions = {
   /**
-   * Firebaseから全てのイベント情報を取得する メモリキャッシュ（state.events）が存在する場合は、forceフラグがtrueでない限り再取得をスキップする
+   * Firebaseから指定された月のイベント情報を取得する メモリキャッシュ（state.fetchedMonths）が存在する場合は、forceフラグがtrueでない限り再取得をスキップする
    *
    * @param {object} context - Vuexのコンテキストオブジェクト
    * @param {(type: string, payload?: unknown) => void} context.commit - Mutationをコミットするための関数
    * @param {object} context.state - 現在のステート
    * @param {object} [payload] - オプション設定
+   * @param {string} payload.monthKey - 取得対象の月キー (例: "2026-04")
    * @param {boolean} [payload.force] - Trueを指定するとキャッシュを無視してサーバーから最新データを取得する
    * @returns {Promise<void>}
    */
-  async fetchEvents({ commit, state }, { force = false } = {}) {
+  async fetchEvents({ commit, state }, { monthKey, force = false } = {}) {
+    if (!monthKey) {
+      return
+    }
+
     // キャッシュチェック: データが既に存在し、かつ強制リロードでない場合は通信をスキップ
-    if (!force && state.events.length > 0) {
+    if (!force && state.fetchedMonths.includes(monthKey)) {
       return
     }
 
     try {
       commit('setError', null)
-      const events = await getEventsService()
-      commit('setEvents', events)
+      const events = await getEventsByMonthService(monthKey)
+      commit('addMonthlyEvents', { monthKey, events })
     } catch (error) {
       commit('setError', error.message)
       throw error
@@ -164,6 +170,17 @@ const actions = {
 }
 
 const mutations = {
+  addMonthlyEvents(state, { monthKey, events }) {
+    const otherMonthEvents = state.events.filter(
+      (e) => (e.date && e.date.substring(0, 7)) !== monthKey
+    )
+
+    state.events = [...otherMonthEvents, ...events]
+
+    if (!state.fetchedMonths.includes(monthKey)) {
+      state.fetchedMonths.push(monthKey)
+    }
+  },
   setEvent(state, event) {
     state.event = event
   },
