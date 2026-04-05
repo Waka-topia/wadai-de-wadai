@@ -17,7 +17,6 @@
         rounded="lg"
         elevation="1"
         class="event-card"
-        :class="{ 'proxy-event-card': isProxyEvent(event) }"
         @click="goToEventDetail(event.eventId)"
       >
         <!-- 上部バッジエリア -->
@@ -42,8 +41,8 @@
               class="font-weight-bold text-white"
               label
             >
-              <v-icon start size="14">mdi-clipboard-text-outline</v-icon>
-              代理登録 — 引き継ぎ募集中
+              <v-icon start size="14">mdi-account-question-outline</v-icon>
+              代理登録 — 代表者の方はこちら
             </v-chip>
           </div>
           <p
@@ -79,9 +78,13 @@
               </p>
               <p
                 v-if="event.description"
-                class="text-body-2 text-grey-darken-1 mb-2 description-text"
+                class="text-body-2 text-grey-darken-3 mb-2 description-text"
               >
-                {{ event.description }}
+                {{
+                  event.description.length > 50
+                    ? event.description.substring(0, 50) + '...'
+                    : event.description
+                }}
               </p>
               <div class="d-flex align-center">
                 <v-icon size="16" color="orange" class="mr-1">mdi-map-marker</v-icon>
@@ -116,14 +119,21 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { adminUserId } from '@/config/constants'
+import { hashValue } from '@/utils/crypto'
 
 const router = useRouter()
 const store = useStore()
+
+const hashedAdminUserId = ref('')
+
+onMounted(async () => {
+  hashedAdminUserId.value = await hashValue(adminUserId)
+})
 
 /**
  * イベントが運営による代理登録かどうかを判定する
@@ -131,7 +141,9 @@ const store = useStore()
  * @param {object} event イベントデータ
  * @returns {boolean} 運営代理登録の場合true
  */
-const isProxyEvent = (event) => event.createdBy === adminUserId
+const isProxyEvent = (event) => {
+  return event.createdBy === hashedAdminUserId.value
+}
 
 const goToEventDetail = (eventId) => {
   void logFirebaseAnalyticsEvent('event_schedule_item_click', { eventId: String(eventId) })
@@ -183,11 +195,6 @@ const filteredEvents = computed(() => {
 
 .event-card:active {
   transform: translateY(0);
-}
-
-/* --- 代理登録カード --- */
-.proxy-event-card {
-  border-left: 3px solid #ff9800;
 }
 
 /* --- 時間カラム --- */

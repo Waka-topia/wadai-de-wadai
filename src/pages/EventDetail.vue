@@ -31,21 +31,42 @@
             <v-icon start size="14">mdi-check-decagram</v-icon>
             公式
           </v-chip>
-          <v-chip
-            v-if="isProxyEvent"
-            size="small"
-            color="orange"
-            variant="flat"
-            label
-            class="font-weight-bold text-white"
-          >
-            <v-icon start size="14">mdi-clipboard-text-outline</v-icon>
-            代理登録
-          </v-chip>
+          <div v-if="isProxyEvent" class="d-flex flex-column align-start">
+            <v-chip
+              size="small"
+              color="orange"
+              variant="flat"
+              label
+              class="font-weight-bold text-white mb-1"
+            >
+              <v-icon start size="14">mdi-account-question-outline</v-icon>
+              代理登録 — 団体の代表者ですか？
+            </v-chip>
+            <span class="text-caption text-orange font-weight-bold d-flex align-center ml-1">
+              <v-icon size="12" class="mr-1">mdi-arrow-down-bold-circle-outline</v-icon>
+              詳細を下にスクロールして確認
+            </span>
+          </div>
         </div>
       </v-card-title>
 
       <v-card-text class="px-5 pb-5 mb-3">
+        <!-- 代理登録時の注意喚起 -->
+        <v-alert
+          v-if="isProxyEvent"
+          type="info"
+          variant="tonal"
+          density="compact"
+          class="mb-5"
+          rounded="lg"
+          icon="mdi-information-outline"
+          color="orange-darken-1"
+        >
+          <div class="text-caption font-weight-bold">
+            このイベントは大学公式カレンダーを元にした運営による代理投稿です。正確な詳細情報は各団体の公式SNS等でご確認ください。
+          </div>
+        </v-alert>
+
         <!-- Meta blocks -->
         <v-list-item class="px-0">
           <template #prepend>
@@ -143,28 +164,52 @@
           </div>
 
           <!-- 3ステップ -->
-          <div class="d-flex align-center justify-center ga-2 mb-3 flex-wrap">
-            <div class="step-item text-center">
-              <v-avatar color="orange" size="28" class="mb-1">
-                <span class="text-caption font-weight-bold text-white">1</span>
+          <div class="d-flex align-center justify-center ga-2 mb-4 flex-wrap">
+            <div class="step-item text-center" style="flex: 1; min-width: 80px">
+              <v-avatar color="orange" size="32" class="mb-1">
+                <span class="text-subtitle-2 font-weight-bold text-white">1</span>
               </v-avatar>
               <p class="text-caption font-weight-bold mb-0">引き継ぎ申請</p>
+              <p class="text-grey-darken-1" style="font-size: 10px; line-height: 1.2">
+                代表者として申請
+              </p>
             </div>
-            <v-icon size="16" color="grey-lighten-1">mdi-chevron-right</v-icon>
-            <div class="step-item text-center">
-              <v-avatar color="blue" size="28" class="mb-1">
-                <span class="text-caption font-weight-bold text-white">2</span>
+            <v-icon size="16" color="grey-lighten-1" class="mt-n5">mdi-chevron-right</v-icon>
+            <div class="step-item text-center" style="flex: 1; min-width: 80px">
+              <v-avatar color="blue" size="32" class="mb-1">
+                <span class="text-subtitle-2 font-weight-bold text-white">2</span>
               </v-avatar>
-              <p class="text-caption font-weight-bold mb-0">公式マーク付与</p>
+              <p class="text-caption font-weight-bold mb-0">公式マーク</p>
+              <p class="text-grey-darken-1" style="font-size: 10px; line-height: 1.2">
+                ＆上位に固定表示
+              </p>
             </div>
-            <v-icon size="16" color="grey-lighten-1">mdi-chevron-right</v-icon>
-            <div class="step-item text-center">
-              <v-avatar color="green" size="28" class="mb-1">
-                <span class="text-caption font-weight-bold text-white">3</span>
+            <v-icon size="16" color="grey-lighten-1" class="mt-n5">mdi-chevron-right</v-icon>
+            <div class="step-item text-center" style="flex: 1; min-width: 80px">
+              <v-avatar color="green" size="32" class="mb-1">
+                <span class="text-subtitle-2 font-weight-bold text-white">3</span>
               </v-avatar>
               <p class="text-caption font-weight-bold mb-0">自由に編集</p>
+              <p class="text-grey-darken-1" style="font-size: 10px; line-height: 1.2">
+                最新情報へ更新
+              </p>
             </div>
           </div>
+
+          <v-alert
+            variant="tonal"
+            color="grey-darken-2"
+            density="compact"
+            class="mb-4 py-2"
+            rounded="md"
+          >
+            <template #prepend>
+              <v-icon size="16" color="orange">mdi-alert-circle-outline</v-icon>
+            </template>
+            <div class="text-caption font-weight-medium" style="line-height: 1.4">
+              運営が団体名簿と照合し認証を行います。公式な関係者でない方の申請は棄却されますのでご了承ください。
+            </div>
+          </v-alert>
 
           <v-btn
             v-if="isLoggedIn"
@@ -301,18 +346,33 @@ const onClaimClick = () => {
 
 const onTransferred = () => {
   // 引き継ぎ完了後にイベントデータを再取得して画面を更新
-  store.dispatch('event/fetchEvent', eventId.value)
+  loadEventData(eventId.value)
 }
 
-onMounted(async () => {
+// イベントデータの取得処理を共通化
+const loadEventData = async (id) => {
+  if (!id) return
   try {
-    await store.dispatch('event/fetchEvent', eventId.value)
+    fetchErrorMessage.value = ''
+    // 前のイベント情報をクリアするために null をセット
+    store.commit('event/setEvent', null)
+    await store.dispatch('event/fetchEvent', { eventId: id })
     // イベント取得後に代表者ステータスを確認
     await checkRepresentativeStatus()
   } catch (error) {
     fetchErrorMessage.value = error.message
   }
-})
+}
+
+// route.params.id の変更を監視してデータを再取得
+// これにより、同じコンポーネント内での遷移（ラグビー部→アメフト部など）でも正しくリセットされる
+watch(
+  () => route.params.id,
+  (newId) => {
+    loadEventData(newId)
+  },
+  { immediate: true },
+)
 </script>
 
 <style scoped>

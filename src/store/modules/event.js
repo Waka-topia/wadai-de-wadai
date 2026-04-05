@@ -75,14 +75,30 @@ const actions = {
   },
 
   /**
-   * Firebaseから単一のイベント情報を取得し、ステートに保存する
+   * Firebaseから単一のイベント情報を取得し、ステートに保存する メモリ上にすでにデータが存在する場合は通信をスキップする
    *
    * @param {object} context - Vuexのコンテキストオブジェクト
    * @param {(type: string, payload?: unknown) => void} context.commit - Mutationをコミットするための関数
-   * @param {string} eventId - 取得対象のイベントID
+   * @param {object} context.state - 現在のステート
+   * @param {object} payload - 取得対象の情報
+   * @param {string} payload.eventId - 取得対象のイベントID
+   * @param {boolean} payload.force - 強制的に再取得するかどうか
    * @returns {Promise<void>}
    */
-  async fetchEvent({ commit }, eventId) {
+  async fetchEvent({ commit, state }, { eventId, force = false } = {}) {
+    if (!eventId) return
+
+    // キャッシュチェック: すでに全イベントリスト(state.events)に対象が含まれている場合はそれを使用
+    if (!force) {
+      const cachedEvent = state.events.find(
+        (e) => e.eventId === eventId || e.original_doc_id === eventId,
+      )
+      if (cachedEvent) {
+        commit('setEvent', cachedEvent)
+        return
+      }
+    }
+
     try {
       commit('setError', null)
       const event = await getEventService(eventId)
