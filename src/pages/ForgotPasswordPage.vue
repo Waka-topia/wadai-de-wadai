@@ -6,7 +6,7 @@
       <v-card-text class="text-center text-body-2 mb-2">
         登録済みのメールアドレスを入力してください。パスワードリセット用のリンクを送信します。
       </v-card-text>
-      <v-form v-model="form" @submit.prevent="onSubmit">
+      <v-form @submit.prevent="onSubmit">
         <v-text-field
           v-model="email"
           class="mb-2"
@@ -21,7 +21,6 @@
 
         <v-btn
           type="submit"
-          :disabled="!form"
           :loading="isLoading"
           block
           color="success"
@@ -44,11 +43,11 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import { required } from '@/utils/forms/validate'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { sendPasswordReset } from '@/services/authService'
 
 const email = ref('')
-const form = ref(false)
 const isLoading = ref(false)
 const snackbar = ref({
   show: false,
@@ -60,16 +59,18 @@ const router = useRouter()
 
 useFirebasePageView('view_forgot_password', {})
 
-const required = (value) => !!value || 'このフィールドは必須です。'
-
 const onBack = () => {
   void logFirebaseAnalyticsEvent('forgot_password_back_click', {})
   router.push('/login')
 }
 
-const onSubmit = async () => {
+const onSubmit = async (validationPromise) => {
   try {
     isLoading.value = true
+
+    const { valid } = await validationPromise
+    if (!valid) throw new Error('入力に誤りがあります。')
+
     await sendPasswordReset(email.value)
 
     void logFirebaseAnalyticsEvent('forgot_password_submit_success', {})

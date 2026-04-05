@@ -148,20 +148,20 @@ export default {
    * @param {object} params - 登録情報
    * @param {string} params.email - メールアドレス
    * @param {string} params.password - パスワード
-   * @param {string} params.username - ユーザー名 (displayName)
+   * @param {string} params.userName - ユーザー名 (displayName)
    * @returns {Promise<object>} 登録されたユーザー情報 (User)
    */
-  async signup({ email, password, username }) {
+  async signup({ email, password, userName }) {
     try {
       // Firebase Authentication でユーザーを作成
       const userCredential = await createUserWithEmailAndPassword(auth, email, password)
       const user = userCredential.user
-      await updateProfile(user, { displayName: username })
+      await updateProfile(user, { displayName: userName })
 
       // Firestore にユーザードキュメントを作成
       await setDoc(doc(db, 'users', user.uid), {
         email,
-        displayName: username,
+        displayName: userName,
         isOfficial: false,
         isProvePending: false,
         proveOwnerApplication: null,

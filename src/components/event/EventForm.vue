@@ -8,7 +8,7 @@
       label="団体名"
       variant="outlined"
       density="comfortable"
-      required
+      :rules="[required]"
       persistent-hint
       prepend-inner-icon="mdi-domain"
     />
@@ -21,7 +21,7 @@
       density="comfortable"
       max="2026-05-31"
       min="2025-04-01"
-      required
+      :rules="[required]"
       prepend-inner-icon="mdi-calendar"
     />
 
@@ -33,7 +33,7 @@
           type="time"
           variant="outlined"
           density="comfortable"
-          required
+          :rules="[required]"
           prepend-inner-icon="mdi-clock-start"
         />
       </v-col>
@@ -44,7 +44,7 @@
           type="time"
           variant="outlined"
           density="comfortable"
-          required
+          :rules="[required]"
           prepend-inner-icon="mdi-clock-end"
         />
       </v-col>
@@ -56,7 +56,7 @@
       variant="outlined"
       density="comfortable"
       placeholder="イベントの場所"
-      required
+      :rules="[required]"
       prepend-inner-icon="mdi-map-marker"
     />
 
@@ -67,7 +67,6 @@
       density="comfortable"
       rows="4"
       placeholder="イベントの概要を入力"
-      required
       prepend-inner-icon="mdi-text"
     />
 
@@ -100,6 +99,7 @@ import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { allGroups } from '@/data/groups'
+import { required } from '@/utils/forms/validate'
 
 const store = useStore()
 const router = useRouter()
@@ -124,8 +124,11 @@ const snackbar = ref({
   message: '',
 })
 
-const submitEvent = async () => {
+const submitEvent = async (validationPromise) => {
   try {
+    const { valid } = await validationPromise
+    if (!valid) throw new Error('入力に誤りがあります。')
+
     const currentUserId = store.getters['auth/userId']
     const currentUserName = store.getters['auth/displayName']
     const selectedGroup = allGroups.find((group) => group.name === newEvent.value.organizerName)

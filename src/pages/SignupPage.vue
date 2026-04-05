@@ -2,9 +2,9 @@
   <v-progress-linear v-if="isLoading" color="success" indeterminate=""></v-progress-linear>
   <v-sheet class="pa-12" rounded>
     <v-card class="py-8">
-      <v-form v-model="form" @submit.prevent="onSubmit">
+      <v-form @submit.prevent="onSubmit">
         <v-text-field
-          v-model="username"
+          v-model="signupData.userName"
           class="mb-2"
           :rules="[required, nameCheck]"
           clearable
@@ -13,7 +13,7 @@
           placeholder="わかやん"
         />
         <v-text-field
-          v-model="email"
+          v-model="signupData.email"
           class="mb-2"
           :rules="[required, emailDomainCheck]"
           clearable
@@ -23,7 +23,7 @@
           prepend-inner-icon="mdi-email-outline"
         ></v-text-field>
         <v-text-field
-          v-model="password"
+          v-model="signupData.password"
           :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
           :rules="[required, passwordRule]"
           :type="visible ? 'text' : 'password'"
@@ -38,18 +38,12 @@
         <!-- モーダルを表示するボタン -->
         <v-btn color="primary" text @click="openRules">利用規約を確認</v-btn>
 
-        <v-checkbox
-          v-model="agree"
-          :rules="[requiredAgree]"
-          label="利用規約に同意する"
-          color="orange"
-        />
+        <v-checkbox v-model="agree" :rules="[required]" label="利用規約に同意する" color="orange" />
 
         <br />
 
         <v-btn
           type="submit"
-          :disabled="!form || !agree"
           :loading="isLoading"
           block
           color="primary"
@@ -86,14 +80,16 @@ import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
+import { required, passwordRule, nameCheck, emailDomainCheck } from '@/utils/forms/validate'
 import TermsRule from '@/components/templates/TermsRule.vue'
 
-const username = ref('')
-const email = ref('')
-const password = ref('')
+const signupData = ref({
+  email: '',
+  password: '',
+  userName: '',
+})
 const visible = ref(false)
 const agree = ref(false)
-const form = ref(false)
 const isLoading = ref(false)
 const dialog = ref(false)
 const snackbar = ref({
@@ -107,36 +103,6 @@ const store = useStore()
 
 useFirebasePageView('view_signup', {})
 
-const required = (value) => !!value || 'このフィールドは必須です。'
-
-const requiredAgree = (value) => {
-  if (!value) {
-    return '利用規約に同意する必要があります。'
-  }
-  return true
-}
-
-const nameCheck = (value) => {
-  if (value && value.length < 2) {
-    return 'ユーザー名は2文字以上で入力してください'
-  }
-  return true
-}
-
-const emailDomainCheck = (value) => {
-  if (value && value.endsWith('@wakayama-u.ac.jp')) {
-    return 'このドメインは使用できません'
-  }
-  return true
-}
-
-const passwordRule = (value) => {
-  if (value && value.length < 8) {
-    return 'パスワードは8文字以上で入力してください'
-  }
-  return true
-}
-
 const openRules = () => {
   void logFirebaseAnalyticsEvent('signup_terms_open_click', {})
   dialog.value = true
@@ -147,14 +113,14 @@ const onLogin = () => {
   router.push('/login')
 }
 
-const onSubmit = async () => {
+const onSubmit = async (validationPromise) => {
   try {
     isLoading.value = true
-    await store.dispatch('auth/signup', {
-      email: email.value,
-      password: password.value,
-      username: username.value,
-    })
+
+    const { valid } = await validationPromise
+    if (!valid) throw new Error('入力に誤りがあります。')
+
+    await store.dispatch('auth/signup', signupData.value)
 
     void logFirebaseAnalyticsEvent('signup_submit_success', {})
 
