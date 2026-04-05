@@ -20,7 +20,9 @@
         <v-icon start class="transition-transform" :class="{ 'rotate-90': route.expanded }">
           mdi-chevron-right
         </v-icon>
-        <span class="flex-grow-1 text-left">{{ route.label }}</span>
+        <span class="flex-grow-1 text-left text-truncate" style="min-width: 0">{{
+          route.label
+        }}</span>
       </v-btn>
 
       <!-- Content -->
@@ -30,18 +32,15 @@
             <!-- Centered Layout -->
             <div class="d-flex flex-column align-center text-center">
               <!-- row 1: Badge & Time -->
-              <div class="d-flex align-center flex-wrap justify-center mb-1">
+              <div class="d-flex align-center mb-1">
                 <!-- Bus Route Badges -->
-                <div
-                  v-if="getBusBadges(route).length > 0"
-                  class="d-flex align-center flex-wrap mr-2"
-                >
+                <div v-if="getBusBadges(route).length > 0" class="d-flex align-center mr-2">
                   <v-chip
                     v-for="(badge, i) in getBusBadges(route)"
                     :key="i"
-                    size="x-small"
+                    size="small"
                     :color="badge.color"
-                    class="font-weight-bold mr-1 mb-1"
+                    class="font-weight-bold mr-1"
                     label
                   >
                     {{ badge.label }}
