@@ -3,9 +3,9 @@ import { allGroups } from '@/data/groups'
 import { db } from '@/firebase/config'
 
 /**
- * groups.js の団体一覧を Firestore の groups コレクションへ登録する
+ * Groups.js の団体一覧を Firestore の groups コレクションへ登録する
  *
- * @returns {Promise<{registeredCount:number, skippedCount:number}>} 登録結果
+ * @returns {Promise<{ registeredCount: number; skippedCount: number }>} 登録結果
  */
 export const registerAllGroupsService = async () => {
   try {
