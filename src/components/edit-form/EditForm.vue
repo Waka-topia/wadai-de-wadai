@@ -73,8 +73,9 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useStore } from 'vuex'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 // import NextShinkan from './NextShinkan.vue'
 // import NextShinkanView from './NextShinkanView.vue'
 import ProfileImage from './ProfileImage.vue'
@@ -84,6 +85,12 @@ import UserId from './UserId.vue'
 import UserName from './UserName.vue'
 
 const dialog = ref(false)
+
+watch(dialog, (open) => {
+  if (open) {
+    void logFirebaseAnalyticsEvent('profile_edit_dialog_open', {})
+  }
+})
 
 const store = useStore()
 const photoURLResolved = computed(() => store.getters['auth/photoURLResolved'])

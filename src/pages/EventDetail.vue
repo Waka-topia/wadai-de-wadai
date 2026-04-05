@@ -1,7 +1,7 @@
 <template>
   <v-container fluid class="event-root">
     <!-- Back -->
-    <v-btn icon variant="text" class="mb-2" @click="router.back()">
+    <v-btn icon variant="text" class="mb-2" @click="handleBack">
       <v-icon>mdi-arrow-left</v-icon>
     </v-btn>
 
@@ -123,6 +123,8 @@
 import { useStore } from 'vuex'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import EditDeleteForm from '@/components/event/EditDeleteForm.vue'
 
 const route = useRoute()
@@ -131,6 +133,15 @@ const store = useStore()
 const fetchErrorMessage = ref('')
 
 const eventId = computed(() => String(route.params.id || ''))
+
+useFirebasePageView('view_event_detail', () => ({
+  eventId: eventId.value,
+}))
+
+const handleBack = () => {
+  void logFirebaseAnalyticsEvent('event_detail_back_click', { eventId: eventId.value })
+  router.back()
+}
 
 onMounted(async () => {
   try {

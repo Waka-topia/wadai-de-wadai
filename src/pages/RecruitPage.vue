@@ -12,12 +12,15 @@
 <script setup>
 import { onMounted, watch, computed } from 'vue'
 import { useStore } from 'vuex'
+import { useFirebasePageView } from '@/composables/useFirebasePageView'
 import RecruitSearchFilter from '@/components/recruit/RecruitSearchFilter.vue'
 import BookMarkFilterTabs from '@/components/recruit/BookMarkFilterTabs.vue'
 import RecruitSortButtons from '@/components/recruit/RecruitSortButtons.vue'
 import RecruitJobCard from '@/components/recruit/RecruitJobCard.vue'
 
 const store = useStore()
+
+useFirebasePageView('view_recruit', {})
 const userId = computed(() => store.state.auth?.userId)
 const sortedJobs = computed(() => store.getters.sortedJobs)
 

@@ -32,6 +32,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 
 const snackbar = ref({
   show: false,
@@ -51,6 +52,8 @@ const props = defineProps({
 const onDelete = async (isActive) => {
   try {
     const currentUserId = store.getters['auth/userId']
+
+    void logFirebaseAnalyticsEvent('event_detail_delete_confirm', { eventId: props.eventId })
 
     await store.dispatch('event/deleteEvent', {
       eventId: props.eventId,

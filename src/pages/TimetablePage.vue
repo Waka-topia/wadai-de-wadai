@@ -121,11 +121,17 @@
 import { ref, computed, watch, onActivated } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
+import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import TimetableGrid from '@/components/timetable/TimetableGrid.vue'
 import LectureEditorModal from '@/components/timetable/LectureEditorModal.vue'
 
 const store = useStore()
 const router = useRouter()
+
+useFirebasePageView('view_timetable', () => ({
+  loggedIn: store.getters['auth/isAuthenticated'],
+}))
 const showModal = ref(false)
 const selectedCell = ref(null)
 
@@ -205,6 +211,7 @@ const todayDateLabel = computed(() => {
  * @param {string} sem - 学期コード ('first' | 'second')
  */
 const switchSemester = (sem) => {
+  void logFirebaseAnalyticsEvent('timetable_semester_change', { semester: sem })
   store.dispatch('timetable/switchSemester', sem)
   showSnackbar(sem === 'first' ? '前期' : '後期', 'blue-grey', 'mdi-calendar-range')
 }
@@ -215,6 +222,7 @@ const switchSemester = (sem) => {
  * @param {number} g - 学年 (1〜4)
  */
 const handleSwitchGrade = (g) => {
+  void logFirebaseAnalyticsEvent('timetable_grade_change', { grade: g })
   store.dispatch('timetable/switchGrade', g)
   showSnackbar(`${g}年生の時間割を表示中`, 'blue-grey', 'mdi-school-outline')
 }
@@ -240,6 +248,7 @@ onActivated(() => {
 
 const handleCellClick = ({ day, period }) => {
   if (!isLoggedIn.value) {
+    void logFirebaseAnalyticsEvent('timetable_cell_click_guest', { day, period })
     router.push('/login')
     return
   }

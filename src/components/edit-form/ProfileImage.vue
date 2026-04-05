@@ -49,6 +49,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useStore } from 'vuex'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 
 const store = useStore()
 
@@ -77,6 +78,7 @@ const saveIcon = async () => {
       isLoading.value = true
       const iconUrl = `userIcon/userIcon${selectedIcon.value + 1}.png`
       await store.dispatch('auth/updatePhotoURL', iconUrl)
+      void logFirebaseAnalyticsEvent('profile_icon_save', { iconIndex: selectedIcon.value })
       snackbar.value = {
         show: true,
         color: 'success',

@@ -84,7 +84,8 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
-
+import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import TermsRule from '@/components/templates/TermsRule.vue'
 
 const username = ref('')
@@ -103,6 +104,8 @@ const snackbar = ref({
 
 const router = useRouter()
 const store = useStore()
+
+useFirebasePageView('view_signup', {})
 
 const required = (value) => !!value || 'このフィールドは必須です。'
 
@@ -135,10 +138,12 @@ const passwordRule = (value) => {
 }
 
 const openRules = () => {
+  void logFirebaseAnalyticsEvent('signup_terms_open_click', {})
   dialog.value = true
 }
 
 const onLogin = () => {
+  void logFirebaseAnalyticsEvent('signup_login_link_click', {})
   router.push('/login')
 }
 
@@ -151,6 +156,8 @@ const onSubmit = async () => {
       username: username.value,
     })
 
+    void logFirebaseAnalyticsEvent('signup_submit_success', {})
+
     snackbar.value = {
       show: true,
       color: 'success',
@@ -161,6 +168,9 @@ const onSubmit = async () => {
       router.push('/login')
     }, 1000)
   } catch (error) {
+    void logFirebaseAnalyticsEvent('signup_submit_error', {
+      errorCode: String(error?.code || 'unknown'),
+    })
     snackbar.value = {
       show: true,
       color: 'error',

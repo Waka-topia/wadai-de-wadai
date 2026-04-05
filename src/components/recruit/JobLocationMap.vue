@@ -28,6 +28,7 @@
 
 <script setup>
 import { onMounted, onUnmounted, ref, computed, markRaw } from 'vue'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 
@@ -56,6 +57,7 @@ const googleMapsUrl = computed(() => {
 })
 
 const openGoogleMaps = () => {
+  void logFirebaseAnalyticsEvent('job_location_map_open_google', {})
   window.open(googleMapsUrl.value, '_blank', 'noopener,noreferrer')
 }
 

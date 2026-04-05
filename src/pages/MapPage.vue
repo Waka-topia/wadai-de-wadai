@@ -5,7 +5,7 @@
     <!-- Top Bar with Controls -->
     <div class="top-bar">
       <!-- Back Button -->
-      <v-btn icon class="control-btn" color="white" elevation="2" @click="$router.push('/')">
+      <v-btn icon class="control-btn" color="white" elevation="2" @click="goHomeFromMap">
         <v-icon>mdi-arrow-left</v-icon>
       </v-btn>
 
@@ -42,7 +42,14 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import BaseMap from '@/components/map/BaseMap.vue'
+
+const router = useRouter()
+
+useFirebasePageView('view_map', {})
 
 const baseMapRef = ref(null)
 const currentLocation = ref(null)
@@ -58,8 +65,14 @@ function handleLocationUpdate(position) {
   // console.log('Location updated:', position)
 }
 
+const goHomeFromMap = () => {
+  void logFirebaseAnalyticsEvent('map_back_home_click', {})
+  router.push('/')
+}
+
 /** 現在地に移動 */
 function goToCurrentLocation() {
+  void logFirebaseAnalyticsEvent('map_current_location_click', {})
   locating.value = true
   // GeolocateControlのtriggerを呼び出す
   // BaseMapのGeolocateControlを直接操作

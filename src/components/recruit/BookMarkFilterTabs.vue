@@ -22,8 +22,9 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { useStore } from 'vuex'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 
 const store = useStore()
 
@@ -31,6 +32,13 @@ const filterTab = computed({
   get: () => store.state.jobs.showBookmarkedOnly,
   set: (value) => store.commit('setShowBookmarkedOnly', value),
 })
+
+watch(
+  () => store.state.jobs.showBookmarkedOnly,
+  (bookmarkOnly) => {
+    void logFirebaseAnalyticsEvent('recruit_bookmark_tab_change', { bookmarkOnly })
+  },
+)
 
 const isAuthenticated = computed(() => store.getters['auth/isAuthenticated'])
 

@@ -24,6 +24,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useStore } from 'vuex'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 
 const props = defineProps({
   jobId: {
@@ -46,6 +47,10 @@ const snackbarMessage = ref('')
 
 const toggleBookmark = () => {
   const willBookmark = !props.isBookmarked
+  void logFirebaseAnalyticsEvent('job_bookmark_toggle', {
+    jobId: props.jobId,
+    bookmarked: willBookmark,
+  })
   snackbarMessage.value = willBookmark ? 'お気に入りに登録しました' : 'お気に入りを解除しました'
 
   snackbar.value = true

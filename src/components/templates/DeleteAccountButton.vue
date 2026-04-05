@@ -54,6 +54,7 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 
 const router = useRouter()
 const store = useStore()
@@ -68,6 +69,7 @@ const snackbar = ref({
 
 const onDeleteAccount = async (isActive) => {
   try {
+    void logFirebaseAnalyticsEvent('delete_account_confirm', {})
     await store.dispatch('auth/deleteAccount')
     await store.dispatch('auth/initializeAuth')
     sessionStorage.removeItem('user')

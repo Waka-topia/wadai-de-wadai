@@ -11,11 +11,16 @@
 <script setup>
 import { computed } from 'vue'
 import { useStore } from 'vuex'
+import { useFirebasePageView } from '@/composables/useFirebasePageView'
 import EditForm from '@/components/edit-form/EditForm.vue'
 import ProfileCard from '@/components/my-page/ProfileCard.vue'
 import RecommendLogin from '@/components/templates/RecommendLogin.vue'
 
 const store = useStore()
+
+useFirebasePageView('view_mypage', () => ({
+  authenticated: store.getters['auth/isAuthenticated'],
+}))
 
 const isAuthenticated = computed(() => store.getters['auth/isAuthenticated'])
 const photoURLResolved = computed(() => store.getters['auth/photoURLResolved'])

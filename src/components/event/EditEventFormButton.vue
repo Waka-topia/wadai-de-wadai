@@ -32,10 +32,17 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import EventForm from '@/components/event/EventForm.vue'
 
 const formDialogOpen = ref(false)
+
+watch(formDialogOpen, (open) => {
+  if (open) {
+    void logFirebaseAnalyticsEvent('event_edit_form_open', {})
+  }
+})
 const closeFormDialog = () => {
   formDialogOpen.value = false
 }
