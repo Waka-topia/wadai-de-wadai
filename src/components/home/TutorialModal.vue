@@ -1,10 +1,10 @@
 <template>
   <v-dialog v-model="dialog" persistent no-click-animation max-width="90vw" width="90vw">
     <v-card class="rounded-xl overflow-hidden" height="90vh">
-      <v-carousel height="100%" hide-delimiter-background :show-arrows="false" color="primary">
+      <v-carousel height="100%" hide-delimiter-background :show-arrows="false" color="orange">
         <v-carousel-item v-for="n in 4" :key="n">
           <div class="tutorial-container pa-10">
-            <div class="text-h2 font-weight-black text-blue-lighten-4 mb-6">0{{ n }}</div>
+            <div class="text-h2 font-weight-black text-orange-darken-1 mb-6">0{{ n }}</div>
             <h3 class="text-h4 mb-4 font-weight-bold">ステップ {{ n }} のタイトル</h3>
             <div class="mt-4">
               <v-img
@@ -42,10 +42,11 @@
 
                 <v-btn
                   block
-                  color="primary"
+                  color="orange"
                   size="x-large"
                   rounded="pill"
                   elevation="4"
+                  class="text-white font-weight-bold"
                   @click="handleTutorialFinish"
                 >
                   アプリをはじめる
