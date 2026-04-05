@@ -5,17 +5,8 @@
         <v-carousel-item>
           <div class="tutorial-container pa-10">
             <div class="text-h2 font-weight-black text-orange-darken-1 my-6">01</div>
-            <h3 class="text-h4 font-weight-bold">ステップ1</h3>
             <div class="mt-4">
-              <v-img
-                src="https://placehold.jp/24/3e8ed0/ffffff/400x300.png?text=Waka-topia"
-                class="rounded-lg mb-6"
-                cover
-                height="250"
-              ></v-img>
-              <p class="text-body-1 text-grey-darken-1">
-                ここにアプリの使い方や画像などを自由に配置してください。
-              </p>
+              <img src="@/assets/tutorial/1.webp" class="tutorial-image rounded-lg w-100" alt="" />
             </div>
           </div>
         </v-carousel-item>
@@ -23,17 +14,8 @@
         <v-carousel-item>
           <div class="tutorial-container pa-10">
             <div class="text-h2 font-weight-black text-orange-darken-1 my-6">02</div>
-            <h3 class="text-h4 font-weight-bold">ステップ2</h3>
             <div class="mt-4">
-              <v-img
-                src="https://placehold.jp/24/3e8ed0/ffffff/400x300.png?text=Waka-topia"
-                class="rounded-lg mb-6"
-                cover
-                height="250"
-              ></v-img>
-              <p class="text-body-1 text-grey-darken-1">
-                ここにアプリの使い方や画像などを自由に配置してください。
-              </p>
+              <img src="@/assets/tutorial/2.webp" class="tutorial-image rounded-lg w-100" alt="" />
             </div>
           </div>
         </v-carousel-item>
@@ -41,17 +23,8 @@
         <v-carousel-item>
           <div class="tutorial-container pa-10">
             <div class="text-h2 font-weight-black text-orange-darken-1 my-6">03</div>
-            <h3 class="text-h4 font-weight-bold">ステップ3</h3>
             <div class="mt-4">
-              <v-img
-                src="https://placehold.jp/24/3e8ed0/ffffff/400x300.png?text=Waka-topia"
-                class="rounded-lg mb-6"
-                cover
-                height="250"
-              ></v-img>
-              <p class="text-body-1 text-grey-darken-1">
-                ここにアプリの使い方や画像などを自由に配置してください。
-              </p>
+              <img src="@/assets/tutorial/3.webp" class="tutorial-image rounded-lg w-100" alt="" />
             </div>
           </div>
         </v-carousel-item>
@@ -59,17 +32,17 @@
         <v-carousel-item>
           <div class="tutorial-container pa-10">
             <div class="text-h2 font-weight-black text-orange-darken-1 my-6">04</div>
-            <h3 class="text-h4 font-weight-bold">ステップ4</h3>
             <div class="mt-4">
-              <v-img
-                src="https://placehold.jp/24/3e8ed0/ffffff/400x300.png?text=Waka-topia"
-                class="rounded-lg mb-6"
-                cover
-                height="250"
-              ></v-img>
-              <p class="text-body-1 text-grey-darken-1">
-                ここにアプリの使い方や画像などを自由に配置してください。
-              </p>
+              <img src="@/assets/tutorial/4.webp" class="tutorial-image rounded-lg w-100" alt="" />
+            </div>
+          </div>
+        </v-carousel-item>
+
+        <v-carousel-item>
+          <div class="tutorial-container pa-10">
+            <div class="text-h2 font-weight-black text-orange-darken-1 my-6">05</div>
+            <div class="mt-4">
+              <img src="@/assets/tutorial/5.webp" class="tutorial-image rounded-lg w-100" alt="" />
             </div>
           </div>
         </v-carousel-item>
