@@ -22,7 +22,7 @@
 
         <v-carousel-item>
           <div class="tutorial-container pa-10">
-            <div class="text-h2 font-weight-black text-orange-darken-1 my-6">04</div>
+            <div class="text-h2 font-weight-black text-orange-darken-1 my-6">03</div>
             <div class="mt-4">
               <img src="@/assets/tutorial/6.webp" class="tutorial-image rounded-lg w-100" alt="" />
             </div>
@@ -31,7 +31,7 @@
 
         <v-carousel-item>
           <div class="tutorial-container pa-10">
-            <div class="text-h2 font-weight-black text-orange-darken-1 my-6">05</div>
+            <div class="text-h2 font-weight-black text-orange-darken-1 my-6">04</div>
             <div class="mt-4">
               <img src="@/assets/tutorial/7.webp" class="tutorial-image rounded-lg w-100" alt="" />
             </div>
