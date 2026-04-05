@@ -13,3 +13,17 @@ export const confirmPasswordRule = (password) => (value) => {
   }
   return true
 }
+
+export const nameCheck = (value) => {
+  if (value && value.length < 2) {
+    return 'ユーザー名は2文字以上で入力してください'
+  }
+  return true
+}
+
+export const emailDomainCheck = (value) => {
+  if (value && value.endsWith('@wakayama-u.ac.jp')) {
+    return 'このドメインは使用できません'
+  }
+  return true
+}

@@ -2,9 +2,9 @@
   <v-progress-linear v-if="isLoading" color="success" indeterminate=""></v-progress-linear>
   <v-sheet class="pa-12" rounded>
     <v-card class="py-8">
-      <v-form v-model="form" @submit.prevent="onSubmit">
+      <v-form @submit.prevent="onSubmit">
         <v-text-field
-          v-model="email"
+          v-model="loginData.email"
           class="mb-2"
           :rules="[required, emailDomainCheck]"
           clearable
@@ -13,7 +13,7 @@
           prepend-inner-icon="mdi-email-outline"
         ></v-text-field>
         <v-text-field
-          v-model="password"
+          v-model="loginData.password"
           :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
           :rules="[required]"
           :type="visible ? 'text' : 'password'"
@@ -28,7 +28,6 @@
 
         <v-btn
           type="submit"
-          :disabled="!form"
           :loading="isLoading"
           block
           color="success"
@@ -55,11 +54,13 @@ import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
+import { required, emailDomainCheck } from '@/utils/forms/validate'
 
-const email = ref('')
-const password = ref('')
+const loginData = ref({
+  email: '',
+  password: '',
+})
 const visible = ref(false)
-const form = ref(false)
 const isLoading = ref(false)
 const snackbar = ref({
   show: false,
@@ -71,15 +72,6 @@ const router = useRouter()
 const store = useStore()
 
 useFirebasePageView('view_login', {})
-
-const required = (value) => !!value || 'このフィールドは必須です。'
-
-const emailDomainCheck = (value) => {
-  if (value && value.endsWith('@wakayama-u.ac.jp')) {
-    return 'このドメインは使用できません'
-  }
-  return true
-}
 
 const onSignUp = () => {
   void logFirebaseAnalyticsEvent('login_signup_link_click', {})
@@ -96,10 +88,14 @@ const onForgotPassword = () => {
   router.push('/forgot-password')
 }
 
-const onSubmit = async () => {
+const onSubmit = async (validationPromise) => {
   try {
     isLoading.value = true
-    await store.dispatch('auth/login', { email: email.value, password: password.value })
+
+    const { valid } = await validationPromise
+    if (!valid) throw new Error('入力に誤りがあります。')
+
+    await store.dispatch('auth/login', loginData.value)
 
     void logFirebaseAnalyticsEvent('login_submit_success', {})
 
