@@ -20,7 +20,7 @@
       </v-card-title>
 
       <v-divider />
-      <EventForm />
+      <EventForm @success="closeFormDialog" @cancel="closeFormDialog" />
       <v-divider />
 
       <v-card-actions class="pa-4">
