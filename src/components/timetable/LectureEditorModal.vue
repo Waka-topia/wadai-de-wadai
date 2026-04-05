@@ -126,7 +126,7 @@
             </div>
           </v-alert>
 
-          <v-form class="editor-form">
+          <v-form class="editor-form" @submit.prevent="onSubmit">
             <v-text-field
               v-model="form.name"
               :rules="[required]"
@@ -247,7 +247,7 @@
               <v-btn variant="text" @click="isExistingLecture ? (isEditMode = false) : close()"
                 >キャンセル</v-btn
               >
-              <v-btn color="orange" variant="flat" @click="onSubmit"> 保存 </v-btn>
+              <v-btn color="orange" variant="flat" type="submit"> 保存 </v-btn>
             </v-card-actions>
           </v-form>
 
