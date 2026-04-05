@@ -1,4 +1,12 @@
-import { arrayUnion, collection, doc, getDoc, getDocs, setDoc, updateDoc } from 'firebase/firestore'
+import {
+  arrayUnion,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  runTransaction,
+  setDoc,
+} from 'firebase/firestore'
 import { v4 as uuidv4 } from 'uuid'
 import { db } from '@/firebase/config'
 
@@ -161,6 +169,14 @@ const verifyEventOwnership = async (eventId, userId) => {
   }
 }
 
+/**
+ * イベント情報を更新する（トランザクションを使用して競合を防止）
+ *
+ * @param {string} eventId イベントID
+ * @param {object} eventData 更新データ
+ * @param {string} userId Firebase AuthのユーザーID
+ * @returns {Promise<void>}
+ */
 export const updateEventService = async (eventId, eventData, userId) => {
   try {
     await verifyEventOwnership(eventId, userId)
@@ -173,57 +189,116 @@ export const updateEventService = async (eventId, eventData, userId) => {
         ? eventData.date.substring(0, 7)
         : 'unknown_month'
 
-    if (oldMonthKey === newMonthKey) {
-      const monthDocRef = doc(db, 'events_monthly', oldMonthKey)
-      const monthSnap = await getDoc(monthDocRef)
-      if (monthSnap.exists()) {
+    const oldMonthDocRef = doc(db, 'events_monthly', oldMonthKey)
+    const newMonthDocRef = doc(db, 'events_monthly', newMonthKey)
+
+    await runTransaction(db, async (transaction) => {
+      if (oldMonthKey === newMonthKey) {
+        // パターンA: 日付（月）が変更されていない場合（同じドキュメント内の更新）
+        const monthSnap = await transaction.get(oldMonthDocRef)
+        if (!monthSnap.exists()) {
+          throw new Error('対象の月別データが存在しません。')
+        }
+
         let eventsList = monthSnap.data().events || []
         const index = eventsList.findIndex(
           (e) => e.eventId === eventId || e.original_doc_id === eventId,
         )
+
         if (index !== -1) {
           eventsList[index] = { ...eventsList[index], ...eventData }
-          await updateDoc(monthDocRef, { events: eventsList })
+          transaction.update(oldMonthDocRef, { events: eventsList })
+        } else {
+          throw new Error('更新対象のイベントが見つかりません。')
+        }
+      } else {
+        // パターンB: 日付（月）が変更された場合（古い月から削除し、新しい月へ追加）
+        // ※Firestoreのルール: トランザクション内では、すべての「読み込み」を「書き込み」より先に行う必要があります。
+        const oldMonthSnap = await transaction.get(oldMonthDocRef)
+        const newMonthSnap = await transaction.get(newMonthDocRef)
+
+        // 1. 古い月からの削除
+        if (oldMonthSnap.exists()) {
+          let oldEventsList = oldMonthSnap.data().events || []
+          oldEventsList = oldEventsList.filter(
+            (e) => e.eventId !== eventId && e.original_doc_id !== eventId,
+          )
+          transaction.update(oldMonthDocRef, {
+            events: oldEventsList,
+            totalCount: oldEventsList.length,
+          })
+        }
+
+        // 2. 新しい月への追加
+        const updatedEvent = { ...oldEvent, ...eventData }
+        if (newMonthSnap.exists()) {
+          let newEventsList = newMonthSnap.data().events || []
+          newEventsList.push(updatedEvent)
+          transaction.update(newMonthDocRef, {
+            events: newEventsList,
+            totalCount: newEventsList.length,
+          })
+        } else {
+          // 新しい月のドキュメントがまだ存在しない場合は作成
+          transaction.set(newMonthDocRef, {
+            events: [updatedEvent],
+            totalCount: 1,
+          })
         }
       }
-    } else {
-      const oldMonthDocRef = doc(db, 'events_monthly', oldMonthKey)
-      const oldMonthSnap = await getDoc(oldMonthDocRef)
-      if (oldMonthSnap.exists()) {
-        let oldEventsList = oldMonthSnap.data().events || []
-        oldEventsList = oldEventsList.filter(
-          (e) => e.eventId !== eventId && e.original_doc_id !== eventId,
-        )
-        await updateDoc(oldMonthDocRef, { events: oldEventsList })
-      }
-
-      const newMonthDocRef = doc(db, 'events_monthly', newMonthKey)
-      const updatedEvent = { ...oldEvent, ...eventData }
-      await setDoc(newMonthDocRef, { events: arrayUnion(updatedEvent) }, { merge: true })
-    }
+    })
   } catch (error) {
-    console.error('Failed to update event:', error)
+    console.error('Failed to update event with transaction:', error)
     throw new Error(`イベントの更新に失敗しました。${error.message}`)
   }
 }
 
+/**
+ * イベントを削除する（トランザクションを使用して競合を防止）
+ *
+ * @param {string} eventId イベントID
+ * @param {string} userId Firebase AuthのユーザーID
+ * @returns {Promise<void>}
+ */
 export const deleteEventService = async (eventId, userId) => {
   try {
+    // 1. 所有権の確認（これはトランザクション外で行ってOKです）
     await verifyEventOwnership(eventId, userId)
+
+    // 2. イベントの月を取得（月別ドキュメントを特定するため）
     const event = await getEventService(eventId)
     const monthKey =
       event.date && event.date.length >= 7 ? event.date.substring(0, 7) : 'unknown_month'
-
     const monthDocRef = doc(db, 'events_monthly', monthKey)
-    const monthSnap = await getDoc(monthDocRef)
 
-    if (monthSnap.exists()) {
+    // 3. トランザクションの実行
+    await runTransaction(db, async (transaction) => {
+      // トランザクション内で最新のドキュメントを読み込む
+      const monthSnap = await transaction.get(monthDocRef)
+
+      if (!monthSnap.exists()) {
+        throw new Error('対象の月別データが存在しません。')
+      }
+
       let eventsList = monthSnap.data().events || []
+
+      // 削除対象のイベントを配列から除外
+      const originalLength = eventsList.length
       eventsList = eventsList.filter((e) => e.eventId !== eventId && e.original_doc_id !== eventId)
-      await updateDoc(monthDocRef, { events: eventsList })
-    }
+
+      // もし配列の長さが変わっていなければ、すでに他の人に削除された可能性がある
+      if (eventsList.length === originalLength) {
+        throw new Error('すでに削除されているか、データが見つかりません。')
+      }
+
+      // トランザクション内で更新を予約する
+      transaction.update(monthDocRef, {
+        events: eventsList,
+        totalCount: eventsList.length, // ついでに件数も更新しておきます
+      })
+    })
   } catch (error) {
-    console.error('Failed to delete event:', error)
+    console.error('Failed to delete event with transaction:', error)
     throw new Error(`イベントの削除に失敗しました。${error.message}`)
   }
 }
