@@ -1,6 +1,6 @@
 <template>
   <div class="edit-delete-root">
-    <v-card rounded="lg" class="mb-4">
+    <v-card rounded="lg" class="mb-4" elevation="0">
       <v-card-text>
         <div class="d-flex ga-3 mb-3">
           <!-- 編集ボタン & ダイアログ -->
