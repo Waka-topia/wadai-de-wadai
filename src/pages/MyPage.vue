@@ -1,6 +1,6 @@
 <template>
   <div v-if="isAuthenticated" class="d-flex flex-column justify-center my-10">
-    <ProfileCard :name="displayName" :photo-url-resolved="photoURLResolved" />
+    <ProfileCard />
     <EditForm />
   </div>
   <div v-else>
@@ -23,6 +23,4 @@ useFirebasePageView('view_mypage', () => ({
 }))
 
 const isAuthenticated = computed(() => store.getters['auth/isAuthenticated'])
-const photoURLResolved = computed(() => store.getters['auth/photoURLResolved'])
-const displayName = computed(() => store.getters['auth/displayName'])
 </script>

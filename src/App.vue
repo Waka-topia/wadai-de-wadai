@@ -42,7 +42,8 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
+import { useStore } from 'vuex'
 import { useRouter, useRoute } from 'vue-router'
 import BottomNavigation from '@/components/templates/BottomNavigation.vue'
 import DeleteAccountButton from '@/components/templates/DeleteAccountButton.vue'
@@ -127,6 +128,22 @@ watch(
     checkEventCalPage(newRoute)
     checkFullscreenPage(newRoute)
   },
+  { immediate: true },
+)
+
+const store = useStore()
+const isAuthenticated = computed(() => store.getters['auth/isAuthenticated'])
+const userId = computed(() => store.getters['auth/userId'])
+
+watch(
+  [isAuthenticated, userId],
+  ([auth, id]) => {
+    if (auth && id) {
+      // 認証復元のタイミング差を吸収して、ID確定後に取得する
+      store.dispatch('users/getCurrentUserData', id)
+    }
+  },
+  // ユーザーの認証状態やIDが変わったタイミングで実行するため、immediateオプションをtrueに設定
   { immediate: true },
 )
 </script>

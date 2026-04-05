@@ -21,8 +21,7 @@
 
         <v-card-text>
           <v-row class="mb-4" align="center" justify="center">
-            <UserIcon :photo-url-resolved="photoURLResolved" />
-            <ProfileImage />
+            <UserIcon :user-icon-url="user.userIconUrl" />
           </v-row>
 
           <v-divider class="my-4" />
@@ -39,26 +38,10 @@
           </div>
 
           <v-row dense>
-            <UserName :display-name="displayName" />
-            <UserAddress :email="email" />
-            <UserId :user-id="userId" />
+            <UserName :user-name="user.userName" />
+            <UserAddress :email="user.email" />
+            <UserId :user-id="user.userId" />
           </v-row>
-
-          <!-- <div class="py-4 mt-5">
-            <v-row align="center">
-            <v-col cols="auto">
-            <v-icon color="orange" large>mdi-map-marker</v-icon>
-            </v-col>
-            <v-col>
-            <h3 class="text-h5 font-weight-bold">次に行く新歓設定</h3>
-            </v-col>
-            </v-row>
-            </div>
-
-            <v-card class="elevation-2 pa-4" outlined>
-            <NextShinkan />
-            <NextShinkanView />
-            </v-card> -->
         </v-card-text>
 
         <v-divider />
@@ -76,9 +59,6 @@
 import { ref, computed, watch } from 'vue'
 import { useStore } from 'vuex'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
-// import NextShinkan from './NextShinkan.vue'
-// import NextShinkanView from './NextShinkanView.vue'
-import ProfileImage from './ProfileImage.vue'
 import UserAddress from './UserAddress.vue'
 import UserIcon from './UserIcon.vue'
 import UserId from './UserId.vue'
@@ -93,8 +73,6 @@ watch(dialog, (open) => {
 })
 
 const store = useStore()
-const photoURLResolved = computed(() => store.getters['auth/photoURLResolved'])
-const displayName = computed(() => store.getters['auth/displayName'] || 'Unknown')
-const email = computed(() => store.getters['auth/email'] || 'Unknown')
-const userId = computed(() => store.getters['auth/userId'] || 'Unknown')
+
+const user = computed(() => store.getters['users/currentUserData'])
 </script>
