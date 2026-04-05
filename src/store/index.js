@@ -5,9 +5,7 @@ import jobsModule from './modules/jobs'
 import locationModule from './modules/location'
 import ratingModule from './modules/rating'
 import scrollModule from './modules/scroll'
-import shinkanModule from './modules/shinkan'
 import timetableModule from './modules/timetable'
-import titleModule from './modules/title'
 import userModule from './modules/user'
 
 export default createStore({
@@ -22,8 +20,6 @@ export default createStore({
       namespaced: true,
       ...userModule,
     },
-    shinkan: shinkanModule,
-    title: titleModule,
     event: {
       namespaced: true,
       ...eventModule,
