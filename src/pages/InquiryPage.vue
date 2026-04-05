@@ -23,4 +23,22 @@
   </v-main>
 </template>
 
-<script setup></script>
+<script setup>
+import { ref } from 'vue'
+import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
+
+useFirebasePageView('view_inquiry', {})
+
+const name = ref('')
+const email = ref('')
+const content = ref('')
+
+const submitInquiry = () => {
+  void logFirebaseAnalyticsEvent('inquiry_submit_click', {
+    hasName: !!name.value,
+    hasEmail: !!email.value,
+    hasContent: !!content.value,
+  })
+}
+</script>

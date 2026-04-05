@@ -119,10 +119,14 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { registerAllGroupsService } from '@/services/groupService'
+import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import {
   getProveOwnerApplicantsService,
   updateProveOwnerApprovalService,
 } from '@/services/proveService'
+
+useFirebasePageView('view_admin', {})
 
 const applicants = ref([])
 const isLoading = ref(false)
@@ -196,6 +200,10 @@ const toggleApproval = async (applicationId, nextValue) => {
   try {
     updatingUserId.value = applicationId
     await updateProveOwnerApprovalService(applicationId, nextValue)
+    void logFirebaseAnalyticsEvent('admin_approval_toggle', {
+      applicationId,
+      approved: nextValue,
+    })
     showSnackbar('success', nextValue ? '承認しました' : '非承認に変更しました')
   } catch (error) {
     targetApplicant.isOfficial = previousValue

@@ -122,9 +122,14 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { useStore } from 'vuex'
+import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { getProveOwnerApplicantService } from '@/services/proveService'
 
 const store = useStore()
+
+useFirebasePageView('view_prove_owner_description', {})
+
 const applicant = ref(null)
 const userId = computed(() => store.getters['auth/userId'])
 const isLoading = ref(false)
@@ -156,6 +161,7 @@ const copyTempId = async () => {
   try {
     const tempId = applicant.value?.proveOwnerApplication?.tempId
     if (tempId) {
+      void logFirebaseAnalyticsEvent('prove_owner_description_copy_temp_id', {})
       await navigator.clipboard.writeText(tempId)
       copied.value = true
       setTimeout(() => {
@@ -172,6 +178,15 @@ const copyTempId = async () => {
 }
 
 const openLink = (url) => {
+  void logFirebaseAnalyticsEvent('prove_owner_description_external_link', {
+    linkDomain: (() => {
+      try {
+        return new URL(url).hostname
+      } catch {
+        return 'unknown'
+      }
+    })(),
+  })
   window.open(url, '_blank')
 }
 

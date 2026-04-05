@@ -52,6 +52,8 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { resetPassword } from '@/services/authService'
 
 const newPassword = ref('')
@@ -70,6 +72,8 @@ const snackbar = ref({
 const route = useRoute()
 const router = useRouter()
 
+useFirebasePageView('view_reset_password', {})
+
 const required = (value) => !!value || 'このフィールドは必須です。'
 const passwordMatch = (value) => value === newPassword.value || 'パスワードが一致しません。'
 
@@ -87,6 +91,8 @@ const onSubmit = async () => {
     isLoading.value = true
     await resetPassword(oobCode.value, newPassword.value)
 
+    void logFirebaseAnalyticsEvent('reset_password_submit_success', {})
+
     snackbar.value = {
       show: true,
       color: 'success',
@@ -97,6 +103,9 @@ const onSubmit = async () => {
       router.push('/login')
     }, 2000)
   } catch (error) {
+    void logFirebaseAnalyticsEvent('reset_password_submit_error', {
+      errorCode: String(error?.code || 'unknown'),
+    })
     snackbar.value = {
       show: true,
       color: 'error',

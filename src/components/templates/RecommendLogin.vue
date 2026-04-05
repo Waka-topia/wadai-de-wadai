@@ -15,16 +15,27 @@
       prepend-icon="mdi-email"
       rounded
       size="x-large"
-      @click="router.push('/login')"
+      @click="goLogin"
     >
       メールアドレスでログイン
     </v-btn>
-    <v-btn size="large" variant="plain" @click="router.push('/signup')">アカウントを作成</v-btn>
+    <v-btn size="large" variant="plain" @click="goSignup">アカウントを作成</v-btn>
   </div>
 </template>
 
 <script setup>
 import { useRouter } from 'vue-router'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 
 const router = useRouter()
+
+const goLogin = () => {
+  void logFirebaseAnalyticsEvent('recommend_login_click', { destination: 'login' })
+  router.push('/login')
+}
+
+const goSignup = () => {
+  void logFirebaseAnalyticsEvent('recommend_login_click', { destination: 'signup' })
+  router.push('/signup')
+}
 </script>

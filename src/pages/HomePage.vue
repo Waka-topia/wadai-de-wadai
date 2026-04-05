@@ -5,6 +5,7 @@
       class="mb-4 rounded-xl elevation-2 syllabus-banner"
       to="/syllabus-search"
       :ripple="true"
+      @click="logSyllabusBannerClick"
     >
       <v-card-text class="d-flex align-center pa-4">
         <v-avatar color="teal-lighten-4" size="48" class="mr-4">
@@ -32,11 +33,19 @@
 </template>
 
 <script setup>
+import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import TrainInfo from '@/components/home/TrainInfo.vue'
 import BusInfo from '@/components/home/BusInfo.vue'
 import CampusMap from '@/components/home/CampusMap.vue'
 import OtherFunctions from '@/components/home/OtherFunctions.vue'
 import WakayamaMatch from '@/components/home/WakayamaMatch.vue'
+
+useFirebasePageView('view_home', {})
+
+const logSyllabusBannerClick = () => {
+  void logFirebaseAnalyticsEvent('home_syllabus_search_banner_click', {})
+}
 </script>
 
 <style scoped>

@@ -1,10 +1,5 @@
 <template>
-  <v-card
-    class="recruit-job-card mb-4 mx-5 mt-5"
-    rounded="lg"
-    elevation="1"
-    @click="router.push(`/jobs/${job.id}`)"
-  >
+  <v-card class="recruit-job-card mb-4 mx-5 mt-5" rounded="lg" elevation="1" @click="goToJobDetail">
     <div class="placeholder-image d-flex align-center justify-center position-relative">
       <v-img
         v-if="job.cardThumbnail"
@@ -58,16 +53,22 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import BookMarkButton from './BookMarkButton.vue'
 
 const router = useRouter()
 
-defineProps({
+const props = defineProps({
   job: {
     type: Object,
     required: true,
   },
 })
+
+const goToJobDetail = () => {
+  void logFirebaseAnalyticsEvent('recruit_job_card_click', { jobId: props.job.id })
+  router.push(`/jobs/${props.job.id}`)
+}
 </script>
 
 <style scoped>

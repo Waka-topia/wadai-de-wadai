@@ -8,7 +8,7 @@
       rounded="pill"
       class="font-weight-bold"
       :class="{ 'active-btn': currentSortKey === option.value }"
-      @click="currentSortKey = option.value"
+      @click="setSortKey(option.value)"
     >
       {{ option.label }}
     </v-btn>
@@ -18,6 +18,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useStore } from 'vuex'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 
 const store = useStore()
 
@@ -29,6 +30,11 @@ const currentSortKey = computed({
     }
   },
 })
+
+const setSortKey = (value) => {
+  void logFirebaseAnalyticsEvent('recruit_sort_change', { sortKey: value })
+  currentSortKey.value = value
+}
 
 const sortOptions = [
   { value: 'newest', label: '新着順' },

@@ -16,7 +16,11 @@
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+import { useFirebasePageView } from '@/composables/useFirebasePageView'
+
+useFirebasePageView('view_jobs_work_in_progress', {})
+</script>
 
 <style scoped>
 .work-in-progress-container {

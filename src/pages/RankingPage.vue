@@ -19,8 +19,12 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import RankingList from '@/components/user-ranking/RankingList.vue'
 import rankingService from '@/services/rankingService'
+
+useFirebasePageView('view_ranking', {})
 
 const snackbar = ref({
   show: false,
@@ -34,6 +38,7 @@ const isLoading = ref(false)
 const updateRanking = async () => {
   try {
     isLoading.value = true
+    void logFirebaseAnalyticsEvent('ranking_refresh_click', {})
     await rankingService.updateTop100()
     renderKey.value += 1
     snackbar.value = {

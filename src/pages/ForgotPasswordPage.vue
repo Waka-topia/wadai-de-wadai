@@ -43,6 +43,8 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { sendPasswordReset } from '@/services/authService'
 
 const email = ref('')
@@ -56,9 +58,12 @@ const snackbar = ref({
 
 const router = useRouter()
 
+useFirebasePageView('view_forgot_password', {})
+
 const required = (value) => !!value || 'このフィールドは必須です。'
 
 const onBack = () => {
+  void logFirebaseAnalyticsEvent('forgot_password_back_click', {})
   router.push('/login')
 }
 
@@ -66,6 +71,8 @@ const onSubmit = async () => {
   try {
     isLoading.value = true
     await sendPasswordReset(email.value)
+
+    void logFirebaseAnalyticsEvent('forgot_password_submit_success', {})
 
     snackbar.value = {
       show: true,
@@ -77,6 +84,9 @@ const onSubmit = async () => {
       router.push('/login')
     }, 3000)
   } catch (error) {
+    void logFirebaseAnalyticsEvent('forgot_password_submit_error', {
+      errorCode: String(error?.code || 'unknown'),
+    })
     snackbar.value = {
       show: true,
       color: 'error',

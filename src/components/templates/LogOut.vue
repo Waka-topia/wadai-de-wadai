@@ -19,7 +19,7 @@
           block
           elevation="0"
           size="large"
-          @click="$router.push('/login')"
+          @click="goLoginFromMenu"
         >
           <v-icon> mdi-login </v-icon>
           ログイン
@@ -48,9 +48,15 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 
 const router = useRouter()
 const store = useStore()
+
+const goLoginFromMenu = () => {
+  void logFirebaseAnalyticsEvent('menu_login_click', {})
+  router.push('/login')
+}
 
 const user = computed(() => store.getters['auth/user'])
 
@@ -62,6 +68,7 @@ const snackbar = ref({
 
 const onLogout = async (isActive) => {
   try {
+    void logFirebaseAnalyticsEvent('menu_logout_confirm', {})
     await store.dispatch('auth/logout')
     await store.dispatch('auth/initializeAuth')
     sessionStorage.removeItem('user')

@@ -48,6 +48,7 @@
 
 <script setup>
 import { ref } from 'vue'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 
 const snackbar = ref({
   show: false,
@@ -56,6 +57,7 @@ const snackbar = ref({
 })
 
 const onFilterClick = (filterType) => {
+  void logFirebaseAnalyticsEvent('recruit_filter_click', { filterType })
   try {
     snackbar.value = {
       show: true,
@@ -72,6 +74,7 @@ const onFilterClick = (filterType) => {
 }
 
 const onSearch = () => {
+  void logFirebaseAnalyticsEvent('recruit_search_icon_click', {})
   try {
     snackbar.value = {
       show: true,

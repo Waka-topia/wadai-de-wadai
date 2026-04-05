@@ -11,9 +11,15 @@
 <script setup>
 import { computed } from 'vue'
 import { useStore } from 'vuex'
+import { useFirebasePageView } from '@/composables/useFirebasePageView'
 import QrScannerComponent from '@/components/templates/QRScanner.vue'
 import RecommendLogin from '@/components/templates/RecommendLogin.vue'
 
 const store = useStore()
+
+useFirebasePageView('view_reader', () => ({
+  authenticated: store.getters['auth/isAuthenticated'],
+}))
+
 const isAuthenticated = computed(() => store.getters['auth/isAuthenticated'])
 </script>
