@@ -7,7 +7,10 @@
       <h1 class="text-h5 font-weight-bold mb-3">団体・代表者としての認証</h1>
       <p class="text-body-2 text-grey-darken-2" style="line-height: 1.6">
         ここのページでは、自分たちの団体のメンバーとして登録・認証が行えます。<br />
-        認証が完了すると、<span class="font-weight-bold text-orange">代理登録された新歓情報の引き継ぎ</span>や、新しいイベントを<span class="font-weight-bold text-orange">公式マーク付き</span>で掲載できるようになります！
+        認証が完了すると、<span class="font-weight-bold text-orange"
+          >代理登録された新歓情報の引き継ぎ</span
+        >や、新しいイベントを<span class="font-weight-bold text-orange">公式マーク付き</span
+        >で掲載できるようになります！
       </p>
     </div>
 

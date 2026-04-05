@@ -73,8 +73,8 @@
     />
 
     <v-btn type="submit" color="orange" block size="large" class="text-white font-weight-bold mt-2">
-      <v-icon start>mdi-check-circle</v-icon>
-      イベントを登録
+      <v-icon start>{{ isEditMode ? 'mdi-update' : 'mdi-check-circle' }}</v-icon>
+      {{ isEditMode ? 'イベントを更新' : 'イベントを登録' }}
     </v-btn>
     <div class="text-center pt-4">
       <v-btn
@@ -96,12 +96,22 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { allGroups } from '@/data/groups'
 import { required } from '@/utils/forms/validate'
+
+const props = defineProps({
+  /** 編集時の初期データ（新規登録時はnull） */
+  initialEvent: {
+    type: Object,
+    default: null,
+  },
+})
+
+const emit = defineEmits(['success', 'cancel'])
 
 const store = useStore()
 const router = useRouter()
@@ -111,6 +121,8 @@ const goProveOwnerFromEventForm = () => {
   router.push('/prove-owner')
 }
 
+const isEditMode = computed(() => !!props.initialEvent)
+
 const newEvent = ref({
   date: '',
   startTime: '',
@@ -119,6 +131,29 @@ const newEvent = ref({
   description: '',
   organizerName: '',
 })
+
+/** 初期入力を初期イベントから同期する */
+const syncInitialData = () => {
+  if (props.initialEvent) {
+    newEvent.value = {
+      date: props.initialEvent.date || '',
+      startTime: props.initialEvent.startTime || '',
+      endTime: props.initialEvent.endTime || '',
+      location: props.initialEvent.location || '',
+      description: props.initialEvent.description || '',
+      organizerName: props.initialEvent.organizerName || '',
+    }
+  }
+}
+
+// 初期化時とプロパティ変更時に同期を実行
+watch(
+  () => props.initialEvent,
+  () => {
+    syncInitialData()
+  },
+  { immediate: true, deep: true },
+)
 
 const snackbar = ref({
   show: false,
@@ -144,19 +179,32 @@ const submitEvent = async (validationPromise) => {
       organizationId: String(selectedGroup.id),
     }
 
-    await store.dispatch('event/createEvent', {
-      eventData,
-      currentUserId,
-      currentUserName,
-    })
-    void logFirebaseAnalyticsEvent('event_form_submit_success', {
-      organizationId: eventData.organizationId,
-    })
+    if (isEditMode.value) {
+      await store.dispatch('event/updateEvent', {
+        eventData,
+        currentUserId,
+      })
+    } else {
+      await store.dispatch('event/createEvent', {
+        eventData,
+        currentUserId,
+        currentUserName,
+      })
+    }
+    void logFirebaseAnalyticsEvent(
+      isEditMode.value ? 'event_form_update_success' : 'event_form_submit_success',
+      {
+        organizationId: eventData.organizationId,
+      },
+    )
     snackbar.value = {
       show: true,
       color: 'success',
-      message: 'イベントが正常に登録されました！',
+      message: isEditMode.value ? 'イベントを更新しました！' : 'イベントが正常に登録されました！',
     }
+
+    // 成功イベントを通知（ダイアログを閉じるためなど）
+    emit('success')
   } catch (error) {
     void logFirebaseAnalyticsEvent('event_form_submit_error', {})
     snackbar.value = {

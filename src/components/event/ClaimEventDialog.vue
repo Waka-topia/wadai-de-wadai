@@ -56,7 +56,9 @@
       <div v-else>
         <v-card-text class="pa-5">
           <p class="text-body-2 mb-4">
-            この機能を利用するには、あなたが <strong>{{ eventOrganizer }}</strong> の公式メンバー（代表者）であることの認証が必要です。
+            この機能を利用するには、あなたが
+            <strong>{{ eventOrganizer }}</strong>
+            の公式メンバー（代表者）であることの認証が必要です。
           </p>
           <p class="text-body-2 text-grey-darken-1 mb-0">
             認証ページへ移動して手続きを行いますか？

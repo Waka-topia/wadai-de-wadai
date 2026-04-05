@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import store from '@/store'
 import { adminUserId } from '@/config/constants'
+import store from '@/store'
 
 /** ルート定義 各ページコンポーネントは動的インポートでコード分割 */
 const routes = [

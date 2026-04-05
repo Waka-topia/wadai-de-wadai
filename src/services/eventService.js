@@ -8,9 +8,10 @@ import {
   setDoc,
 } from 'firebase/firestore'
 import { v4 as uuidv4 } from 'uuid'
-import { db } from '@/firebase/config'
-import { isUserRepresentative } from '@/services/groupService'
 import { adminUserId, officialEventPriority } from '@/config/constants'
+import { db } from '@/firebase/config'
+import { hashValue } from '@/utils/crypto'
+import { isUserRepresentative } from '@/services/groupService'
 
 /**
  * Groupsコレクションの代表者リストから公式認証ステータスを解決する
@@ -71,10 +72,11 @@ export const transferEventOwnershipService = async (
     // 3. 月別ドキュメント内のイベントを更新（トランザクション使用）
     const monthKey =
       event.date && event.date.length >= 7 ? event.date.substring(0, 7) : 'unknown_month'
-    const monthDocRef = doc(db, 'events_monthly', monthKey)
+    const monthDocRef = doc(db, 'events_monthly_hashed', monthKey)
 
+    const hashedNewOwnerId = await hashValue(newOwnerUserId)
     const updatedFields = {
-      createdBy: newOwnerUserId,
+      createdBy: hashedNewOwnerId,
       createdByName: newOwnerName || '匿名ユーザー',
       isOfficial: true,
       role: 'official',
@@ -125,10 +127,11 @@ export const addEventService = async (eventData, userId, userName) => {
 
     // FireBaseに保存するイベントデータに必要なフィールドを追加
     const eventId = uuidv4()
+    const hashedUserId = await hashValue(userId)
     const createdEvent = {
       ...eventData,
       eventId,
-      createdBy: userId,
+      createdBy: hashedUserId,
       createdByName: userName || '匿名ユーザー',
       role,
       isOfficial,
@@ -140,7 +143,7 @@ export const addEventService = async (eventData, userId, userName) => {
     const monthKey = dateStr.length >= 7 ? dateStr.substring(0, 7) : 'unknown_month'
 
     // 該当月のドキュメントへの参照
-    const monthDocRef = doc(db, 'events_monthly', monthKey)
+    const monthDocRef = doc(db, 'events_monthly_hashed', monthKey)
 
     // merge: true を指定することで、ドキュメントが存在しない場合は新規作成し、
     // 存在する場合は既存データを上書きせずに events 配列にだけ追加 (arrayUnion) します。
@@ -166,7 +169,7 @@ export const addEventService = async (eventData, userId, userName) => {
  */
 export const getEventsService = async () => {
   try {
-    const eventsSnapshot = await getDocs(collection(db, 'events_monthly'))
+    const eventsSnapshot = await getDocs(collection(db, 'events_monthly_hashed'))
     let allEvents = []
 
     eventsSnapshot.docs.forEach((docSnap) => {
@@ -192,7 +195,7 @@ export const getEventsService = async () => {
  */
 export const getEventsByMonthService = async (monthKey) => {
   try {
-    const docRef = doc(db, 'events_monthly', monthKey)
+    const docRef = doc(db, 'events_monthly_hashed', monthKey)
     const docSnap = await getDoc(docRef)
 
     if (docSnap.exists()) {
@@ -216,7 +219,7 @@ export const getEventsByMonthService = async (monthKey) => {
  */
 export const getEventService = async (eventId) => {
   try {
-    const eventsSnapshot = await getDocs(collection(db, 'events_monthly'))
+    const eventsSnapshot = await getDocs(collection(db, 'events_monthly_hashed'))
 
     // 全ての月別ドキュメントの中から、該当のイベントIDを持つデータを探す
     for (const docSnap of eventsSnapshot.docs) {
@@ -258,13 +261,28 @@ const verifyEventOwnership = async (eventId, userId) => {
     throw new Error('このイベントは旧方式データのため編集・削除できません')
   }
 
-  if (event.createdBy === adminUserId) {
+  const hashedUserId = await hashValue(userId)
+  const hashedAdminId = await hashValue(adminUserId)
+
+  // 1. 運営アカウント（管理者）は全許可
+  if (event.createdBy === hashedAdminId) {
     return
   }
 
-  if (event.createdBy !== userId) {
-    throw new Error('このイベントを操作する権限がありません')
+  // 2. 作成者本人なら許可
+  if (event.createdBy === hashedUserId) {
+    return
   }
+
+  // 3. 公式イベントの場合、その団体の代表者なら許可
+  if (event.isOfficial && event.organizationId) {
+    const isRep = await isUserRepresentative(event.organizationId, userId)
+    if (isRep) {
+      return
+    }
+  }
+
+  throw new Error('このイベントを操作する権限がありません')
 }
 
 /**
@@ -287,8 +305,8 @@ export const updateEventService = async (eventId, eventData, userId) => {
         ? eventData.date.substring(0, 7)
         : 'unknown_month'
 
-    const oldMonthDocRef = doc(db, 'events_monthly', oldMonthKey)
-    const newMonthDocRef = doc(db, 'events_monthly', newMonthKey)
+    const oldMonthDocRef = doc(db, 'events_monthly_hashed', oldMonthKey)
+    const newMonthDocRef = doc(db, 'events_monthly_hashed', newMonthKey)
 
     await runTransaction(db, async (transaction) => {
       if (oldMonthKey === newMonthKey) {
@@ -367,7 +385,7 @@ export const deleteEventService = async (eventId, userId) => {
     const event = await getEventService(eventId)
     const monthKey =
       event.date && event.date.length >= 7 ? event.date.substring(0, 7) : 'unknown_month'
-    const monthDocRef = doc(db, 'events_monthly', monthKey)
+    const monthDocRef = doc(db, 'events_monthly_hashed', monthKey)
 
     // 3. トランザクションの実行
     await runTransaction(db, async (transaction) => {

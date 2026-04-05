@@ -129,8 +129,19 @@ const actions = {
   async updateEvent({ commit, state }, { eventData, currentUserId }) {
     try {
       commit('setError', null)
-      await updateEventService(state.currentEvent.eventId, eventData, currentUserId)
-      commit('setCurrentEvent', { ...state.currentEvent, ...eventData })
+      const targetEvent = state.event || state.currentEvent
+      if (!targetEvent || !targetEvent.eventId) {
+        throw new Error('更新対象のイベントIDが見つかりません。')
+      }
+
+      await updateEventService(targetEvent.eventId, eventData, currentUserId)
+
+      const updatedEvent = { ...targetEvent, ...eventData }
+      // 詳細表示用ステートの更新
+      commit('setEvent', updatedEvent)
+      commit('setCurrentEvent', updatedEvent)
+      // 一覧リストのキャッシュ更新
+      commit('updateEventInList', updatedEvent)
     } catch (error) {
       commit('setError', error.message)
       throw error
@@ -225,14 +236,14 @@ const mutations = {
   },
   updateEventInList(state, updatedEvent) {
     const index = state.events.findIndex(
-      (e) => e.eventId === updatedEvent.eventId || e.original_doc_id === updatedEvent.eventId
+      (e) => e.eventId === updatedEvent.eventId || e.original_doc_id === updatedEvent.eventId,
     )
     if (index !== -1) {
       // 既存の配列を破壊せずに新しいオブジェクトをセットしてリアクティビティを保つ
       state.events = [
         ...state.events.slice(0, index),
         updatedEvent,
-        ...state.events.slice(index + 1)
+        ...state.events.slice(index + 1),
       ]
     }
   },

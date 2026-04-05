@@ -1,33 +1,60 @@
 <template>
   <div class="event-list">
     <!-- 団体代表者向け告知バナー -->
-    <v-alert
+    <v-card
       v-if="showClaimBanner"
-      variant="tonal"
-      color="orange"
-      closable
-      class="mx-4 mt-4 mb-0"
+      class="claim-banner mx-4 mt-4 mb-0"
       rounded="lg"
-      @click:close="dismissBanner"
+      variant="outlined"
+      color="orange"
     >
-      <template #prepend>
-        <v-icon>mdi-bullhorn</v-icon>
-      </template>
-      <p class="text-body-2 font-weight-bold mb-1">新歓イベントの管理者を募集中！</p>
-      <p class="text-caption mb-2">
-        代表者証明で公式マーク付き＆上位表示。代理登録されたイベントを引き継いで自由に管理できます。
-      </p>
-      <v-btn
-        size="small"
-        color="orange"
-        variant="flat"
-        class="text-white font-weight-bold"
-        to="/prove-owner"
-        @click="onBannerCtaClick"
-      >
-        代表者証明をする
-      </v-btn>
-    </v-alert>
+      <v-card-text class="pa-4">
+        <div class="d-flex align-center justify-space-between mb-3">
+          <div class="d-flex align-center">
+            <v-avatar color="orange" size="36" class="mr-3">
+              <v-icon color="white" size="20">mdi-bullhorn</v-icon>
+            </v-avatar>
+            <p class="text-body-1 font-weight-bold mb-0">団体の代表者さんへ</p>
+          </div>
+          <v-btn icon size="x-small" variant="text" @click="dismissBanner">
+            <v-icon size="18">mdi-close</v-icon>
+          </v-btn>
+        </div>
+
+        <div class="d-flex ga-3 mb-3 banner-steps">
+          <div class="banner-step">
+            <v-icon size="20" color="orange" class="mb-1">mdi-account-check</v-icon>
+            <p class="text-caption font-weight-bold mb-0">代表者証明</p>
+          </div>
+          <v-icon size="16" color="grey-lighten-1" class="align-self-center">
+            mdi-chevron-right
+          </v-icon>
+          <div class="banner-step">
+            <v-icon size="20" color="blue" class="mb-1">mdi-check-decagram</v-icon>
+            <p class="text-caption font-weight-bold mb-0">公式マーク</p>
+          </div>
+          <v-icon size="16" color="grey-lighten-1" class="align-self-center">
+            mdi-chevron-right
+          </v-icon>
+          <div class="banner-step">
+            <v-icon size="20" color="green" class="mb-1">mdi-arrow-up-bold-circle</v-icon>
+            <p class="text-caption font-weight-bold mb-0">上位表示</p>
+          </div>
+        </div>
+
+        <v-btn
+          color="orange"
+          variant="flat"
+          block
+          class="text-white font-weight-bold"
+          to="/prove-owner"
+          @click="onBannerCtaClick"
+        >
+          <v-icon start>mdi-arrow-right-circle</v-icon>
+          代表者証明を始める
+        </v-btn>
+      </v-card-text>
+    </v-card>
 
     <VueCal
       class="vuecal"
@@ -43,18 +70,27 @@
       @cell-click="onCellClick"
     ></VueCal>
 
-    <v-divider class="my-5"></v-divider>
+    <v-divider class="my-4"></v-divider>
 
     <v-btn class="font-weight-bold set-today-btn" rounded variant="outlined" @click="setToday">
-      <v-icon left>mdi-calendar-today</v-icon>
+      <v-icon start size="18">mdi-calendar-today</v-icon>
       今日の新歓イベント
     </v-btn>
 
-    <div class="nav-buttons">
-      <button class="nav-btn" @click="changeDate(-1)">&#x3C;</button>
-      <h3 class="title">{{ selectedDate }} の新歓イベント</h3>
-      <button class="nav-btn" @click="changeDate(1)">&#x3E;</button>
+    <!-- 改善された日付ナビゲーション -->
+    <div class="date-nav">
+      <v-btn icon variant="text" size="small" @click="changeDate(-1)">
+        <v-icon>mdi-chevron-left</v-icon>
+      </v-btn>
+      <div class="date-display">
+        <v-icon size="18" color="orange" class="mr-2">mdi-calendar</v-icon>
+        <span class="text-body-1 font-weight-bold">{{ formattedDate }}</span>
+      </div>
+      <v-btn icon variant="text" size="small" @click="changeDate(1)">
+        <v-icon>mdi-chevron-right</v-icon>
+      </v-btn>
     </div>
+
     <EventSchedule v-model:selected-date="selectedDate" />
 
     <EditEventFormButton />
@@ -92,6 +128,16 @@ const dismissBanner = () => {
 const onBannerCtaClick = () => {
   void logFirebaseAnalyticsEvent('event_claim_banner_cta_click', {})
 }
+
+/** 選択中の日付を日本語フォーマットで表示する */
+const formattedDate = computed(() => {
+  const d = new Date(selectedDate.value)
+  const month = d.getMonth() + 1
+  const day = d.getDate()
+  const weekdays = ['日', '月', '火', '水', '木', '金', '土']
+  const weekday = weekdays[d.getDay()]
+  return `${month}月${day}日（${weekday}）の新歓イベント`
+})
 
 const events = computed(() => {
   const storeEvents = store.getters['event/allEvents']
@@ -165,29 +211,39 @@ onMounted(() => {
 </script>
 
 <style>
-/* --- レイアウト（既存） --- */
+/* --- レイアウト --- */
 .event-list {
   height: 100%;
 }
 
-.nav-buttons {
+/* --- バナーステップ --- */
+.banner-steps {
+  justify-content: center;
+}
+
+.banner-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 64px;
+}
+
+/* --- 日付ナビゲーション --- */
+.date-nav {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  margin-bottom: 10px;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 0 16px;
 }
 
-.nav-btn {
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-
-.nav-btn:hover {
-  color: #ff9800;
+.date-display {
+  display: flex;
+  align-items: center;
+  background: #fff8e1;
+  border-radius: 20px;
+  padding: 6px 16px;
 }
 
 /* --- VueCal コンテナ --- */

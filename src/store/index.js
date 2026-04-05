@@ -3,11 +3,11 @@ import authModule from './modules/auth'
 import eventModule from './modules/event'
 import jobsModule from './modules/jobs'
 import locationModule from './modules/location'
+import proveModule from './modules/prove'
 import ratingModule from './modules/rating'
 import scrollModule from './modules/scroll'
 import timetableModule from './modules/timetable'
 import userModule from './modules/user'
-import proveModule from './modules/prove'
 
 export default createStore({
   state: {},
