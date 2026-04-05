@@ -1,9 +1,8 @@
 /**
- * 文字列を SHA-256 でハッシュ化する
- * (Web Crypto API を使用)
+ * 文字列を SHA-256 でハッシュ化する (Web Crypto API を使用)
  *
  * @param {string} val ハッシュ化する文字列
- * @returns {Promise<string|null>} ハッシュ化された16進数文字列
+ * @returns {Promise<string | null>} ハッシュ化された16進数文字列
  */
 export const hashValue = async (val) => {
   if (val === null || val === undefined) {
