@@ -1,6 +1,6 @@
 <template>
   <v-form class="pa-4" @submit.prevent="submitEvent">
-    <v-select
+    <v-autocomplete
       v-model="newEvent.organizerName"
       :items="allGroups"
       item-title="name"
@@ -11,6 +11,8 @@
       :rules="[required]"
       persistent-hint
       prepend-inner-icon="mdi-domain"
+      no-data-text="団体が見つかりません。一覧から選択するか正しい名称を入力してください。"
+      clearable
     />
 
     <v-text-field

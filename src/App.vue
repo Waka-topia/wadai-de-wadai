@@ -58,18 +58,24 @@ const isEventCalPage = ref(false)
 const isFullscreenPage = ref(false)
 
 const routeTitleMap = {
-  '/': 'ホーム',
-  '/login': 'ログイン',
-  '/signup': 'サインアップ',
-  '/mypage': 'マイページ',
-  '/eventcal': '新歓日程',
-  '/inquiry': 'お問い合わせ',
-  '/rule': '利用規約',
-  '/map': 'マップ',
-  '/jobs': '求人情報',
-  '/timetable': '時間割',
-  '/forgot-password': 'パスワードリセット',
-  '/reset-password': 'パスワードリセット',
+  Home: 'ホーム',
+  LoginPage: 'ログイン',
+  SignupPage: 'サインアップ',
+  MyPage: 'マイページ',
+  EventCal: '新歓日程',
+  EventDetail: '新歓詳細',
+  InquiryPage: 'お問い合わせ',
+  Rule: '利用規約',
+  Map: 'マップ',
+  RecruitPage: '求人情報',
+  JobDetailPage: '求人詳細',
+  Timetable: '時間割',
+  ForgotPasswordPage: 'パスワードリセット',
+  ResetPasswordPage: 'パスワードリセット',
+  SyllabusSearch: 'シラバス検索',
+  ProveOwner: '代表者認証',
+  ProveOwnerDescription: '認証の手引',
+  Admin: '管理画面',
 }
 
 /**
@@ -78,7 +84,7 @@ const routeTitleMap = {
  * @param {object} currentRoute
  */
 const updateTitle = (currentRoute) => {
-  title.value = routeTitleMap[currentRoute.path] || ''
+  title.value = routeTitleMap[currentRoute.name] || ''
 }
 
 /**

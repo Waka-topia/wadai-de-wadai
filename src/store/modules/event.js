@@ -3,6 +3,7 @@ import {
   deleteEventService,
   getEventsByMonthService, // getEventsServiceから変更
   getEventService,
+  transferEventOwnershipService,
   updateEventService,
 } from '@/services/eventService'
 
@@ -158,6 +159,35 @@ const actions = {
   },
 
   /**
+   * 運営が代理登録したイベントの管理権限を引き継ぐ
+   *
+   * @param {object} context - Vuexのコンテキストオブジェクト
+   * @param {(type: string, payload?: unknown) => void} context.commit - Mutationをコミットするための関数
+   * @param {object} payload - 引き継ぎに必要な情報
+   * @param {string} payload.eventId - 対象のイベントID
+   * @param {string} payload.currentUserId - 操作ユーザーのID
+   * @param {string} payload.currentUserName - 操作ユーザーの名前
+   * @param {string} payload.organizationId - 団体ID
+   * @returns {Promise<void>}
+   */
+  async transferOwnership({ commit }, { eventId, currentUserId, currentUserName, organizationId }) {
+    try {
+      commit('setError', null)
+      const updatedEvent = await transferEventOwnershipService(
+        eventId,
+        currentUserId,
+        currentUserName,
+        organizationId,
+      )
+      commit('setEvent', updatedEvent)
+      commit('updateEventInList', updatedEvent)
+    } catch (error) {
+      commit('setError', error.message)
+      throw error
+    }
+  },
+
+  /**
    * 編集モードの状態を切り替える
    *
    * @param {object} context - Vuexのコンテキストオブジェクト
@@ -192,6 +222,19 @@ const mutations = {
   },
   setCurrentEvent(state, event) {
     state.currentEvent = event
+  },
+  updateEventInList(state, updatedEvent) {
+    const index = state.events.findIndex(
+      (e) => e.eventId === updatedEvent.eventId || e.original_doc_id === updatedEvent.eventId
+    )
+    if (index !== -1) {
+      // 既存の配列を破壊せずに新しいオブジェクトをセットしてリアクティビティを保つ
+      state.events = [
+        ...state.events.slice(0, index),
+        updatedEvent,
+        ...state.events.slice(index + 1)
+      ]
+    }
   },
   setError(state, error) {
     state.error = error

@@ -76,13 +76,25 @@ service cloud.firestore {
     }
 
     // ============================================================
-    // 承認済み代表者（V2）
+    // 承認済み代表者（V2 - レガシー互換）
     // groupRepresentatives/{groupId_userId}
     // ============================================================
     match /groupRepresentatives/{representativeId} {
       allow read: if request.auth != null;
 
       // 現行の管理画面運用に合わせ、作成/更新/削除は認証済みユーザーに許可
+      allow write: if request.auth != null;
+    }
+
+    // ============================================================
+    // 団体マスターデータ・代表者管理
+    // groups/{groupId}
+    // ============================================================
+    match /groups/{groupId} {
+      // 認証済みユーザーなら誰でも読める（代表者の存在確認に使用）
+      allow read: if request.auth != null;
+
+      // 書き込みは認証済みユーザーに許可（代表者追加・パスワード設定）
       allow write: if request.auth != null;
     }
 

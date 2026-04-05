@@ -7,6 +7,7 @@ import ratingModule from './modules/rating'
 import scrollModule from './modules/scroll'
 import timetableModule from './modules/timetable'
 import userModule from './modules/user'
+import proveModule from './modules/prove'
 
 export default createStore({
   state: {},
@@ -28,5 +29,6 @@ export default createStore({
     location: locationModule,
     rating: ratingModule,
     scroll: scrollModule,
+    prove: proveModule,
   },
 })

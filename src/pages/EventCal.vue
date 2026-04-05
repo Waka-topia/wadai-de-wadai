@@ -1,5 +1,34 @@
 <template>
   <div class="event-list">
+    <!-- 団体代表者向け告知バナー -->
+    <v-alert
+      v-if="showClaimBanner"
+      variant="tonal"
+      color="orange"
+      closable
+      class="mx-4 mt-4 mb-0"
+      rounded="lg"
+      @click:close="dismissBanner"
+    >
+      <template #prepend>
+        <v-icon>mdi-bullhorn</v-icon>
+      </template>
+      <p class="text-body-2 font-weight-bold mb-1">新歓イベントの管理者を募集中！</p>
+      <p class="text-caption mb-2">
+        代表者証明で公式マーク付き＆上位表示。代理登録されたイベントを引き継いで自由に管理できます。
+      </p>
+      <v-btn
+        size="small"
+        color="orange"
+        variant="flat"
+        class="text-white font-weight-bold"
+        to="/prove-owner"
+        @click="onBannerCtaClick"
+      >
+        代表者証明をする
+      </v-btn>
+    </v-alert>
+
     <VueCal
       class="vuecal"
       :disable-views="['years', 'year', 'week', 'day']"
@@ -43,6 +72,26 @@ import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
 
 const store = useStore()
+
+// --- 告知バナーの表示制御 ---
+const bannerDismissedKey = 'event_claim_banner_dismissed'
+const isLoggedIn = computed(() => !!store.getters['auth/userId'])
+const bannerDismissed = ref(localStorage.getItem(bannerDismissedKey) === 'true')
+
+/** バナーを表示するかどうかの判定 ログイン済みかつ、バナーを閉じていない場合に表示 */
+const showClaimBanner = computed(() => isLoggedIn.value && !bannerDismissed.value)
+
+/** バナーを閉じてlocalStorageに記録する */
+const dismissBanner = () => {
+  bannerDismissed.value = true
+  localStorage.setItem(bannerDismissedKey, 'true')
+  void logFirebaseAnalyticsEvent('event_claim_banner_dismiss', {})
+}
+
+/** バナーのCTAボタンクリック時のアナリティクスイベント */
+const onBannerCtaClick = () => {
+  void logFirebaseAnalyticsEvent('event_claim_banner_cta_click', {})
+}
 
 const events = computed(() => {
   const storeEvents = store.getters['event/allEvents']
