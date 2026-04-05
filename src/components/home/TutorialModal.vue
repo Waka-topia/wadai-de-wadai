@@ -61,37 +61,53 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-// 先ほど成功した config のパスから、db と auth の両方を読み込む
 import { db, auth } from '../../firebase/config'
-import { doc, updateDoc } from 'firebase/firestore'
+import { doc, getDoc, updateDoc } from 'firebase/firestore'
+import { onAuthStateChanged } from 'firebase/auth' // 追加
 
 const dialog = ref(false)
 const tutorialDontShowAgain = ref(false)
 
 onMounted(() => {
-  const isHiddenLocal = localStorage.getItem('hide_intro_tutorial')
-  if (!isHiddenLocal) {
-    dialog.value = true
-  }
+  // 1. ログイン状態の変化を監視
+  onAuthStateChanged(auth, async (currentUser) => {
+    if (currentUser) {
+      try {
+        // 2. Firestoreからユーザー設定を取得
+        const userRef = doc(db, 'users', currentUser.uid)
+        const userSnap = await getDoc(userRef)
+
+        if (userSnap.exists()) {
+          const userData = userSnap.data()
+          // 3. データベースのフラグが true でなければ表示
+          if (userData.tutorialDontShowAgain !== true) {
+            dialog.value = true
+          }
+        } else {
+          // ユーザーデータ自体がない（初回ログイン等）場合は表示
+          dialog.value = true
+        }
+      } catch (e) {
+        console.error('[Firebase] Read error:', e)
+        // エラー時は安全のために表示しない、またはデフォルト表示にするか決める
+      }
+    }
+  })
 })
 
 /** チュートリアル終了およびフラグの永続化 */
 const handleTutorialFinish = async () => {
   if (tutorialDontShowAgain.value) {
-    // 1. ローカルストレージに保存
-    localStorage.setItem('hide_intro_tutorial', 'true')
-
-    // 2. Firebase Auth から直接現在のログインユーザーを取得する (推測不要で確実)
     const currentUser = auth.currentUser
 
-    // 認証済みであればFirestoreを更新
     if (currentUser && currentUser.uid) {
       try {
         const userRef = doc(db, 'users', currentUser.uid)
+        // 4. Firestoreのみ更新（localStorageは削除）
         await updateDoc(userRef, {
           tutorialDontShowAgain: true,
         })
-        console.log(`[Firebase] Write success for user: ${currentUser.uid}`)
+        console.log(`[Firebase] Flags updated for user: ${currentUser.uid}`)
       } catch (e) {
         console.error('[Firebase] Write error:', e)
       }
