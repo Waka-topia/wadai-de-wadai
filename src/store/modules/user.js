@@ -57,7 +57,7 @@ const actions = {
       commit('setIsFetchedCurrentUserData', true)
       return user
     } catch (error) {
-      throw new Error(`ユーザーデータの取得に失敗しました。${error.message}`)
+      throw new Error(error.message)
     }
   },
 }

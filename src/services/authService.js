@@ -8,7 +8,7 @@ import {
   signOut,
   updateProfile,
 } from 'firebase/auth'
-import { doc, getDoc, setDoc } from 'firebase/firestore'
+import { deleteDoc, doc, getDoc, setDoc } from 'firebase/firestore'
 import { auth, db } from '@/firebase/config'
 import store from '@/store'
 
@@ -176,13 +176,17 @@ export default {
           error.message = 'ネットワークエラーが発生しました。接続を確認してください。'
           break
       }
-      throw error
+      throw new Error(`ログアウトに失敗しました。${error.message}`)
     }
   },
 
   async deleteAccount() {
     try {
-      await deleteUser(auth.currentUser)
+      const currentUser = auth.currentUser
+      if (!currentUser) throw new Error('ユーザーがログインしていません。')
+
+      await deleteUser(currentUser)
+      await deleteDoc(doc(db, 'users', currentUser.uid))
     } catch (error) {
       switch (error.code) {
         case 'auth/requires-recent-login':
@@ -193,7 +197,7 @@ export default {
           error.message = 'ネットワークエラーが発生しました。接続を確認してください。'
           break
       }
-      throw error
+      throw new Error(`アカウントの削除に失敗しました。${error.message}`)
     }
   },
 
