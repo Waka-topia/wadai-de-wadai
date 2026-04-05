@@ -2,7 +2,7 @@
   <v-progress-linear v-if="isLoading" color="success" indeterminate=""></v-progress-linear>
   <v-sheet class="pa-12" rounded>
     <v-card class="py-8">
-      <v-form v-model="form" @submit.prevent="onSubmit">
+      <v-form @submit.prevent="onSubmit">
         <v-select
           v-model="selectedGroup"
           :items="allGroups"
@@ -13,7 +13,6 @@
           label="団体名"
           variant="outlined"
           density="comfortable"
-          required
           persistent-hint
           prepend-inner-icon="mdi-domain"
         />
@@ -95,7 +94,6 @@ const password = ref('')
 const confirmPassword = ref('')
 const visible = ref(false)
 const confirmVisible = ref(false)
-const form = ref(false)
 const isLoading = ref(false)
 const snackbar = ref({
   show: false,
