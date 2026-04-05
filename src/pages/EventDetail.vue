@@ -362,17 +362,7 @@ const loadEventData = async (id) => {
   } catch (error) {
     fetchErrorMessage.value = error.message
   }
-}
-
-// route.params.id の変更を監視してデータを再取得
-// これにより、同じコンポーネント内での遷移（ラグビー部→アメフト部など）でも正しくリセットされる
-watch(
-  () => route.params.id,
-  (newId) => {
-    loadEventData(newId)
-  },
-  { immediate: true },
-)
+})
 </script>
 
 <style scoped>

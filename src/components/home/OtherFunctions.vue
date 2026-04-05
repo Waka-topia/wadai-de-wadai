@@ -77,11 +77,16 @@ const features = ref([
     url: 'https://www.wakayama-u.ac.jp/',
   },
   {
-    label: 'マップ',
-    icon: 'mdi-map-marker-radius-outline',
+    label: 'グループ',
+    icon: 'mdi-sofa-outline',
     color: 'grey',
-    url: null,
-    isMap: true, // マップアイコンであることを示すフラグ
+    url: 'https://web.wakayama-u.ac.jp/lib/grouproom/',
+  },
+  {
+    label: 'セミナー',
+    icon: 'mdi-sofa-outline',
+    color: 'grey',
+    url: 'http://web.wakayama-u.ac.jp/lib/seminar/',
   },
 ])
 

@@ -1,7 +1,8 @@
 <template>
   <div v-if="isAuthenticated" class="d-flex flex-column justify-center my-10">
-    <ProfileCard :name="displayName" :photo-url-resolved="photoURLResolved" />
+    <ProfileCard />
     <EditForm />
+    <ContactBanner />
   </div>
   <div v-else>
     <RecommendLogin />
@@ -13,6 +14,7 @@ import { computed } from 'vue'
 import { useStore } from 'vuex'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
 import EditForm from '@/components/edit-form/EditForm.vue'
+import ContactBanner from '@/components/my-page/ContactBanner.vue'
 import ProfileCard from '@/components/my-page/ProfileCard.vue'
 import RecommendLogin from '@/components/templates/RecommendLogin.vue'
 
@@ -23,6 +25,4 @@ useFirebasePageView('view_mypage', () => ({
 }))
 
 const isAuthenticated = computed(() => store.getters['auth/isAuthenticated'])
-const photoURLResolved = computed(() => store.getters['auth/photoURLResolved'])
-const displayName = computed(() => store.getters['auth/displayName'])
 </script>

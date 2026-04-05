@@ -8,7 +8,7 @@ import {
   signOut,
   updateProfile,
 } from 'firebase/auth'
-import { doc, getDoc, setDoc } from 'firebase/firestore'
+import { deleteDoc, doc, getDoc, setDoc } from 'firebase/firestore'
 import { auth, db } from '@/firebase/config'
 import store from '@/store'
 
@@ -62,33 +62,6 @@ export const resetPassword = async (oobCode, newPassword) => {
         error.message = 'ネットワークエラーが発生しました。接続を確認してください。'
         break
     }
-    throw error
-  }
-}
-
-/**
- * Firestore から photoURL を取得する関数
- *
- * @param {string} userId - ユーザーID
- * @returns {Promise<string | null>} PhotoURL（存在しない場合は null）
- */
-export async function getPhotoURL(userId) {
-  try {
-    // Firestore の正しいドキュメント参照を作成
-    const docRef = doc(db, `users/${userId}`)
-
-    // ドキュメントを取得
-    const docSnap = await getDoc(docRef)
-
-    if (docSnap.exists()) {
-      const data = docSnap.data()
-      return data.photoURL || null // photoURL を返す（存在しない場合は null）
-    } else {
-      console.log('No such document!')
-      return null
-    }
-  } catch (error) {
-    console.error('Error getting photo URL: ', error)
     throw error
   }
 }
@@ -203,13 +176,17 @@ export default {
           error.message = 'ネットワークエラーが発生しました。接続を確認してください。'
           break
       }
-      throw error
+      throw new Error(`ログアウトに失敗しました。${error.message}`)
     }
   },
 
   async deleteAccount() {
     try {
-      await deleteUser(auth.currentUser)
+      const currentUser = auth.currentUser
+      if (!currentUser) throw new Error('ユーザーがログインしていません。')
+
+      await deleteUser(currentUser)
+      await deleteDoc(doc(db, 'users', currentUser.uid))
     } catch (error) {
       switch (error.code) {
         case 'auth/requires-recent-login':
@@ -220,31 +197,7 @@ export default {
           error.message = 'ネットワークエラーが発生しました。接続を確認してください。'
           break
       }
-      throw error
-    }
-  },
-
-  /**
-   * 画像URLの更新処理 (Authentication と Firestore の両方を更新)
-   *
-   * @param {object} user - Firebase Authentication のユーザーオブジェクト
-   * @param {string} photoURL - 新しい画像のURL
-   * @returns {Promise<void>}
-   */
-  async updatePhotoURL(user, photoURL) {
-    try {
-      // Firebase Authentication のプロフィール情報を更新
-      await updateProfile(user, { photoURL })
-
-      // Firestore の参照先を定義
-      const docRef = doc(db, `users/${user.uid}`)
-      // Firestore に photoURL を保存
-      await setDoc(docRef, { photoURL }, { merge: true })
-
-      console.log('User photo URL updated in Firestore and Authentication:', photoURL)
-    } catch (error) {
-      console.error('Error updating photo URL:', error)
-      throw error
+      throw new Error(`アカウントの削除に失敗しました。${error.message}`)
     }
   },
 

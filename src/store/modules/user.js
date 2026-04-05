@@ -1,10 +1,15 @@
-import { getPhotoURL } from '@/services/authService'
 import { fetchUserData } from '@/services/userService'
 
 const state = () => ({
+  currentUserData: {
+    userName: 'Unknown',
+    email: 'メールアドレスが設定されていません',
+    userId: 'ユーザーIDが設定されていません',
+    userIconUrl: '/src/assets/userIcon/defaultIcon.png',
+  },
+  isFetchedCurrentUserData: false,
   userId: '',
   userDataCache: {},
-  userPhotoURLs: {},
 })
 
 const getCurrentStatus = (state) => {
@@ -26,30 +31,44 @@ const actions = {
       }
 
       // 未取得の場合はデータを取得して状態を更新
-      const userData = await fetchUserData(userId)
-      const userDataPayload = {
+      const user = await fetchUserData(userId)
+      const userData = {
         userId,
-        ...userData,
+        ...user,
       }
-      commit('setCachedUserData', userDataPayload)
-      return userData
+      commit('setCachedUserData', userData)
+      return user
     } catch (error) {
       throw new Error(`ユーザーデータの取得に失敗しました。${error.message}`)
     }
   },
-  async getPhotoURL({ commit }, userId) {
+  async getCurrentUserData({ commit, state }, userId) {
     try {
-      const photoURL = await getPhotoURL(userId)
-      commit('setUserPhotoURL', { userId, photoURL })
-      return photoURL
+      if (!userId) throw new Error('ユーザーIDが不足しています')
+
+      // キャッシュが存在する場合はそれを返す
+      if (state.isFetchedCurrentUserData) return state.currentUserData
+
+      // キャッシュが存在しない場合はFireStoreからフェッチ
+      const user = await fetchUserData(userId)
+
+      // storeの状態を更新
+      commit('setCurrentUserData', user)
+      commit('setIsFetchedCurrentUserData', true)
+      return user
     } catch (error) {
-      console.error('Error fetching photo URL:', error)
-      throw error
+      throw new Error(error.message)
     }
   },
 }
 
 const mutations = {
+  setCurrentUserData(state, userData) {
+    state.currentUserData = userData
+  },
+  setIsFetchedCurrentUserData(state, isFetched) {
+    state.isFetchedCurrentUserData = isFetched
+  },
   setCurrentUserId(state, userId) {
     state.userId = userId
   },
@@ -59,12 +78,10 @@ const mutations = {
       [userId]: userData,
     }
   },
-  setUserPhotoURL(state, { userId, photoURL }) {
-    state.userPhotoURLs[userId] = photoURL
-  },
 }
 
 const getters = {
+  currentUserData: (state) => state.currentUserData,
   isProved: (state) => {
     const currentStatus = getCurrentStatus(state)
     return Boolean(currentStatus?.isProved)
@@ -75,7 +92,6 @@ const getters = {
   },
   isFetched: (state) => Boolean(getCurrentStatus(state)),
   userId: (state) => state.userId,
-  getUserPhotoURL: (state) => (userId) => state.userPhotoURLs[userId] || null,
 }
 
 export default {

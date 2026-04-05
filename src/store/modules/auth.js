@@ -25,12 +25,6 @@ export default {
       state.user = null
       state.idToken = null
       state.userId = null
-      state.belongingOrgs = []
-    },
-    setPhotoURL(state, photoURL) {
-      if (state.user) {
-        state.user.photoURL = photoURL
-      }
     },
   },
   actions: {
@@ -61,10 +55,8 @@ export default {
         commit('setUser', user)
         commit('setIdToken', idToken)
         commit('setUserId', user.uid)
-        console.log('User logged in:', user)
       } catch (error) {
-        console.error('Login failed:', error)
-        throw error
+        throw new Error(error.message)
       }
     },
     async signup({ commit }, { email, password, userName }) {
@@ -75,10 +67,8 @@ export default {
         commit('setIdToken', idToken)
         commit('setUserId', user.uid)
         commit('setUserOrgs', user.belongingOrgs || [])
-        console.log('User signed up:', user)
       } catch (error) {
-        console.error('Sign-up failed:', error)
-        throw error
+        throw new Error(error.message)
       }
     },
     async logout({ commit, dispatch }) {
@@ -86,30 +76,16 @@ export default {
         await authService.logout()
         commit('clearAuthState')
         dispatch('timetable/resetCache', null, { root: true }) // キャッシュをリセット
-        console.log('User logged out')
       } catch (error) {
-        console.error('Logout failed:', error)
-        throw error
+        throw new Error(error.message)
       }
     },
     async deleteAccount({ commit }) {
       try {
         await authService.deleteAccount()
         commit('clearAuthState')
-        console.log('User account deleted')
       } catch (error) {
-        console.error('Delete account failed:', error)
-        throw error
-      }
-    },
-    async updatePhotoURL({ commit, state }, photoURL) {
-      try {
-        await authService.updatePhotoURL(state.user, photoURL)
-        commit('setPhotoURL', photoURL)
-        console.log('Photo URL updated to:', photoURL)
-      } catch (error) {
-        console.error('Error updating photo URL:', error)
-        throw error
+        throw new Error(error.message)
       }
     },
     async saveUserOrgs({ commit, state }, orgs) {
@@ -135,15 +111,6 @@ export default {
     userId: (state) => state.userId,
     email: (state) => state.user?.email || '',
     providerData: (state) => state.user?.providerData || [],
-    photoURL: (state) => state.user?.photoURL || null,
-
-    photoURLResolved: (state) => {
-      if (state.user?.photoURL) {
-        return `/src/assets/${state.user?.photoURL}`
-      } else {
-        return '/src/assets/userIcon/defaultIcon.png'
-      }
-    },
     displayName: (state) => {
       return state.user?.displayName || 'ゲスト'
     },

@@ -7,7 +7,7 @@
         </v-col>
         <v-col>
           <div class="text-subtitle-1 font-weight-medium">ユーザー名</div>
-          <div class="text-body-1">{{ props.displayName }}</div>
+          <div class="text-body-1">{{ props.userName }}</div>
         </v-col>
       </v-row>
     </v-card>
@@ -16,7 +16,7 @@
 
 <script setup>
 const props = defineProps({
-  displayName: {
+  userName: {
     type: String,
     required: true,
   },

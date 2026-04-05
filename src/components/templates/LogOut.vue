@@ -78,7 +78,6 @@ const onLogout = async (isActive) => {
       color: 'success',
       message: 'ログアウトしました',
     }
-    isActive.value = false
 
     setTimeout(() => {
       router.push('/login')
@@ -87,8 +86,10 @@ const onLogout = async (isActive) => {
     snackbar.value = {
       show: true,
       color: 'error',
-      message: `ログアウトに失敗しました: ${error.message}`,
+      message: error.message,
     }
+  } finally {
+    isActive.value = false
   }
 }
 </script>

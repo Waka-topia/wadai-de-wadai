@@ -45,6 +45,13 @@
               代理登録 — 代表者の方はこちら
             </v-chip>
           </div>
+          <p
+            v-if="isProxyEvent(event)"
+            class="text-caption text-grey-darken-1 mt-2 mb-0 proxy-note"
+          >
+            <v-icon size="12" color="grey" class="mr-1">mdi-information-outline</v-icon>
+            Waka-topiaが大学公式情報を元に代理投稿しています。団体の代表者は詳細画面から引き継ぎが可能です。
+          </p>
         </div>
 
         <!-- メインコンテンツ -->
@@ -93,6 +100,19 @@
             </v-icon>
           </div>
         </v-card-text>
+
+        <!-- 代理登録イベント用の引き継ぎCTA -->
+        <div v-if="isProxyEvent(event)" class="claim-cta px-4 pb-3">
+          <v-divider class="mb-3" />
+          <div class="d-flex align-center">
+            <v-icon size="18" color="orange" class="mr-2 pulse-icon"
+              >mdi-hand-pointing-right</v-icon
+            >
+            <span class="text-body-2 font-weight-bold text-orange">
+              タップして引き継ぎ → 公式マーク＆上位表示
+            </span>
+          </div>
+        </div>
       </v-card>
     </div>
   </div>
