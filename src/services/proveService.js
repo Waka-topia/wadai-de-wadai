@@ -1,6 +1,7 @@
 import {
   collection,
   doc,
+  getDoc,
   getDocs,
   limit,
   orderBy,
@@ -11,6 +12,7 @@ import {
 } from 'firebase/firestore'
 import { v4 as uuidv4 } from 'uuid'
 import { db } from '@/firebase/config'
+import { addRepresentativeByApproval } from '@/services/groupService'
 
 /**
  * 代表者証明申請をgroupsコレクションに保存する
@@ -153,17 +155,22 @@ export const updateProveOwnerApprovalService = async (applicationId, isApproved)
     const requestedAt = new Date().toISOString()
     const targetApplicationRef = doc(db, 'proveApplications', applicationId)
 
+    // 先に申請データを取得してトランザクション外で使用する情報を準備
+    const targetApplicationSnapshot = await getDoc(targetApplicationRef)
+
+    if (!targetApplicationSnapshot.exists()) {
+      throw new Error('承認対象の申請が見つかりません')
+    }
+
+    const targetApplicationData = targetApplicationSnapshot.data()
+    if (!['pending', 'inReview'].includes(targetApplicationData.status)) {
+      throw new Error('この申請はすでに審査済みです')
+    }
+
+    // 申請ステータスの更新（トランザクション）
     await runTransaction(db, async (transaction) => {
-      const targetApplicationSnapshot = await transaction.get(targetApplicationRef)
-
-      if (!targetApplicationSnapshot.exists()) {
-        throw new Error('承認対象の申請が見つかりません')
-      }
-
-      const targetApplicationData = targetApplicationSnapshot.data()
-      if (!['pending', 'inReview'].includes(targetApplicationData.status)) {
-        throw new Error('この申請はすでに審査済みです')
-      }
+      const freshSnap = await transaction.get(targetApplicationRef)
+      if (!freshSnap.exists()) throw new Error('承認対象の申請が見つかりません')
 
       transaction.update(targetApplicationRef, {
         status: isApproved ? 'approved' : 'rejected',
@@ -171,7 +178,7 @@ export const updateProveOwnerApprovalService = async (applicationId, isApproved)
         updatedAt: requestedAt,
       })
 
-      // 承認された場合はgroupRepresentativesコレクションに代表者情報を保存する
+      // 後方互換: groupRepresentatives にも書き込み
       if (isApproved) {
         const groupRepresentativeRef = doc(
           db,
@@ -194,6 +201,16 @@ export const updateProveOwnerApprovalService = async (applicationId, isApproved)
         )
       }
     })
+
+    // 承認された場合、新しい groups コレクションにも代表者を追加
+    if (isApproved) {
+      await addRepresentativeByApproval(
+        targetApplicationData.groupId,
+        targetApplicationData.userId,
+        targetApplicationData.userNameSnapshot,
+        targetApplicationData.password,
+      )
+    }
   } catch (error) {
     throw new Error(`承認状態の更新に失敗しました。${error.message}`)
   }

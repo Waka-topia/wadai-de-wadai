@@ -7,17 +7,9 @@ import router from './router'
 import authService from './services/authService'
 import store from './store'
 
-const app = createApp(App)
+let app
 
-// アプリケーションを先にマウント
-app.use(router)
-app.use(store)
-app.config.globalProperties.$authService = authService // authServiceを登録（任意）
-app.use(vuetify)
-setupFirebaseAnalyticsRouter(router) // analyticsのためのルート計測の登録
-app.mount('#app')
-
-// 認証状態を監視
+// 認証状態の初回取得を待機してからアプリケーションをマウント
 authService.onAuthStateChanged(async (user) => {
   if (user) {
     const idToken = await user.getIdToken()
@@ -28,5 +20,16 @@ authService.onAuthStateChanged(async (user) => {
   } else {
     store.commit('auth/clearAuthState')
     console.log('No user authenticated')
+  }
+
+  // 初回のみアプリをマウント
+  if (!app) {
+    app = createApp(App)
+    app.use(router)
+    app.use(store)
+    app.config.globalProperties.$authService = authService // authServiceを登録（任意）
+    app.use(vuetify)
+    setupFirebaseAnalyticsRouter(router) // analyticsのためのルート計測の登録
+    app.mount('#app')
   }
 })

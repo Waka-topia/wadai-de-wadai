@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { adminUserId } from '@/config/constants'
 import store from '@/store'
 
 /** ルート定義 各ページコンポーネントは動的インポートでコード分割 */
@@ -98,6 +99,7 @@ const routes = [
   {
     path: '/admin',
     name: 'Admin',
+    meta: { requiresAdmin: true },
     component: () => import('@/pages/AdminPage.vue'),
   },
 ]
@@ -145,7 +147,7 @@ const router = createRouter({
   },
 })
 
-// ナビゲーションガード: ページを離れる前にスクロール位置を保存
+// ナビゲーションガード: ページを離れる前にスクロール位置を保存し、アクセス制御を実施
 router.beforeEach((to, from, next) => {
   // スクロール位置を保存するページのリスト
   const saveScrollPages = ['/', '/ranking', '/mypage', '/eventcal']
@@ -160,6 +162,20 @@ router.beforeEach((to, from, next) => {
       path: from.path,
       scrollTop,
     })
+  }
+
+  // Adminページのアクセス制御
+  if (to.matched.some((record) => record.meta.requiresAdmin)) {
+    const currentUserId = store.getters['auth/userId']
+    console.log('[DEBUG Admin Guard] currentUserId:', currentUserId)
+    console.log('[DEBUG Admin Guard] adminUserId (from env):', adminUserId)
+    if (currentUserId !== adminUserId) {
+      console.warn('[DEBUG Admin Guard] User is not admin. Redirecting to home.')
+      // 運営アカウントでなければホームにリダイレクト
+      next({ path: '/' })
+      return
+    }
+    console.log('[DEBUG Admin Guard] Access granted.')
   }
 
   next()

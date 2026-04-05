@@ -1,28 +1,14 @@
-import { fetchOrganizationData, submitOwnership } from '@/services/proveService'
+import { addRepresentativeByPassword, hasExistingRepresentatives } from '@/services/groupService'
+import { submitOwnership } from '@/services/proveService'
 
 const state = {
   organizationId: '',
-  proveOwnerStatusCache: {},
   applicants: [],
-}
-
-const getCurrentStatus = (state) => {
-  return state.proveOwnerStatusCache[state.organizationId] || null
 }
 
 const mutations = {
   setCurrentOrganizationId(state, organizationId) {
     state.organizationId = organizationId
-  },
-  setCachedProveOwnerStatus(state, { organizationId, isProvePending, isProved, provedPassword }) {
-    state.proveOwnerStatusCache = {
-      ...state.proveOwnerStatusCache,
-      [organizationId]: {
-        isProvePending,
-        isProved,
-        provedPassword,
-      },
-    }
   },
   setApplicants(state, applicants) {
     state.applicants = applicants
@@ -30,62 +16,61 @@ const mutations = {
 }
 
 const actions = {
-  async fetchProveOwnerStatus({ commit, state }, organizationId) {
+  /**
+   * 初回申請（運営承認が必要なフロー）を提出する
+   *
+   * @param {object} context - Vuexのコンテキストオブジェクト
+   * @param {(type: string, payload?: unknown) => void} context.commit - Mutationをコミットするための関数
+   * @param {object} applicationData - 申請データ
+   * @returns {Promise<object>} 申請結果
+   */
+  async submitInitialApplication({ commit }, applicationData) {
     try {
-      if (!organizationId) return
-
-      commit('setCurrentOrganizationId', organizationId)
-
-      const cachedStatus = state.proveOwnerStatusCache[organizationId]
-
-      // キャッシュが存在する場合はそれを使用して状態を更新
-      if (cachedStatus) {
-        return
-      }
-
-      // 未取得の場合はデータを取得して状態を更新
-      const groupData = await fetchOrganizationData(organizationId)
-      const statusPayload = {
-        organizationId: organizationId,
-        isProvePending: Boolean(groupData.isProvePending),
-        isProved: Boolean(groupData.isProved),
-        provedPassword: groupData.provedPassword || null,
-      }
-
-      commit('setCachedProveOwnerStatus', statusPayload)
-    } catch (error) {
-      throw new Error(`代表者証明の状態の取得に失敗しました。${error.message}`)
-    }
-  },
-  async submitOwnerApprove({ commit }, applicationData) {
-    try {
-      await submitOwnership(applicationData)
-
-      commit('setCachedProveOwnerStatus', applicationData)
+      commit('setCurrentOrganizationId', applicationData.organizationId)
+      const result = await submitOwnership(applicationData)
+      return result
     } catch (error) {
       throw new Error(`代表者証明の申請に失敗しました。${error.message}`)
+    }
+  },
+
+  /**
+   * 後続登録（パスワード認証で即座に登録）を実行する
+   *
+   * @param {object} _context - Vuexのコンテキストオブジェクト（未使用）
+   * @param {object} payload - 登録データ
+   * @param {string} payload.groupId - 団体ID
+   * @param {string} payload.userId - ユーザーID
+   * @param {string} payload.userName - ユーザー名
+   * @param {string} payload.password - パスワード
+   * @returns {Promise<object>} 登録結果
+   */
+  async submitPasswordRegistration(_context, { groupId, userId, userName, password }) {
+    try {
+      const result = await addRepresentativeByPassword(groupId, userId, userName, password)
+      return result
+    } catch (error) {
+      throw new Error(`代表者登録に失敗しました。${error.message}`)
+    }
+  },
+
+  /**
+   * 指定された団体にすでに代表者がいるかを確認する
+   *
+   * @param {object} _context - Vuexのコンテキストオブジェクト（未使用）
+   * @param {string} groupId - 団体ID
+   * @returns {Promise<boolean>} 代表者がいる場合true
+   */
+  async checkExistingRepresentatives(_context, groupId) {
+    try {
+      return await hasExistingRepresentatives(groupId)
+    } catch (error) {
+      throw new Error(`代表者情報の取得に失敗しました。${error.message}`)
     }
   },
 }
 
 const getters = {
-  isProvePending: (state) => {
-    const currentStatus = getCurrentStatus(state)
-    return Boolean(currentStatus?.isProvePending)
-  },
-  isProved: (state) => {
-    const currentStatus = getCurrentStatus(state)
-    return Boolean(currentStatus?.isProved)
-  },
-  isVerifiedPassword: (state) => (password) => {
-    const currentStatus = getCurrentStatus(state)
-    return currentStatus?.provedPassword === password
-  },
-  provedPassword: (state) => {
-    const currentStatus = getCurrentStatus(state)
-    return currentStatus?.provedPassword || null
-  },
-  isFetched: (state) => Boolean(getCurrentStatus(state)),
   organizationId: (state) => state.organizationId,
   applicants: (state) => state.applicants,
 }
