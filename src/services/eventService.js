@@ -60,8 +60,9 @@ export const transferEventOwnershipService = async (
 
     // 2. 対象イベントを取得して検証
     const event = await getEventService(eventId)
+    const hashedAdminId = await hashValue(adminUserId)
 
-    if (event.createdBy !== adminUserId) {
+    if (event.createdBy !== hashedAdminId) {
       throw new Error('このイベントは運営による代理登録ではないため、引き継ぎできません。')
     }
 
