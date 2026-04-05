@@ -11,9 +11,6 @@ import bcrypt from 'bcryptjs'
 import { allGroups } from '@/data/groups'
 import { db } from '@/firebase/config'
 
-// 代表者ステータスのメモリキャッシュ (groupId_userId -> boolean)
-const representativeCache = new Map()
-
 /**
  * Groups.js の団体一覧を Firestore の groups コレクションへ登録する
  *
@@ -232,19 +229,9 @@ export const addRepresentativeByApproval = async (groupId, userId, userName, pas
 export const isUserRepresentative = async (groupId, userId) => {
   if (!groupId || !userId) return false
 
-  // キャッシュチェック
-  const cacheKey = `${groupId}_${userId}`
-  if (representativeCache.has(cacheKey)) {
-    return representativeCache.get(cacheKey)
-  }
-
   const group = await getGroupService(groupId)
   if (!group) return false
 
   const representatives = group.representatives || []
-  const isRep = representatives.some((rep) => rep.userId === userId)
-
-  // 結果をキャッシュに保存
-  representativeCache.set(cacheKey, isRep)
-  return isRep
+  return representatives.some((rep) => rep.userId === userId)
 }
