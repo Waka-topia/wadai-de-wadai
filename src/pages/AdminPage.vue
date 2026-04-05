@@ -5,6 +5,17 @@
     <v-card class="pa-4">
       <h1 class="text-h5 mb-4">代表者証明 申請者一覧</h1>
 
+      <div class="mb-4">
+        <v-btn
+          :disabled="isRegisteringGroups"
+          color="primary"
+          variant="flat"
+          @click="registerGroups"
+        >
+          {{ isRegisteringGroups ? '登録中...' : 'groups.js を Firebase に登録' }}
+        </v-btn>
+      </div>
+
       <div class="d-none d-md-block">
         <v-table>
           <thead>
@@ -107,6 +118,7 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
+import { registerAllGroupsService } from '@/services/groupService'
 import {
   getProveOwnerApplicantsService,
   updateProveOwnerApprovalService,
@@ -115,6 +127,7 @@ import {
 const applicants = ref([])
 const isLoading = ref(false)
 const updatingUserId = ref('')
+const isRegisteringGroups = ref(false)
 const snackbar = ref({
   show: false,
   color: '',
@@ -150,6 +163,21 @@ const loadApplicants = async () => {
     showSnackbar('error', error.message)
   } finally {
     isLoading.value = false
+  }
+}
+
+const registerGroups = async () => {
+  try {
+    isRegisteringGroups.value = true
+    const { registeredCount, skippedCount } = await registerAllGroupsService()
+    showSnackbar(
+      'success',
+      `団体データを登録しました（新規: ${registeredCount}件 / 既存スキップ: ${skippedCount}件）`,
+    )
+  } catch (error) {
+    showSnackbar('error', error.message)
+  } finally {
+    isRegisteringGroups.value = false
   }
 }
 
