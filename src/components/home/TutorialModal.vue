@@ -2,10 +2,64 @@
   <v-dialog v-model="dialog" persistent no-click-animation max-width="90vw" width="90vw">
     <v-card class="rounded-xl overflow-hidden" height="90vh">
       <v-carousel height="100%" hide-delimiter-background :show-arrows="false" color="orange">
-        <v-carousel-item v-for="n in 4" :key="n">
+        <v-carousel-item>
           <div class="tutorial-container pa-10">
-            <div class="text-h2 font-weight-black text-orange-darken-1 mb-6">0{{ n }}</div>
-            <h3 class="text-h4 mb-4 font-weight-bold">ステップ {{ n }} のタイトル</h3>
+            <div class="text-h2 font-weight-black text-orange-darken-1 my-6">01</div>
+            <h3 class="text-h4 font-weight-bold">ステップ1</h3>
+            <div class="mt-4">
+              <v-img
+                src="https://placehold.jp/24/3e8ed0/ffffff/400x300.png?text=Waka-topia"
+                class="rounded-lg mb-6"
+                cover
+                height="250"
+              ></v-img>
+              <p class="text-body-1 text-grey-darken-1">
+                ここにアプリの使い方や画像などを自由に配置してください。
+              </p>
+            </div>
+          </div>
+        </v-carousel-item>
+
+        <v-carousel-item>
+          <div class="tutorial-container pa-10">
+            <div class="text-h2 font-weight-black text-orange-darken-1 my-6">02</div>
+            <h3 class="text-h4 font-weight-bold">ステップ2</h3>
+            <div class="mt-4">
+              <v-img
+                src="https://placehold.jp/24/3e8ed0/ffffff/400x300.png?text=Waka-topia"
+                class="rounded-lg mb-6"
+                cover
+                height="250"
+              ></v-img>
+              <p class="text-body-1 text-grey-darken-1">
+                ここにアプリの使い方や画像などを自由に配置してください。
+              </p>
+            </div>
+          </div>
+        </v-carousel-item>
+
+        <v-carousel-item>
+          <div class="tutorial-container pa-10">
+            <div class="text-h2 font-weight-black text-orange-darken-1 my-6">03</div>
+            <h3 class="text-h4 font-weight-bold">ステップ3</h3>
+            <div class="mt-4">
+              <v-img
+                src="https://placehold.jp/24/3e8ed0/ffffff/400x300.png?text=Waka-topia"
+                class="rounded-lg mb-6"
+                cover
+                height="250"
+              ></v-img>
+              <p class="text-body-1 text-grey-darken-1">
+                ここにアプリの使い方や画像などを自由に配置してください。
+              </p>
+            </div>
+          </div>
+        </v-carousel-item>
+
+        <v-carousel-item>
+          <div class="tutorial-container pa-10">
+            <div class="text-h2 font-weight-black text-orange-darken-1 my-6">04</div>
+            <h3 class="text-h4 font-weight-bold">ステップ4</h3>
             <div class="mt-4">
               <v-img
                 src="https://placehold.jp/24/3e8ed0/ffffff/400x300.png?text=Waka-topia"
@@ -26,7 +80,7 @@
               class="flex-grow-1 pa-10 d-flex flex-column justify-center align-center text-center"
             >
               <v-icon size="80" color="success" class="mb-6">mdi-check-decagram</v-icon>
-              <h3 class="text-h4 font-weight-bold mb-4">準備が整いました</h3>
+              <h3 class="text-h4 font-weight-bold my-4">準備が整いました</h3>
               <p class="text-body-1 mb-10 text-grey-darken-1">
                 「これ以降表示しない」にチェックを入れると、次回から表示されません。
               </p>
