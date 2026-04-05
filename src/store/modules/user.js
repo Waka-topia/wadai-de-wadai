@@ -1,12 +1,10 @@
 import { getPhotoURL } from '@/services/authService'
-import { getNextShinkan } from '@/services/nextShinkanService'
 import { fetchUserData } from '@/services/userService'
 
 const state = () => ({
   userId: '',
   userDataCache: {},
   userPhotoURLs: {},
-  nextShinkanDetails: {},
 })
 
 const getCurrentStatus = (state) => {
@@ -49,16 +47,6 @@ const actions = {
       throw error
     }
   },
-  async getNextShinkanDetails({ commit }, userId) {
-    try {
-      const nextShinkan = await getNextShinkan(userId)
-      commit('setNextShinkanDetails', { userId, nextShinkan })
-      return nextShinkan
-    } catch (error) {
-      console.error('Error fetching next Shinkan details:', error)
-      throw error
-    }
-  },
 }
 
 const mutations = {
@@ -74,9 +62,6 @@ const mutations = {
   setUserPhotoURL(state, { userId, photoURL }) {
     state.userPhotoURLs[userId] = photoURL
   },
-  setNextShinkanDetails(state, { userId, nextShinkan }) {
-    state.nextShinkanDetails[userId] = nextShinkan
-  },
 }
 
 const getters = {
@@ -91,7 +76,6 @@ const getters = {
   isFetched: (state) => Boolean(getCurrentStatus(state)),
   userId: (state) => state.userId,
   getUserPhotoURL: (state) => (userId) => state.userPhotoURLs[userId] || null,
-  getNextShinkanDetails: (state) => (userId) => state.nextShinkanDetails[userId] || null,
 }
 
 export default {
