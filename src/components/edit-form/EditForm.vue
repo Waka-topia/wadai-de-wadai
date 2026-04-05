@@ -41,6 +41,7 @@
             <UserName :user-name="user.userName" />
             <UserAddress :email="user.email" />
             <UserId :user-id="user.userId" />
+            <UserOrgs :belonging-orgs="user.belongingOrgs ?? []" />
           </v-row>
         </v-card-text>
 
@@ -63,6 +64,7 @@ import UserAddress from './UserAddress.vue'
 import UserIcon from './UserIcon.vue'
 import UserId from './UserId.vue'
 import UserName from './UserName.vue'
+import UserOrgs from './UserOrgs.vue'
 
 const dialog = ref(false)
 

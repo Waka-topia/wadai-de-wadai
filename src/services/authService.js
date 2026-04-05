@@ -233,7 +233,6 @@ export default {
         const data = userSnap.data()
         return data.belongingOrgs || []
       } else {
-        console.log('No such document!')
         return []
       }
     } catch (error) {
