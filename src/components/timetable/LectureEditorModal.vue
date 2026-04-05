@@ -126,126 +126,136 @@
             </div>
           </v-alert>
 
-          <!-- 講義名（手動入力） -->
-          <div class="field-label">講義名 <span class="required">*</span></div>
-          <p
-            v-if="!isExistingLecture"
-            class="text-caption text-grey mb-1"
-            style="font-size: 0.7rem"
-          >
-            ※検索せずに直接追加する場合は以下に入力してください
-          </p>
-          <v-text-field
-            v-model="form.name"
-            placeholder="例：基礎プログラミング"
-            variant="outlined"
-            density="compact"
-            :rules="[(v) => !!v || '講義名を入力してください']"
-            class="mb-2"
-          ></v-text-field>
-
-          <!-- カラー選択 -->
-          <div class="field-label">カラー</div>
-          <div class="color-palette mb-3">
-            <button
-              v-for="(colorDef, colorKey) in colorPalette"
-              :key="colorKey"
-              class="color-swatch"
-              :style="{ backgroundColor: colorDef.border }"
-              :class="{ 'color-swatch--selected': form.color === colorKey }"
-              :title="colorKey"
-              type="button"
-              @click="form.color = colorKey"
+          <v-form class="editor-form" @submit.prevent="onSubmit">
+            <v-text-field
+              v-model="form.name"
+              :rules="[required]"
+              class="mb-2"
+              density="comfortable"
+              label="講義名 *"
+              placeholder="例：基礎プログラミング"
+              variant="outlined"
             >
-              <v-icon v-if="form.color === colorKey" color="white" size="14">mdi-check</v-icon>
-            </button>
-          </div>
+              <template v-if="!isExistingLecture" #details>
+                <div class="text-caption text-grey" style="font-size: 0.72rem">
+                  ※検索せずに直接追加する場合は講義名を入力してください
+                </div>
+              </template>
+            </v-text-field>
 
-          <!-- 担当教員 -->
-          <div class="field-label">担当教員</div>
-          <v-text-field
-            v-model="form.teacher"
-            variant="outlined"
-            placeholder="例：山田 太郎"
-            density="compact"
-            class="mb-2"
-          />
+            <div class="d-flex align-center justify-space-between mb-2">
+              <span class="text-caption font-weight-bold text-grey-darken-1">カラー</span>
+              <v-chip size="x-small" variant="tonal">{{ form.color }}</v-chip>
+            </div>
+            <v-item-group v-model="form.color" class="mb-4 d-flex flex-wrap ga-2" mandatory>
+              <v-item
+                v-for="(colorDef, colorKey) in colorPalette"
+                v-slot="{ isSelected, toggle }"
+                :key="colorKey"
+                :value="colorKey"
+              >
+                <v-btn
+                  :aria-label="`${colorKey} を選択`"
+                  :class="{ 'color-choice--selected': isSelected }"
+                  :color="colorDef.border"
+                  :variant="isSelected ? 'flat' : 'tonal'"
+                  density="comfortable"
+                  icon
+                  size="small"
+                  @click="toggle"
+                >
+                  <v-icon
+                    :icon="isSelected ? 'mdi-check' : 'mdi-palette'"
+                    color="white"
+                    size="14"
+                  />
+                </v-btn>
+              </v-item>
+            </v-item-group>
 
-          <!-- 教室 + 単位数（横並び） -->
-          <div class="row-fields">
-            <div class="row-field flex-grow-1">
-              <div class="field-label">教室</div>
-              <v-text-field
-                v-model="form.room"
-                variant="outlined"
-                placeholder="例：A棟101"
-                density="compact"
-              />
-            </div>
-            <div class="row-field credits-field">
-              <div class="field-label">単位数</div>
-              <v-select
-                v-model="form.credits"
-                :items="[0, 1, 2, 3, 4]"
-                variant="outlined"
-                density="compact"
-                suffix=""
-              />
-            </div>
-          </div>
+            <v-text-field
+              v-model="form.teacher"
+              class="mb-2"
+              :rules="[required]"
+              density="comfortable"
+              label="担当教員"
+              placeholder="例：山田 太郎"
+              variant="outlined"
+            />
 
-          <!-- 必修区分と取得状況 -->
-          <div class="row-fields">
-            <div class="row-field" style="max-width: 140px">
-              <div class="field-label">区分</div>
-              <v-select
-                v-model="form.required"
-                :items="requiredItems"
-                item-title="label"
-                item-value="value"
-                variant="outlined"
-                density="compact"
-              />
-            </div>
-            <div class="row-field flex-grow-1 ml-2">
-              <div class="field-label">単位取得状況</div>
-              <v-select
-                v-model="form.creditStatus"
-                :items="creditStatusItems"
-                item-title="label"
-                item-value="value"
-                variant="outlined"
-                density="compact"
-              />
-            </div>
-          </div>
+            <v-row class="mb-1" dense>
+              <v-col cols="8">
+                <v-text-field
+                  v-model="form.room"
+                  :rules="[required]"
+                  density="comfortable"
+                  label="教室"
+                  placeholder="例：A棟101"
+                  variant="outlined"
+                />
+              </v-col>
+              <v-col cols="4">
+                <v-select
+                  v-model="form.credits"
+                  :items="[0, 1, 2, 3, 4]"
+                  :rules="[required]"
+                  density="comfortable"
+                  label="単位数"
+                  variant="outlined"
+                />
+              </v-col>
+            </v-row>
 
-          <!-- メモ -->
-          <div class="field-label">メモ</div>
-          <v-textarea
-            v-model="form.memo"
-            variant="outlined"
-            placeholder="例：出席必須, 教科書持参"
-            density="compact"
-            rows="2"
-            class="mb-2"
-          />
+            <v-row class="mb-1" dense>
+              <v-col cols="12">
+                <v-select
+                  v-model="form.required"
+                  :items="requiredItems"
+                  :rules="[required]"
+                  density="comfortable"
+                  item-title="label"
+                  item-value="value"
+                  label="区分"
+                  variant="outlined"
+                />
+              </v-col>
+              <v-col cols="12">
+                <v-select
+                  v-model="form.creditStatus"
+                  :items="creditStatusItems"
+                  :rules="[required]"
+                  density="comfortable"
+                  item-title="label"
+                  item-value="value"
+                  label="単位取得状況"
+                  variant="outlined"
+                />
+              </v-col>
+            </v-row>
+
+            <v-textarea
+              v-model="form.memo"
+              auto-grow
+              density="comfortable"
+              label="メモ"
+              placeholder="例：出席必須, 教科書持参"
+              rows="2"
+              variant="outlined"
+            />
+            <v-card-actions class="modal-actions">
+              <v-spacer />
+              <v-btn variant="text" @click="isExistingLecture ? (isEditMode = false) : close()"
+                >キャンセル</v-btn
+              >
+              <v-btn color="orange" variant="flat" type="submit"> 保存 </v-btn>
+            </v-card-actions>
+          </v-form>
 
           <LectureReviewPanel
             v-if="currentLectureName && !isEditMode"
             :lecture-name="currentLectureName"
           />
         </v-card-text>
-
-        <v-card-actions class="modal-actions">
-          <v-spacer />
-          <v-btn variant="text" @click="isExistingLecture ? (isEditMode = false) : close()"
-            >キャンセル</v-btn
-          >
-          <v-btn color="orange" variant="flat" :disabled="!form.name" @click="handleSave">
-            保存
-          </v-btn>
-        </v-card-actions>
       </template>
     </v-card>
   </v-dialog>
@@ -271,6 +281,7 @@ import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
+import { required } from '@/utils/forms/validate'
 import LectureSyllabusPanel from '@/components/timetable/LectureSyllabusPanel.vue'
 import LectureReviewPanel from '@/components/timetable/LectureReviewPanel.vue'
 
@@ -432,18 +443,16 @@ watch(
   },
 )
 
-/** 保存ボタン押下時の処理 */
-const handleSave = () => {
-  if (!props.selectedCell || !form.value.name) return
+const onSubmit = async (validationPromise) => {
+  const { valid } = await validationPromise
+  if (!valid) throw new Error('入力に誤りがあります。')
+
   executeFinalSave()
 }
 
 /** 最終的な保存実行ロジック */
 const executeFinalSave = () => {
-  const name =
-    typeof form.value.name === 'object' && form.value.name !== null
-      ? form.value.name.name
-      : form.value.name
+  const name = typeof form.value.name === 'object' ? form.value.name.name : form.value.name
 
   void logFirebaseAnalyticsEvent('lecture_editor_save', {
     day: props.selectedCell?.day,
@@ -525,6 +534,11 @@ const close = () => {
   scrollbar-gutter: stable;
 }
 
+.editor-form {
+  display: flex;
+  flex-direction: column;
+}
+
 /* 詳細ビュー固有スタイル */
 .detail-course-name {
   font-size: 1.4rem;
@@ -542,69 +556,10 @@ const close = () => {
   background: transparent !important;
 }
 
-/* フォーム系固有スタイル */
-.field-label {
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: #555;
-  margin-bottom: 4px;
-}
-
-.required {
-  color: #f44336;
-}
-
-/* カラーパレット */
-.color-palette {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.color-swatch {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: 2px solid transparent;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition:
-    transform 0.12s,
-    box-shadow 0.12s;
-}
-
-.color-swatch:hover {
-  transform: scale(1.15);
-}
-
-.color-swatch--selected {
-  border-color: #333;
-  transform: scale(1.15);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-/* 横並びフィールド */
-.row-fields {
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-  margin-bottom: 4px;
-}
-
-.row-field {
-  min-width: 0;
-}
-
-.credits-field {
-  width: 100px;
-  flex-shrink: 0;
-}
-
-.required-field {
-  width: 110px;
-  flex-shrink: 0;
+.color-choice--selected {
+  box-shadow:
+    0 0 0 2px #fff,
+    0 0 0 4px rgba(255, 152, 0, 0.8);
 }
 
 .modal-actions {
