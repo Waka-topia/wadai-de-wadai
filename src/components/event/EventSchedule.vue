@@ -116,14 +116,21 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { adminUserId } from '@/config/constants'
+import { hashValue } from '@/utils/crypto'
 
 const router = useRouter()
 const store = useStore()
+
+const hashedAdminUserId = ref('')
+
+onMounted(async () => {
+  hashedAdminUserId.value = await hashValue(adminUserId)
+})
 
 /**
  * イベントが運営による代理登録かどうかを判定する
@@ -131,7 +138,9 @@ const store = useStore()
  * @param {object} event イベントデータ
  * @returns {boolean} 運営代理登録の場合true
  */
-const isProxyEvent = (event) => event.createdBy === adminUserId
+const isProxyEvent = (event) => {
+  return event.createdBy === hashedAdminUserId.value
+}
 
 const goToEventDetail = (eventId) => {
   void logFirebaseAnalyticsEvent('event_schedule_item_click', { eventId: String(eventId) })
