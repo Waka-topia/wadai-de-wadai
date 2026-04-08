@@ -1,4 +1,5 @@
 <template>
+  <v-skeleton-loader v-if="isLoading" type="card"></v-skeleton-loader>
   <v-container class="pa-4 pb-16 search-page-container">
     <div class="d-flex align-center gap-2 mb-4">
       <!-- 戻るボタン -->
@@ -30,8 +31,24 @@
       {{ getDayName(targetDay) }} {{ targetPeriod }}限 に追加する授業
     </v-alert>
 
+    <!-- エラー表示 -->
+    <v-alert
+      v-if="syllabusError"
+      type="error"
+      variant="tonal"
+      class="mb-4 rounded-lg"
+      density="compact"
+    >
+      {{ syllabusError }}
+    </v-alert>
+
+    <!-- 検索中ローディング -->
+    <div v-if="isSearching" class="text-center py-8">
+      <v-progress-circular indeterminate color="orange" />
+    </div>
+
     <!-- 検索結果リスト -->
-    <div v-if="hasSearched && !loading">
+    <div v-else-if="hasSearched">
       <!-- 検索結果が見つからなかった場合 -->
       <div v-if="suggestions.length === 0" class="text-center py-8">
         <v-avatar color="amber-lighten-4" size="80" class="mb-4">
@@ -313,9 +330,7 @@ import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
-import { fetchMasterIndex, saveSyllabusWithIndex } from '@/services/lectureIndexService'
 import LectureSyllabusPanel from '@/components/timetable/LectureSyllabusPanel.vue'
-import { normalizeLectureName } from '@/utils/lectureNormalizer'
 
 const store = useStore()
 const router = useRouter()
@@ -325,8 +340,8 @@ const targetDay = ref(null)
 const targetPeriod = ref(null)
 
 onMounted(async () => {
-  // マスターインデックスのロード
-  await loadMasterIndex()
+  // マスターインデックスのロード（取得済みの場合はストアがスキップする）
+  await store.dispatch('syllabus/fetchMasterIndex')
 
   if (history.state && history.state.targetDay) {
     targetDay.value = history.state.targetDay
@@ -345,17 +360,13 @@ const getDayName = (code) => {
 
 // 検索ステート
 const searchQuery = ref('')
-const suggestions = ref([])
-const masterIndex = ref({ l: [], updatedAt: null })
-const loading = ref(false)
 const hasSearched = ref(false)
-const isInitialLoading = ref(true)
 
-// オンメモリキャッシュ（APIコール削減）
-// アプローチAでは masterIndex がキャッシュを兼ねるため不要になります
+const suggestions = computed(() => store.getters['syllabus/searchResults'])
+const isLoading = computed(() => store.getters['syllabus/isLoading'])
+const isSearching = computed(() => store.getters['syllabus/isSearching'])
+const syllabusError = computed(() => store.getters['syllabus/error'])
 
-const uid = computed(() => store.getters['auth/userId'])
-const userName = computed(() => store.getters['auth/displayName'] || '匿名ユーザー')
 const isLoggedIn = computed(() => store.getters['auth/isAuthenticated'])
 
 // シラバス表示・追加ステート
@@ -436,48 +447,18 @@ const periods = [
   { title: '6限 (18:00~19:30)', value: 6 },
 ]
 
-// マスターデータの読み込み
-const loadMasterIndex = async () => {
-  try {
-    masterIndex.value = await fetchMasterIndex()
-  } catch (error) {
-    console.error('Failed to load master index:', error)
-  } finally {
-    isInitialLoading.value = false
-  }
-}
-
-// 定額課金対応の検索アルゴリズム（ローカル検索）
-const executeSearch = async () => {
+// 定額課金対応の検索（ローカルフィルタリング）
+const executeSearch = () => {
   const queryText = searchQuery.value ? searchQuery.value.trim() : ''
   if (!queryText) return
 
-  loading.value = true
   hasSearched.value = true
-
-  // ローカルでのフィルタリング（爆速・0アクセス）
-  const normalizedQuery = normalizeLectureName(queryText)
-  const filtered = masterIndex.value.l.filter((item) => {
-    return item.id.includes(queryText) || item.n.includes(normalizedQuery)
-  })
+  store.dispatch('syllabus/searchLectures', queryText)
 
   void logFirebaseAnalyticsEvent('syllabus_search_execute', {
     queryLength: queryText.length,
-    resultCount: filtered.length,
+    resultCount: suggestions.value.length,
   })
-
-  // テンプレートの互換性のためにマッピング
-  // インデックスの形式 { id, n, t, b, c, g } -> 表示の形式 { name, teacher, room, credits, categories }
-  suggestions.value = filtered.map((item) => ({
-    name: item.id,
-    teacher: item.t,
-    room: item.b,
-    credits: item.c,
-    categories: item.g || [],
-    count: 0, // 今後必要ならインデックスに含める
-  }))
-
-  loading.value = false
 }
 
 const openSyllabusModal = (lectureName) => {
@@ -580,28 +561,25 @@ const registerAndSave = async () => {
   saving.value = true
   const lectureName = newLectureName.value.trim()
   try {
-    await saveSyllabusWithIndex(
+    await store.dispatch('syllabus/registerSyllabus', {
       lectureName,
-      {
+      syllabusData: {
         teacher: newTeacher.value.trim(),
         room: newRoom.value.trim(),
         credits: Number(newCredits.value),
         categories: [],
         description: newMemo.value.trim(),
       },
-      uid.value,
-      userName.value,
-    )
+    })
 
     // 完了フィードバック
     showSnackbar(`「${lectureName}」をみんなのシラバスに登録しました！`, {
       icon: 'mdi-check-circle',
     })
 
-    // インデックスを再ロードして検索結果に反映
-    await loadMasterIndex()
+    // 再取得後に検索結果に反映
     searchQuery.value = lectureName
-    await executeSearch()
+    executeSearch()
   } catch (error) {
     console.error('Failed to register syllabus:', error)
   }
