@@ -6,16 +6,15 @@
         <v-btn icon variant="text" @click="close"><v-icon>mdi-close</v-icon></v-btn>
         <span>{{ selectedCell ? `${dayLabel} ${displayPeriods}限` : '講義を登録' }}</span>
         <v-btn
-          v-if="!isEditMode && isExistingLecture"
+          v-if="isEditMode || !isExistingLecture"
           color="orange"
-          variant="flat"
-          size="small"
-          @click="isEditMode = true"
-          >編集する</v-btn
-        >
-        <v-btn v-else color="orange" variant="flat" size="small" type="submit" form="lecture-form"
+          variant="text"
+          class="font-weight-bold"
+          type="submit"
+          form="lecture-form"
           >保存</v-btn
         >
+        <div v-else class="header-spacer" />
       </v-card-title>
 
       <template v-if="!isEditMode && isExistingLecture">
@@ -99,9 +98,13 @@
             @linked="handleSyllabusLinked"
           />
         </v-card-text>
-        <v-card-actions v-show="!isSyllabusExpanded" class="modal-actions">
-          <v-btn variant="text" color="error" @click="confirmDelete">削除</v-btn>
-          <v-spacer />
+        <v-card-actions v-show="!isSyllabusExpanded" class="modal-actions flex-column ga-2">
+          <v-btn color="grey" variant="flat" rounded="lg" block @click="isEditMode = true"
+            >編集する</v-btn
+          >
+          <v-btn color="error" variant="outlined" rounded="lg" block @click="confirmDelete"
+            >削除</v-btn
+          >
         </v-card-actions>
       </template>
 
@@ -307,7 +310,7 @@
       <v-card-actions>
         <v-spacer />
         <v-btn variant="text" @click="showDeleteConfirm = false">キャンセル</v-btn>
-        <v-btn color="error" variant="flat" @click="handleDelete">削除する</v-btn>
+        <v-btn color="error" class="font-weight-bold" @click="handleDelete">削除する</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -607,6 +610,9 @@ const close = () => (dialog.value = false)
 }
 .modal-actions {
   padding: 8px 16px 12px;
+}
+.header-spacer {
+  min-width: 64px;
 }
 .confirm-title {
   font-size: 1rem;
