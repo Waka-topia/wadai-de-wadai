@@ -112,26 +112,25 @@
         <v-card-text class="modal-body">
           <v-alert
             v-if="!isExistingLecture"
-            color="teal-lighten-5"
-            border="start"
-            border-color="teal"
+            color="orange-lighten-5"
+            border-color="orange"
             class="mb-4 pb-2 pt-3 px-3"
             density="compact"
           >
             <div class="d-flex align-center justify-space-between">
               <div>
-                <div class="text-caption font-weight-bold text-teal-darken-3">
-                  📚 みんなのシラバスから探す
+                <div class="text-caption font-weight-bold text-orange-darken-3">
+                  📚 「みんなのシラバス」から探す
                 </div>
-                <div class="text-teal-darken-1" style="font-size: 0.65rem">
+                <div class="text-orange-darken-1" style="font-size: 0.65rem">
                   楽単度や過去のレビューが見れます！
                 </div>
               </div>
               <v-btn
-                color="teal"
+                color="orange"
                 variant="flat"
                 size="small"
-                class="font-weight-bold px-3"
+                class="font-weight-bold px-3 text-white"
                 @click="jumpToSyllabusSearch"
                 >検索する</v-btn
               >
@@ -140,22 +139,29 @@
 
           <v-form id="lecture-form" class="editor-form" @submit.prevent="onSubmit">
             <div class="mb-4">
-              <div class="text-caption font-weight-bold text-grey-darken-1 mb-1">
-                履修期間（複数選択可）*
-              </div>
-              <v-btn-toggle
-                v-model="form.quarters"
-                multiple
-                mandatory
-                color="orange"
+              <v-select
+                v-model="quarterSelectValue"
+                :items="quarterSelectOptions"
+                item-title="title"
+                item-value="value"
+                label="履修期間 *"
                 variant="outlined"
                 density="comfortable"
-                class="w-100 d-flex"
-              >
-                <v-btn v-for="q in availableQuarters" :key="q" :value="q" class="flex-grow-1">{{
-                  q
-                }}</v-btn>
-              </v-btn-toggle>
+                :rules="[(v) => !!v || '履修期間を選択してください']"
+              />
+            </div>
+
+            <div class="mb-4">
+              <v-select
+                v-model="form.day"
+                :items="dayOptions"
+                item-title="title"
+                item-value="value"
+                label="曜日 *"
+                variant="outlined"
+                density="comfortable"
+                :rules="[(v) => !!v || '曜日を選択してください']"
+              />
             </div>
 
             <div class="mb-4">
@@ -169,13 +175,7 @@
                 variant="outlined"
                 density="comfortable"
                 :rules="[(v) => v.length > 0 || '時限を選択してください']"
-              >
-                <template #prepend
-                  ><v-chip color="orange" variant="flat" class="mt-1 font-weight-bold"
-                    >{{ dayLabel }}曜日</v-chip
-                  ></template
-                >
-              </v-select>
+              />
             </div>
 
             <v-text-field
@@ -184,45 +184,11 @@
               class="mb-2"
               density="comfortable"
               label="講義名 *"
+              hint="検索せずに直接追加する場合は講義名を入力してください"
               placeholder="例：基礎プログラミング"
               variant="outlined"
             >
-              <template v-if="!isExistingLecture" #details
-                ><div class="text-caption text-grey" style="font-size: 0.72rem">
-                  ※検索せずに直接追加する場合は講義名を入力してください
-                </div></template
-              >
             </v-text-field>
-
-            <div class="d-flex align-center justify-space-between mb-2">
-              <span class="text-caption font-weight-bold text-grey-darken-1">カラー</span
-              ><v-chip size="x-small" variant="tonal">{{ form.color }}</v-chip>
-            </div>
-            <v-item-group v-model="form.color" class="mb-4 d-flex flex-wrap ga-2" mandatory>
-              <v-item
-                v-for="(colorDef, colorKey) in colorPalette"
-                v-slot="{ isSelected, toggle }"
-                :key="colorKey"
-                :value="colorKey"
-              >
-                <v-btn
-                  :aria-label="`${colorKey} を選択`"
-                  :class="{ 'color-choice--selected': isSelected }"
-                  :color="colorDef.border"
-                  :variant="isSelected ? 'flat' : 'tonal'"
-                  density="comfortable"
-                  icon
-                  size="small"
-                  @click="toggle"
-                >
-                  <v-icon
-                    :icon="isSelected ? 'mdi-check' : 'mdi-palette'"
-                    color="white"
-                    size="14"
-                  />
-                </v-btn>
-              </v-item>
-            </v-item-group>
 
             <v-text-field
               v-model="form.teacher"
@@ -288,6 +254,36 @@
               rows="2"
               variant="outlined"
             />
+
+            <div class="d-flex align-center justify-space-between mb-2">
+              <span class="text-caption font-weight-bold text-grey-darken-1">カラー</span
+              ><v-chip size="x-small" variant="tonal">{{ form.color }}</v-chip>
+            </div>
+            <v-item-group v-model="form.color" class="mb-4 d-flex flex-wrap ga-2" mandatory>
+              <v-item
+                v-for="(colorDef, colorKey) in colorPalette"
+                v-slot="{ isSelected, toggle }"
+                :key="colorKey"
+                :value="colorKey"
+              >
+                <v-btn
+                  :aria-label="`${colorKey} を選択`"
+                  :class="{ 'color-choice--selected': isSelected }"
+                  :color="colorDef.border"
+                  :variant="isSelected ? 'flat' : 'tonal'"
+                  density="comfortable"
+                  icon
+                  size="small"
+                  @click="toggle"
+                >
+                  <v-icon
+                    :icon="isSelected ? 'mdi-check' : 'mdi-palette'"
+                    color="white"
+                    size="14"
+                  />
+                </v-btn>
+              </v-item>
+            </v-item-group>
           </v-form>
 
           <LectureReviewPanel
@@ -342,6 +338,31 @@ const availableQuarters = computed(() =>
   currentSemester.value === 'second' ? ['3Q', '4Q'] : ['1Q', '2Q'],
 )
 
+const quarterSelectOptions = computed(() => {
+  if (currentSemester.value === 'second') {
+    return [
+      { title: '3Q', value: '3Q' },
+      { title: '4Q', value: '4Q' },
+      { title: '後期（3Q・4Q）', value: '3Q,4Q' },
+    ]
+  } else {
+    return [
+      { title: '1Q', value: '1Q' },
+      { title: '2Q', value: '2Q' },
+      { title: '前期（1Q・2Q）', value: '1Q,2Q' },
+    ]
+  }
+})
+
+const quarterSelectValue = computed({
+  get() {
+    return (form.value.quarters ?? []).join(',')
+  },
+  set(val) {
+    form.value.quarters = val ? val.split(',') : [...availableQuarters.value]
+  },
+})
+
 const dialog = computed({
   get: () => props.modelValue,
   set: (val) => emit('update:modelValue', val),
@@ -382,6 +403,7 @@ const form = ref({
   isFromSyllabus: false,
   quarters: [],
   periods: [],
+  day: null,
 })
 
 const resetForm = () => {
@@ -406,6 +428,7 @@ const resetForm = () => {
     isFromSyllabus: false,
     quarters: defaultQuarters,
     periods: props.selectedCell ? [props.selectedCell.period] : [],
+    day: props.selectedCell?.day || null,
   }
 }
 
@@ -450,9 +473,17 @@ const creditStatusColor = computed(() =>
 
 // 既存講義の判定は「編集用IDを持っているか」で行う
 const isExistingLecture = computed(() => !!form.value.id)
+const dayOptions = [
+  { title: '月曜日', value: 'mon' },
+  { title: '火曜日', value: 'tue' },
+  { title: '水曜日', value: 'wed' },
+  { title: '木曜日', value: 'thu' },
+  { title: '金曜日', value: 'fri' },
+]
+
 const dayLabel = computed(() => {
   const labels = { mon: '月', tue: '火', wed: '水', thu: '木', fri: '金' }
-  return props.selectedCell ? labels[props.selectedCell.day] || '' : ''
+  return form.value.day ? labels[form.value.day] || '' : ''
 })
 const displayPeriods = computed(() =>
   form.value.periods && form.value.periods.length > 0
@@ -498,6 +529,7 @@ watch(
             ? lecture.quarters
             : [...availableQuarters.value],
         periods: lecture.periods && lecture.periods.length ? lecture.periods : [cell.period],
+        day: cell.day,
       }
     } else {
       resetForm()
@@ -514,13 +546,13 @@ const onSubmit = async (validationPromise) => {
 const executeFinalSave = () => {
   const name = typeof form.value.name === 'object' ? form.value.name.name : form.value.name
   void logFirebaseAnalyticsEvent('lecture_editor_save', {
-    day: props.selectedCell?.day,
+    day: form.value.day,
     periods: form.value.periods,
     isExisting: isExistingLecture.value,
   })
 
   store.dispatch('timetable/saveLecture', {
-    day: props.selectedCell.day,
+    day: form.value.day,
     periods: form.value.periods,
     lecture: { ...form.value, name, originalName: form.value.originalName || name },
   })
@@ -539,13 +571,13 @@ const confirmDelete = () => (showDeleteConfirm.value = true)
 const handleDelete = () => {
   if (!props.selectedCell) return
   void logFirebaseAnalyticsEvent('lecture_editor_delete', {
-    day: props.selectedCell.day,
+    day: form.value.day,
     periods: form.value.periods,
   })
 
   // 対象のIDを持つ授業だけを削除する
   store.dispatch('timetable/removeLecture', {
-    day: props.selectedCell.day,
+    day: form.value.day,
     periods: form.value.periods,
     lectureId: form.value.id,
   })
