@@ -110,33 +110,6 @@
 
       <template v-else>
         <v-card-text class="modal-body">
-          <v-alert
-            v-if="!isExistingLecture"
-            color="orange-lighten-5"
-            border-color="orange"
-            class="mb-4 pb-2 pt-3 px-3"
-            density="compact"
-          >
-            <div class="d-flex align-center justify-space-between">
-              <div>
-                <div class="text-caption font-weight-bold text-orange-darken-3">
-                  📚 「みんなのシラバス」から探す
-                </div>
-                <div class="text-orange-darken-1" style="font-size: 0.65rem">
-                  楽単度や過去のレビューが見れます！
-                </div>
-              </div>
-              <v-btn
-                color="orange"
-                variant="flat"
-                size="small"
-                class="font-weight-bold px-3 text-white"
-                @click="jumpToSyllabusSearch"
-                >検索する</v-btn
-              >
-            </div>
-          </v-alert>
-
           <v-form id="lecture-form" class="editor-form" @submit.prevent="onSubmit">
             <div class="mb-4">
               <v-select

@@ -89,6 +89,41 @@
       <TimetableGrid @cell-click="handleCellClick" />
     </main>
 
+    <v-bottom-sheet v-model="showChoiceSheet" max-width="600">
+      <v-card rounded="t-xl" class="pa-4 pb-6">
+        <div class="d-flex justify-center mb-3">
+          <div style="width: 36px; height: 4px; border-radius: 2px; background: #ddd" />
+        </div>
+        <div class="text-subtitle2 font-weight-bold text-center mb-4">
+          {{ pendingCellLabel }}に追加する方法を選んでください
+        </div>
+        <div class="d-flex flex-column ga-3">
+          <v-btn
+            color="orange"
+            class="text-white font-weight-bold"
+            variant="flat"
+            size="large"
+            rounded="lg"
+            prepend-icon="mdi-book-search"
+            @click="handleChoiceSyllabus"
+          >
+            みんなのシラバスから検索
+          </v-btn>
+          <v-btn
+            color="orange"
+            class="text-orange font-weight-bold"
+            variant="outlined"
+            size="large"
+            rounded="lg"
+            prepend-icon="mdi-pencil"
+            @click="handleChoiceManual"
+          >
+            自分で入力する
+          </v-btn>
+        </div>
+      </v-card>
+    </v-bottom-sheet>
+
     <LectureEditorModal
       v-model="showModal"
       :selected-cell="selectedCell"
@@ -115,6 +150,8 @@ const router = useRouter()
 useFirebasePageView('view_timetable', () => ({ loggedIn: store.getters['auth/isAuthenticated'] }))
 const showModal = ref(false)
 const selectedCell = ref(null)
+const showChoiceSheet = ref(false)
+const pendingCell = ref(null)
 
 const { showSnackbar } = useSnackbar()
 
@@ -188,14 +225,38 @@ onActivated(() => {
   if (userId.value) store.dispatch('timetable/fetchTimetable')
 })
 
-// 引数に lectureId を追加
+const dayLabels = { mon: '月', tue: '火', wed: '水', thu: '木', fri: '金' }
+const pendingCellLabel = computed(() => {
+  if (!pendingCell.value) return ''
+  const { day, period } = pendingCell.value
+  return `${dayLabels[day] || ''}曜日 ${period}限`
+})
+
 const handleCellClick = ({ day, period, lectureId }) => {
   if (!isAuthenticated.value) {
     void logFirebaseAnalyticsEvent('timetable_cell_click_guest', { day, period })
     router.push('/login')
     return
   }
-  selectedCell.value = { day, period, lectureId }
+  if (lectureId) {
+    selectedCell.value = { day, period, lectureId }
+    showModal.value = true
+  } else {
+    pendingCell.value = { day, period, lectureId: null }
+    showChoiceSheet.value = true
+  }
+}
+
+const handleChoiceSyllabus = () => {
+  showChoiceSheet.value = false
+  const { day, period } = pendingCell.value
+  void logFirebaseAnalyticsEvent('lecture_add_choice_syllabus', { day, period })
+  router.push({ path: '/syllabus-search', state: { targetDay: day, targetPeriod: period } })
+}
+
+const handleChoiceManual = () => {
+  showChoiceSheet.value = false
+  selectedCell.value = pendingCell.value
   showModal.value = true
 }
 </script>
