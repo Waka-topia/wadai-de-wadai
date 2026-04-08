@@ -1,9 +1,21 @@
 <template>
-  <v-dialog v-model="dialog" max-width="480" persistent scrollable>
-    <v-card class="modal-card" rounded="xl" height="65vh" min-height="480" max-height="600">
+  <v-bottom-sheet v-model="dialog" scrollable>
+    <v-card class="modal-card" rounded="t-xl" height="65vh" min-height="480" max-height="600">
+      <div class="bottom-sheet-handle" />
       <v-card-title class="modal-title">
-        <span>{{ selectedCell ? `${dayLabel} ${displayPeriods}限` : '講義を登録' }}</span>
         <v-btn icon variant="text" @click="close"><v-icon>mdi-close</v-icon></v-btn>
+        <span>{{ selectedCell ? `${dayLabel} ${displayPeriods}限` : '講義を登録' }}</span>
+        <v-btn
+          v-if="!isEditMode && isExistingLecture"
+          color="orange"
+          variant="flat"
+          size="small"
+          @click="isEditMode = true"
+          >編集する</v-btn
+        >
+        <v-btn v-else color="orange" variant="flat" size="small" type="submit" form="lecture-form"
+          >保存</v-btn
+        >
       </v-card-title>
 
       <template v-if="!isEditMode && isExistingLecture">
@@ -90,7 +102,6 @@
         <v-card-actions v-show="!isSyllabusExpanded" class="modal-actions">
           <v-btn variant="text" color="error" @click="confirmDelete">削除</v-btn>
           <v-spacer />
-          <v-btn color="orange" variant="flat" @click="isEditMode = true"> 編集する </v-btn>
         </v-card-actions>
       </template>
 
@@ -124,7 +135,7 @@
             </div>
           </v-alert>
 
-          <v-form class="editor-form" @submit.prevent="onSubmit">
+          <v-form id="lecture-form" class="editor-form" @submit.prevent="onSubmit">
             <div class="mb-4">
               <div class="text-caption font-weight-bold text-grey-darken-1 mb-1">
                 履修期間（複数選択可）*
@@ -274,13 +285,6 @@
               rows="2"
               variant="outlined"
             />
-            <v-card-actions class="modal-actions">
-              <v-spacer />
-              <v-btn variant="text" @click="isExistingLecture ? (isEditMode = false) : close()"
-                >キャンセル</v-btn
-              >
-              <v-btn color="orange" variant="flat" type="submit"> 保存 </v-btn>
-            </v-card-actions>
           </v-form>
 
           <LectureReviewPanel
@@ -290,7 +294,7 @@
         </v-card-text>
       </template>
     </v-card>
-  </v-dialog>
+  </v-bottom-sheet>
 
   <v-dialog v-model="showDeleteConfirm" max-width="320">
     <v-card rounded="xl">
@@ -556,11 +560,18 @@ const close = () => (dialog.value = false)
   display: flex !important;
   flex-direction: column !important;
 }
+.bottom-sheet-handle {
+  width: 36px;
+  height: 4px;
+  background: #ddd;
+  border-radius: 2px;
+  margin: 8px auto 0;
+}
 .modal-title {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 20px 0;
+  padding: 12px 12px 0;
   font-size: 1.1rem;
   font-weight: bold;
   color: #333;
