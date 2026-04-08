@@ -55,36 +55,6 @@
       </div>
     </header>
 
-    <section v-if="isAuthenticated && todayLectures.length > 0" class="today-section">
-      <div class="today-section-title">
-        <v-icon size="16" color="orange">mdi-calendar-today</v-icon>今日の授業<span
-          class="today-date"
-          >{{ todayDateLabel }}</span
-        >
-      </div>
-      <div class="today-cards">
-        <div
-          v-for="lecture in todayLectures"
-          :key="lecture.id"
-          class="today-card"
-          :style="getTodayCardStyle(lecture)"
-        >
-          <div class="today-card-period">{{ lecture.period }}限</div>
-          <div class="today-card-info">
-            <div class="today-card-name">{{ lecture.name }}</div>
-            <div class="today-card-meta">
-              <span v-if="lecture.room"
-                ><v-icon size="11" style="opacity: 0.7">mdi-map-marker</v-icon
-                >{{ lecture.room }}</span
-              >
-              <span v-if="lecture.teacher">{{ lecture.teacher }}</span>
-            </div>
-          </div>
-          <div class="today-card-time">{{ getPeriodStart(lecture.period) }}</div>
-        </div>
-      </div>
-    </section>
-
     <main class="page-content">
       <TimetableGrid @cell-click="handleCellClick" />
     </main>
@@ -130,6 +100,36 @@
       @saved="onLectureSaved"
       @deleted="onLectureDeleted"
     />
+
+    <section v-if="isAuthenticated && todayLectures.length > 0" class="today-section">
+      <div class="today-section-title">
+        <v-icon size="16" color="orange">mdi-calendar-today</v-icon>今日の授業<span
+          class="today-date"
+          >{{ todayDateLabel }}</span
+        >
+      </div>
+      <div class="today-cards">
+        <div
+          v-for="lecture in todayLectures"
+          :key="lecture.id"
+          class="today-card"
+          :style="getTodayCardStyle(lecture)"
+        >
+          <div class="today-card-period">{{ lecture.period }}限</div>
+          <div class="today-card-info">
+            <div class="today-card-name">{{ lecture.name }}</div>
+            <div class="today-card-meta">
+              <span v-if="lecture.room"
+                ><v-icon size="11" style="opacity: 0.7">mdi-map-marker</v-icon
+                >{{ lecture.room }}</span
+              >
+              <span v-if="lecture.teacher">{{ lecture.teacher }}</span>
+            </div>
+          </div>
+          <div class="today-card-time">{{ getPeriodStart(lecture.period) }}</div>
+        </div>
+      </div>
+    </section>
   </div>
 </template>
 
