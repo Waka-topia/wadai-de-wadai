@@ -1,11 +1,9 @@
 <template>
   <div class="timetable-grid-container">
-    <!-- ローディング中 -->
     <div v-if="isLoading" class="loading-overlay">
       <v-progress-circular indeterminate color="orange" size="40" />
     </div>
 
-    <!-- 未ログイン時の案内バナー -->
     <div v-else-if="!isLoggedIn" class="guest-banner">
       <v-icon color="orange" size="28">mdi-account-lock-outline</v-icon>
       <div class="guest-banner-text">
@@ -15,10 +13,8 @@
     </div>
 
     <div class="timetable-grid">
-      <!-- 角のセル -->
       <div class="grid-header-cell corner"></div>
 
-      <!-- 曜日ヘッダー -->
       <div
         v-for="day in days"
         :key="day.value"
@@ -29,9 +25,7 @@
         <span v-if="isToday(day.value)" class="today-dot"></span>
       </div>
 
-      <!-- 各時限の行 -->
       <template v-for="period in periods" :key="period">
-        <!-- 時限ヘッダー -->
         <div
           class="grid-header-cell period"
           :class="{ 'current-period-header': isCurrentPeriod(period) }"
@@ -41,7 +35,6 @@
           <span class="period-end-time">{{ getPeriodEnd(period) }}</span>
         </div>
 
-        <!-- 各曜日のセル -->
         <div
           v-for="day in days"
           :key="`${day.value}-${period}`"
@@ -53,25 +46,27 @@
           }"
           @click="onCellClick(day.value, period)"
         >
-          <div
-            v-if="getLecture(day.value, period)"
-            class="lecture-card"
-            :style="getLectureCardStyle(day.value, period)"
-          >
-            <!-- 必修バッジ + 講義名 -->
-            <div class="lecture-header">
-              <div class="lecture-name">{{ getLecture(day.value, period).name }}</div>
+          <template v-if="getLectures(day.value, period).length > 0">
+            <div
+              v-for="lecture in getLectures(day.value, period)"
+              :key="lecture.id"
+              class="lecture-card"
+              :style="getLectureCardStyle(lecture)"
+              @click.stop="onCellClick(day.value, period, lecture.id)"
+            >
+              <div class="lecture-header">
+                <div class="lecture-name">{{ lecture.name }}</div>
+              </div>
+              <div class="lecture-detail">
+                <span v-if="lecture.room" class="lecture-room">
+                  <v-icon size="10" style="opacity: 0.7">mdi-map-marker</v-icon>
+                  {{ lecture.room }}
+                </span>
+                <span v-if="lecture.year" class="lecture-year">{{ lecture.year }}年</span>
+              </div>
             </div>
-            <div class="lecture-detail">
-              <span v-if="getLecture(day.value, period).room" class="lecture-room">
-                <v-icon size="10" style="opacity: 0.7">mdi-map-marker</v-icon>
-                {{ getLecture(day.value, period).room }}
-              </span>
-              <span v-if="getLecture(day.value, period).year" class="lecture-year"
-                >{{ getLecture(day.value, period).year }}年</span
-              >
-            </div>
-          </div>
+          </template>
+
           <div v-else class="add-icon">
             <v-icon size="small" color="#ddd">mdi-plus</v-icon>
           </div>
@@ -97,31 +92,24 @@ defineProps({
       { label: '金', value: 'fri' },
     ],
   },
-  periods: {
-    type: Array,
-    default: () => [1, 2, 3, 4, 5, 6],
-  },
+  periods: { type: Array, default: () => [1, 2, 3, 4, 5, 6] },
 })
 
 const emit = defineEmits(['cellClick'])
-
 const store = useStore()
 
-const onCellClick = (day, period) => {
-  if (isLoggedIn.value) {
-    void logFirebaseAnalyticsEvent('timetable_grid_cell_click', { day, period })
-  }
-  emit('cellClick', { day, period })
+// IDを含めてEmitする
+const onCellClick = (day, period, lectureId = null) => {
+  if (isLoggedIn.value) void logFirebaseAnalyticsEvent('timetable_grid_cell_click', { day, period })
+  emit('cellClick', { day, period, lectureId })
 }
 
 const isLoading = computed(() => store.getters['timetable/isLoading'])
 const isLoggedIn = computed(() => store.getters['auth/isAuthenticated'])
 
-const getLecture = (day, period) => {
-  return store.getters['timetable/getLecture'](day, period)
-}
+// 配列を取得するGetterに変更
+const getLectures = (day, period) => store.getters['timetable/getLectures'](day, period)
 
-/** 時限の開始・終了時刻 */
 const periodTimes = {
   1: { start: '09:10', end: '10:40' },
   2: { start: '10:50', end: '12:20' },
@@ -130,33 +118,21 @@ const periodTimes = {
   5: { start: '16:30', end: '18:00' },
   6: { start: '18:10', end: '19:40' },
 }
-
 const getPeriodStart = (period) => periodTimes[period]?.start || ''
 const getPeriodEnd = (period) => periodTimes[period]?.end || ''
 
-/** 今日の曜日コードを返す（0=日, 1=月...） */
 const dayCodeMap = { 1: 'mon', 2: 'tue', 3: 'wed', 4: 'thu', 5: 'fri' }
 const todayCode = computed(() => dayCodeMap[new Date().getDay()] || '')
-
 const isToday = (dayValue) => todayCode.value === dayValue
 
-/**
- * 現在の時限を判定する
- *
- * @param {number} period - 時限番号
- * @returns {boolean} 現在の時限ならtrue
- */
 const isCurrentPeriod = (period) => {
   const now = new Date()
   const [sh, sm] = periodTimes[period].start.split(':').map(Number)
   const [eh, em] = periodTimes[period].end.split(':').map(Number)
-  const startMin = sh * 60 + sm
-  const endMin = eh * 60 + em
   const nowMin = now.getHours() * 60 + now.getMinutes()
-  return nowMin >= startMin && nowMin <= endMin
+  return nowMin >= sh * 60 + sm && nowMin <= eh * 60 + em
 }
 
-/** カラーパレット（8色） */
 const colorPalette = {
   orange: { bg: '#fff3e0', border: '#ff9800', text: '#e65100', sub: '#ef6c00' },
   red: { bg: '#fce4ec', border: '#e91e63', text: '#c2185b', sub: '#e91e63' },
@@ -168,19 +144,17 @@ const colorPalette = {
   brown: { bg: '#efebe9', border: '#795548', text: '#4e342e', sub: '#6d4c41' },
 }
 
-const getLectureCardStyle = (day, period) => {
-  const lecture = getLecture(day, period)
+const getLectureCardStyle = (lecture) => {
   if (!lecture) return {}
   const color = colorPalette[lecture.color] || colorPalette.orange
-
   let leftBorderColor = color.border
   let leftBorderWidth = '4px'
 
   if (lecture.required === 'req' || lecture.required === 'required') {
-    leftBorderColor = '#e53935' // 赤
+    leftBorderColor = '#e53935'
     leftBorderWidth = '6px'
   } else if (lecture.required === 'semi' || lecture.required === 'semi-required') {
-    leftBorderColor = '#8e24aa' // 紫
+    leftBorderColor = '#8e24aa'
     leftBorderWidth = '6px'
   }
 
@@ -202,14 +176,12 @@ const getLectureCardStyle = (day, period) => {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   margin-top: 1rem;
 }
-
 .loading-overlay {
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 48px 0;
 }
-
 .guest-banner {
   display: flex;
   align-items: center;
@@ -220,23 +192,20 @@ const getLectureCardStyle = (day, period) => {
   padding: 14px 16px;
   margin: 0 0 12px;
 }
-
 .guest-banner-title {
   font-size: 0.92rem;
   font-weight: bold;
   color: #e65100;
 }
-
 .guest-banner-sub {
   font-size: 0.78rem;
   color: #ef6c00;
   margin-top: 2px;
 }
-
 .timetable-grid {
   display: grid;
-  grid-template-columns: 44px repeat(5, 1fr); /* 時間軸を少しスリムに */
-  grid-auto-rows: auto; /* 高さはセルの比率に任せる */
+  grid-template-columns: 44px repeat(5, 1fr);
+  grid-auto-rows: auto;
   width: 100%;
   border: 1px solid #eee;
   border-radius: 12px;
@@ -245,7 +214,6 @@ const getLectureCardStyle = (day, period) => {
   gap: 1px;
 }
 
-/* ヘッダー共通 */
 .grid-header-cell {
   background-color: #f8f9fa;
   padding: 8px 4px;
@@ -256,8 +224,6 @@ const getLectureCardStyle = (day, period) => {
   border-bottom: 2px solid #eee;
   border-right: 1px solid #eee;
 }
-
-/* 曜日ヘッダー */
 .grid-header-cell.day {
   height: 44px;
   display: flex;
@@ -267,13 +233,10 @@ const getLectureCardStyle = (day, period) => {
   gap: 3px;
   position: relative;
 }
-
-/* 今日の曜日ヘッダー */
 .grid-header-cell.day.today-col-header {
   background: linear-gradient(135deg, #ff9800, #ff6f00);
   color: white;
 }
-
 .today-dot {
   width: 5px;
   height: 5px;
@@ -281,8 +244,6 @@ const getLectureCardStyle = (day, period) => {
   background: white;
   opacity: 0.8;
 }
-
-/* 時限ヘッダー */
 .grid-header-cell.period {
   display: flex;
   flex-direction: column;
@@ -291,77 +252,64 @@ const getLectureCardStyle = (day, period) => {
   gap: 1px;
   background-color: #f8f9fa;
   padding: 4px 2px;
-  height: 100%; /* セルの高さに合わせる */
+  height: 100%;
 }
-
 .grid-header-cell.period.current-period-header {
   background: linear-gradient(135deg, #ff9800, #ff6f00);
   color: white;
 }
-
 .period-num {
   font-size: 1rem;
   font-weight: bold;
   color: #333;
   line-height: 1;
 }
-
 .current-period-header .period-num {
   color: white;
 }
-
 .period-time {
   font-size: 0.6rem;
   color: #999;
   line-height: 1;
 }
-
 .period-end-time {
   font-size: 0.58rem;
   color: #bbb;
   line-height: 1;
 }
-
 .current-period-header .period-time,
 .current-period-header .period-end-time {
   color: rgba(255, 255, 255, 0.85);
 }
 
-/* セル */
+/* セルのスタイル（複数対応） */
 .grid-cell {
   background-color: white;
-  aspect-ratio: 1 / 1.35; /* 端末の横幅に応じて動的に高さを決定 */
+  aspect-ratio: 1 / 1.35;
   min-height: 0;
   padding: 2px;
   cursor: pointer;
   transition: background-color 0.15s;
   display: flex;
   flex-direction: column;
-  align-items: stretch; /* 中身を横幅一杯に広げる */
-  justify-content: stretch; /* 中身を縦幅一杯に広げる */
+  align-items: stretch;
+  justify-content: stretch;
   position: relative;
   overflow: hidden;
+  gap: 2px; /* 複数カードがある場合の隙間 */
 }
-
 .grid-cell:hover {
   background-color: #fff9f0;
 }
-
-/* 今日の列 */
 .grid-cell.today-col {
   background-color: #fffde7;
 }
-
 .grid-cell.today-col:hover {
   background-color: #fff3e0;
 }
-
-/* 現在時限の行 */
 .grid-cell.current-period-row {
   background-color: #f3f8ff;
 }
-
-/* 今日かつ現在時限 */
 .grid-cell.today-current {
   background-color: #fff8e1;
   box-shadow: inset 0 0 0 2px #ffcc02;
@@ -369,8 +317,8 @@ const getLectureCardStyle = (day, period) => {
 
 /* 講義カード */
 .lecture-card {
-  width: 100%;
-  height: 100%; /* セル一杯に広げる */
+  flex: 1; /* 複数ある場合は均等に分割、1つの場合は全高 */
+  min-height: 0;
   border-left: 4px solid #ff9800;
   border-radius: 4px;
   padding: 4px 3px;
@@ -380,25 +328,22 @@ const getLectureCardStyle = (day, period) => {
   overflow: hidden;
   transition: box-shadow 0.15s;
 }
-
 .lecture-card:hover {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
-
 .lecture-name {
   font-size: 0.7rem;
   font-weight: bold;
   color: var(--lecture-text, #e65100);
   overflow: hidden;
   display: -webkit-box;
-  -webkit-line-clamp: 4; /* 最大4行まで表示可能に */
-  line-clamp: 4;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   line-height: 1.25;
   word-break: break-all;
   margin-bottom: 2px;
 }
-
 .lecture-detail {
   display: flex;
   align-items: center;
@@ -406,7 +351,6 @@ const getLectureCardStyle = (day, period) => {
   gap: 2px;
   margin-top: 2px;
 }
-
 .lecture-room {
   font-size: 0.6rem;
   color: var(--lecture-sub, #ef6c00);
@@ -418,25 +362,17 @@ const getLectureCardStyle = (day, period) => {
   gap: 1px;
   flex: 1;
 }
-
-.lecture-credits {
-  font-size: 0.58rem;
-  color: var(--lecture-sub, #ef6c00);
-  white-space: nowrap;
-  font-weight: 600;
-  opacity: 0.8;
-}
-
 .add-icon {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   opacity: 0.35;
   transition: opacity 0.15s;
 }
-
 .grid-cell:hover .add-icon {
   opacity: 0.6;
 }
-
-/* 講義ヘッダー（バッジ＋名前） */
 .lecture-header {
   display: flex;
   align-items: flex-start;
@@ -444,8 +380,6 @@ const getLectureCardStyle = (day, period) => {
   flex: 1;
   overflow: hidden;
 }
-
-/* 年次ラベル */
 .lecture-year {
   font-size: 0.58rem;
   color: var(--lecture-sub, #ef6c00);
