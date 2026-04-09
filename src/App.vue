@@ -4,7 +4,7 @@
       <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer"> </v-app-bar-nav-icon>
 
       <v-app-bar-title class="font-weight-bold text-h7 text-white">
-        ワダイdeワダイ-{{ title }}-
+        ワダイdeワダイ(大学非公式)-{{ title }}-
       </v-app-bar-title>
     </v-app-bar>
 
@@ -33,7 +33,7 @@
       </router-view>
       <div v-if="!isFullscreenPage" class="mb-6">
         <v-footer app>
-          <span>&copy; 2025 ワダイdeワダイ</span>
+          <span>&copy; 2026 ワダイdeワダイ(大学非公式)</span>
         </v-footer>
       </div>
     </v-main>
