@@ -15,6 +15,11 @@
           お問い合わせ
           <v-icon class="position-absolute right-0 mx-2"> mdi-open-in-new </v-icon>
         </v-list-item>
+        <v-list-item class="position-relative my-1" block size="large" @click="gotoInstagram">
+          <v-icon color="pink"> mdi-instagram </v-icon>
+          運営Instagram
+          <v-icon class="position-absolute right-0 mx-2"> mdi-open-in-new </v-icon>
+        </v-list-item>
         <v-list-item class="position-relative my-1" block size="large" @click="gotorule">
           <v-icon> mdi-information-outline </v-icon>
           利用規約
@@ -124,6 +129,11 @@ const gotoinquiry = () => {
 
 const gotorule = () => {
   router.push('/rule')
+}
+
+/** 公式Instagramを開く */
+const gotoInstagram = () => {
+  window.open('https://instagram.com/wakatopia_official', '_blank')
 }
 
 watch(
