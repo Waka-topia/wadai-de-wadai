@@ -1,5 +1,5 @@
 <template>
-  <v-card class="py-6 text-center" elevation="0.5" rounded="lg">
+  <v-card class="py-6 text-center" elevation="1" rounded="lg">
     <v-avatar class="mb-3" size="140">
       <v-img class="rounded-circle" alt="ユーザーのアイコン" :src="user.userIconUrl"></v-img>
     </v-avatar>

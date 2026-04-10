@@ -29,7 +29,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { onUnmounted, ref, watch } from 'vue'
 import qrCodeImage from '@/assets/QR/wadai-de-wadai.png'
 
 // パネルの開閉状態を管理する変数
@@ -38,13 +38,28 @@ const panel = ref(null)
 // 画像の表示/非表示を管理する変数
 const isImageVisible = ref(false)
 
+// タイマーIDを保持する変数
+let timer = null
+
+// コンポーネント破棄時にタイマーをクリア
+onUnmounted(() => {
+  if (timer) clearTimeout(timer)
+})
+
 // パネルの状態を監視
 watch(panel, (newVal) => {
+  // 既存のタイマーがあればクリアしてレースコンディションを防ぐ
+  if (timer) {
+    clearTimeout(timer)
+    timer = null
+  }
+
   if (newVal === 'qr') {
     // パネルが開かれたら、アニメーション完了（約300ms）を待ってから画像を表示
-    setTimeout(() => {
+    timer = setTimeout(() => {
       isImageVisible.value = true
-    }, 10)
+      timer = null
+    }, 300)
   } else {
     // パネルが閉じられたら即座に画像を非表示に戻す
     isImageVisible.value = false

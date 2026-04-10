@@ -1,51 +1,107 @@
 <template>
-  <v-progress-linear v-if="isLoading" color="success" indeterminate=""></v-progress-linear>
-  <v-sheet class="pa-12" rounded>
-    <v-card class="py-8">
+  <v-container class="fill-height d-flex align-start justify-center" fluid>
+    <v-card class="pa-6 pa-md-8 w-100" max-width="450" rounded="xl" elevation="1" outlined>
+      <v-progress-linear
+        v-if="isLoading"
+        color="orange-darken-2"
+        indeterminate
+        absolute
+        top
+      ></v-progress-linear>
+
+      <div class="text-center mb-8">
+        <v-avatar color="orange-lighten-5" size="72" class="mb-4">
+          <v-icon size="36" color="orange-darken-2">mdi-login</v-icon>
+        </v-avatar>
+        <h2 class="text-h5 font-weight-bold text-grey-darken-3">ログイン</h2>
+        <p class="text-caption text-grey-darken-1 mt-1">ワダイdeワダイへようこそ</p>
+      </div>
+
       <v-form @submit.prevent="onSubmit">
         <v-text-field
           v-model="loginData.email"
-          class="mb-2"
+          class="mb-4"
           :rules="[required, emailDomainCheck]"
           clearable
-          label="Email"
+          label="メールアドレス"
           placeholder="sample@gmail.com"
           prepend-inner-icon="mdi-email-outline"
+          variant="outlined"
+          color="orange-darken-2"
+          density="comfortable"
         ></v-text-field>
+
         <v-text-field
           v-model="loginData.password"
           :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
           :rules="[required]"
           :type="visible ? 'text' : 'password'"
           clearable
-          label="Password"
-          placeholder="Xa4%j87d"
+          label="パスワード"
+          placeholder="パスワードを入力"
           prepend-inner-icon="mdi-lock-outline"
+          variant="outlined"
+          color="orange-darken-2"
+          density="comfortable"
           @click:append-inner="visible = !visible"
         ></v-text-field>
 
-        <br />
+        <div class="d-flex justify-end mb-6 mt-n2">
+          <a
+            href="#"
+            class="text-caption text-orange-darken-2 font-weight-medium text-decoration-none"
+            @click.prevent="onForgotPassword"
+          >
+            パスワードをお忘れですか？
+          </a>
+        </div>
 
         <v-btn
           type="submit"
           :loading="isLoading"
           block
-          color="success"
-          size="large"
-          variant="elevated"
+          color="orange-darken-2"
+          size="x-large"
+          rounded="pill"
+          class="font-weight-bold mb-2"
+          elevation="0"
         >
-          Sign In
+          ログイン
         </v-btn>
       </v-form>
-      <v-divider class="mt-10"></v-divider>
-      <v-btn variant="text" @click="onSignUp"> アカウントを作成する </v-btn>
-      <v-btn variant="text" @click="onStart"> ログインせずに開始する </v-btn>
-      <v-btn variant="text" @click="onForgotPassword"> パスワードを忘れた場合 </v-btn>
+
+      <v-divider class="my-6"></v-divider>
+
+      <div class="d-flex flex-column" style="gap: 12px">
+        <v-btn
+          variant="outlined"
+          color="orange-darken-2"
+          rounded="pill"
+          size="large"
+          block
+          class="font-weight-bold bg-white"
+          @click="onSignUp"
+        >
+          新しいアカウントを作成
+        </v-btn>
+
+        <v-btn
+          variant="text"
+          color="grey-darken-1"
+          rounded="pill"
+          size="large"
+          block
+          @click="onStart"
+        >
+          ログインせずに開始する
+        </v-btn>
+      </div>
     </v-card>
-    <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
+
+    <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000" rounded="pill">
       {{ snackbar.message }}
     </v-snackbar>
-  </v-sheet>
+  </v-container>
 </template>
 
 <script setup>

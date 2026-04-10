@@ -46,7 +46,7 @@
           rounded="pill"
           @click="goToProveOwner"
         >
-          団体者証明へ進む
+          団体代表者証明へ進む
         </v-btn>
       </div>
     </v-card>
