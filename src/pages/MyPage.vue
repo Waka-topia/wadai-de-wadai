@@ -3,6 +3,19 @@
     <ProfileCard />
     <EditForm />
     <ContactBanner />
+
+    <div class="pa-4 text-center">
+      <v-btn
+        to="/tutorial"
+        class="text-white font-weight-bold"
+        color="orange"
+        elevation="3"
+        rounded
+      >
+        使い方を見る
+      </v-btn>
+    </div>
+
   </div>
   <div v-else>
     <RecommendLogin />
