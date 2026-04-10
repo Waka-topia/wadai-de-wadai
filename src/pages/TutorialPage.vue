@@ -60,7 +60,7 @@ const isFirstSlide = computed(() => currentIndex.value === 0)
 const isLastSlide = computed(() => currentIndex.value === totalImages - 1)
 
 /**
- * handle back button click: slide back or exit tutorial
+ * Handle back button click: slide back or exit tutorial
  *
  * @returns {void}
  */
@@ -75,7 +75,7 @@ const handleBack = () => {
 }
 
 /**
- * handle next button click: slide forward or finish tutorial
+ * Handle next button click: slide forward or finish tutorial
  *
  * @returns {void}
  */

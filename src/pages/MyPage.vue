@@ -15,7 +15,6 @@
         使い方を見る
       </v-btn>
     </div>
-
   </div>
   <div v-else>
     <RecommendLogin />
