@@ -1,6 +1,6 @@
 <template>
   <div class="tutorial-container">
-    <div class="tutorial-slider overflow-hidden rounded-lg elevation-2">
+    <div class="tutorial-slider m-7 overflow-hidden rounded-lg">
       <div
         class="slider-track d-flex transition-transform"
         :style="{ transform: `translateX(-${currentIndex * 100}%)` }"
@@ -10,23 +10,15 @@
         <img src="@/assets/tutorial/6.webp" alt="tutorial 3" class="slider-img" />
         <img src="@/assets/tutorial/7.webp" alt="tutorial 4" class="slider-img" />
       </div>
-
-      <div class="slider-indicators">
-        <div
-          v-for="n in totalImages"
-          :key="n"
-          class="indicator-dot"
-          :class="{ active: currentIndex === n - 1 }"
-        />
-      </div>
     </div>
 
     <div class="floating-nav-container">
       <v-btn
         color="white"
         class="text-blue-darken-2 font-weight-bold back-btn"
-        elevation="4"
+        elevation="2"
         rounded="pill"
+        size="large"
         :prepend-icon="isFirstSlide ? 'mdi-close' : 'mdi-chevron-left'"
         @click="handleBack"
       >
@@ -36,8 +28,9 @@
       <v-btn
         color="blue-darken-2"
         class="text-white font-weight-bold next-btn"
-        elevation="4"
+        elevation="2"
         rounded="pill"
+        size="large"
         :append-icon="isLastSlide ? 'mdi-check' : 'mdi-chevron-right'"
         @click="handleNext"
       >
@@ -95,7 +88,6 @@ const handleNext = () => {
   position: relative;
   width: 100%;
   height: 100%;
-  padding-bottom: 120px; /* 下部ボタン群と重ならないよう余白を確保 */
 }
 
 /* 1. 枠組み（はみ出た部分を隠して1枚分だけ見せる） */
@@ -119,36 +111,15 @@ const handleNext = () => {
 .slider-img {
   flex: 0 0 100%;
   width: 100%;
-  padding: 70px; /* ★ここで好みの余白を指定します（例: 16px, 24px, 5% など） */
-  box-sizing: border-box; /* ★重要：paddingを含めて全体を「幅100%」に抑え込む魔法のプロパティ */
+  height: 100%;
+  padding: 70px;
+  box-sizing: border-box;
   object-fit: contain;
-}
-
-/* 下部の丸いインジケーター */
-.slider-indicators {
-  position: absolute;
-  bottom: 16px;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-}
-.indicator-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: rgba(0, 0, 0, 0.3);
-  transition: background-color 0.2s;
-}
-.indicator-dot.active {
-  background-color: #ff9800; /* アクティブな丸の色（オレンジ） */
 }
 
 /* フローティングボタンのコンテナ */
 .floating-nav-container {
   position: fixed;
-  /* BottomNavigationの高さ(64px) + 余白(16px) + セーフエリアを考慮 */
   bottom: calc(80px + env(safe-area-inset-bottom));
   left: 0;
   right: 0;
@@ -156,17 +127,16 @@ const handleNext = () => {
   justify-content: space-between;
   padding: 0 16px;
   pointer-events: none;
-  z-index: 100;
 }
 
-/* ボタン自体はクリック判定を有効化する */
+/* ボタン自体はクリック判定を有効化し、サイズを明示的に大きくする */
 .floating-nav-container .v-btn {
   pointer-events: auto;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-  transition: width 0.3s ease; /* 文字幅が変わった時に滑らかに */
+  height: 54px !important; /* ボタンの縦幅を厚く */
+  font-size: 1.1rem !important; /* 文字サイズを大きく */
+  padding: 0 28px !important; /* 左右の余白を広げて横幅も大きく */
 }
 
-/* 中央に突き出たホームボタンとの干渉を避けるため、左右に寄せる */
 .back-btn {
   margin-right: auto;
 }
