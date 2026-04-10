@@ -93,13 +93,14 @@ const handleNext = () => {
 /* 1. 枠組み（はみ出た部分を隠して1枚分だけ見せる） */
 .tutorial-slider {
   width: 100%;
-  background-color: #f5f5f5;
   overflow: hidden;
 }
 
 /* 2. 画像を横一列に並べるトラック */
 .slider-track {
   width: 100%;
+  padding: 70px;
+  gap: 140px;
 }
 
 /* スライド時の滑らかなアニメーション */
@@ -112,9 +113,9 @@ const handleNext = () => {
   flex: 0 0 100%;
   width: 100%;
   height: 100%;
-  padding: 70px;
   box-sizing: border-box;
   object-fit: contain;
+  border-radius: 20px;
 }
 
 /* フローティングボタンのコンテナ */
