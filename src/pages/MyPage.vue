@@ -4,15 +4,16 @@
     <EditForm />
     <ContactBanner />
 
-    <div class="pa-4 text-center">
+    <div class="my-8 text-center">
       <v-btn
         to="/tutorial"
         class="text-white font-weight-bold"
+        size="large"
         color="orange"
         elevation="3"
         rounded
       >
-        使い方を見る
+        スマホアプリとして使う方法を見る
       </v-btn>
     </div>
   </div>

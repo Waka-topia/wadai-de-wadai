@@ -90,25 +90,27 @@ const handleNext = () => {
   height: 100%;
 }
 
-/* 1. 枠組み（はみ出た部分を隠して1枚分だけ見せる） */
+/* 枠組み（はみ出た部分を隠して1枚分だけ見せる） */
 .tutorial-slider {
   width: 100%;
   overflow: hidden;
 }
 
-/* 2. 画像を横一列に並べるトラック */
+/**
+ * 画像を横一列に並べるトラック．各画像についてpaddingを
+ * 70に指定したので，140のgapを指定してスライド時中央に来るようにしている
+ * 要改善
+ */
 .slider-track {
   width: 100%;
   padding: 70px;
   gap: 140px;
 }
 
-/* スライド時の滑らかなアニメーション */
 .transition-transform {
   transition: transform 0.3s ease-in-out;
 }
 
-/* 3. 各画像を必ず枠の100%の幅にする */
 .slider-img {
   flex: 0 0 100%;
   width: 100%;
