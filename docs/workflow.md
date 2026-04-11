@@ -42,13 +42,13 @@ npm run dev
 
 ```bash
 # 新機能開発
-git checkout -b feature/機能名
+git switch -b feature/機能名
 
 # バグ修正
-git checkout -b fix/バグ名
+git switch -b fix/バグ名
 
 # ドキュメント更新
-git checkout -b docs/更新内容
+git switch -b docs/更新内容
 ```
 
 ### 2. コード作成
@@ -94,11 +94,11 @@ git push origin feature/機能名
 
 ### 開発
 
-| コマンド          | 説明                         |
-| ----------------- | ---------------------------- |
-| `npm run dev`     | 開発サーバー起動（HMR有効）  |
-| `npm run build`   | 本番ビルド（`dist/` に出力） |
-| `npm run preview` | ビルド結果をプレビュー       |
+| コマンド            | 説明                         |
+| ------------------- | ---------------------------- |
+| `npm run dev`       | 開発サーバー起動（HMR有効）  |
+| `npm run build:dev` | 本番ビルド（`dist/` に出力） |
+| `npm run preview`   | ビルド結果をプレビュー       |
 
 ### コード品質
 
@@ -296,10 +296,14 @@ git push origin feature/新機能名
 
 ```bash
 # ビルド
-npm run build
+npm run build:dev
 
 # Firebaseデプロイ（Firebase CLIが必要）
 firebase deploy --only hosting
+
+or
+
+npm run deploy:dev
 ```
 
 ---
