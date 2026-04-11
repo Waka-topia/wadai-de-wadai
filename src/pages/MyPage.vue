@@ -1,10 +1,12 @@
 <template>
+  <div v-if="isAuthenticated" class="d-flex flex-column justify-center my-10 px-4">
+    <ProfileHeader />
 
-  <div v-if="isAuthenticated" class="d-flex flex-column justify-center my-10">
-    <ProfileCard />
-    <EditForm />
-    <ContactBanner />
+    <ContactBanner class="mt-4" />
 
+    <BasicInfoPanel class="mt-4" />
+
+    <AppQRCode class="mt-4" />
     <div class="my-8 text-center">
       <v-btn
         to="/tutorial"
@@ -17,16 +19,6 @@
         スマホアプリとして使う方法を見る
       </v-btn>
     </div>
-
-  <div v-if="isAuthenticated" class="d-flex flex-column justify-center my-10 px-4">
-    <ProfileHeader />
-
-    <ContactBanner class="mt-4" />
-
-    <BasicInfoPanel class="mt-4" />
-
-    <AppQRCode class="mt-4" />
-
   </div>
   <div v-else>
     <RecommendLogin />
