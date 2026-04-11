@@ -4,7 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "vite build",
+    "build:dev": "vite build --mode development",
+    "build:prod": "vite build --mode production",
+    "deploy:dev": "firebase use dev && npm run build:dev && firebase deploy --only hosting",
+    "deploy:prod": "firebase use prod && npm run build:prod && firebase deploy --only hosting",
     "dev": "vite",
     "format": "prettier --write .",
     "lint": "eslint . --fix",
