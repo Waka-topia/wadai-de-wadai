@@ -45,15 +45,13 @@
       </v-card>
     </template>
   </v-dialog>
-  <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="3000">
-    {{ snackbar.message }}
-  </v-snackbar>
 </template>
 
 <script setup>
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
+import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 
 const router = useRouter()
@@ -63,11 +61,7 @@ const user = computed(() => store.getters['auth/user'])
 const userEmail = computed(() => store.getters['users/currentUserData']?.email)
 const isDialogOpen = ref(false)
 
-const snackbar = ref({
-  show: false,
-  color: '',
-  message: '',
-})
+const { showSnackbar } = useSnackbar()
 
 const onDeleteAccount = async () => {
   try {
@@ -76,21 +70,13 @@ const onDeleteAccount = async () => {
     await store.dispatch('auth/initializeAuth')
     sessionStorage.removeItem('user')
 
-    snackbar.value = {
-      show: true,
-      color: 'success',
-      message: 'アカウントを削除しました',
-    }
+    showSnackbar('アカウントを削除しました', 'success', { icon: 'mdi-check-circle' })
 
     setTimeout(() => {
       router.push('/login')
     }, 1000)
   } catch (error) {
-    snackbar.value = {
-      show: true,
-      color: 'error',
-      message: error.message,
-    }
+    showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
   } finally {
     isDialogOpen.value = false
   }

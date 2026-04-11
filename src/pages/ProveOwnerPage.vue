@@ -139,23 +139,13 @@
         <v-btn
           variant="plain"
           class="mt-3"
-          @click="
-            snackbar = {
-              show: true,
-              color: 'info',
-              message: 'パスワードリセット機能は現在準備中です。',
-            }
-          "
+          @click="showSnackbar('パスワードリセット機能は現在準備中です。', 'info')"
         >
           パスワードを忘れた場合はこちら
         </v-btn>
       </v-form>
     </v-card>
   </v-container>
-
-  <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
-    {{ snackbar.message }}
-  </v-snackbar>
 </template>
 
 <script setup>
@@ -164,6 +154,7 @@ import { useRouter } from 'vue-router'
 import { required, passwordRule, confirmPasswordRule } from '@/utils/forms/validate'
 import { useStore } from 'vuex'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { allGroups } from '@/data/groups'
 
@@ -175,11 +166,8 @@ const confirmVisible = ref(false)
 const isLoading = ref(false)
 const isCheckingGroup = ref(false)
 const registrationMode = ref(null) // 'initial' | 'subsequent'
-const snackbar = ref({
-  show: false,
-  color: '',
-  message: '',
-})
+
+const { showSnackbar } = useSnackbar()
 
 const router = useRouter()
 const store = useStore()
@@ -210,11 +198,7 @@ const onGroupSelected = async (group) => {
       mode: registrationMode.value,
     })
   } catch (error) {
-    snackbar.value = {
-      show: true,
-      color: 'error',
-      message: error.message,
-    }
+    showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
     registrationMode.value = 'initial'
   } finally {
     isCheckingGroup.value = false
@@ -248,11 +232,7 @@ const onSubmit = async (validationPromise) => {
         organizationId: String(selected.id),
       })
 
-      snackbar.value = {
-        show: true,
-        color: 'success',
-        message: '代表者として登録されました！🎉',
-      }
+      showSnackbar('代表者として登録されました！', 'success', { icon: 'mdi-check-circle' })
 
       setTimeout(() => {
         router.push('/eventcal')
@@ -272,11 +252,7 @@ const onSubmit = async (validationPromise) => {
         organizationId: String(selected.id),
       })
 
-      snackbar.value = {
-        show: true,
-        color: 'success',
-        message: '申請を受け付けました',
-      }
+      showSnackbar('申請を受け付けました', 'success', { icon: 'mdi-check-circle' })
 
       setTimeout(() => {
         router.push('/prove-owner/description')
@@ -284,11 +260,7 @@ const onSubmit = async (validationPromise) => {
     }
   } catch (error) {
     void logFirebaseAnalyticsEvent('prove_owner_submit_error', {})
-    snackbar.value = {
-      show: true,
-      color: 'error',
-      message: error.message,
-    }
+    showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
   } finally {
     isLoading.value = false
   }

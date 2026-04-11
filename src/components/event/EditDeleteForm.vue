@@ -52,10 +52,6 @@
         </p>
       </v-card-text>
     </v-card>
-
-    <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
-      {{ snackbar.message }}
-    </v-snackbar>
   </div>
 </template>
 
@@ -63,6 +59,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
+import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import EventForm from '@/components/event/EventForm.vue'
 
@@ -78,11 +75,7 @@ const props = defineProps({
   },
 })
 
-const snackbar = ref({
-  show: false,
-  message: '',
-  color: '',
-})
+const { showSnackbar } = useSnackbar()
 
 const router = useRouter()
 const store = useStore()
@@ -105,11 +98,7 @@ const onDelete = async () => {
       currentUserId,
     })
 
-    snackbar.value = {
-      show: true,
-      message: 'イベントが正常に削除されました。',
-      color: 'success',
-    }
+    showSnackbar('イベントが正常に削除されました。', 'success', { icon: 'mdi-check-circle' })
 
     deleteDialogOpen.value = false
 
@@ -118,11 +107,7 @@ const onDelete = async () => {
     }, 500)
   } catch (error) {
     deleteDialogOpen.value = false
-    snackbar.value = {
-      show: true,
-      message: error.message,
-      color: 'error',
-    }
+    showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
   }
 }
 </script>

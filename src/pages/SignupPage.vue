@@ -129,10 +129,6 @@
       </v-btn>
     </v-card>
 
-    <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000" rounded="pill">
-      {{ snackbar.message }}
-    </v-snackbar>
-
     <v-dialog v-model="dialog" max-width="600px">
       <v-card rounded="xl" class="pa-2">
         <v-card-title class="text-h6 font-weight-bold text-center pt-4"> 利用規約 </v-card-title>
@@ -160,6 +156,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { required, passwordRule, nameCheck, emailDomainCheck } from '@/utils/forms/validate'
 import TermsRule from '@/components/templates/TermsRule.vue'
@@ -173,11 +170,8 @@ const visible = ref(false)
 const agree = ref(false)
 const isLoading = ref(false)
 const dialog = ref(false)
-const snackbar = ref({
-  show: false,
-  color: '',
-  message: '',
-})
+
+const { showSnackbar } = useSnackbar()
 
 // ★ 追加: 規約を読んだかどうかを判定するフラグ
 const hasReadTerms = ref(false)
@@ -211,11 +205,7 @@ const onSubmit = async (validationPromise) => {
 
     void logFirebaseAnalyticsEvent('signup_submit_success', {})
 
-    snackbar.value = {
-      show: true,
-      color: 'success',
-      message: 'サインアップしました',
-    }
+    showSnackbar('サインアップしました', 'success', { icon: 'mdi-check-circle' })
 
     setTimeout(() => {
       router.push('/login')
@@ -224,11 +214,7 @@ const onSubmit = async (validationPromise) => {
     void logFirebaseAnalyticsEvent('signup_submit_error', {
       errorCode: String(error?.code || 'unknown'),
     })
-    snackbar.value = {
-      show: true,
-      color: 'error',
-      message: `サインアップに失敗しました。${error.message}`,
-    }
+    showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
   } finally {
     isLoading.value = false
   }

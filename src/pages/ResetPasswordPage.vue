@@ -43,9 +43,6 @@
         </v-btn>
       </v-form>
     </v-card>
-    <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
-      {{ snackbar.message }}
-    </v-snackbar>
   </v-sheet>
 </template>
 
@@ -53,6 +50,7 @@
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { resetPassword } from '@/services/authService'
 
@@ -63,11 +61,8 @@ const visibleConfirm = ref(false)
 const form = ref(false)
 const isLoading = ref(false)
 const oobCode = ref('')
-const snackbar = ref({
-  show: false,
-  color: '',
-  message: '',
-})
+
+const { showSnackbar } = useSnackbar()
 
 const route = useRoute()
 const router = useRouter()
@@ -93,11 +88,7 @@ const onSubmit = async () => {
 
     void logFirebaseAnalyticsEvent('reset_password_submit_success', {})
 
-    snackbar.value = {
-      show: true,
-      color: 'success',
-      message: 'パスワードを変更しました。',
-    }
+    showSnackbar('パスワードを変更しました。', 'success', { icon: 'mdi-check-circle' })
 
     setTimeout(() => {
       router.push('/login')
@@ -106,11 +97,7 @@ const onSubmit = async () => {
     void logFirebaseAnalyticsEvent('reset_password_submit_error', {
       errorCode: String(error?.code || 'unknown'),
     })
-    snackbar.value = {
-      show: true,
-      color: 'error',
-      message: `パスワードの変更に失敗しました: ${error.message}`,
-    }
+    showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
   } finally {
     isLoading.value = false
   }

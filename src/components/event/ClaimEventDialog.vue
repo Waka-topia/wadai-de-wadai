@@ -78,17 +78,14 @@
       </div>
     </v-card>
   </v-dialog>
-
-  <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
-    {{ snackbar.message }}
-  </v-snackbar>
 </template>
 
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { useStore } from 'vuex'
-import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { useRouter } from 'vue-router'
+import { useSnackbar } from '@/composables/useSnackbar'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 
 const router = useRouter()
 const store = useStore()
@@ -121,11 +118,8 @@ const dialogOpen = computed({
 
 const isLoading = ref(false)
 const showRedirectPrompt = ref(false)
-const snackbar = ref({
-  show: false,
-  color: '',
-  message: '',
-})
+
+const { showSnackbar } = useSnackbar()
 
 const onCancel = () => {
   dialogOpen.value = false
@@ -150,11 +144,7 @@ const onConfirm = async () => {
       organizationId: props.organizationId,
     })
 
-    snackbar.value = {
-      show: true,
-      color: 'success',
-      message: 'イベントの管理権限を引き継ぎました！',
-    }
+    showSnackbar('イベントの管理権限を引き継ぎました！', 'success', { icon: 'mdi-check-circle' })
 
     dialogOpen.value = false
     emit('transferred')
@@ -166,11 +156,7 @@ const onConfirm = async () => {
     if (error.message.includes('代表者証明が必要です')) {
       showRedirectPrompt.value = true
     } else {
-      snackbar.value = {
-        show: true,
-        color: 'error',
-        message: error.message,
-      }
+      showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
     }
   } finally {
     isLoading.value = false

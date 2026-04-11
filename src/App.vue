@@ -42,20 +42,41 @@
         </v-footer>
       </div>
     </v-main>
+
+    <v-snackbar
+      v-model="snackbarState.show"
+      :color="snackbarState.color"
+      :timeout="snackbarState.timeout"
+      location="top"
+      rounded="pill"
+    >
+      <span class="d-flex align-center">
+        <v-icon v-if="snackbarState.icon" class="mr-2" size="18">
+          {{ snackbarState.icon }}
+        </v-icon>
+        {{ snackbarState.message }}
+      </span>
+      <template v-if="snackbarState.showCloseButton" #actions>
+        <v-btn color="white" variant="text" @click="closeSnackbar">閉じる</v-btn>
+      </template>
+    </v-snackbar>
   </v-app>
   <BottomNavigation v-if="showBottomNavigation && !isFullscreenPage" />
 </template>
 
 <script setup>
 import { computed, ref, watch } from 'vue'
-import { useStore } from 'vuex'
 import { useRouter, useRoute } from 'vue-router'
+import { useStore } from 'vuex'
 import BottomNavigation from '@/components/templates/BottomNavigation.vue'
 import DeleteAccountButton from '@/components/templates/DeleteAccountButton.vue'
 import LogOutButton from '@/components/templates/LogOut.vue'
+import { useSnackbar } from '@/composables/useSnackbar'
 
 const router = useRouter()
 const route = useRoute()
+
+const { snackbarState, closeSnackbar } = useSnackbar()
 
 const drawer = ref(null)
 const title = ref('ホーム')
