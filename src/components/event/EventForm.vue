@@ -89,16 +89,13 @@
       代表者証明をすることでイベントが上位に表示されやすくなります
     </p>
   </v-form>
-
-  <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
-    {{ snackbar.message }}
-  </v-snackbar>
 </template>
 
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
+import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { allGroups } from '@/data/groups'
 import { required } from '@/utils/forms/validate'
@@ -155,11 +152,7 @@ watch(
   { immediate: true, deep: true },
 )
 
-const snackbar = ref({
-  show: false,
-  color: '',
-  message: '',
-})
+const { showSnackbar } = useSnackbar()
 
 const submitEvent = async (validationPromise) => {
   try {
@@ -197,21 +190,17 @@ const submitEvent = async (validationPromise) => {
         organizationId: eventData.organizationId,
       },
     )
-    snackbar.value = {
-      show: true,
-      color: 'success',
-      message: isEditMode.value ? 'イベントを更新しました！' : 'イベントが正常に登録されました！',
-    }
+    showSnackbar(
+      isEditMode.value ? 'イベントを更新しました！' : 'イベントが正常に登録されました！',
+      'success',
+      { icon: 'mdi-check-circle' },
+    )
 
     // 成功イベントを通知（ダイアログを閉じるためなど）
     emit('success')
   } catch (error) {
     void logFirebaseAnalyticsEvent('event_form_submit_error', {})
-    snackbar.value = {
-      show: true,
-      color: 'error',
-      message: error.message,
-    }
+    showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
   }
 }
 </script>

@@ -113,16 +113,13 @@
       </div>
     </v-card>
   </v-sheet>
-
-  <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
-    {{ snackbar.message }}
-  </v-snackbar>
 </template>
 
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { useStore } from 'vuex'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { getProveOwnerApplicantService } from '@/services/proveService'
 
@@ -135,11 +132,7 @@ const userId = computed(() => store.getters['auth/userId'])
 const isLoading = ref(false)
 const copied = ref(false)
 
-const snackbar = ref({
-  show: false,
-  color: '',
-  message: '',
-})
+const { showSnackbar } = useSnackbar()
 
 const fetchApplicantData = async () => {
   try {
@@ -147,11 +140,7 @@ const fetchApplicantData = async () => {
 
     applicant.value = await getProveOwnerApplicantService(userId.value)
   } catch (error) {
-    snackbar.value = {
-      show: true,
-      color: 'error',
-      message: error.message,
-    }
+    showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
   } finally {
     isLoading.value = false
   }
@@ -169,11 +158,7 @@ const copyTempId = async () => {
       }, 2000)
     }
   } catch (error) {
-    snackbar.value = {
-      show: true,
-      color: 'error',
-      message: `コピーに失敗しました: ${error.message}`,
-    }
+    showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
   }
 }
 

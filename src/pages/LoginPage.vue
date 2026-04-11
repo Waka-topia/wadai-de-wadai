@@ -97,10 +97,6 @@
         </v-btn>
       </div>
     </v-card>
-
-    <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000" rounded="pill">
-      {{ snackbar.message }}
-    </v-snackbar>
   </v-container>
 </template>
 
@@ -109,6 +105,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { required, emailDomainCheck } from '@/utils/forms/validate'
 
@@ -118,11 +115,8 @@ const loginData = ref({
 })
 const visible = ref(false)
 const isLoading = ref(false)
-const snackbar = ref({
-  show: false,
-  color: '',
-  message: '',
-})
+
+const { showSnackbar } = useSnackbar()
 
 const router = useRouter()
 const store = useStore()
@@ -155,11 +149,7 @@ const onSubmit = async (validationPromise) => {
 
     void logFirebaseAnalyticsEvent('login_submit_success', {})
 
-    snackbar.value = {
-      show: true,
-      color: 'success',
-      message: 'ログインしました',
-    }
+    showSnackbar('ログインしました', 'success', { icon: 'mdi-check-circle' })
 
     setTimeout(() => {
       router.push('/')
@@ -168,11 +158,7 @@ const onSubmit = async (validationPromise) => {
     void logFirebaseAnalyticsEvent('login_submit_error', {
       errorCode: String(error?.code || 'unknown'),
     })
-    snackbar.value = {
-      show: true,
-      color: 'error',
-      message: `ログインに失敗しました: ${error.message}`,
-    }
+    showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
   } finally {
     isLoading.value = false
   }

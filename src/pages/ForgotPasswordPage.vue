@@ -54,10 +54,6 @@
         ログイン画面に戻る
       </v-btn>
     </v-card>
-
-    <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000" rounded="pill">
-      {{ snackbar.message }}
-    </v-snackbar>
   </v-container>
 </template>
 
@@ -65,17 +61,15 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import { useSnackbar } from '@/composables/useSnackbar'
 import { required } from '@/utils/forms/validate'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { sendPasswordReset } from '@/services/authService'
 
 const email = ref('')
 const isLoading = ref(false)
-const snackbar = ref({
-  show: false,
-  color: '',
-  message: '',
-})
+
+const { showSnackbar } = useSnackbar()
 
 const router = useRouter()
 
@@ -97,11 +91,9 @@ const onSubmit = async (validationPromise) => {
 
     void logFirebaseAnalyticsEvent('forgot_password_submit_success', {})
 
-    snackbar.value = {
-      show: true,
-      color: 'success',
-      message: 'リセットメールを送信しました。メールをご確認ください。',
-    }
+    showSnackbar('リセットメールを送信しました。メールをご確認ください。', 'success', {
+      icon: 'mdi-check-circle',
+    })
 
     setTimeout(() => {
       router.push('/login')
@@ -110,11 +102,7 @@ const onSubmit = async (validationPromise) => {
     void logFirebaseAnalyticsEvent('forgot_password_submit_error', {
       errorCode: String(error?.code || 'unknown'),
     })
-    snackbar.value = {
-      show: true,
-      color: 'error',
-      message: `送信に失敗しました: ${error.message}`,
-    }
+    showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
   } finally {
     isLoading.value = false
   }

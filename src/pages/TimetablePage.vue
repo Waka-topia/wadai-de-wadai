@@ -95,17 +95,6 @@
       @saved="onLectureSaved"
       @deleted="onLectureDeleted"
     />
-
-    <v-snackbar
-      v-model="snackbarShow"
-      :color="snackbarColor"
-      location="bottom"
-      timeout="2500"
-      rounded="pill"
-    >
-      <v-icon class="mr-2" size="18">{{ snackbarIcon }}</v-icon
-      >{{ snackbarMessage }}
-    </v-snackbar>
   </div>
 </template>
 
@@ -114,6 +103,7 @@ import { ref, computed, watch, onActivated } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import TimetableHeaderControls from '@/components/timetable/TimetableHeaderControls.vue'
 import TimetableGrid from '@/components/timetable/TimetableGrid.vue'
@@ -126,20 +116,12 @@ useFirebasePageView('view_timetable', () => ({ loggedIn: store.getters['auth/isA
 const showModal = ref(false)
 const selectedCell = ref(null)
 
-const snackbarShow = ref(false)
-const snackbarMessage = ref('')
-const snackbarColor = ref('green')
-const snackbarIcon = ref('mdi-check-circle')
+const { showSnackbar } = useSnackbar()
 
-const showSnackbar = (message, color = 'green', icon = 'mdi-check-circle') => {
-  snackbarMessage.value = message
-  snackbarColor.value = color
-  snackbarIcon.value = icon
-  snackbarShow.value = true
-}
-
-const onLectureSaved = (lectureName) => showSnackbar(`「${lectureName}」を保存しました`)
-const onLectureDeleted = () => showSnackbar('講義を削除しました', 'grey', 'mdi-trash-can-outline')
+const onLectureSaved = (lectureName) =>
+  showSnackbar(`「${lectureName}」を保存しました`, 'success', { icon: 'mdi-check-circle' })
+const onLectureDeleted = () =>
+  showSnackbar('講義を削除しました', 'success', { icon: 'mdi-check-circle' })
 
 const isAuthenticated = computed(() => store.getters['auth/isAuthenticated'])
 const todayLectures = computed(() => store.getters['timetable/todayLectures'])

@@ -39,15 +39,13 @@
       </v-card>
     </template>
   </v-dialog>
-  <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="3000">
-    {{ snackbar.message }}
-  </v-snackbar>
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
+import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 
 const router = useRouter()
@@ -60,11 +58,7 @@ const goLoginFromMenu = () => {
 
 const user = computed(() => store.getters['auth/user'])
 
-const snackbar = ref({
-  show: false,
-  color: '',
-  message: '',
-})
+const { showSnackbar } = useSnackbar()
 
 const onLogout = async (isActive) => {
   try {
@@ -73,21 +67,13 @@ const onLogout = async (isActive) => {
     await store.dispatch('auth/initializeAuth')
     sessionStorage.removeItem('user')
 
-    snackbar.value = {
-      show: true,
-      color: 'success',
-      message: 'ログアウトしました',
-    }
+    showSnackbar('ログアウトしました', 'success', { icon: 'mdi-check-circle' })
 
     setTimeout(() => {
       router.push('/login')
     }, 1000)
   } catch (error) {
-    snackbar.value = {
-      show: true,
-      color: 'error',
-      message: error.message,
-    }
+    showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
   } finally {
     isActive.value = false
   }

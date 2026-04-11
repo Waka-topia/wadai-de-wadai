@@ -110,16 +110,13 @@
       </v-row>
     </v-card>
   </v-sheet>
-
-  <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
-    {{ snackbar.message }}
-  </v-snackbar>
 </template>
 
 <script setup>
 import { onMounted, ref } from 'vue'
 import { registerAllGroupsService } from '@/services/groupService'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import {
   getProveOwnerApplicantsService,
@@ -132,11 +129,8 @@ const applicants = ref([])
 const isLoading = ref(false)
 const updatingUserId = ref('')
 const isRegisteringGroups = ref(false)
-const snackbar = ref({
-  show: false,
-  color: '',
-  message: '',
-})
+
+const { showSnackbar } = useSnackbar()
 
 const formatDate = (value) => {
   if (!value) {
@@ -151,20 +145,12 @@ const formatDate = (value) => {
   return date.toLocaleString('ja-JP')
 }
 
-const showSnackbar = (color, message) => {
-  snackbar.value = {
-    show: true,
-    color,
-    message,
-  }
-}
-
 const loadApplicants = async () => {
   try {
     isLoading.value = true
     applicants.value = await getProveOwnerApplicantsService()
   } catch (error) {
-    showSnackbar('error', error.message)
+    showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
   } finally {
     isLoading.value = false
   }
@@ -175,11 +161,12 @@ const registerGroups = async () => {
     isRegisteringGroups.value = true
     const { registeredCount, skippedCount } = await registerAllGroupsService()
     showSnackbar(
-      'success',
       `団体データを登録しました（新規: ${registeredCount}件 / 既存スキップ: ${skippedCount}件）`,
+      'success',
+      { icon: 'mdi-check-circle' },
     )
   } catch (error) {
-    showSnackbar('error', error.message)
+    showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
   } finally {
     isRegisteringGroups.value = false
   }
@@ -204,10 +191,12 @@ const toggleApproval = async (applicationId, nextValue) => {
       applicationId,
       approved: nextValue,
     })
-    showSnackbar('success', nextValue ? '承認しました' : '非承認に変更しました')
+    showSnackbar(nextValue ? '承認しました' : '非承認に変更しました', 'success', {
+      icon: 'mdi-check-circle',
+    })
   } catch (error) {
     targetApplicant.isOfficial = previousValue
-    showSnackbar('error', error.message)
+    showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
   } finally {
     updatingUserId.value = ''
   }

@@ -11,19 +11,12 @@
       {{ isBookmarked ? 'mdi-star' : 'mdi-star-outline' }}
     </v-icon>
   </v-btn>
-
-  <v-snackbar v-model="snackbar" :timeout="2000" location="bottom">
-    {{ snackbarMessage }}
-
-    <template #actions>
-      <v-btn color="orange" variant="text" @click="snackbar = false"> 閉じる </v-btn>
-    </template>
-  </v-snackbar>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { useStore } from 'vuex'
+import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 
 const props = defineProps({
@@ -42,8 +35,7 @@ const store = useStore()
 // authモジュールからuserIdが存在するかどうか判定
 const isAuthenticated = computed(() => !!store.state.auth?.userId)
 
-const snackbar = ref(false)
-const snackbarMessage = ref('')
+const { showSnackbar } = useSnackbar()
 
 const toggleBookmark = () => {
   const willBookmark = !props.isBookmarked
@@ -51,9 +43,9 @@ const toggleBookmark = () => {
     jobId: props.jobId,
     bookmarked: willBookmark,
   })
-  snackbarMessage.value = willBookmark ? 'お気に入りに登録しました' : 'お気に入りを解除しました'
-
-  snackbar.value = true
+  showSnackbar(willBookmark ? 'お気に入りに登録しました' : 'お気に入りを解除しました', 'info', {
+    icon: 'mdi-check-circle',
+  })
 
   store.dispatch('toggleJobBookmark', props.jobId)
 }

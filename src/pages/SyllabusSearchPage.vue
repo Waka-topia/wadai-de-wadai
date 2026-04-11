@@ -343,20 +343,6 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-
-    <!-- 成功通知用スナックバー -->
-    <v-snackbar
-      v-model="showSuccessSnackbar"
-      color="teal-darken-2"
-      elevation="24"
-      rounded="pill"
-      :timeout="4000"
-    >
-      <div class="text-center w-100 font-weight-bold">
-        <v-icon left class="mr-2">mdi-check-circle</v-icon>
-        {{ successMessage }}
-      </div>
-    </v-snackbar>
   </v-container>
 </template>
 
@@ -364,6 +350,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
+import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { fetchMasterIndex, saveSyllabusWithIndex } from '@/services/lectureIndexService'
 import { getSyllabus } from '@/services/syllabusService'
@@ -421,8 +408,8 @@ const selectedLectureName = ref(null)
 const showSyllabusModal = ref(false)
 const showAddDialog = ref(false)
 const saving = ref(false)
-const showSuccessSnackbar = ref(false)
-const successMessage = ref('')
+
+const { showSnackbar } = useSnackbar()
 
 // 新規作成時の中間ステップ用
 const showNewLectureNameDialog = ref(false)
@@ -574,7 +561,9 @@ const registerSyllabus = async () => {
   )
     return
   if (!isLoggedIn.value) {
-    alert('シラバスを登録するにはログインが必要です。')
+    showSnackbar('シラバスを登録するにはログインが必要です。', 'error', {
+      icon: 'mdi-alert-circle',
+    })
     return
   }
 
@@ -596,8 +585,9 @@ const registerSyllabus = async () => {
     )
 
     // 完了フィードバック
-    successMessage.value = `「${lectureName}」をみんなのシラバスに登録しました！`
-    showSuccessSnackbar.value = true
+    showSnackbar(`「${lectureName}」をみんなのシラバスに登録しました！`, {
+      icon: 'mdi-check-circle',
+    })
 
     // ダイアログを閉じてリセット
     showNewLectureNameDialog.value = false
