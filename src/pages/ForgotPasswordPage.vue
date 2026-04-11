@@ -1,42 +1,64 @@
 <template>
-  <v-progress-linear v-if="isLoading" color="success" indeterminate=""></v-progress-linear>
-  <v-sheet class="pa-12" rounded>
-    <v-card class="py-8">
-      <v-card-title class="text-center mb-4">パスワードをリセット</v-card-title>
-      <v-card-text class="text-center text-body-2 mb-2">
-        登録済みのメールアドレスを入力してください。パスワードリセット用のリンクを送信します。
-      </v-card-text>
+  <v-container class="fill-height d-flex align-start justify-center pt-10" fluid>
+    <v-card class="pa-6 pa-md-8 w-100" max-width="450" rounded="xl" elevation="1" outlined>
+      <v-progress-linear
+        v-if="isLoading"
+        color="orange-darken-2"
+        indeterminate
+        absolute
+        top
+      ></v-progress-linear>
+
+      <div class="text-center mb-8">
+        <v-avatar color="orange-lighten-5" size="72" class="mb-4">
+          <v-icon size="36" color="orange-darken-2">mdi-lock-reset</v-icon>
+        </v-avatar>
+        <h2 class="text-h5 font-weight-bold text-grey-darken-3">パスワードをリセット</h2>
+        <p class="text-caption text-grey-darken-1 mt-2">
+          登録済みのメールアドレスを入力してください。<br />
+          パスワード再設定用のリンクを送信します。
+        </p>
+      </div>
+
       <v-form @submit.prevent="onSubmit">
         <v-text-field
           v-model="email"
-          class="mb-2"
+          class="mb-6"
           :rules="[required]"
           clearable
-          label="Email"
+          label="メールアドレス"
           placeholder="sample@gmail.com"
           prepend-inner-icon="mdi-email-outline"
+          variant="outlined"
+          color="orange-darken-2"
+          density="comfortable"
         ></v-text-field>
-
-        <br />
 
         <v-btn
           type="submit"
           :loading="isLoading"
           block
-          color="success"
-          size="large"
-          variant="elevated"
+          color="green-darken-2"
+          size="x-large"
+          rounded="pill"
+          class="font-weight-bold mb-2"
+          elevation="0"
         >
           リセットメールを送信
         </v-btn>
       </v-form>
-      <v-divider class="mt-10"></v-divider>
-      <v-btn variant="text" @click="onBack">ログインに戻る</v-btn>
+
+      <v-divider class="my-6"></v-divider>
+
+      <v-btn variant="text" color="grey-darken-1" rounded="pill" size="large" block @click="onBack">
+        ログイン画面に戻る
+      </v-btn>
     </v-card>
-    <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
+
+    <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000" rounded="pill">
       {{ snackbar.message }}
     </v-snackbar>
-  </v-sheet>
+  </v-container>
 </template>
 
 <script setup>

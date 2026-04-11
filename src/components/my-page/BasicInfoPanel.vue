@@ -1,0 +1,29 @@
+<template>
+  <v-expansion-panels>
+    <v-expansion-panel elevation="1" rounded="lg">
+      <v-expansion-panel-title class="font-weight-bold text-subtitle-1">
+        <v-icon class="mr-3" color="grey-darken-1">mdi-card-account-details-outline</v-icon>
+        基本情報・所属団体（証明等）
+      </v-expansion-panel-title>
+
+      <v-expansion-panel-text class="bg-grey-lighten-4 pt-4">
+        <v-row dense>
+          <UserAddress :email="user.email" />
+          <UserId :user-id="user.userId" />
+          <UserOrgs :belonging-orgs="user.belongingOrgs ?? []" />
+        </v-row>
+      </v-expansion-panel-text>
+    </v-expansion-panel>
+  </v-expansion-panels>
+</template>
+
+<script setup>
+import { computed } from 'vue'
+import { useStore } from 'vuex'
+import UserAddress from '@/components/user-profile/UserAddress.vue'
+import UserId from '@/components/user-profile/UserId.vue'
+import UserOrgs from '@/components/user-profile/UserOrgs.vue'
+
+const store = useStore()
+const user = computed(() => store.getters['users/currentUserData'])
+</script>

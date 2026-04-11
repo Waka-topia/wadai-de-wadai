@@ -14,6 +14,7 @@ dist-ssr
 coverage
 *.local
 .cache
+.firebase
 
 /cypress/videos/
 /cypress/screenshots/
@@ -34,3 +35,5 @@ coverage
 .env
 .env.local
 .env.*.local
+.env.dev*
+.env.prod*
