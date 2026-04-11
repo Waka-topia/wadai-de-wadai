@@ -58,6 +58,4 @@ jobs:
 
       - name: Deploy to Firebase (prod)
         if: github.event_name == 'push'
-        run: |
-          npx firebase-tools use prod --token ${{ secrets.FIREBASE_TOKEN }}
-          npx firebase-tools deploy --only hosting --token ${{ secrets.FIREBASE_TOKEN }}
+        run: npx firebase-tools deploy --only hosting --project wadai-de-wadai --token ${{ secrets.FIREBASE_TOKEN }}
