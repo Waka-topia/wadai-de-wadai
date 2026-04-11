@@ -6,6 +6,7 @@ import locationModule from './modules/location'
 import proveModule from './modules/prove'
 import ratingModule from './modules/rating'
 import scrollModule from './modules/scroll'
+import syllabusModule from './modules/syllabus'
 import timetableModule from './modules/timetable'
 import userModule from './modules/user'
 
@@ -25,6 +26,7 @@ export default createStore({
       namespaced: true,
       ...eventModule,
     },
+    syllabus: syllabusModule,
     jobs: jobsModule,
     location: locationModule,
     rating: ratingModule,
