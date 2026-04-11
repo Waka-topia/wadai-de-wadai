@@ -7,6 +7,18 @@
     <BasicInfoPanel class="mt-4" />
 
     <AppQRCode class="mt-4" />
+    <div class="my-8 text-center">
+      <v-btn
+        to="/tutorial"
+        class="text-white font-weight-bold"
+        size="large"
+        color="orange"
+        elevation="3"
+        rounded
+      >
+        スマホアプリとして使う方法を見る
+      </v-btn>
+    </div>
   </div>
   <div v-else>
     <RecommendLogin />
