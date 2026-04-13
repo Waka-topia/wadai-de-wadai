@@ -1,18 +1,26 @@
 <template>
   <div class="event-schedule">
     <!-- 空状態 -->
-    <div v-if="filteredEvents.length === 0" class="no-events-container">
-      <v-icon size="48" color="grey-lighten-1" class="mb-3">mdi-calendar-blank-outline</v-icon>
+    <div v-if="displayEvents.length === 0" class="no-events-container">
+      <v-icon size="48" color="grey-lighten-1" class="mb-3">
+        {{ props.events ? 'mdi-calendar-search' : 'mdi-calendar-blank-outline' }}
+      </v-icon>
       <p class="text-body-1 font-weight-bold text-grey-darken-1 mb-1">
-        この日のイベントはありません
+        {{ props.events ? '該当するイベントはありません' : 'この日のイベントはありません' }}
       </p>
-      <p class="text-caption text-grey">別の日をカレンダーから選択してください</p>
+      <p class="text-caption text-grey">
+        {{
+          props.events
+            ? '別のキーワードで試してみてください'
+            : '別の日をカレンダーから選択してください'
+        }}
+      </p>
     </div>
 
     <!-- イベントカードリスト -->
     <div v-else class="d-flex flex-column ga-3">
       <v-card
-        v-for="event in filteredEvents"
+        v-for="event in displayEvents"
         :key="event.eventId"
         rounded="lg"
         elevation="1"
@@ -74,6 +82,9 @@
           <div class="d-flex align-start">
             <!-- 時間カラム -->
             <div class="time-column text-center mr-4 flex-shrink-0">
+              <div v-if="props.events" class="date-badge mb-1">
+                {{ formatDate(event.date) }}
+              </div>
               <p class="text-body-1 font-weight-bold text-orange mb-0">
                 {{ event.startTime }}
               </p>
@@ -149,15 +160,42 @@ const goToEventDetail = (eventId) => {
 }
 
 const props = defineProps({
+  /** 選択中の日付 (YYYY-MM-DD) */
   selectedDate: {
     type: String,
     default: '',
   },
+  /** 表示するイベントリスト (指定がない場合は selectedDate から取得) */
+  events: {
+    type: Array,
+    default: null,
+  },
 })
 
-const filteredEvents = computed(() => {
+/** 表示対象のイベントリストを計算する プロップスで events が渡されている場合はそれを使用し、 そうでない場合はストアから selectedDate に基づいて取得する */
+const displayEvents = computed(() => {
+  if (props.events) {
+    return props.events
+  }
   return store.getters['event/sortedEventsByDate'](props.selectedDate)
 })
+
+/**
+ * 日付文字列を M/D 形式にフォーマットする
+ *
+ * @param {string} dateStr - YYYY-MM-DD 形式の日付文字列
+ * @returns {string} M/D 形式
+ */
+const formatDate = (dateStr) => {
+  if (!dateStr) return ''
+  const parts = dateStr.split('-')
+  const month = parseInt(parts[1], 10)
+  const day = parseInt(parts[2], 10)
+  const date = new Date(dateStr)
+  const weekdays = ['日', '月', '火', '水', '木', '金', '土']
+  const weekday = weekdays[date.getDay()]
+  return `${month}/${day}(${weekday})`
+}
 </script>
 
 <style scoped>
@@ -211,7 +249,19 @@ const filteredEvents = computed(() => {
 
 /* --- 時間カラム --- */
 .time-column {
-  min-width: 52px;
+  min-width: 60px;
+}
+
+.date-badge {
+  display: inline-block;
+  background-color: #fff3e0;
+  color: #ff9900;
+  border: 1px solid #ffcc80;
+  padding: 0px 4px;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  line-height: 1.4;
 }
 
 /* --- 区切り線 --- */

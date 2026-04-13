@@ -56,7 +56,36 @@
       </v-card-text>
     </v-card>
 
+    <!-- 検索バーエリア -->
+    <div class="search-wrapper mx-4 mt-4 d-flex align-center ga-2">
+      <v-text-field
+        v-model="searchQuery"
+        placeholder="団体名で検索"
+        prepend-inner-icon="mdi-magnify"
+        variant="outlined"
+        density="comfortable"
+        hide-details
+        color="orange"
+        class="flex-grow-1 search-field"
+      ></v-text-field>
+      <v-btn
+        v-if="searchQuery"
+        variant="text"
+        color="grey-darken-1"
+        class="font-weight-bold px-1"
+        @click="searchQuery = ''"
+      >
+        キャンセル
+      </v-btn>
+    </div>
+
+    <!-- 検索情報の表示 -->
+    <div v-if="searchQuery" class="mx-4 mt-2">
+      <span class="text-caption font-weight-bold text-grey-darken-1">検索結果を表示中</span>
+    </div>
+
     <VueCal
+      v-show="!searchQuery"
       class="vuecal"
       :disable-views="['years', 'year', 'week', 'day']"
       :events="events"
@@ -70,28 +99,30 @@
       @cell-click="onCellClick"
     ></VueCal>
 
-    <v-divider class="my-4"></v-divider>
+    <div v-show="!searchQuery">
+      <v-divider class="my-4"></v-divider>
 
-    <v-btn class="font-weight-bold set-today-btn" rounded variant="outlined" @click="setToday">
-      <v-icon start size="18">mdi-calendar-today</v-icon>
-      今日の新歓イベント
-    </v-btn>
-
-    <!-- 改善された日付ナビゲーション -->
-    <div class="date-nav">
-      <v-btn icon variant="text" size="small" @click="changeDate(-1)">
-        <v-icon>mdi-chevron-left</v-icon>
+      <v-btn class="font-weight-bold set-today-btn" rounded variant="outlined" @click="setToday">
+        <v-icon start size="18">mdi-calendar-today</v-icon>
+        今日の新歓イベント
       </v-btn>
-      <div class="date-display">
-        <v-icon size="18" color="orange" class="mr-2">mdi-calendar</v-icon>
-        <span class="text-body-1 font-weight-bold">{{ formattedDate }}</span>
+
+      <!-- 改善された日付ナビゲーション -->
+      <div class="date-nav">
+        <v-btn icon variant="text" size="small" @click="changeDate(-1)">
+          <v-icon>mdi-chevron-left</v-icon>
+        </v-btn>
+        <div class="date-display">
+          <v-icon size="18" color="orange" class="mr-2">mdi-calendar</v-icon>
+          <span class="text-body-1 font-weight-bold">{{ formattedDate }}</span>
+        </div>
+        <v-btn icon variant="text" size="small" @click="changeDate(1)">
+          <v-icon>mdi-chevron-right</v-icon>
+        </v-btn>
       </div>
-      <v-btn icon variant="text" size="small" @click="changeDate(1)">
-        <v-icon>mdi-chevron-right</v-icon>
-      </v-btn>
     </div>
 
-    <EventSchedule v-model:selected-date="selectedDate" />
+    <EventSchedule v-model:selected-date="selectedDate" :events="searchedEvents" />
 
     <!-- イベント追加フォーム -->
     <BaseBottomSheet title="新歓イベントの登録">
@@ -127,6 +158,33 @@ import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
 
 const store = useStore()
+
+// --- 検索機能 ---
+const searchQuery = ref('')
+
+/** 検索ワードに基づいてイベントをフィルタリングする */
+const searchedEvents = computed(() => {
+  if (!searchQuery.value) return null
+  const query = searchQuery.value.toLowerCase()
+  const rawEvents = store.getters['event/allEvents']
+  const today = toDateString(new Date())
+
+  return rawEvents
+    .filter((event) => {
+      // 今日以降のイベントのみを表示
+      const isFuture = event.date >= today
+      const matchesQuery =
+        event.organizerName?.toLowerCase().includes(query) ||
+        event.title?.toLowerCase().includes(query) ||
+        event.description?.toLowerCase().includes(query)
+      return isFuture && matchesQuery
+    })
+    .sort((a, b) => {
+      // 日付と開始時間でソート
+      if (a.date !== b.date) return a.date.localeCompare(b.date)
+      return a.startTime.localeCompare(b.startTime)
+    })
+})
 
 // --- 告知バナーの表示制御 ---
 const bannerDismissedKey = 'event_claim_banner_dismissed'
@@ -389,6 +447,15 @@ onMounted(() => {
 
 .vuecal__event {
   display: none;
+}
+
+/* --- 検索バーの調整 --- */
+.search-container {
+  margin-bottom: 8px;
+}
+
+.search-field :deep(.v-field__outline) {
+  --v-field-border-width: 2px;
 }
 
 .vuecal__no-event {
