@@ -65,6 +65,12 @@ const features = ref([
     url: 'https://moodle.wakayama-u.ac.jp/',
   },
   {
+    label: 'シラバス',
+    icon: 'mdi-book-open-variant',
+    color: 'deep-purple',
+    url: 'https://web.wakayama-u.ac.jp/syllabus/',
+  },
+  {
     label: '教育サポート',
     icon: 'mdi-cube',
     color: 'blue',
