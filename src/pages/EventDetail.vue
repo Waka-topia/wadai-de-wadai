@@ -54,8 +54,14 @@
             </v-avatar>
           </template>
           <v-list-item-subtitle class="text-caption text-uppercase"> 団体名 </v-list-item-subtitle>
-          <v-list-item-title class="font-weight-bold">
-            {{ event.organizerName }}
+          <v-list-item-title
+            class="font-weight-bold d-flex align-center cursor-pointer"
+            @click="goToGroup"
+          >
+            <span class="text-decoration-underline">
+              {{ event.organizerName }}
+            </span>
+            <v-icon size="18" class="ml-1">mdi-chevron-right</v-icon>
           </v-list-item-title>
         </v-list-item>
 
@@ -240,6 +246,11 @@ const currentUserId = computed(() => store.getters['auth/userId'])
 const hashedAdminId = ref('')
 const hashedCurrentUserId = ref('')
 const isRepresentative = ref(false)
+
+const goToGroup = () => {
+  if (!event.value.organizationId) return
+  router.push(`/groups/${event.value.organizationId}`)
+}
 
 /** ハッシュ化したIDをあらかじめ計算しておく */
 onMounted(async () => {

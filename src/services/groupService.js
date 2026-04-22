@@ -38,6 +38,10 @@ export const registerAllGroupsService = async () => {
         name: group.name,
         mainCategory: group.mainCategory,
         subCategory: group.subCategory,
+        detailCategory: group.detailCategory || '',
+        description: group.description || '',
+        instagramUrl: group.instagramUrl || '',
+        thumbnailUrl: group.thumbnailUrl || '',
         representatives: [],
         representativeCount: 0,
         hasPassword: false,
@@ -93,6 +97,96 @@ export const hasExistingRepresentatives = async (groupId) => {
 
   const reps = group.representatives || []
   return reps.length > 0
+}
+
+/**
+ * Firestore の groups コレクションから全団体を取得する
+ *
+ * @returns {Promise<object[]>} 団体データの配列
+ */
+export const getAllGroupsService = async () => {
+  try {
+    const groupsRef = collection(db, 'groups')
+    const snapshot = await getDocs(groupsRef)
+
+    return snapshot.docs.map((doc) => doc.data()).sort((a, b) => a.id - b.id)
+  } catch (error) {
+    throw new Error(`団体一覧の取得に失敗しました。${error.message}`)
+  }
+}
+
+/**
+ * 団体データを新規作成する
+ *
+ * @param {object} group 団体データ
+ * @returns {Promise<void>}
+ */
+export const createGroupService = async (group) => {
+  try {
+    const groupId = String(group.id)
+    const groupRef = doc(db, 'groups', groupId)
+
+    await setDoc(groupRef, {
+      id: group.id,
+      name: group.name,
+      mainCategory: group.mainCategory,
+      subCategory: group.subCategory,
+      detailCategory: group.detailCategory || '',
+      description: group.description || '',
+      instagramUrl: group.instagramUrl || '',
+      thumbnailUrl: group.thumbnailUrl || '',
+
+      representatives: [],
+      representativeCount: 0,
+      hasPassword: false,
+
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    })
+  } catch (error) {
+    throw new Error(`団体の作成に失敗しました。${error.message}`)
+  }
+}
+
+/**
+ * 団体の基本情報を更新する
+ *
+ * @param {string | number} groupId 団体ID
+ * @param {object} updates 更新内容
+ * @returns {Promise<void>}
+ */
+export const updateGroupService = async (groupId, updates) => {
+  try {
+    const groupRef = doc(db, 'groups', String(groupId))
+
+    await setDoc(
+      groupRef,
+      {
+        ...updates,
+        updatedAt: new Date().toISOString(),
+      },
+      { merge: true },
+    )
+  } catch (error) {
+    throw new Error(`団体情報の更新に失敗しました。${error.message}`)
+  }
+}
+
+/**
+ * 次に使う団体IDを取得する
+ *
+ * @returns {Promise<number>} 次の団体ID
+ */
+export const getNextGroupIdService = async () => {
+  try {
+    const groups = await getAllGroupsService()
+
+    const maxId = groups.length ? Math.max(...groups.map((group) => Number(group.id) || 0)) : 0
+
+    return maxId + 1
+  } catch (error) {
+    throw new Error(`次の団体ID取得に失敗しました。${error.message}`)
+  }
 }
 
 /**

@@ -25,6 +25,11 @@
           利用規約
           <v-icon class="position-absolute right-0 mx-2"> mdi-chevron-right </v-icon>
         </v-list-item>
+        <v-list-item class="position-relative my-1" block size="large" @click="gotoGroups">
+          <v-icon>mdi-account-group-outline</v-icon>
+          団体一覧
+          <v-icon class="position-absolute right-0 mx-2">mdi-chevron-right</v-icon>
+        </v-list-item>
         <LogOutButton />
         <DeleteAccountButton />
       </v-list>
@@ -103,6 +108,8 @@ const routeTitleMap = {
   ProveOwner: '代表者認証',
   ProveOwnerDescription: '認証の手引',
   Admin: '管理画面',
+  GroupListPage: '団体一覧',
+  GroupDetailPage: '団体詳細',
 }
 
 /**
@@ -155,6 +162,10 @@ const gotorule = () => {
 /** 公式Instagramを開く */
 const gotoInstagram = () => {
   window.open('https://instagram.com/wakatopia_official', '_blank')
+}
+
+const gotoGroups = () => {
+  router.push('/groups')
 }
 
 watch(
