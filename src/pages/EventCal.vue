@@ -93,7 +93,9 @@
 
     <EventSchedule v-model:selected-date="selectedDate" />
 
-    <EditEventFormButton />
+    <!-- イベント追加フォーム -->
+    <EventFormFab @click="openFormDialog" />
+    <EventFormSheet v-model="formDialogOpen" />
   </div>
 </template>
 
@@ -102,8 +104,9 @@ import { ref, onMounted, computed, watch } from 'vue'
 import { useStore } from 'vuex'
 import VueCal from 'vue-cal'
 import 'vue-cal/dist/vuecal.css'
+import EventFormFab from '@/components/event/EventFormFab.vue'
+import EventFormSheet from '@/components/event/EventFormSheet.vue'
 import EventSchedule from '@/components/event/EventSchedule.vue'
-import EditEventFormButton from '@/components/event/EditEventFormButton.vue'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
 
@@ -202,6 +205,13 @@ const changeDate = (days) => {
     direction: days > 0 ? 'next' : 'prev',
     targetDate: newDateString,
   })
+}
+
+const formDialogOpen = ref(false)
+
+const openFormDialog = () => {
+  formDialogOpen.value = true
+  void logFirebaseAnalyticsEvent('event_edit_form_open', {})
 }
 
 onMounted(() => {
