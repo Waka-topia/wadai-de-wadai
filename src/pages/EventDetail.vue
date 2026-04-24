@@ -178,8 +178,32 @@
         </v-card>
       </div>
 
-      <!-- Danger action -->
-      <EditDeleteForm v-if="canEdit" :event-id="eventId" :event="event" />
+      <!-- 編集・削除ボタン -->
+      <div v-if="canEdit" class="d-flex flex-column ga-3 px-5 pb-5">
+        <v-btn
+          color="grey-darken-3"
+          class="font-weight-bold"
+          variant="flat"
+          rounded="pill"
+          @click="editSheetOpen = true"
+        >
+          <v-icon start>mdi-pencil</v-icon>
+          このイベントを編集する
+        </v-btn>
+        <v-btn
+          color="red-lighten-1"
+          class="font-weight-bold"
+          variant="flat"
+          rounded="pill"
+          @click="deleteSheetOpen = true"
+        >
+          <v-icon start>mdi-delete</v-icon>
+          削除する
+        </v-btn>
+        <p class="text-caption text-grey text-center mb-0">
+          ※作成者本人、または団体の代表者のみ操作できます
+        </p>
+      </div>
     </v-card>
 
     <v-card v-else rounded="lg" elevation="2" class="pa-6 text-center">
@@ -194,6 +218,21 @@
       :organization-id="event.organizationId || ''"
       @transferred="onTransferred"
     />
+
+    <EditEventSheet v-model="editSheetOpen" :event="event" />
+
+    <BaseBottomSheet v-model="deleteSheetOpen" title="イベントの削除">
+      <v-card-text>このイベントを削除します。本当によろしいですか？</v-card-text>
+      <v-card-actions class="pa-4 pt-0">
+        <v-btn class="flex-grow-1" variant="text" @click="deleteSheetOpen = false"
+          >キャンセル</v-btn
+        >
+        <v-divider vertical style="border-color: #000000; opacity: 1" />
+        <v-btn class="flex-grow-1 font-weight-bold" color="red" variant="text" @click="onDelete">
+          削除する
+        </v-btn>
+      </v-card-actions>
+    </BaseBottomSheet>
   </v-container>
 </template>
 
@@ -206,14 +245,19 @@ import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { adminUserId } from '@/config/constants'
 import { hashValue } from '@/utils/crypto'
 import { isUserRepresentative } from '@/services/groupService'
-import EditDeleteForm from '@/components/event/EditDeleteForm.vue'
+import { useSnackbar } from '@/composables/useSnackbar'
+import BaseBottomSheet from '@/components/common/BaseBottomSheet.vue'
 import ClaimEventDialog from '@/components/event/ClaimEventDialog.vue'
+import EditEventSheet from '@/components/event/EditEventSheet.vue'
 
 const route = useRoute()
 const router = useRouter()
 const store = useStore()
+const { showSnackbar } = useSnackbar()
 const fetchErrorMessage = ref('')
 const claimDialogOpen = ref(false)
+const editSheetOpen = ref(false)
+const deleteSheetOpen = ref(false)
 
 const event = computed(() => {
   return store.getters['event/event'] || {}
@@ -295,6 +339,22 @@ const onClaimClick = () => {
 const onTransferred = () => {
   // 引き継ぎ完了後にイベントデータを再取得して画面を更新
   store.dispatch('event/fetchEvent', eventId.value)
+}
+
+const onDelete = async () => {
+  try {
+    const currentUserId = store.getters['auth/userId']
+    void logFirebaseAnalyticsEvent('event_detail_delete_confirm', { eventId: eventId.value })
+    await store.dispatch('event/deleteEvent', { eventId: eventId.value, currentUserId })
+    showSnackbar('イベントが正常に削除されました。', 'success', { icon: 'mdi-check-circle' })
+    deleteSheetOpen.value = false
+    setTimeout(() => {
+      router.push('/eventcal')
+    }, 500)
+  } catch (error) {
+    deleteSheetOpen.value = false
+    showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
+  }
 }
 
 onMounted(async () => {
