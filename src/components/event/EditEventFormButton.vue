@@ -1,34 +1,33 @@
 <template>
-  <v-dialog v-model:model-value="formDialogOpen" max-width="700">
+  <v-bottom-sheet v-model:model-value="formDialogOpen" max-height="90vh">
     <template #activator="{ props: activatorProps }">
       <v-btn
         v-bind="activatorProps"
-        class="text-white font-weight-bold fab-btn"
+        class="text-white font-weight-bold fab-btn py-7 px-5 d-flex align-center justify-center"
         color="orange"
         variant="elevated"
         elevation="4"
-        rounded
-        prepend-icon="mdi-calendar-plus"
+        rounded="pill"
       >
         団体向けフォーム
       </v-btn>
     </template>
-    <v-card rounded="lg">
-      <v-card-title class="text-h5 font-weight-bold pa-5 pb-3">
-        <v-icon class="mr-2" color="orange">mdi-calendar-clock-outline</v-icon>
-        新歓イベントの登録
+    <v-card rounded="t-xl" class="overflow-y-auto" style="max-height: 90vh">
+      <v-card-title class="text-subtitle-1 font-weight-bold d-flex align-center">
+        <v-btn icon variant="text" size="default" color="orange" @click="closeFormDialog">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+        <div class="d-flex align-center justify-center flex-grow-1">
+          <v-icon class="mr-2" size="small">mdi-calendar-outline</v-icon>
+          新歓イベントの登録
+        </div>
+        <div style="width: 40px" />
       </v-card-title>
 
       <v-divider />
       <EventForm />
-      <v-divider />
-
-      <v-card-actions class="pa-4">
-        <v-spacer />
-        <v-btn variant="text" @click="closeFormDialog">キャンセル</v-btn>
-      </v-card-actions>
     </v-card>
-  </v-dialog>
+  </v-bottom-sheet>
 </template>
 
 <script setup>
@@ -52,7 +51,7 @@ const closeFormDialog = () => {
 .fab-btn {
   position: fixed;
   bottom: 100px;
-  right: 24px;
+  right: 16px;
   z-index: 1000;
 }
 </style>

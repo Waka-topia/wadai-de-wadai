@@ -8,6 +8,8 @@
       label="団体名"
       variant="outlined"
       density="comfortable"
+      bg-color="grey-lighten-4"
+      base-color="grey-darken-2"
       :rules="[required]"
       persistent-hint
       prepend-inner-icon="mdi-domain"
@@ -21,6 +23,8 @@
       type="date"
       variant="outlined"
       density="comfortable"
+      bg-color="grey-lighten-4"
+      base-color="grey-darken-2"
       max="2026-05-31"
       min="2025-04-01"
       :rules="[required]"
@@ -35,6 +39,8 @@
           type="time"
           variant="outlined"
           density="comfortable"
+          bg-color="grey-lighten-4"
+          base-color="grey-darken-2"
           :rules="[required]"
           prepend-inner-icon="mdi-clock-start"
         />
@@ -46,6 +52,8 @@
           type="time"
           variant="outlined"
           density="comfortable"
+          bg-color="grey-lighten-4"
+          base-color="grey-darken-2"
           :rules="[required]"
           prepend-inner-icon="mdi-clock-end"
         />
@@ -57,6 +65,8 @@
       label="場所"
       variant="outlined"
       density="comfortable"
+      bg-color="grey-lighten-4"
+      base-color="grey-darken-2"
       placeholder="イベントの場所"
       :rules="[required]"
       prepend-inner-icon="mdi-map-marker"
@@ -67,26 +77,37 @@
       label="概要"
       variant="outlined"
       density="comfortable"
+      bg-color="grey-lighten-4"
+      base-color="grey-darken-2"
       rows="4"
       placeholder="イベントの概要を入力"
       prepend-inner-icon="mdi-text"
     />
 
-    <v-btn type="submit" color="orange" block size="large" class="text-white font-weight-bold mt-2">
-      <v-icon start>{{ isEditMode ? 'mdi-update' : 'mdi-check-circle' }}</v-icon>
-      {{ isEditMode ? 'イベントを更新' : 'イベントを登録' }}
+    <v-btn
+      type="submit"
+      color="orange"
+      block
+      size="large"
+      rounded="pill"
+      class="text-white font-weight-bold text-body-2 mt-2"
+    >
+      {{ isEditMode ? 'このイベントを更新する' : 'このイベントを登録する' }}
     </v-btn>
     <div class="text-center pt-4">
       <v-btn
-        variant="text"
-        class="text-button text-decoration-underline"
+        block
+        size="large"
+        rounded="pill"
+        color="red-lighten-1"
+        class="text-white font-weight-bold text-body-2"
         @click="goProveOwnerFromEventForm"
       >
         団体の代表者であることを証明する
       </v-btn>
     </div>
-    <p class="text-grey text-caption">
-      代表者証明をすることでイベントが上位に表示されやすくなります
+    <p class="text-grey-darken-1 text-caption mt-3">
+      ※代表者証明をすることでイベントが上位に表示されやすくなります
     </p>
   </v-form>
 </template>
@@ -204,3 +225,14 @@ const submitEvent = async (validationPromise) => {
   }
 }
 </script>
+
+<style scoped>
+:deep(.v-field--variant-outlined .v-field__outline) {
+  --v-field-border-width: 2px;
+}
+
+:deep(.v-field:not(.v-field--focused) .v-label) {
+  color: #616161;
+  opacity: 1;
+}
+</style>
