@@ -219,22 +219,19 @@
       @transferred="onTransferred"
     />
 
+    <!-- イベントの編集シート -->
     <BaseBottomSheet v-model="editSheetOpen" title="イベントの編集">
       <EventForm v-if="editSheetOpen" :initial-event="event" @success="editSheetOpen = false" />
     </BaseBottomSheet>
 
-    <BaseBottomSheet v-model="deleteSheetOpen" title="イベントの削除">
-      <v-card-text>このイベントを削除します。本当によろしいですか？</v-card-text>
-      <v-card-actions class="pa-4 pt-0">
-        <v-btn class="flex-grow-1" variant="text" @click="deleteSheetOpen = false"
-          >キャンセル</v-btn
-        >
-        <v-divider vertical style="border-color: #000000; opacity: 1" />
-        <v-btn class="flex-grow-1 font-weight-bold" color="red" variant="text" @click="onDelete">
-          削除する
-        </v-btn>
-      </v-card-actions>
-    </BaseBottomSheet>
+    <!-- 削除の確認ダイアログ -->
+    <BaseDialog
+      v-model="deleteSheetOpen"
+      title="イベントの削除"
+      message="このイベントを削除します。本当によろしいですか？"
+      confirm-label="削除する"
+      @confirm="onDelete"
+    />
   </v-container>
 </template>
 
@@ -249,6 +246,7 @@ import { hashValue } from '@/utils/crypto'
 import { isUserRepresentative } from '@/services/groupService'
 import { useSnackbar } from '@/composables/useSnackbar'
 import BaseBottomSheet from '@/components/common/BaseBottomSheet.vue'
+import BaseDialog from '@/components/common/BaseDialog.vue'
 import ClaimEventDialog from '@/components/event/ClaimEventDialog.vue'
 import EventForm from '@/components/event/EventForm.vue'
 
