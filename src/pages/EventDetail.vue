@@ -15,7 +15,12 @@
       {{ fetchErrorMessage }}
     </v-alert>
 
-    <v-card v-else-if="event.eventId" rounded="lg" elevation="2">
+    <v-card
+      v-else-if="event.eventId"
+      rounded="lg"
+      variant="outlined"
+      style="border-width: 2px; border-color: #bdbdbd"
+    >
       <!-- Title + ステータスバッジ -->
       <v-card-title class="pa-5 pb-2">
         <div class="d-flex align-center flex-wrap ga-2">
@@ -59,7 +64,7 @@
           </v-list-item-title>
         </v-list-item>
 
-        <v-divider inset />
+        <v-divider thickness="2" color="grey-darken-1" />
 
         <v-list lines="two" class="pa-0">
           <v-list-item class="px-0">
@@ -74,7 +79,7 @@
             </v-list-item-title>
           </v-list-item>
 
-          <v-divider inset />
+          <v-divider thickness="2" color="grey-darken-1" />
 
           <v-list-item class="px-0">
             <template #prepend>
@@ -88,7 +93,7 @@
             </v-list-item-title>
           </v-list-item>
 
-          <v-divider inset />
+          <v-divider thickness="2" color="grey-darken-1" />
 
           <v-list-item class="px-0">
             <template #prepend>
@@ -102,34 +107,27 @@
             </v-list-item-title>
           </v-list-item>
 
-          <v-list-item class="px-0">
-            <template #prepend>
-              <v-avatar color="orange" size="40" rounded="lg" class="align-self-start mt-1">
-                <v-icon color="white" size="20">mdi-text-long</v-icon>
-              </v-avatar>
-            </template>
-            <v-list-item-subtitle class="text-caption text-uppercase"> 概要 </v-list-item-subtitle>
-            <v-list-item-title class="font-weight-bold text-wrap" style="line-height: 1.6">
-              {{ event.description }}
-            </v-list-item-title>
-          </v-list-item>
+          <v-divider thickness="2" color="grey-darken-1" />
 
-          <v-divider inset />
+          <div class="d-flex align-start ga-4 px-0 py-2">
+            <v-avatar color="orange" size="40" rounded="lg" class="flex-shrink-0 mt-1">
+              <v-icon color="white" size="20">mdi-text-long</v-icon>
+            </v-avatar>
+            <div>
+              <div class="text-caption text-uppercase text-medium-emphasis mb-1">概要</div>
+              <div class="font-weight-bold text-wrap" style="line-height: 1.6">
+                {{ event.description }}
+              </div>
+            </div>
+          </div>
 
-          <v-list-item class="px-0">
-            <template #prepend>
-              <v-avatar color="blue-grey" size="40" rounded="lg">
-                <v-icon color="white" size="20">mdi-account-edit</v-icon>
-              </v-avatar>
-            </template>
-            <v-list-item-subtitle class="text-caption text-uppercase">
-              作成者
-            </v-list-item-subtitle>
-            <v-list-item-title class="font-weight-medium">
-              {{ event.createdByName || '匿名ユーザー' }}
-            </v-list-item-title>
-          </v-list-item>
+          <v-divider thickness="2" color="grey-darken-1" />
         </v-list>
+        <div class="text-right mt-2">
+          <span class="text-caption text-grey-lighten-1">
+            作成者: {{ event.createdByName || '匿名ユーザー' }}
+          </span>
+        </div>
       </v-card-text>
 
       <!-- 運営代理登録の引き継ぎ誘導 (3ステップガイド形式) -->
@@ -150,14 +148,14 @@
               </v-avatar>
               <p class="text-caption font-weight-bold mb-0">引き継ぎ申請</p>
             </div>
-            <v-icon size="16" color="grey-lighten-1">mdi-chevron-right</v-icon>
+            <v-icon size="16" color="grey-darken-1">mdi-chevron-right</v-icon>
             <div class="step-item text-center">
               <v-avatar color="blue" size="28" class="mb-1">
                 <span class="text-caption font-weight-bold text-white">2</span>
               </v-avatar>
               <p class="text-caption font-weight-bold mb-0">公式マーク付与</p>
             </div>
-            <v-icon size="16" color="grey-lighten-1">mdi-chevron-right</v-icon>
+            <v-icon size="16" color="grey-darken-1">mdi-chevron-right</v-icon>
             <div class="step-item text-center">
               <v-avatar color="green" size="28" class="mb-1">
                 <span class="text-caption font-weight-bold text-white">3</span>
