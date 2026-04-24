@@ -94,8 +94,19 @@
     <EventSchedule v-model:selected-date="selectedDate" />
 
     <!-- イベント追加フォーム -->
-    <EventFormFab @click="openFormDialog" />
-    <EventFormSheet v-model="formDialogOpen" />
+    <v-btn
+      class="text-white font-weight-bold fab-btn py-7 px-5 d-flex align-center justify-center"
+      color="orange"
+      variant="elevated"
+      elevation="4"
+      rounded="pill"
+      @click="openFormDialog"
+    >
+      団体向けフォーム
+    </v-btn>
+    <BaseBottomSheet v-model="formDialogOpen" title="新歓イベントの登録">
+      <EventForm v-if="formDialogOpen" @success="formDialogOpen = false" />
+    </BaseBottomSheet>
   </div>
 </template>
 
@@ -104,8 +115,8 @@ import { ref, onMounted, computed, watch } from 'vue'
 import { useStore } from 'vuex'
 import VueCal from 'vue-cal'
 import 'vue-cal/dist/vuecal.css'
-import EventFormFab from '@/components/event/EventFormFab.vue'
-import EventFormSheet from '@/components/event/EventFormSheet.vue'
+import BaseBottomSheet from '@/components/common/BaseBottomSheet.vue'
+import EventForm from '@/components/event/EventForm.vue'
 import EventSchedule from '@/components/event/EventSchedule.vue'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
@@ -384,5 +395,13 @@ onMounted(() => {
 
 .vuecal__no-event {
   display: none;
+}
+
+/* --- FABボタン --- */
+.fab-btn {
+  position: fixed;
+  bottom: 100px;
+  right: 16px;
+  z-index: 1000;
 }
 </style>

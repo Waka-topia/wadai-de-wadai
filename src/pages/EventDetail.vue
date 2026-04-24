@@ -219,7 +219,9 @@
       @transferred="onTransferred"
     />
 
-    <EditEventSheet v-model="editSheetOpen" :event="event" />
+    <BaseBottomSheet v-model="editSheetOpen" title="イベントの編集">
+      <EventForm v-if="editSheetOpen" :initial-event="event" @success="editSheetOpen = false" />
+    </BaseBottomSheet>
 
     <BaseBottomSheet v-model="deleteSheetOpen" title="イベントの削除">
       <v-card-text>このイベントを削除します。本当によろしいですか？</v-card-text>
@@ -248,7 +250,7 @@ import { isUserRepresentative } from '@/services/groupService'
 import { useSnackbar } from '@/composables/useSnackbar'
 import BaseBottomSheet from '@/components/common/BaseBottomSheet.vue'
 import ClaimEventDialog from '@/components/event/ClaimEventDialog.vue'
-import EditEventSheet from '@/components/event/EditEventSheet.vue'
+import EventForm from '@/components/event/EventForm.vue'
 
 const route = useRoute()
 const router = useRouter()
