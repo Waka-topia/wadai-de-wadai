@@ -88,12 +88,7 @@
     </BaseBottomSheet>
 
     <!-- 時間割の入力フォーム -->
-    <BaseBottomSheet
-      v-model="isEditorSheetOpen"
-      :title="editorSheetTitle"
-      max-height="80vh"
-      scrollable
-    >
+    <BaseBottomSheet v-model="isEditorSheetOpen" :title="editorSheetTitle" scrollable>
       <LectureEditorModal
         v-if="isEditorSheetOpen"
         :selected-cell="activeCell"

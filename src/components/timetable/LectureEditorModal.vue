@@ -6,10 +6,12 @@
         :items="quarterSelectOptions"
         item-title="title"
         item-value="value"
-        label="履修期間 *"
+        label="履修期間"
         variant="outlined"
         density="comfortable"
-        :rules="[(v) => !!v || '履修期間を選択してください']"
+        bg-color="grey-lighten-4"
+        base-color="grey-darken-2"
+        :rules="[required]"
       />
     </div>
 
@@ -19,10 +21,12 @@
         :items="dayOptions"
         item-title="title"
         item-value="value"
-        label="曜日 *"
+        label="曜日"
         variant="outlined"
         density="comfortable"
-        :rules="[(v) => !!v || '曜日を選択してください']"
+        bg-color="grey-lighten-4"
+        base-color="grey-darken-2"
+        :rules="[required]"
       />
     </div>
 
@@ -33,10 +37,12 @@
         multiple
         chips
         closable-chips
-        label="時限（複数選択で連続コマ）*"
+        label="時限（複数選択で連続コマ）"
         variant="outlined"
         density="comfortable"
-        :rules="[(v) => v.length > 0 || '時限を選択してください']"
+        bg-color="grey-lighten-4"
+        base-color="grey-darken-2"
+        :rules="[required]"
       />
     </div>
 
@@ -45,12 +51,13 @@
       :rules="[required]"
       class="mb-2"
       density="comfortable"
-      label="講義名 *"
+      label="講義名"
       hint="検索せずに直接追加する場合は講義名を入力してください"
       placeholder="例：基礎プログラミング"
       variant="outlined"
-    >
-    </v-text-field>
+      bg-color="grey-lighten-4"
+      base-color="grey-darken-2"
+    />
 
     <v-text-field
       v-model="form.teacher"
@@ -60,6 +67,8 @@
       label="担当教員"
       placeholder="例：山田 太郎"
       variant="outlined"
+      bg-color="grey-lighten-4"
+      base-color="grey-darken-2"
     />
 
     <v-row class="mb-1" dense>
@@ -71,6 +80,8 @@
           label="教室"
           placeholder="例：A棟101"
           variant="outlined"
+          bg-color="grey-lighten-4"
+          base-color="grey-darken-2"
       /></v-col>
       <v-col cols="4"
         ><v-select
@@ -80,6 +91,8 @@
           density="comfortable"
           label="単位数"
           variant="outlined"
+          bg-color="grey-lighten-4"
+          base-color="grey-darken-2"
       /></v-col>
     </v-row>
     <v-row class="mb-1" dense>
@@ -93,6 +106,8 @@
           item-value="value"
           label="区分"
           variant="outlined"
+          bg-color="grey-lighten-4"
+          base-color="grey-darken-2"
       /></v-col>
       <v-col cols="12"
         ><v-select
@@ -104,6 +119,8 @@
           item-value="value"
           label="単位取得状況"
           variant="outlined"
+          bg-color="grey-lighten-4"
+          base-color="grey-darken-2"
       /></v-col>
     </v-row>
 
@@ -115,6 +132,8 @@
       placeholder="例：出席必須, 教科書持参"
       rows="2"
       variant="outlined"
+      bg-color="grey-lighten-4"
+      base-color="grey-darken-2"
     />
 
     <div class="d-flex align-center justify-space-between mb-2">
@@ -388,6 +407,15 @@ const handleDelete = () => {
 </script>
 
 <style scoped>
+:deep(.v-field--variant-outlined .v-field__outline) {
+  --v-field-border-width: 2px;
+}
+
+:deep(.v-field:not(.v-field--focused) .v-label) {
+  color: #616161;
+  opacity: 1;
+}
+
 .editor-form {
   display: flex;
   flex-direction: column;
