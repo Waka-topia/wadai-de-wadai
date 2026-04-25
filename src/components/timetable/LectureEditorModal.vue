@@ -184,7 +184,6 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { useStore } from 'vuex'
-import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { required } from '@/utils/forms/validate'
 import LectureReviewPanel from '@/components/timetable/LectureReviewPanel.vue'
@@ -192,10 +191,9 @@ import BaseDialog from '@/components/common/BaseDialog.vue'
 
 const props = defineProps({
   selectedCell: { type: Object, default: null }, // { day, period, lectureId }
-  close: { type: Function, default: null },
 })
+const emit = defineEmits(['save', 'delete'])
 const store = useStore()
-const { showSnackbar } = useSnackbar()
 
 const currentSemester = computed(() => store.getters['timetable/semester'])
 // 現在表示されているクォーター（'all', '1Q', '2Q', '3Q', '4Q'）を取得
@@ -366,14 +364,11 @@ const executeFinalSave = () => {
     periods: form.value.periods,
     isExisting: isExistingLecture.value,
   })
-
-  store.dispatch('timetable/saveLecture', {
+  emit('save', {
     day: form.value.day,
     periods: form.value.periods,
     lecture: { ...form.value, name, originalName: form.value.originalName || name },
   })
-  showSnackbar(`「${name}」を保存しました`, 'success', { icon: 'mdi-check-circle' })
-  props.close?.()
 }
 
 const handleDelete = () => {
@@ -382,16 +377,12 @@ const handleDelete = () => {
     day: form.value.day,
     periods: form.value.periods,
   })
-
-  // 対象のIDを持つ授業だけを削除する
-  store.dispatch('timetable/removeLecture', {
+  showDeleteConfirm.value = false
+  emit('delete', {
     day: form.value.day,
     periods: form.value.periods,
     lectureId: form.value.id,
   })
-  showDeleteConfirm.value = false
-  showSnackbar('講義を削除しました', 'success', { icon: 'mdi-check-circle' })
-  props.close?.()
 }
 </script>
 

@@ -94,9 +94,12 @@
       max-height="80vh"
       scrollable
     >
-      <template #default="{ close }">
-        <LectureEditorModal v-if="isEditorSheetOpen" :selected-cell="activeCell" :close="close" />
-      </template>
+      <LectureEditorModal
+        v-if="isEditorSheetOpen"
+        :selected-cell="activeCell"
+        @save="handleLectureSave"
+        @delete="handleLectureDelete"
+      />
     </BaseBottomSheet>
 
     <section v-if="isAuthenticated && todayLectures.length > 0" class="today-section">
@@ -136,6 +139,7 @@ import { ref, computed, watch, onActivated } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import BaseBottomSheet from '@/components/common/BaseBottomSheet.vue'
 import TimetableHeaderControls from '@/components/timetable/TimetableHeaderControls.vue'
@@ -144,6 +148,7 @@ import LectureEditorModal from '@/components/timetable/LectureEditorModal.vue'
 
 const store = useStore()
 const router = useRouter()
+const { showSnackbar } = useSnackbar()
 
 useFirebasePageView('view_timetable', () => ({ loggedIn: store.getters['auth/isAuthenticated'] }))
 const sheetState = ref({
@@ -268,6 +273,18 @@ const handleChoiceSyllabus = () => {
 
 const handleChoiceManual = () => {
   sheetState.value = { active: 'editor', cell: activeCell.value }
+}
+
+const handleLectureSave = ({ day, periods, lecture }) => {
+  store.dispatch('timetable/saveLecture', { day, periods, lecture })
+  showSnackbar(`「${lecture.name}」を保存しました`, 'success', { icon: 'mdi-check-circle' })
+  sheetState.value.active = null
+}
+
+const handleLectureDelete = ({ day, periods, lectureId }) => {
+  store.dispatch('timetable/removeLecture', { day, periods, lectureId })
+  showSnackbar('講義を削除しました', 'success', { icon: 'mdi-check-circle' })
+  sheetState.value.active = null
 }
 </script>
 
