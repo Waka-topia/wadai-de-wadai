@@ -191,6 +191,7 @@ import BaseDialog from '@/components/common/BaseDialog.vue'
 
 const props = defineProps({
   selectedCell: { type: Object, default: null }, // { day, period, lectureId }
+  prefillName: { type: String, default: '' },
 })
 const emit = defineEmits(['save', 'delete'])
 const store = useStore()
@@ -276,8 +277,8 @@ const resetForm = () => {
 
   form.value = {
     id: null,
-    name: '',
-    originalName: '',
+    name: props.prefillName || '',
+    originalName: props.prefillName || '',
     color: 'orange',
     room: '',
     memo: '',
