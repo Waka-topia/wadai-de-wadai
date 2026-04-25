@@ -43,9 +43,9 @@
                 target="_blank"
                 rel="noopener noreferrer"
                 @click.stop
-              >
+                >
                 詳細はこちら
-              </a> -->
+                </a> -->
             </v-card>
           </v-menu>
         </div>
