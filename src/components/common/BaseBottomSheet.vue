@@ -8,17 +8,10 @@
     <template v-if="$slots.activator" #activator="{ props: activatorProps }">
       <slot :props="activatorProps" name="activator" />
     </template>
-    <v-card
-      ref="cardRef"
-      rounded="t-xl"
-      class="overflow-y-auto"
-      @touchstart="onTouchStart"
-      @touchmove="onTouchMove"
-      @touchend="onTouchEnd"
-    >
-      <div class="bottom-sheet-handle" />
+    <v-card rounded="t-xl" class="d-flex flex-column overflow-hidden">
+      <div class="bottom-sheet-handle"></div>
       <template v-if="title || $slots['title-action']">
-        <v-card-title class="text-subtitle-1 font-weight-bold d-flex align-center">
+        <v-card-title class="text-subtitle-1 font-weight-bold d-flex align-center flex-shrink-0">
           <v-btn icon variant="text" size="default" color="orange" @click="open = false">
             <v-icon>mdi-close</v-icon>
           </v-btn>
@@ -29,13 +22,15 @@
         </v-card-title>
         <v-divider />
       </template>
-      <slot :close="() => (open = false)" :is-open="open" />
+      <div class="overflow-y-auto flex-grow-1">
+        <slot :close="() => (open = false)" :is-open="open" />
+      </div>
     </v-card>
   </v-bottom-sheet>
 </template>
 
 <script setup>
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 
 const props = defineProps({
   modelValue: { type: Boolean, default: undefined },
@@ -56,65 +51,4 @@ const open = computed({
     else internalOpen.value = val
   },
 })
-
-const cardRef = ref(null)
-const touchStartY = ref(0)
-
-// 次回オープン時に transform をリセットする（クローズ時にリセットすると一瞬元の位置が見えるため）
-watch(
-  () => open.value,
-  (val) => {
-    if (val) {
-      nextTick(() => {
-        const el = cardEl()
-        if (el) {
-          el.style.transition = ''
-          el.style.transform = ''
-        }
-      })
-    }
-  },
-)
-
-const cardEl = () => cardRef.value?.$el
-
-const onTouchStart = (e) => {
-  touchStartY.value = e.touches[0].clientY
-  const el = cardEl()
-  if (el) el.style.transition = 'none'
-}
-
-const onTouchMove = (e) => {
-  const deltaY = e.touches[0].clientY - touchStartY.value
-  if (deltaY <= 0) return
-  const el = cardEl()
-  if (el) el.style.transform = `translateY(${deltaY}px)`
-}
-
-const onTouchEnd = (e) => {
-  const deltaY = e.changedTouches[0].clientY - touchStartY.value
-  const el = cardEl()
-  if (!el) return
-
-  if (deltaY > 80) {
-    el.style.transition = 'transform 0.3s ease'
-    el.style.transform = 'translateY(100%)'
-    setTimeout(() => {
-      open.value = false
-    }, 300)
-  } else {
-    el.style.transition = 'transform 0.3s ease'
-    el.style.transform = ''
-  }
-}
 </script>
-
-<style>
-.bottom-sheet-handle {
-  width: 36px;
-  height: 4px;
-  border-radius: 2px;
-  background: #ddd;
-  margin: 8px auto 4px;
-}
-</style>
