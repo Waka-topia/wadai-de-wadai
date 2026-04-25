@@ -94,18 +94,23 @@
     <EventSchedule v-model:selected-date="selectedDate" />
 
     <!-- イベント追加フォーム -->
-    <v-btn
-      class="text-white font-weight-bold fab-btn py-7 px-5 d-flex align-center justify-center"
-      color="orange"
-      variant="elevated"
-      elevation="4"
-      rounded="pill"
-      @click="openFormDialog"
-    >
-      団体向けフォーム
-    </v-btn>
-    <BaseBottomSheet v-model="formDialogOpen" title="新歓イベントの登録">
-      <EventForm v-if="formDialogOpen" @success="formDialogOpen = false" />
+    <BaseBottomSheet title="新歓イベントの登録">
+      <template #activator="{ props: activatorProps }">
+        <v-btn
+          v-bind="activatorProps"
+          class="text-white font-weight-bold fab-btn py-7 px-5 d-flex align-center justify-center"
+          color="orange"
+          variant="elevated"
+          elevation="4"
+          rounded="pill"
+          @click="logFirebaseAnalyticsEvent('event_edit_form_open', {})"
+        >
+          団体向けフォーム
+        </v-btn>
+      </template>
+      <template #default="{ close, isOpen }">
+        <EventForm v-if="isOpen" @success="close" />
+      </template>
     </BaseBottomSheet>
   </div>
 </template>
@@ -216,13 +221,6 @@ const changeDate = (days) => {
     direction: days > 0 ? 'next' : 'prev',
     targetDate: newDateString,
   })
-}
-
-const formDialogOpen = ref(false)
-
-const openFormDialog = () => {
-  formDialogOpen.value = true
-  void logFirebaseAnalyticsEvent('event_edit_form_open', {})
 }
 
 onMounted(() => {

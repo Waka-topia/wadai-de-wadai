@@ -59,47 +59,45 @@
       <TimetableGrid @cell-click="handleCellClick" />
     </main>
 
-    <v-bottom-sheet v-model="showChoiceSheet" max-width="600">
-      <v-card rounded="t-xl" class="pa-4 pb-6">
-        <div class="d-flex justify-center mb-3">
-          <div style="width: 36px; height: 4px; border-radius: 2px; background: #ddd" />
-        </div>
-        <div class="text-subtitle2 font-weight-bold text-center mb-4">
-          {{ pendingCellLabel }}に追加する方法を選んでください
-        </div>
-        <div class="d-flex flex-column ga-3">
-          <v-btn
-            color="orange"
-            class="text-white font-weight-bold"
-            variant="flat"
-            size="large"
-            rounded="lg"
-            prepend-icon="mdi-book-search"
-            @click="handleChoiceSyllabus"
-          >
-            みんなのシラバスから検索
-          </v-btn>
-          <v-btn
-            color="orange"
-            class="text-orange font-weight-bold"
-            variant="outlined"
-            size="large"
-            rounded="lg"
-            prepend-icon="mdi-pencil"
-            @click="handleChoiceManual"
-          >
-            自分で入力する
-          </v-btn>
-        </div>
-      </v-card>
-    </v-bottom-sheet>
+    <!-- 時間割の入力方法の選択シート -->
+    <BaseBottomSheet v-model="isChoiceSheetOpen" :title="`${choiceCellLabel}に追加する方法`">
+      <div class="d-flex flex-column ga-3 pa-4 pb-6">
+        <v-btn
+          color="orange"
+          class="text-white font-weight-bold"
+          variant="flat"
+          size="large"
+          rounded="lg"
+          prepend-icon="mdi-book-search"
+          @click="handleChoiceSyllabus"
+        >
+          みんなのシラバスから検索
+        </v-btn>
+        <v-btn
+          color="orange"
+          class="text-orange font-weight-bold"
+          variant="outlined"
+          size="large"
+          rounded="lg"
+          prepend-icon="mdi-pencil"
+          @click="handleChoiceManual"
+        >
+          自分で入力する
+        </v-btn>
+      </div>
+    </BaseBottomSheet>
 
-    <LectureEditorModal
-      v-model="showModal"
-      :selected-cell="selectedCell"
-      @saved="onLectureSaved"
-      @deleted="onLectureDeleted"
-    />
+    <!-- 時間割の入力フォーム -->
+    <BaseBottomSheet
+      v-model="isEditorSheetOpen"
+      :title="editorSheetTitle"
+      max-height="80vh"
+      scrollable
+    >
+      <template #default="{ close }">
+        <LectureEditorModal v-if="isEditorSheetOpen" :selected-cell="activeCell" :close="close" />
+      </template>
+    </BaseBottomSheet>
 
     <section v-if="isAuthenticated && todayLectures.length > 0" class="today-section">
       <div class="today-section-title">
@@ -138,8 +136,8 @@ import { ref, computed, watch, onActivated } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
-import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
+import BaseBottomSheet from '@/components/common/BaseBottomSheet.vue'
 import TimetableHeaderControls from '@/components/timetable/TimetableHeaderControls.vue'
 import TimetableGrid from '@/components/timetable/TimetableGrid.vue'
 import LectureEditorModal from '@/components/timetable/LectureEditorModal.vue'
@@ -148,17 +146,34 @@ const store = useStore()
 const router = useRouter()
 
 useFirebasePageView('view_timetable', () => ({ loggedIn: store.getters['auth/isAuthenticated'] }))
-const showModal = ref(false)
-const selectedCell = ref(null)
-const showChoiceSheet = ref(false)
-const pendingCell = ref(null)
+const sheetState = ref({
+  active: null, // null | 'choice' | 'editor'
+  cell: null, // { day, period, lectureId }
+})
 
-const { showSnackbar } = useSnackbar()
+const isChoiceSheetOpen = computed({
+  get: () => sheetState.value.active === 'choice',
+  set: (val) => {
+    if (!val) sheetState.value.active = null
+  },
+})
 
-const onLectureSaved = (lectureName) =>
-  showSnackbar(`「${lectureName}」を保存しました`, 'success', { icon: 'mdi-check-circle' })
-const onLectureDeleted = () =>
-  showSnackbar('講義を削除しました', 'success', { icon: 'mdi-check-circle' })
+const isEditorSheetOpen = computed({
+  get: () => sheetState.value.active === 'editor',
+  set: (val) => {
+    if (!val) sheetState.value.active = null
+  },
+})
+
+const activeCell = computed(() => sheetState.value.cell)
+
+const dayLabels = { mon: '月', tue: '火', wed: '水', thu: '木', fri: '金' }
+
+const editorSheetTitle = computed(() => {
+  if (!activeCell.value) return '講義を登録'
+  const { day, period } = activeCell.value
+  return `${dayLabels[day] || ''}曜 ${period}限`
+})
 
 const isAuthenticated = computed(() => store.getters['auth/isAuthenticated'])
 const todayLectures = computed(() => store.getters['timetable/todayLectures'])
@@ -225,10 +240,9 @@ onActivated(() => {
   if (userId.value) store.dispatch('timetable/fetchTimetable')
 })
 
-const dayLabels = { mon: '月', tue: '火', wed: '水', thu: '木', fri: '金' }
-const pendingCellLabel = computed(() => {
-  if (!pendingCell.value) return ''
-  const { day, period } = pendingCell.value
+const choiceCellLabel = computed(() => {
+  if (!activeCell.value) return ''
+  const { day, period } = activeCell.value
   return `${dayLabels[day] || ''}曜日 ${period}限`
 })
 
@@ -239,25 +253,21 @@ const handleCellClick = ({ day, period, lectureId }) => {
     return
   }
   if (lectureId) {
-    selectedCell.value = { day, period, lectureId }
-    showModal.value = true
+    sheetState.value = { active: 'editor', cell: { day, period, lectureId } }
   } else {
-    pendingCell.value = { day, period, lectureId: null }
-    showChoiceSheet.value = true
+    sheetState.value = { active: 'choice', cell: { day, period, lectureId: null } }
   }
 }
 
 const handleChoiceSyllabus = () => {
-  showChoiceSheet.value = false
-  const { day, period } = pendingCell.value
+  const { day, period } = activeCell.value
   void logFirebaseAnalyticsEvent('lecture_add_choice_syllabus', { day, period })
+  sheetState.value.active = null
   router.push({ path: '/syllabus-search', state: { targetDay: day, targetPeriod: period } })
 }
 
 const handleChoiceManual = () => {
-  showChoiceSheet.value = false
-  selectedCell.value = pendingCell.value
-  showModal.value = true
+  sheetState.value = { active: 'editor', cell: activeCell.value }
 }
 </script>
 

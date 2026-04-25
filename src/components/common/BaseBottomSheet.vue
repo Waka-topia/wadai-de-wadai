@@ -5,6 +5,9 @@
     :max-width="maxWidth"
     :scrollable="scrollable"
   >
+    <template v-if="$slots.activator" #activator="{ props: activatorProps }">
+      <slot :props="activatorProps" name="activator" />
+    </template>
     <v-card
       ref="cardRef"
       rounded="t-xl"
@@ -26,7 +29,7 @@
         </v-card-title>
         <v-divider />
       </template>
-      <slot />
+      <slot :close="() => (open = false)" :is-open="open" />
     </v-card>
   </v-bottom-sheet>
 </template>
@@ -35,7 +38,7 @@
 import { computed, nextTick, ref, watch } from 'vue'
 
 const props = defineProps({
-  modelValue: { type: Boolean, required: true },
+  modelValue: { type: Boolean, default: undefined },
   title: { type: String, default: '' },
   maxHeight: { type: String, default: '90vh' },
   maxWidth: { type: String, default: undefined },
@@ -43,9 +46,15 @@ const props = defineProps({
 })
 const emit = defineEmits(['update:modelValue'])
 
+// v-model が渡されない場合（activator のみ）は内部 ref で管理する
+const internalOpen = ref(false)
+
 const open = computed({
-  get: () => props.modelValue,
-  set: (val) => emit('update:modelValue', val),
+  get: () => (props.modelValue !== undefined ? props.modelValue : internalOpen.value),
+  set: (val) => {
+    if (props.modelValue !== undefined) emit('update:modelValue', val)
+    else internalOpen.value = val
+  },
 })
 
 const cardRef = ref(null)
@@ -53,7 +62,7 @@ const touchStartY = ref(0)
 
 // 次回オープン時に transform をリセットする（クローズ時にリセットすると一瞬元の位置が見えるため）
 watch(
-  () => props.modelValue,
+  () => open.value,
   (val) => {
     if (val) {
       nextTick(() => {

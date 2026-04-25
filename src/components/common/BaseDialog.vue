@@ -1,5 +1,8 @@
 <template>
   <v-dialog v-model="open" :max-width="maxWidth">
+    <template v-if="$slots.activator" #activator="{ props: activatorProps }">
+      <slot :props="activatorProps" name="activator" />
+    </template>
     <v-card rounded="lg">
       <v-card-title v-if="title" class="pa-5 pb-2 font-weight-bold">{{ title }}</v-card-title>
       <slot>
