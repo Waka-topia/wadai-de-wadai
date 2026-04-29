@@ -37,7 +37,7 @@
     </div>
 
     <OtherFunctions />
-    </v-container>
+  </v-container>
 </template>
 
 <script setup>
