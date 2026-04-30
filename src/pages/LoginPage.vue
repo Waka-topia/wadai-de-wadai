@@ -102,7 +102,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
 import { useSnackbar } from '@/composables/useSnackbar'
@@ -119,6 +119,7 @@ const isLoading = ref(false)
 const { showSnackbar } = useSnackbar()
 
 const router = useRouter()
+const route = useRoute()
 const store = useStore()
 
 useFirebasePageView('view_login', {})
@@ -152,7 +153,9 @@ const onSubmit = async (validationPromise) => {
     showSnackbar('ログインしました', 'success', { icon: 'mdi-check-circle' })
 
     setTimeout(() => {
-      router.push('/')
+      // ガードによるリダイレクト先がある場合はそこへ、なければトップへ
+      const redirectPath = route.query.redirect || '/'
+      router.push(String(redirectPath))
     }, 1000)
   } catch (error) {
     void logFirebaseAnalyticsEvent('login_submit_error', {

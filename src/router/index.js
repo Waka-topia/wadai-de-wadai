@@ -32,11 +32,13 @@ const routes = [
   {
     path: '/mypage',
     name: 'MyPage',
+    meta: { requiresAuth: true },
     component: () => import('@/pages/MyPage.vue'),
   },
   {
     path: '/tutorial',
     name: 'Tutorial',
+    meta: { requiresAuth: true },
     component: () => import('@/pages/TutorialPage.vue'),
   },
   {
@@ -94,11 +96,13 @@ const routes = [
   {
     path: '/prove-owner',
     name: 'ProveOwner',
+    meta: { requiresAuth: true },
     component: () => import('@/pages/ProveOwnerPage.vue'),
   },
   {
     path: '/prove-owner/description',
     name: 'ProveOwnerDescription',
+    meta: { requiresAuth: true },
     component: () => import('@/pages/ProveOwnerDescriptionPage.vue'),
   },
   {
@@ -167,6 +171,15 @@ router.beforeEach((to, from, next) => {
       path: from.path,
       scrollTop,
     })
+  }
+
+  // 認証が必要なページのアクセス制御（未ログインならログインページへリダイレクト）
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
+    const isAuthenticated = store.getters['auth/isAuthenticated']
+    if (!isAuthenticated) {
+      next({ path: '/login', query: { redirect: to.fullPath } })
+      return
+    }
   }
 
   // Adminページのアクセス制御
