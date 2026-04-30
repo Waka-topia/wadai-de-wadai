@@ -36,13 +36,13 @@ export default {
               commit('setUser', user)
               commit('setIdToken', idToken)
               commit('setUserId', user.uid)
-              console.log('User logged in:', user)
+              // console.log('[Auth] User signed in:', user.uid)
               resolve()
             })
           } else {
             commit('clearAuthState')
             dispatch('timetable/resetCache', null, { root: true }) // キャッシュをリセット
-            console.log('No user logged in')
+            // console.log('[Auth] No user signed in')
             resolve()
           }
         })
@@ -92,7 +92,7 @@ export default {
       try {
         await authService.saveUserOrgs(state.userId, orgs)
         commit('setUserOrgs', orgs)
-        console.log('User organizations updated:', orgs)
+        // console.log('[Auth] User organizations updated:', orgs)
       } catch (error) {
         console.error('Error saving user organizations:', error)
         throw error

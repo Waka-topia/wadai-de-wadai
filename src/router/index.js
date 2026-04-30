@@ -185,15 +185,15 @@ router.beforeEach((to, from, next) => {
   // Adminページのアクセス制御
   if (to.matched.some((record) => record.meta.requiresAdmin)) {
     const currentUserId = store.getters['auth/userId']
-    console.log('[DEBUG Admin Guard] currentUserId:', currentUserId)
-    console.log('[DEBUG Admin Guard] adminUserId (from env):', adminUserId)
+    // console.log('[AdminGuard] currentUserId:', currentUserId)
+    // console.log('[AdminGuard] adminUserId:', adminUserId)
     if (currentUserId !== adminUserId) {
-      console.warn('[DEBUG Admin Guard] User is not admin. Redirecting to home.')
+      // console.warn('[AdminGuard] Not admin. Redirecting to home.')
       // 運営アカウントでなければホームにリダイレクト
       next({ path: '/' })
       return
     }
-    console.log('[DEBUG Admin Guard] Access granted.')
+    // console.log('[AdminGuard] Access granted.')
   }
 
   next()

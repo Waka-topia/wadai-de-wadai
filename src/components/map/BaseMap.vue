@@ -173,7 +173,7 @@ onMounted(() => {
         navigator.clipboard
           .writeText(`Coordinates: { lat: ${lat}, lng: ${lng} }`)
           .then(() => {
-            console.log('Coordinates copied to clipboard')
+            // console.log('Coordinates copied to clipboard')
             // 簡単なフィードバック（オプション）
             // alert('Copied!')
           })
