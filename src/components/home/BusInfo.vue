@@ -14,7 +14,8 @@
         color="indigo"
         @click="$emit('refresh')"
       >
-        <template v-if="canRefresh"> <v-icon left>mdi-refresh</v-icon>更新 </template>
+        <!-- 更新ボタン(1分に1回のみ) -->
+        <template v-if="canRefresh"> <v-icon left>mdi-refresh</v-icon></template>
         <template v-else> {{ cooldown }}s </template>
       </v-btn>
     </div>
@@ -90,7 +91,7 @@
                   </span>
                 </div>
 
-                <!-- 地図表示ボタン -->
+                <!-- 地図表示ボタン（後ほど実装） -->
                 <div class="mt-4 w-100">
                   <v-btn
                     color="blue-darken-1"
@@ -105,7 +106,7 @@
                 </div>
               </template>
 
-              <!-- データが存在しない（本日の運行終了など）場合 -->
+              <!-- データが存在しないまたはデータ取得先が次のバスを持っていない場合 -->
               <template v-else>
                 <div class="py-4 text-grey-darken-1">
                   <v-icon size="large" class="mb-2">mdi-bus-off</v-icon>
@@ -142,7 +143,6 @@ import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 const props = defineProps({
   targetBuses: {
     type: Object,
-    // 初期値を空配列に変更
     default: () => ({ routeUniv: [], routeJr: [] }),
   },
   isFetching: Boolean,
@@ -181,15 +181,14 @@ const toggleRoute = (index) => {
   route.expanded = !route.expanded
 }
 
-// 【堅牢化】targetBuses配列から、時計(currentUnixSec)に連動して「今有効なバス」を動的に取得する
+// 「今有効なバス」を動的に取得
 const getRouteData = (gtfsKey) => {
   if (!props.targetBuses) return null
   const buses = props.targetBuses[gtfsKey]
 
-  // データが配列でない、または空の場合はnull
   if (!buses || !Array.isArray(buses) || buses.length === 0) return null
 
-  // 予定時刻を「60秒」過ぎるまでは表示をキープし、60秒を過ぎたら自動的に配列の「次のバス」に切り替わる
+  // 予定時刻を「60秒」過ぎるまでは表示をキープし、60秒を過ぎたら自動的に配列の「次のバス」に切り替える
   const activeBus = buses.find((bus) => bus.targetTime > currentUnixSec.value - 60)
 
   return activeBus || null

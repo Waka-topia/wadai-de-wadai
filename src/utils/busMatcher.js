@@ -7,7 +7,7 @@ export const BUS_CONFIG = {
 
 export const findTargetBuses = (gtfsData) => {
   if (!gtfsData || !gtfsData.tripUpdates || !gtfsData.tripUpdates.entity) {
-    return { routeUniv: [], routeJr: [] } // 空の配列を返すように変更
+    return { routeUniv: [], routeJr: [] }
   }
 
   const entities = gtfsData.tripUpdates.entity
@@ -48,8 +48,8 @@ export const findTargetBuses = (gtfsData) => {
         return
       }
 
-      // 【堅牢化】予定時刻から「5分前（300秒）」〜 未来のバスをすべて配列として保持する
-      if (targetTimeSec > nowSec - 300) {
+      // 5分前（-300秒）～ 未来のバスをすべて取得
+      if (targetTimeSec - nowSec > -300) {
         const busInfo = {
           entity: entity,
           tripId: trip.tripId,
@@ -72,7 +72,6 @@ export const findTargetBuses = (gtfsData) => {
   candidatesUniv.sort((a, b) => a.targetTime - b.targetTime)
   candidatesJr.sort((a, b) => a.targetTime - b.targetTime)
 
-  // 【堅牢化】単一のオブジェクトではなく、配列をごっそりそのまま返す
   return {
     routeUniv: candidatesUniv,
     routeJr: candidatesJr,
