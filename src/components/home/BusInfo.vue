@@ -142,7 +142,8 @@ import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 const props = defineProps({
   targetBuses: {
     type: Object,
-    default: () => ({ routeUniv: null, routeJr: null }),
+    // 初期値を空配列に変更
+    default: () => ({ routeUniv: [], routeJr: [] }),
   },
   isFetching: Boolean,
   cooldown: Number,
@@ -151,11 +152,10 @@ const props = defineProps({
 
 defineEmits(['refresh', 'show-map'])
 
-// UI描画用の静的データ（アコーディオン状態とラベルなど）
 const uiRoutes = ref([
   {
     key: 'BusUniv',
-    gtfsKey: 'routeUniv', // targetBuses オブジェクト内のキーと紐付け
+    gtfsKey: 'routeUniv',
     label: '和歌山大学→和歌山大学前駅・ふじと台',
     color: '#42A5F5',
     expanded: false,
@@ -169,7 +169,6 @@ const uiRoutes = ref([
   },
 ])
 
-// リアルタイムカウントダウン用の現在時刻（秒）
 const currentUnixSec = ref(Math.floor(Date.now() / 1000))
 let intervalId = null
 
@@ -182,13 +181,20 @@ const toggleRoute = (index) => {
   route.expanded = !route.expanded
 }
 
-// targetBuses から該当路線のデータを取得
+// 【堅牢化】targetBuses配列から、時計(currentUnixSec)に連動して「今有効なバス」を動的に取得する
 const getRouteData = (gtfsKey) => {
   if (!props.targetBuses) return null
-  return props.targetBuses[gtfsKey]
+  const buses = props.targetBuses[gtfsKey]
+
+  // データが配列でない、または空の場合はnull
+  if (!buses || !Array.isArray(buses) || buses.length === 0) return null
+
+  // 予定時刻を「60秒」過ぎるまでは表示をキープし、60秒を過ぎたら自動的に配列の「次のバス」に切り替わる
+  const activeBus = buses.find((bus) => bus.targetTime > currentUnixSec.value - 60)
+
+  return activeBus || null
 }
 
-// UI表示用のヘルパー関数
 const getStatusText = (status) => {
   if (status === 'origin') return '始発'
   if (status === 'destination') return '終点'
@@ -205,13 +211,13 @@ const getTimeLabel = (timeType) => {
   return timeType === 'arrival' ? '着' : '発'
 }
 
-// 予測到着・出発時刻（UNIX秒）と現在時刻の差分からカウントダウンを計算
 const getCountdown = (gtfsKey) => {
   const data = getRouteData(gtfsKey)
-  // 変更点: arrivalTime から targetTime に修正
   if (!data || !data.targetTime) return { minutes: '--', seconds: '--' }
 
   const diffSec = data.targetTime - currentUnixSec.value
+
+  // 予定時刻を過ぎてからの60秒間は、0分0秒で待機させる
   if (diffSec <= 0) return { minutes: '0', seconds: '00' }
 
   const m = Math.floor(diffSec / 60)
@@ -219,7 +225,6 @@ const getCountdown = (gtfsKey) => {
   return { minutes: m, seconds: s }
 }
 
-// UNIX Timestamp (秒) を "HH:mm" にフォーマット
 const formatTime = (unixSec) => {
   if (!unixSec) return '--:--'
   const d = new Date(unixSec * 1000)
@@ -229,7 +234,6 @@ const formatTime = (unixSec) => {
 }
 
 onMounted(() => {
-  // 毎秒現在時刻を更新してカウントダウンを動かす
   intervalId = setInterval(() => {
     currentUnixSec.value = Math.floor(Date.now() / 1000)
   }, 1000)
