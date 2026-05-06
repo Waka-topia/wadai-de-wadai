@@ -25,26 +25,93 @@
     </v-card>
 
     <TrainInfo />
-    <BusInfo />
+
+    <BusInfo
+      :target-buses="targetBuses"
+      :is-fetching="isFetching"
+      :cooldown="cooldown"
+      :can-refresh="canRefresh"
+      @refresh="refresh"
+      @show-map="openBusMap"
+    />
+
     <CampusMap />
     <OtherFunctions />
     <!-- <WakayamaMatch /> -->
+
+    <!-- 地図ダイアログの追加 -->
+    <v-dialog v-model="isMapVisible" fullscreen transition="dialog-bottom-transition">
+      <v-card class="map-dialog-card">
+        <MapPage
+          v-if="isMapVisible"
+          :bus-position="activeBusPosition"
+          :active-route="activeRoute"
+          @close="isMapVisible = false"
+        />
+
+        <v-btn icon class="close-map-btn" color="white" elevation="4" @click="isMapVisible = false">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
+import { getBusPosition } from '@/utils/busMatcher'
+import { useBusRealtime } from '@/composables/useBusRealtime'
+
 import TrainInfo from '@/components/home/TrainInfo.vue'
 import BusInfo from '@/components/home/BusInfo.vue'
 import CampusMap from '@/components/home/CampusMap.vue'
 import OtherFunctions from '@/components/home/OtherFunctions.vue'
 // import WakayamaMatch from '@/components/home/WakayamaMatch.vue'
+import MapPage from '@/pages/MapPage.vue'
 
 useFirebasePageView('view_home', {})
 
 const logSyllabusBannerClick = () => {
   void logFirebaseAnalyticsEvent('home_syllabus_search_banner_click', {})
+}
+
+const isMapVisible = ref(false)
+const activeBusPosition = ref(null)
+const activeRoute = ref('') // 'routeUniv' または 'routeJr'
+
+const { realtimeBusData, targetBuses, isFetching, cooldown, canRefresh, refresh } = useBusRealtime()
+
+/**
+ * 地図を表示するボタン（BusInfo内のボタン）が押された時の処理
+ *
+ * @param {String} routeKey - 'BusUniv' (路線Univ) または 'BusJr' (路線Jr)
+ */
+const openBusMap = (routeKey) => {
+  console.log(`🗺️ 地図表示リクエスト: ${routeKey}`)
+
+  activeRoute.value = routeKey === 'BusUniv' ? 'routeUniv' : 'routeJr'
+
+  const targetBus = routeKey === 'BusUniv' ? targetBuses.value.routeUniv : targetBuses.value.routeJr
+
+  if (targetBus && targetBus.tripId) {
+    console.log(`🆔 対象TripID: ${targetBus.tripId}`)
+
+    const position = getBusPosition(realtimeBusData.value, targetBus.tripId)
+
+    if (position) {
+      console.log('📍 座標特定成功:', position)
+      activeBusPosition.value = position
+      isMapVisible.value = true
+    } else {
+      console.warn('⚠️ 座標が見つかりませんでした(VehiclePosition不足)')
+      alert('現在このバスの現在地が配信されていません。')
+    }
+  } else {
+    console.warn('⚠️ 対象路線の運行バスが特定できていません')
+    alert('現在、運行中の該当バスが見つかりませんでした。')
+  }
 }
 </script>
 
@@ -61,5 +128,17 @@ const logSyllabusBannerClick = () => {
 }
 .syllabus-banner:active {
   transform: scale(0.98);
+}
+.map-dialog-card {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+.close-map-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 2000;
 }
 </style>
