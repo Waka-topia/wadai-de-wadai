@@ -1,11 +1,26 @@
 <template>
   <div class="mb-6">
+    <!-- Header with Refresh Button -->
     <div class="d-flex align-center mb-2">
       <v-icon color="#1976D2" class="mr-2">mdi-bus</v-icon>
-      <span class="font-weight-bold">バス情報</span>
+      <span class="font-weight-bold">和歌山大学発 バス接近情報</span>
+      <v-spacer></v-spacer>
+
+      <v-btn
+        variant="tonal"
+        size="small"
+        :disabled="!canRefresh"
+        :loading="isFetching"
+        color="indigo"
+        @click="$emit('refresh')"
+      >
+        <template v-if="canRefresh"> <v-icon left>mdi-refresh</v-icon>更新 </template>
+        <template v-else> {{ cooldown }}s </template>
+      </v-btn>
     </div>
 
-    <div v-for="(route, index) in routes" :key="index" class="mb-3">
+    <!-- Routes Accordion -->
+    <div v-for="(route, index) in uiRoutes" :key="index" class="mb-3">
       <!-- Button -->
       <v-btn
         block
@@ -29,47 +44,63 @@
       <div class="expand-wrapper" :class="{ expanded: route.expanded }">
         <div class="expand-inner bg-white border-s border-e border-b rounded-b-lg">
           <div class="pa-4">
-            <!-- Centered Layout -->
             <div class="d-flex flex-column align-center text-center">
-              <!-- row 1: Badge & Time -->
-              <div class="d-flex align-center mb-1">
-                <!-- Bus Route Badges -->
-                <div v-if="getBusBadges(route).length > 0" class="d-flex align-center mr-2">
-                  <v-chip
-                    v-for="(badge, i) in getBusBadges(route)"
-                    :key="i"
-                    size="small"
-                    :color="badge.color"
-                    class="font-weight-bold mr-1"
-                    label
-                  >
-                    {{ badge.label }}
+              <!-- 予測データが存在する場合 -->
+              <template v-if="getRouteData(route.gtfsKey)">
+                <div class="d-flex align-center mb-1">
+                  <v-chip size="small" color="indigo" class="font-weight-bold mr-2" label>
+                    リアルタイム予測
                   </v-chip>
+                  <div class="text-h6 font-weight-bold">
+                    {{ formatTime(getRouteData(route.gtfsKey).arrivalTime) }} 予定
+                  </div>
                 </div>
-                <div class="text-h6 font-weight-bold">{{ route.nextDepartureTime }}発</div>
-              </div>
 
-              <!-- row 2: Countdown (Main) -->
-              <div class="text-h3 font-weight-bold text-blue mb-2">
-                <span class="text-h2">{{ route.nextDepartureIn }}</span>
-                <span class="text-h6">分</span>
-                <span class="text-h4 mx-1">{{ route.nextDepartureSeconds }}</span>
-                <span class="text-h6">秒</span>
-              </div>
+                <!-- リアルタイム カウントダウン -->
+                <div class="text-h3 font-weight-bold text-blue mb-2">
+                  <span class="text-h2">{{ getCountdown(route.gtfsKey).minutes }}</span>
+                  <span class="text-h6">分</span>
+                  <span class="text-h4 mx-1">{{ getCountdown(route.gtfsKey).seconds }}</span>
+                  <span class="text-h6">秒</span>
+                </div>
 
-              <!-- row 3: Next Bus Info (Separated & Aligned) -->
-              <div
-                v-if="route.nextBus"
-                class="mt-2 py-1 px-3 bg-grey-lighten-4 rounded-pill d-inline-flex align-center"
-              >
-                <span class="text-caption text-grey-darken-1 mr-2">次発</span>
-                <span class="text-caption font-weight-bold text-grey-darken-2">
-                  {{ route.nextBus.time }}発
-                </span>
-              </div>
+                <!-- 遅れ情報の表示（あれば） -->
+                <div
+                  v-if="getRouteData(route.gtfsKey).delay > 60"
+                  class="mt-1 py-1 px-3 bg-red-lighten-5 text-red-darken-2 rounded-pill d-inline-flex align-center"
+                >
+                  <v-icon size="small" class="mr-1">mdi-alert-circle-outline</v-icon>
+                  <span class="text-caption font-weight-bold">
+                    約 {{ Math.floor(getRouteData(route.gtfsKey).delay / 60) }} 分遅れ
+                  </span>
+                </div>
+
+                <!-- 地図表示ボタン -->
+                <div class="mt-4 w-100">
+                  <v-btn
+                    color="blue-darken-1"
+                    variant="flat"
+                    block
+                    rounded="pill"
+                    prepend-icon="mdi-map-marker-radius"
+                    @click="$emit('show-map', route.key)"
+                  >
+                    現在地を地図で確認
+                  </v-btn>
+                </div>
+              </template>
+
+              <!-- データが存在しない（本日の運行終了など）場合 -->
+              <template v-else>
+                <div class="py-4 text-grey-darken-1">
+                  <v-icon size="large" class="mb-2">mdi-bus-off</v-icon>
+                  <div>現在、運行中のデータを受信していません</div>
+                  <div class="text-caption mt-1">（本日の運行終了、または発車時刻の数分前）</div>
+                </div>
+              </template>
 
               <!-- Link to full timetable -->
-              <div class="mt-2 text-right">
+              <div class="mt-4 text-right w-100 border-top pt-2">
                 <v-btn
                   variant="text"
                   density="compact"
@@ -78,7 +109,7 @@
                   href="https://transfer-cloud.navitime.biz/wakayamabus/courses?busstop=00220063"
                   target="_blank"
                 >
-                  時刻表を見る <v-icon end size="small">mdi-open-in-new</v-icon>
+                  公式時刻表を見る <v-icon end size="small">mdi-open-in-new</v-icon>
                 </v-btn>
               </div>
             </div>
@@ -92,64 +123,43 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
-import timetableService from '@/services/timetableService'
 
-const routes = ref([
+const props = defineProps({
+  targetBuses: {
+    type: Object,
+    default: () => ({ routeUniv: null, routeJr: null }),
+  },
+  isFetching: Boolean,
+  cooldown: Number,
+  canRefresh: Boolean,
+})
+
+defineEmits(['refresh', 'show-map'])
+
+// UI描画用の静的データ（アコーディオン状態とラベルなど）
+const uiRoutes = ref([
   {
-    key: 'BusUniv', // Correct PascalCase key
+    key: 'BusUniv',
+    gtfsKey: 'routeUniv', // targetBuses オブジェクト内のキーと紐付け
     label: '和歌山大学→和歌山大学前駅・ふじと台',
     color: '#42A5F5',
     expanded: false,
-    nextDepartureIn: '--',
-    nextDepartureSeconds: '--',
-    nextDepartureTime: '--:--',
-    nextDepartureFeatures: [],
-    nextDepartureDest: null,
-    nextBus: null,
   },
   {
-    key: 'BusJr', // Correct PascalCase key
+    key: 'BusJr',
+    gtfsKey: 'routeJr',
     label: '和歌山大学→JR和歌山駅',
     color: '#0D47A1',
     expanded: false,
-    nextDepartureIn: '--',
-    nextDepartureSeconds: '--',
-    nextDepartureTime: '--:--',
-    nextDepartureFeatures: [],
-    nextDepartureDest: null,
-    nextBus: null,
   },
 ])
 
-const getBusBadges = (route) => {
-  const badges = []
-  if (!route.nextDepartureDest) return badges
-
-  // BusUniv: Station Only
-  if (route.nextDepartureDest === 'station_only') {
-    badges.push({ label: '駅止', color: 'red' })
-  }
-
-  // BusUniv: Fujitodai (Standard)
-  if (route.nextDepartureDest === 'fujitodai') {
-    badges.push({ label: 'ふじと台 (和大前駅経由)', color: 'teal' })
-  }
-
-  // BusJr: Via Nobutoki
-  if (route.nextDepartureFeatures && route.nextDepartureFeatures.includes('via_nobutoki')) {
-    badges.push({ label: '延時・市役所', color: 'blue-grey' })
-  }
-
-  // BusJr: Via Jiromaru
-  if (route.nextDepartureFeatures && route.nextDepartureFeatures.includes('via_jiromaru')) {
-    badges.push({ label: '次郎丸', color: 'brown' })
-  }
-
-  return badges
-}
+// リアルタイムカウントダウン用の現在時刻（秒）
+const currentUnixSec = ref(Math.floor(Date.now() / 1000))
+let intervalId = null
 
 const toggleRoute = (index) => {
-  const route = routes.value[index]
+  const route = uiRoutes.value[index]
   void logFirebaseAnalyticsEvent('home_bus_route_toggle', {
     routeKey: route.key,
     expanded: !route.expanded,
@@ -157,47 +167,39 @@ const toggleRoute = (index) => {
   route.expanded = !route.expanded
 }
 
-const updateTimetable = () => {
-  routes.value.forEach((route) => {
-    const departures = timetableService.getNextDepartures(route.key, 2)
-
-    if (departures.length > 0) {
-      const next = departures[0]
-      route.nextDepartureTime = next.departureTime
-      const t = next.timeUntil
-      route.nextDepartureIn = t.minutes
-      route.nextDepartureSeconds = t.seconds.toString().padStart(2, '0')
-
-      // Rich info
-      route.nextDepartureFeatures = next.features || []
-      route.nextDepartureDest = next.dest
-
-      // Next Bus Logic
-      if (departures.length > 1) {
-        const nextBus = departures[1]
-        route.nextBus = {
-          time: nextBus.departureTime,
-        }
-      } else {
-        route.nextBus = null
-      }
-    } else {
-      route.nextDepartureTime = '終了'
-      route.nextDepartureIn = '--'
-      route.nextDepartureSeconds = '--'
-      route.nextDepartureFeatures = []
-      route.nextDepartureDest = null
-      route.nextBus = null
-    }
-  })
+// targetBuses から該当路線のデータを取得
+const getRouteData = (gtfsKey) => {
+  if (!props.targetBuses) return null
+  return props.targetBuses[gtfsKey]
 }
 
-let intervalId
+// 予測到着時刻（UNIX秒）と現在時刻の差分からカウントダウンを計算
+const getCountdown = (gtfsKey) => {
+  const data = getRouteData(gtfsKey)
+  if (!data || !data.arrivalTime) return { minutes: '--', seconds: '--' }
+
+  const diffSec = data.arrivalTime - currentUnixSec.value
+  if (diffSec <= 0) return { minutes: '0', seconds: '00' }
+
+  const m = Math.floor(diffSec / 60)
+  const s = String(diffSec % 60).padStart(2, '0')
+  return { minutes: m, seconds: s }
+}
+
+// UNIX Timestamp (秒) を "HH:mm" にフォーマット
+const formatTime = (unixSec) => {
+  if (!unixSec) return '--:--'
+  const d = new Date(unixSec * 1000)
+  const h = String(d.getHours()).padStart(2, '0')
+  const m = String(d.getMinutes()).padStart(2, '0')
+  return `${h}:${m}`
+}
 
 onMounted(() => {
-  updateTimetable()
-  // Update every second for seconds precision
-  intervalId = setInterval(updateTimetable, 1000)
+  // 毎秒現在時刻を更新してカウントダウンを動かす
+  intervalId = setInterval(() => {
+    currentUnixSec.value = Math.floor(Date.now() / 1000)
+  }, 1000)
 })
 
 onUnmounted(() => {
@@ -248,5 +250,9 @@ onUnmounted(() => {
 
 .z-10 {
   z-index: 10;
+}
+
+.border-top {
+  border-top: 1px solid #eeeeee;
 }
 </style>
