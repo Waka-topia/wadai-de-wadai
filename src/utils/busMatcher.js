@@ -1,19 +1,18 @@
 // src/utils/busMatcher.js
 
 // =========================================================
-// 🎯 和歌山バス GTFS ターゲットID設定（自動探索結果より設定）
+// 🎯 和歌山バス GTFS ターゲットID設定（プラットホーム判定）
 // =========================================================
 export const BUS_CONFIG = {
-  // 和歌山大学のバス停ID（上り・下り両方の乗り場に対応するため配列化）
-  univStopIds: ['63_1', '63_2'],
+  // 代わりに「どちらの乗り場（プラットホーム）に停まるか」で完全に振り分けます。
 
-  // 路線Univ（和歌山大学前駅・ふじと台方面）の路線IDリスト（前方一致）
-  // ※もし表示が逆なら '16000' と入れ替えてください
-  routeUnivIds: ['16002'],
+  // 路線Univ（和歌山大学前駅・ふじと台方面）の乗り場ID
+  // ※もし画面上で表示が逆になっていたら、ここを '63_1' にしてください
+  univPlatformId: '63_2',
 
-  // 路線Jr（JR和歌山駅方面）の路線IDリスト（前方一致）
-  // ※もし表示が逆なら '16002' と入れ替えてください
-  routeJrIds: ['16000'],
+  // 路線Jr（JR和歌山駅方面）の乗り場ID
+  // ※もし画面上で表示が逆になっていたら、ここを '63_2' にしてください
+  jrPlatformId: '63_1',
 }
 
 /** GTFSデータから「和歌山大学に次に到着/出発するバス」を特定する */
@@ -23,12 +22,11 @@ export const findTargetBuses = (gtfsData) => {
   }
 
   const entities = gtfsData.tripUpdates.entity
-  const nowSec = Math.floor(Date.now() / 1000) // GTFSの時間は秒単位（UNIX Timestamp）
+  const nowSec = Math.floor(Date.now() / 1000) // 現在時刻（UNIX秒）
 
   let candidatesUniv = []
   let candidatesJr = []
 
-  // 全バスのこれからの停車予定をチェック
   entities.forEach((entity) => {
     const trip = entity.tripUpdate.trip
     if (!trip || !trip.routeId) return
@@ -36,35 +34,31 @@ export const findTargetBuses = (gtfsData) => {
     const stopUpdates = entity.tripUpdate.stopTimeUpdate || []
 
     // このバスが「和歌山大学（63_1 または 63_2）」に停まる予定があるか探す
-    const univStop = stopUpdates.find((stu) => BUS_CONFIG.univStopIds.includes(stu.stopId))
+    const univStop = stopUpdates.find(
+      (stu) => stu.stopId === BUS_CONFIG.univPlatformId || stu.stopId === BUS_CONFIG.jrPlatformId,
+    )
 
     if (univStop) {
-      const hasArr = univStop.arrival && univStop.arrival.time
-      const hasDep = univStop.departure && univStop.departure.time
-
       let targetTimeSec = 0
       let delay = 0
-      let status = 'transit' // 'origin'(始発) | 'destination'(終点) | 'transit'(途中)
-      let timeType = 'departure' // 'departure'(発) | 'arrival'(着)
+      let status = 'transit'
+      let timeType = 'departure'
 
-      // GTFSの仕様に合わせた始発・終点・途中の判定
-      if (hasDep && !hasArr) {
-        status = 'origin'
+      const depTime = univStop.departure?.time
+      const arrTime = univStop.arrival?.time
+
+      if (depTime) {
+        targetTimeSec = parseInt(depTime, 10)
+        delay = univStop.departure?.delay || 0
         timeType = 'departure'
-        targetTimeSec = parseInt(univStop.departure.time, 10)
-        delay = univStop.departure.delay || 0
-      } else if (hasArr && !hasDep) {
-        status = 'destination'
+        status = arrTime ? 'transit' : 'origin' // 到着もあれば途中、出発のみなら始発
+      } else if (arrTime) {
+        targetTimeSec = parseInt(arrTime, 10)
+        delay = univStop.arrival?.delay || 0
         timeType = 'arrival'
-        targetTimeSec = parseInt(univStop.arrival.time, 10)
-        delay = univStop.arrival.delay || 0
-      } else if (hasArr && hasDep) {
-        status = 'transit'
-        timeType = 'departure' // 途中の場合は「出発時刻」を基準にする
-        targetTimeSec = parseInt(univStop.departure.time, 10)
-        delay = univStop.departure.delay || 0
+        status = 'destination' // 到着のみなら終点
       } else {
-        return // 時間データが全くなければスキップ
+        return
       }
 
       // まだ出発/到着していない（未来の時間の）バスのみ候補に入れる
@@ -73,18 +67,18 @@ export const findTargetBuses = (gtfsData) => {
           entity: entity,
           tripId: trip.tripId,
           routeId: trip.routeId,
-          targetTime: targetTimeSec, // UIでカウントダウンに使う基準時間
+          targetTime: targetTimeSec,
           delay: delay,
-          status: status, // UI表示用ステータス
-          timeType: timeType, // UI表示用（発/着）
+          status: status,
+          timeType: timeType,
         }
 
-        // 路線UnivかJrに振り分け（startsWith で前方一致にしているのは枝番を吸収するため）
-        const isRouteUniv = BUS_CONFIG.routeUnivIds.some((id) => trip.routeId.startsWith(id))
-        const isRouteJr = BUS_CONFIG.routeJrIds.some((id) => trip.routeId.startsWith(id))
-
-        if (isRouteUniv) candidatesUniv.push(busInfo)
-        if (isRouteJr) candidatesJr.push(busInfo)
+        // プラットホームのIDを見て、どっち方面のバスかを振り分ける
+        if (univStop.stopId === BUS_CONFIG.univPlatformId) {
+          candidatesUniv.push(busInfo)
+        } else if (univStop.stopId === BUS_CONFIG.jrPlatformId) {
+          candidatesJr.push(busInfo)
+        }
       }
     }
   })

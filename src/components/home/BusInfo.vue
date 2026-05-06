@@ -47,12 +47,25 @@
             <div class="d-flex flex-column align-center text-center">
               <!-- 予測データが存在する場合 -->
               <template v-if="getRouteData(route.gtfsKey)">
-                <div class="d-flex align-center mb-1">
-                  <v-chip size="small" color="indigo" class="font-weight-bold mr-2" label>
-                    リアルタイム予測
+                <div class="d-flex align-center justify-center flex-wrap mb-1">
+                  <v-chip size="small" color="indigo" class="font-weight-bold mr-2 mb-1" label>
+                    リアルタイム
                   </v-chip>
-                  <div class="text-h6 font-weight-bold">
-                    {{ formatTime(getRouteData(route.gtfsKey).arrivalTime) }} 予定
+
+                  <!-- ステータスバッジ（始発 / 終点） -->
+                  <v-chip
+                    v-if="getStatusText(getRouteData(route.gtfsKey).status)"
+                    size="small"
+                    :color="getStatusColor(getRouteData(route.gtfsKey).status)"
+                    class="font-weight-bold mr-2 mb-1"
+                    label
+                  >
+                    {{ getStatusText(getRouteData(route.gtfsKey).status) }}
+                  </v-chip>
+
+                  <div class="text-h6 font-weight-bold mb-1">
+                    {{ formatTime(getRouteData(route.gtfsKey).targetTime) }}
+                    {{ getTimeLabel(getRouteData(route.gtfsKey).timeType) }}予定
                   </div>
                 </div>
 
@@ -61,7 +74,9 @@
                   <span class="text-h2">{{ getCountdown(route.gtfsKey).minutes }}</span>
                   <span class="text-h6">分</span>
                   <span class="text-h4 mx-1">{{ getCountdown(route.gtfsKey).seconds }}</span>
-                  <span class="text-h6">秒</span>
+                  <span class="text-h6"
+                    >秒{{ getTimeLabel(getRouteData(route.gtfsKey).timeType) }}</span
+                  >
                 </div>
 
                 <!-- 遅れ情報の表示（あれば） -->
@@ -173,12 +188,30 @@ const getRouteData = (gtfsKey) => {
   return props.targetBuses[gtfsKey]
 }
 
-// 予測到着時刻（UNIX秒）と現在時刻の差分からカウントダウンを計算
+// UI表示用のヘルパー関数
+const getStatusText = (status) => {
+  if (status === 'origin') return '始発'
+  if (status === 'destination') return '終点'
+  return ''
+}
+
+const getStatusColor = (status) => {
+  if (status === 'origin') return 'green-darken-1'
+  if (status === 'destination') return 'blue-grey-darken-1'
+  return 'grey'
+}
+
+const getTimeLabel = (timeType) => {
+  return timeType === 'arrival' ? '着' : '発'
+}
+
+// 予測到着・出発時刻（UNIX秒）と現在時刻の差分からカウントダウンを計算
 const getCountdown = (gtfsKey) => {
   const data = getRouteData(gtfsKey)
-  if (!data || !data.arrivalTime) return { minutes: '--', seconds: '--' }
+  // 変更点: arrivalTime から targetTime に修正
+  if (!data || !data.targetTime) return { minutes: '--', seconds: '--' }
 
-  const diffSec = data.arrivalTime - currentUnixSec.value
+  const diffSec = data.targetTime - currentUnixSec.value
   if (diffSec <= 0) return { minutes: '0', seconds: '00' }
 
   const m = Math.floor(diffSec / 60)
