@@ -1,20 +1,22 @@
 // src/utils/busMatcher.js
 
 // =========================================================
-// 🎯 ターゲットID設定（後でコンソールのログを見てここを埋めます）
+// 🎯 和歌山バス GTFS ターゲットID設定（自動探索結果より設定）
 // =========================================================
 export const BUS_CONFIG = {
-  // 和歌山大学のバス停ID
-  univStopId: 'UNKNOWN_STOP_ID',
+  // 和歌山大学のバス停ID（上り・下り両方の乗り場に対応するため配列化）
+  univStopIds: ['63_1', '63_2'],
 
-  // 路線Univ（和歌山大学前駅・ふじと台方面）の路線IDリスト（前方一致用）
-  routeUnivIds: ['UNKNOWN_ROUTE_UNIV'],
+  // 路線Univ（和歌山大学前駅・ふじと台方面）の路線IDリスト（前方一致）
+  // ※もし表示が逆なら '16000' と入れ替えてください
+  routeUnivIds: ['16002'],
 
-  // 路線Jr（JR和歌山駅方面）の路線IDリスト（前方一致用）
-  routeJrIds: ['UNKNOWN_ROUTE_JR'],
+  // 路線Jr（JR和歌山駅方面）の路線IDリスト（前方一致）
+  // ※もし表示が逆なら '16002' と入れ替えてください
+  routeJrIds: ['16000'],
 }
 
-/** GTFSデータから「和歌山大学に次に到着するバス」を特定する */
+/** GTFSデータから「和歌山大学に次に到着/出発するバス」を特定する */
 export const findTargetBuses = (gtfsData) => {
   if (!gtfsData || !gtfsData.tripUpdates || !gtfsData.tripUpdates.entity) {
     return { routeUniv: null, routeJr: null }
@@ -22,21 +24,6 @@ export const findTargetBuses = (gtfsData) => {
 
   const entities = gtfsData.tripUpdates.entity
   const nowSec = Math.floor(Date.now() / 1000) // GTFSの時間は秒単位（UNIX Timestamp）
-
-  // --- 🕵️ ID調査用デバッグログ（本番では消してOK） ---
-  console.groupCollapsed('💡 [ID調査] 現在のGTFSデータに含まれるID一覧')
-  const activeRoutes = new Set()
-  const activeStops = new Set()
-  entities.forEach((e) => {
-    if (e.tripUpdate?.trip?.routeId) activeRoutes.add(e.tripUpdate.trip.routeId)
-    e.tripUpdate?.stopTimeUpdate?.forEach((stu) => {
-      if (stu.stopId) activeStops.add(stu.stopId)
-    })
-  })
-  console.log('路線(routeId)の候補:', Array.from(activeRoutes))
-  console.log('直近のバス停(stopId)の候補:', Array.from(activeStops).slice(0, 10), '...など')
-  console.groupEnd()
-  // ----------------------------------------------------
 
   let candidatesUniv = []
   let candidatesJr = []
@@ -48,20 +35,48 @@ export const findTargetBuses = (gtfsData) => {
 
     const stopUpdates = entity.tripUpdate.stopTimeUpdate || []
 
-    // このバスが「和歌山大学（univStopId）」に停まる予定があるか探す
-    const univStop = stopUpdates.find((stu) => stu.stopId === BUS_CONFIG.univStopId)
+    // このバスが「和歌山大学（63_1 または 63_2）」に停まる予定があるか探す
+    const univStop = stopUpdates.find((stu) => BUS_CONFIG.univStopIds.includes(stu.stopId))
 
-    if (univStop && univStop.arrival && univStop.arrival.time) {
-      const arrivalTimeSec = parseInt(univStop.arrival.time, 10)
+    if (univStop) {
+      const hasArr = univStop.arrival && univStop.arrival.time
+      const hasDep = univStop.departure && univStop.departure.time
 
-      // まだ到着していない（未来の時間の）バスのみ候補に入れる
-      if (arrivalTimeSec > nowSec) {
+      let targetTimeSec = 0
+      let delay = 0
+      let status = 'transit' // 'origin'(始発) | 'destination'(終点) | 'transit'(途中)
+      let timeType = 'departure' // 'departure'(発) | 'arrival'(着)
+
+      // GTFSの仕様に合わせた始発・終点・途中の判定
+      if (hasDep && !hasArr) {
+        status = 'origin'
+        timeType = 'departure'
+        targetTimeSec = parseInt(univStop.departure.time, 10)
+        delay = univStop.departure.delay || 0
+      } else if (hasArr && !hasDep) {
+        status = 'destination'
+        timeType = 'arrival'
+        targetTimeSec = parseInt(univStop.arrival.time, 10)
+        delay = univStop.arrival.delay || 0
+      } else if (hasArr && hasDep) {
+        status = 'transit'
+        timeType = 'departure' // 途中の場合は「出発時刻」を基準にする
+        targetTimeSec = parseInt(univStop.departure.time, 10)
+        delay = univStop.departure.delay || 0
+      } else {
+        return // 時間データが全くなければスキップ
+      }
+
+      // まだ出発/到着していない（未来の時間の）バスのみ候補に入れる
+      if (targetTimeSec > nowSec) {
         const busInfo = {
           entity: entity,
           tripId: trip.tripId,
           routeId: trip.routeId,
-          arrivalTime: arrivalTimeSec, // 秒
-          delay: univStop.arrival.delay || 0, // 遅れ（秒）
+          targetTime: targetTimeSec, // UIでカウントダウンに使う基準時間
+          delay: delay,
+          status: status, // UI表示用ステータス
+          timeType: timeType, // UI表示用（発/着）
         }
 
         // 路線UnivかJrに振り分け（startsWith で前方一致にしているのは枝番を吸収するため）
@@ -74,9 +89,9 @@ export const findTargetBuses = (gtfsData) => {
     }
   })
 
-  // 到着予定時間が最も早い順にソート（昇順）
-  candidatesUniv.sort((a, b) => a.arrivalTime - b.arrivalTime)
-  candidatesJr.sort((a, b) => a.arrivalTime - b.arrivalTime)
+  // 時間が最も早い順にソート（昇順）
+  candidatesUniv.sort((a, b) => a.targetTime - b.targetTime)
+  candidatesJr.sort((a, b) => a.targetTime - b.targetTime)
 
   return {
     routeUniv: candidatesUniv.length > 0 ? candidatesUniv[0] : null,
