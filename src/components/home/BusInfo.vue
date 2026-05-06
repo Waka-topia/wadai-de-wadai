@@ -46,76 +46,94 @@
           <div class="pa-4">
             <div class="d-flex flex-column align-center text-center">
               <!-- 予測データ(リアルタイム または 時刻表)が存在する場合 -->
-              <template v-if="getActiveBus(route)">
-                <div class="d-flex align-center justify-center flex-wrap mb-1">
-                  <!-- データの出所を示すバッジ -->
-                  <v-chip
-                    size="small"
-                    :color="getActiveBus(route).isRealtime ? 'indigo' : 'blue-grey-darken-1'"
-                    :variant="getActiveBus(route).isRealtime ? 'elevated' : 'outlined'"
-                    class="font-weight-bold mr-2 mb-1"
-                    label
-                  >
-                    <v-icon start size="small" class="mr-1">
-                      {{
-                        getActiveBus(route).isRealtime
-                          ? 'mdi-satellite-uplink'
-                          : 'mdi-calendar-clock'
-                      }}
-                    </v-icon>
-                    {{ getActiveBus(route).isRealtime ? 'リアルタイム' : '時刻表予測' }}
-                  </v-chip>
-
-                  <!-- ステータスバッジ（リアルタイムデータ等で始発/終点が明確な場合のみ表示） -->
-                  <v-chip
-                    v-if="getActiveBus(route).status && getStatusText(getActiveBus(route).status)"
-                    size="small"
-                    :color="getStatusColor(getActiveBus(route).status)"
-                    class="font-weight-bold mr-2 mb-1"
-                    label
-                  >
-                    {{ getStatusText(getActiveBus(route).status) }}
-                  </v-chip>
-
-                  <div class="text-h6 font-weight-bold mb-1">
-                    {{ formatTime(getActiveBus(route).targetTime) }}
-                    {{ getTimeLabel(getActiveBus(route).timeType) }}予定
-                  </div>
+              <template v-if="getRouteInfo(route).mainBus">
+                <!-- 1. トップ表示：〇〇:〇〇発予定 -->
+                <div class="text-h5 font-weight-bold mb-3 text-grey-darken-4">
+                  {{ formatTime(getRouteInfo(route).mainBus.targetTime) }}
+                  {{ getTimeLabel(getRouteInfo(route).mainBus.timeType) }}予定
                 </div>
 
-                <!-- 経路情報の表示（時刻表データなど付加情報がある場合のみ表示） -->
-                <div
-                  v-if="getActiveBus(route).extraInfo"
-                  class="text-caption text-grey-darken-2 font-weight-bold mb-2"
-                >
-                  <v-icon size="x-small" class="mr-1">mdi-map-marker-path</v-icon>
-                  {{ getActiveBus(route).extraInfo }}
-                </div>
+                <!-- 2. Flexコンテナ：時刻表 と リアルタイム予測 を横並び比較 -->
+                <v-row dense class="mb-4 w-100">
+                  <!-- 【左】時刻表 -->
+                  <v-col cols="6">
+                    <div
+                      class="h-100 bg-grey-lighten-4 rounded pa-2 border border-grey-lighten-2 d-flex flex-column justify-center align-center"
+                    >
+                      <div class="text-caption text-grey-darken-1 font-weight-bold mb-1">
+                        <v-icon size="small" class="mr-1">mdi-calendar-clock</v-icon>時刻表
+                      </div>
+                      <div v-if="getRouteInfo(route).staticBus">
+                        <div class="text-h6 font-weight-bold text-grey-darken-3">
+                          {{ formatTime(getRouteInfo(route).staticBus.targetTime) }}
+                        </div>
+                        <div
+                          class="text-caption text-grey-darken-2"
+                          style="font-size: 0.7rem !important; line-height: 1.2"
+                        >
+                          {{ getRouteInfo(route).staticBus.extraInfo || '通常便' }}
+                        </div>
+                      </div>
+                      <div v-else class="text-caption text-grey mt-1">本日の運行終了</div>
+                    </div>
+                  </v-col>
 
-                <!-- リアルタイム カウントダウン -->
+                  <!-- 【右】リアルタイム予測 -->
+                  <v-col cols="6">
+                    <div
+                      class="h-100 rounded pa-2 border d-flex flex-column justify-center align-center"
+                      :class="
+                        getRouteInfo(route).rtBus
+                          ? 'bg-blue-lighten-5 border-blue-lighten-3'
+                          : 'bg-grey-lighten-4 border-grey-lighten-2'
+                      "
+                    >
+                      <div
+                        class="text-caption font-weight-bold mb-1"
+                        :class="
+                          getRouteInfo(route).rtBus ? 'text-blue-darken-2' : 'text-grey-darken-1'
+                        "
+                      >
+                        <v-icon size="small" class="mr-1">mdi-satellite-uplink</v-icon
+                        >リアルタイム予測
+                      </div>
+                      <div v-if="getRouteInfo(route).rtBus">
+                        <div class="text-h6 font-weight-bold text-blue-darken-3">
+                          {{ formatTime(getRouteInfo(route).rtBus.targetTime) }}
+                        </div>
+                        <div
+                          v-if="getRouteInfo(route).rtBus.delay > 60"
+                          class="text-caption font-weight-bold text-red-darken-1"
+                          style="font-size: 0.7rem !important; line-height: 1.2"
+                        >
+                          約{{ Math.floor(getRouteInfo(route).rtBus.delay / 60) }}分遅れ
+                        </div>
+                        <div
+                          v-else
+                          class="text-caption font-weight-bold text-green-darken-2"
+                          style="font-size: 0.7rem !important; line-height: 1.2"
+                        >
+                          ほぼ定刻
+                        </div>
+                      </div>
+                      <div v-else class="text-caption text-grey mt-1">データなし</div>
+                    </div>
+                  </v-col>
+                </v-row>
+
+                <!-- 3. カウントダウン表示 -->
                 <div
                   class="text-h3 font-weight-bold mb-2"
-                  :class="getActiveBus(route).isRealtime ? 'text-blue' : 'text-blue-grey-darken-2'"
+                  :class="getRouteInfo(route).rtBus ? 'text-blue' : 'text-blue-grey-darken-2'"
                 >
                   <span class="text-h2">{{ getCountdown(route).minutes }}</span>
                   <span class="text-h6">分</span>
                   <span class="text-h4 mx-1">{{ getCountdown(route).seconds }}</span>
-                  <span class="text-h6">秒{{ getTimeLabel(getActiveBus(route).timeType) }}</span>
-                </div>
-
-                <!-- 遅れ情報の表示（リアルタイムかつ遅延がある場合のみ） -->
-                <div
-                  v-if="getActiveBus(route).isRealtime && getActiveBus(route).delay > 60"
-                  class="mt-1 py-1 px-3 bg-red-lighten-5 text-red-darken-2 rounded-pill d-inline-flex align-center"
-                >
-                  <v-icon size="small" class="mr-1">mdi-alert-circle-outline</v-icon>
-                  <span class="text-caption font-weight-bold">
-                    約 {{ Math.floor(getActiveBus(route).delay / 60) }} 分遅れ
-                  </span>
+                  <span class="text-h6">秒</span>
                 </div>
               </template>
 
-              <!-- データが存在しない（本日の運行が完全に終了）場合 -->
+              <!-- データがどちらも存在しない（本日の運行が完全に終了）場合 -->
               <template v-else>
                 <div class="py-4 text-grey-darken-1">
                   <v-icon size="large" class="mb-2">mdi-bus-off</v-icon>
@@ -124,7 +142,7 @@
                 </div>
               </template>
 
-              <!-- Link to full timetable -->
+              <!-- 公式時刻表リンク -->
               <div class="mt-4 text-right w-100 border-top pt-2">
                 <v-btn
                   variant="text"
@@ -151,11 +169,9 @@ import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { rawTimetables } from '@/data/rawTimetables'
 
 // ----------------------------------------------------
-// 実践的な祝日判定ライブラリのインポート
-// ※ ターミナルで `npm install japanese-holidays` を実行してください。
-// もしプロジェクト独自の祝日判定関数がある場合は、この部分を差し替えてください。
+// 【修正】Vite(Vue3)環境でエラーにならない安全なインポート構文
 // ----------------------------------------------------
-import { isHoliday } from 'japanese-holidays'
+import * as JapaneseHolidays from 'japanese-holidays'
 
 const props = defineProps({
   targetBuses: {
@@ -210,7 +226,8 @@ const getStaticBus = (staticKey, currentSec) => {
   // 土日・祝日を正確に判定してダイヤグラムを切り替える
   const day = now.getDay()
   const isWeekend = day === 0 || day === 6
-  const isPublicHoliday = !!isHoliday(now) // 祝日・振替休日を判定
+  // 【修正】メソッド呼び出しに変更
+  const isPublicHoliday = !!JapaneseHolidays.isHoliday(now)
 
   const dayType = isWeekend || isPublicHoliday ? 'weekend' : 'weekday'
 
@@ -250,7 +267,6 @@ const getStaticBus = (staticKey, currentSec) => {
         isRealtime: false,
         targetTime: Math.floor(targetDate.getTime() / 1000),
         extraInfo: extraInfo,
-        // 思い込みを排除し、静的時刻表からの予測データにはステータスバッジを付けない
         status: null,
         timeType: 'departure',
       }
@@ -263,53 +279,44 @@ const getStaticBus = (staticKey, currentSec) => {
 }
 
 // ----------------------------------------------------
-// 🚀 現在有効なバスを取得する（ハイブリッド判定）
+// 🚀 両方のデータ（リアルタイムと時刻表）を取得し整理する関数
 // ----------------------------------------------------
-const getActiveBus = (route) => {
-  // 1. まずはGTFSリアルタイムデータを探す
+const getRouteInfo = (route) => {
+  let rtBus = null
+  let staticBus = null
+
+  // 1. リアルタイムデータの取得
   if (props.targetBuses) {
     const rtBuses = props.targetBuses[route.gtfsKey]
     if (rtBuses && Array.isArray(rtBuses) && rtBuses.length > 0) {
       // 予定時刻を60秒過ぎるまでは表示キープ
-      const activeRT = rtBuses.find((bus) => bus.targetTime > currentUnixSec.value - 60)
-      if (activeRT) {
-        return { ...activeRT, isRealtime: true }
-      }
+      rtBus = rtBuses.find((bus) => bus.targetTime > currentUnixSec.value - 60)
     }
   }
 
-  // 2. リアルタイムデータがない場合は、時刻表データへフォールバック
-  const staticBus = getStaticBus(route.staticKey, currentUnixSec.value)
-  if (staticBus) {
-    return staticBus
-  }
+  // 2. 時刻表データの取得
+  staticBus = getStaticBus(route.staticKey, currentUnixSec.value)
 
-  // 3. どちらもない（運行終了）
-  return null
+  // 3. メイン表示用のバスを決定（リアルタイム優先、なければ時刻表）
+  const mainBus = rtBus || staticBus
+
+  return {
+    rtBus,
+    staticBus,
+    mainBus,
+  }
 }
 
 // --- ヘルパー関数 ---
-const getStatusText = (status) => {
-  if (status === 'origin') return '始発'
-  if (status === 'destination') return '終点'
-  return ''
-}
-
-const getStatusColor = (status) => {
-  if (status === 'origin') return 'green-darken-1'
-  if (status === 'destination') return 'blue-grey-darken-1'
-  return 'grey'
-}
-
 const getTimeLabel = (timeType) => {
   return timeType === 'arrival' ? '着' : '発'
 }
 
 const getCountdown = (route) => {
-  const data = getActiveBus(route)
-  if (!data || !data.targetTime) return { minutes: '--', seconds: '--' }
+  const info = getRouteInfo(route)
+  if (!info.mainBus || !info.mainBus.targetTime) return { minutes: '--', seconds: '--' }
 
-  const diffSec = data.targetTime - currentUnixSec.value
+  const diffSec = info.mainBus.targetTime - currentUnixSec.value
   if (diffSec <= 0) return { minutes: '0', seconds: '00' }
 
   const m = Math.floor(diffSec / 60)
