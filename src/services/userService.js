@@ -1,4 +1,5 @@
 import { doc, getDoc } from 'firebase/firestore'
+import defaultIcon from '@/assets/userIcon/defaultIcon.png'
 import { db } from '@/firebase/config'
 
 export const fetchUserData = async (userId) => {
@@ -16,7 +17,7 @@ export const fetchUserData = async (userId) => {
       userName: userData.displayName || 'Unknown',
       email: userData.email || 'メールアドレスが設定されていません',
       userId: userId || 'ユーザーIDが設定されていません',
-      userIconUrl: userData.photoURL || '/src/assets/userIcon/defaultIcon.png',
+      userIconUrl: userData.photoURL || defaultIcon,
     }
 
     return user

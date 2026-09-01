@@ -1,11 +1,6 @@
 <template>
   <div v-if="isAuthenticated" class="ranking-page pa-4">
-    <RankingList
-      :entries="entries"
-      :is-loading="isLoading"
-      :error-message="errorMessage"
-      :current-user-id="userId || ''"
-    />
+    <RankingList :entries="entries" :is-loading="isLoading" :error-message="errorMessage" />
 
     <!-- 自分の順位を常時表示 -->
     <v-card

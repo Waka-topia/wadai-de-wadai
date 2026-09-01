@@ -5,7 +5,7 @@
     </v-alert>
 
     <template v-else-if="isLoading">
-      <v-skeleton-loader v-for="n in 7" :key="n" type="list-item-avatar-two-line" />
+      <v-skeleton-loader v-for="n in 5" :key="n" type="list-item-avatar-three-line" />
     </template>
 
     <v-alert v-else-if="entries.length === 0" type="info" variant="tonal" density="comfortable">
@@ -13,20 +13,17 @@
     </v-alert>
 
     <template v-else>
-      <RankingPodium :entries="podiumEntries" />
+      <RankingProfileCard
+        v-for="entry in visibleEntries"
+        :key="entry.userId"
+        :rank="entry.rank"
+        :name="entry.displayName"
+        :count="entry.stampCount"
+      />
 
-      <v-list v-if="restEntries.length > 0" class="py-0 bg-transparent" lines="one">
-        <RankingRow
-          v-for="entry in visibleRestEntries"
-          :key="entry.userId"
-          :entry="entry"
-          :is-me="entry.userId === currentUserId"
-        />
-      </v-list>
-
-      <div v-if="hasMore" class="text-center mt-3">
+      <div v-if="hasMore" class="text-center mt-4">
         <v-btn variant="tonal" color="orange" rounded="pill" @click="showAll = true">
-          もっと見る（残り{{ restEntries.length - visibleRestEntries.length }}人）
+          もっと見る（残り{{ entries.length - visibleEntries.length }}人）
         </v-btn>
       </div>
     </template>
@@ -35,11 +32,10 @@
 
 <script setup>
 import { computed, ref } from 'vue'
-import RankingPodium from '@/components/user-ranking/RankingPodium.vue'
-import RankingRow from '@/components/user-ranking/RankingRow.vue'
+import RankingProfileCard from '@/components/user-ranking/RankingProfileCard.vue'
 
-/** 「もっと見る」を押すまでに表彰台の下へ表示する人数 */
-const initialRestCount = 47
+/** 「もっと見る」を押すまでに表示する人数 */
+const initialCount = 50
 
 const props = defineProps({
   /** Rank 付きのランキングエントリ一覧 */
@@ -57,19 +53,12 @@ const props = defineProps({
     type: String,
     default: '',
   },
-  /** ログイン中のユーザーID（自分の行をハイライトする） */
-  currentUserId: {
-    type: String,
-    default: '',
-  },
 })
 
 const showAll = ref(false)
 
-const podiumEntries = computed(() => props.entries.slice(0, 3))
-const restEntries = computed(() => props.entries.slice(3))
-const visibleRestEntries = computed(() =>
-  showAll.value ? restEntries.value : restEntries.value.slice(0, initialRestCount),
+const visibleEntries = computed(() =>
+  showAll.value ? props.entries : props.entries.slice(0, initialCount),
 )
-const hasMore = computed(() => visibleRestEntries.value.length < restEntries.value.length)
+const hasMore = computed(() => visibleEntries.value.length < props.entries.length)
 </script>

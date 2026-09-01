@@ -1,3 +1,4 @@
+import defaultIcon from '@/assets/userIcon/defaultIcon.png'
 import { fetchUserData } from '@/services/userService'
 
 const state = () => ({
@@ -5,7 +6,7 @@ const state = () => ({
     userName: 'Unknown',
     email: 'メールアドレスが設定されていません',
     userId: 'ユーザーIDが設定されていません',
-    userIconUrl: '/src/assets/userIcon/defaultIcon.png',
+    userIconUrl: defaultIcon,
     belongingOrgs: [],
   },
   isFetchedCurrentUserData: false,
