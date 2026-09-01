@@ -58,7 +58,7 @@
       </router-view>
       <div class="mb-6">
         <v-footer app>
-          <span>&copy; 2026 和大DE話題(大学非公式)</span>
+          <span>&copy; 2026 和大DE話題</span>
         </v-footer>
       </div>
     </v-main>
