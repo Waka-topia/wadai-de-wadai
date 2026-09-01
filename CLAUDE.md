@@ -9,7 +9,7 @@
 2025年4月（新歓シーズン）時点の **QRコード読み取り / ランキング / スタンプ一覧** を復刻したブランチです。
 
 - **`main` にマージしないでください。**
-- デプロイ先は本番とは別の Firebase プロジェクト（`wadai-de-wadai-v1-0-0`）です。
+- デプロイ先は本番とは別の Firebase プロジェクト（`wadai-de-wadai-v1`）です。
   `.firebaserc` から `dev` / `prod` のエイリアスは意図的に外してあります。
 - 環境変数は `.env.revival`（`vite build --mode revival` が読む）。`npm run dev` も `--mode revival` です。
 - 求人・時間割・シラバス検索・キャンパスマップ・ホーム・代表者証明・管理画面は**削除済み**です。
