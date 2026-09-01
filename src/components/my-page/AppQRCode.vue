@@ -3,7 +3,7 @@
     <v-expansion-panel value="qr" elevation="1" rounded="lg">
       <v-expansion-panel-title class="font-weight-bold text-subtitle-1">
         <v-icon color="primary" class="mr-3">mdi-qrcode</v-icon>
-        ワダイdeワダイをシェア
+        和大DE話題をシェア
       </v-expansion-panel-title>
 
       <v-expansion-panel-text class="text-center pt-4">

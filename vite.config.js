@@ -29,8 +29,8 @@ export default defineConfig({
         ],
       },
       manifest: {
-        name: 'ワダイdeワダイ(2025年4月復刻版)',
-        short_name: 'ワダイ復刻版',
+        name: '和大DE話題(2025年4月復刻版)',
+        short_name: '和大DE話題v1',
         description: '2025年新歓シーズンのスタンプラリーを復刻したデモ版',
         theme_color: '#FF9900',
         icons: [

@@ -12,7 +12,7 @@
       </v-avatar>
 
       <h2 class="text-h6 font-weight-bold text-orange-darken-4 mb-2">
-        ワダイdeワダイで<br />みんなと新歓に行こう！
+        和大DE話題で<br />みんなと新歓に行こう！
       </h2>
 
       <p class="text-body-2 text-medium-emphasis mb-8">

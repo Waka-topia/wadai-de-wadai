@@ -14,7 +14,7 @@
           <v-icon size="36" color="orange-darken-2">mdi-account-plus</v-icon>
         </v-avatar>
         <h2 class="text-h5 font-weight-bold text-grey-darken-3">アカウント作成</h2>
-        <p class="text-caption text-grey-darken-1 mt-1">ワダイdeワダイを始めよう！</p>
+        <p class="text-caption text-grey-darken-1 mt-1">和大DE話題を始めよう！</p>
       </div>
 
       <v-form @submit.prevent="onSubmit">

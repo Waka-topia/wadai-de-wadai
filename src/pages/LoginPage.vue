@@ -14,7 +14,7 @@
           <v-icon size="36" color="orange-darken-2">mdi-login</v-icon>
         </v-avatar>
         <h2 class="text-h5 font-weight-bold text-grey-darken-3">ログイン</h2>
-        <p class="text-caption text-grey-darken-1 mt-1">ワダイdeワダイへようこそ</p>
+        <p class="text-caption text-grey-darken-1 mt-1">和大DE話題へようこそ</p>
       </div>
 
       <v-form @submit.prevent="onSubmit">

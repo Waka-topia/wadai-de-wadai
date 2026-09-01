@@ -4,7 +4,7 @@
       <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer"> </v-app-bar-nav-icon>
 
       <v-app-bar-title class="font-weight-bold text-h7 text-white">
-        ワダイdeワダイ-{{ title }}-
+        和大DE話題-{{ title }}-
       </v-app-bar-title>
 
       <!-- 2025年4月版の復刻であることが常に分かるようにしておく -->
@@ -58,7 +58,7 @@
       </router-view>
       <div class="mb-6">
         <v-footer app>
-          <span>&copy; 2026 ワダイdeワダイ(大学非公式)</span>
+          <span>&copy; 2026 和大DE話題(大学非公式)</span>
         </v-footer>
       </div>
     </v-main>
