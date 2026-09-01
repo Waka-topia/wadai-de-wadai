@@ -4,11 +4,30 @@
       <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer"> </v-app-bar-nav-icon>
 
       <v-app-bar-title class="font-weight-bold text-h7 text-white">
-        ワダイdeワダイ(大学非公式)-{{ title }}-
+        ワダイdeワダイ-{{ title }}-
       </v-app-bar-title>
+
+      <!-- 2025年4月版の復刻であることが常に分かるようにしておく -->
+      <v-chip class="mr-3 font-weight-bold" color="white" size="small" variant="flat">
+        v{{ appVersion }}
+      </v-chip>
     </v-app-bar>
 
     <v-navigation-drawer v-model="drawer" class="bg-white">
+      <v-alert
+        class="ma-2"
+        type="info"
+        variant="tonal"
+        density="compact"
+        icon="mdi-history"
+        rounded="lg"
+      >
+        <span class="text-caption">
+          これは 2025年4月（新歓シーズン）時点の
+          <strong>v{{ appVersion }}</strong> を復刻したデモ版です
+        </span>
+      </v-alert>
+
       <v-list>
         <v-list-item class="position-relative my-1" block size="large" @click="gotoinquiry">
           <v-icon> mdi-email-outline </v-icon>
@@ -78,6 +97,9 @@ const router = useRouter()
 const route = useRoute()
 
 const { snackbarState, closeSnackbar } = useSnackbar()
+
+/** 復刻対象のバージョン。ヘッダーとドロワーに表示する */
+const appVersion = '1.0.0'
 
 const drawer = ref(null)
 const title = ref('新歓日程')

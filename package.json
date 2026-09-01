@@ -1,18 +1,18 @@
 {
   "name": "wadai-de-wadai",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "build:dev": "vite build --mode development",
-    "build:prod": "vite build --mode production",
-    "deploy:dev": "firebase use dev && npm run build:dev && firebase deploy --only hosting",
-    "deploy:prod": "firebase use prod && npm run build:prod && firebase deploy --only hosting",
-    "dev": "vite",
+    "build:revival": "vite build --mode revival",
+    "deploy:revival": "firebase use revival && npm run build:revival && firebase deploy --only hosting",
+    "deploy:revival:rules": "firebase use revival && firebase deploy --only firestore:rules,firestore:indexes",
+    "dev": "vite --mode revival",
     "format": "prettier --write .",
     "lint": "eslint . --fix",
     "prepare": "husky",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "preview:revival": "firebase use revival && npm run build:revival && firebase hosting:channel:deploy revival-test --expires 7d"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^7.1.0",

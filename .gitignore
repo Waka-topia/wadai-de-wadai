@@ -37,3 +37,4 @@ coverage
 .env.*.local
 .env.dev*
 .env.prod*
+.env.revival

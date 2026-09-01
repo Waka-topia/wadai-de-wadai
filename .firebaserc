@@ -1,8 +1,7 @@
 {
   "projects": {
-    "default": "wadai-de-wadai",
-    "dev": "wadai-de-wadai-dev",
-    "prod": "wadai-de-wadai"
+    "default": "wadai-de-wadai-v1-0-0",
+    "revival": "wadai-de-wadai-v1-0-0"
   },
   "targets": {},
   "etags": {}
