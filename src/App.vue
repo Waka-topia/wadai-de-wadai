@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar v-if="!isFullscreenPage" color="orange">
+    <v-app-bar color="orange">
       <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer"> </v-app-bar-nav-icon>
 
       <v-app-bar-title class="font-weight-bold text-h7 text-white">
@@ -8,7 +8,7 @@
       </v-app-bar-title>
     </v-app-bar>
 
-    <v-navigation-drawer v-if="!isFullscreenPage" v-model="drawer" class="bg-white">
+    <v-navigation-drawer v-model="drawer" class="bg-white">
       <v-list>
         <v-list-item class="position-relative my-1" block size="large" @click="gotoinquiry">
           <v-icon> mdi-email-outline </v-icon>
@@ -32,11 +32,12 @@
 
     <v-main>
       <router-view v-slot="{ Component }">
-        <keep-alive include="HomePage,RankingPage,MyPage,EventCal,TimetablePage">
+        <!-- ReaderPage はカメラを、RankingPage は onSnapshot を保持するため keep-alive しない -->
+        <keep-alive include="EventCal,MyPage">
           <component :is="Component" />
         </keep-alive>
       </router-view>
-      <div v-if="!isFullscreenPage" class="mb-6">
+      <div class="mb-6">
         <v-footer app>
           <span>&copy; 2026 ワダイdeワダイ(大学非公式)</span>
         </v-footer>
@@ -61,7 +62,7 @@
       </template>
     </v-snackbar>
   </v-app>
-  <BottomNavigation v-if="showBottomNavigation && !isFullscreenPage" />
+  <BottomNavigation v-if="showBottomNavigation" />
 </template>
 
 <script setup>
@@ -79,30 +80,22 @@ const route = useRoute()
 const { snackbarState, closeSnackbar } = useSnackbar()
 
 const drawer = ref(null)
-const title = ref('ホーム')
+const title = ref('新歓日程')
 const showBottomNavigation = ref(true)
-const isEventCalPage = ref(false)
-const isFullscreenPage = ref(false)
 
 const routeTitleMap = {
-  Home: 'ホーム',
+  Home: '新歓日程',
+  EventDetail: '新歓詳細',
+  QrReader: 'QR読み取り',
+  Ranking: 'ランキング',
+  MyPage: 'マイページ',
   LoginPage: 'ログイン',
   SignupPage: 'サインアップ',
-  MyPage: 'マイページ',
-  EventCal: '新歓日程',
-  EventDetail: '新歓詳細',
-  InquiryPage: 'お問い合わせ',
-  Rule: '利用規約',
-  Map: 'マップ',
-  RecruitPage: '求人情報',
-  JobDetailPage: '求人詳細',
-  Timetable: '時間割',
   ForgotPasswordPage: 'パスワードリセット',
   ResetPasswordPage: 'パスワードリセット',
-  SyllabusSearch: 'シラバス検索',
-  ProveOwner: '代表者認証',
-  ProveOwnerDescription: '認証の手引',
-  Admin: '管理画面',
+  InquiryPage: 'お問い合わせ',
+  Rule: '利用規約',
+  Tutorial: 'チュートリアル',
 }
 
 /**
@@ -121,24 +114,6 @@ const updateTitle = (currentRoute) => {
  */
 const updateBottomNavigationVisibility = (currentRoute) => {
   showBottomNavigation.value = !['/login', '/signup'].includes(currentRoute.path)
-}
-
-/**
- * 新歓カレンダーページの判定
- *
- * @param {object} currentRoute
- */
-const checkEventCalPage = (currentRoute) => {
-  isEventCalPage.value = currentRoute.path.includes('/eventcal')
-}
-
-/**
- * 全画面表示ページの判定
- *
- * @param {object} currentRoute
- */
-const checkFullscreenPage = (currentRoute) => {
-  isFullscreenPage.value = ['/map'].includes(currentRoute.path)
 }
 
 const gotoinquiry = () => {
@@ -162,8 +137,6 @@ watch(
   (newRoute) => {
     updateTitle(newRoute)
     updateBottomNavigationVisibility(newRoute)
-    checkEventCalPage(newRoute)
-    checkFullscreenPage(newRoute)
   },
   { immediate: true },
 )

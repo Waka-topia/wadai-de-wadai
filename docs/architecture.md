@@ -1,35 +1,36 @@
 # アーキテクチャ
 
+> このドキュメントは **2025年4月版 復刻ブランチ（`revival/2025-04`）** の構成を説明します。
+> `main` とは機能セットも Firebase プロジェクトも異なります。
+
 ## 技術スタック
 
 ### フロントエンド
 
-- **Vue 3.5.12** - プログレッシブフレームワーク
-- **Vuetify 3.7.4** - マテリアルデザインUIフレームワーク
-- **Vue Router 4.4.5** - 公式ルーター
-- **Vuex 4.0.2** - 状態管理
+- **Vue 3.5** - プログレッシブフレームワーク（Composition API / `<script setup>`）
+- **Vuetify 3.11** - マテリアルデザインUIフレームワーク
+- **Vue Router 4.6** - 公式ルーター
+- **Vuex 4.1** - 状態管理
 
 ### ビルド/開発ツール
 
-- **Vite 6.0.0** - 高速ビルドツール
+- **Vite 7** - 高速ビルドツール
 - **Vite PWA Plugin** - Progressive Web App対応
+- **Node.js 24.11.1** - `mise.toml` / `.node-version` で固定
 
 ### バックエンド/インフラ
 
-- **Firebase 11.0.2** - 認証・データベース・ホスティング
-- **Service Worker** - オフライン対応・プッシュ通知
+- **Firebase 12** - 認証・Firestore・ホスティング・Analytics
+- **Service Worker** - オフライン対応
 
 ### UI/UX
 
-- **Leaflet 1.9.4** - 地図表示（OpenStreetMap）
-- **Mapbox GL 3.8.0** - 高度な地図機能
-- **QRコードリーダー** (`vue-qrcode-reader`, `jsqr`)
+- **vue-qrcode-reader** - QRコード読み取り（`QrcodeStream`）
+- **vue-cal** - 新歓カレンダー
 - **Font Awesome & MDI** - アイコンライブラリ
 
 ### ユーティリティ
 
-- **Turf.js** - 地理空間解析
-- **bcryptjs** - パスワードハッシュ化
 - **uuid** - 一意識別子生成
 
 ---
@@ -40,34 +41,37 @@
 wadai-de-wadai/
 ├── src/
 │   ├── components/       # 再利用可能なUIコンポーネント
-│   │   ├── EditForm/     # 編集フォーム関連
-│   │   ├── Event/        # イベント関連
-│   │   ├── MyPage/       # マイページ関連
-│   │   ├── UserRanking/  # ユーザーランキング関連
-│   │   ├── icons/        # カスタムアイコン
-│   │   └── templates/    # テンプレートコンポーネント
+│   │   ├── event/        # 新歓イベント関連
+│   │   ├── my-page/      # マイページ関連（スタンプコレクション含む）
+│   │   ├── qr-reader/    # QR読み取りとスタンプ獲得演出
+│   │   ├── templates/    # 共通レイアウト（ボトムナビ等）
+│   │   ├── user-profile/ # プロフィール表示
+│   │   └── user-ranking/ # ランキング（表彰台・リスト行）
+│   ├── composables/      # ロジックの再利用単位
+│   ├── config/           # 定数
+│   ├── data/             # 静的マスターデータ（groups.js / stamps.js）
 │   ├── pages/            # ページコンポーネント（ルートに対応）
 │   ├── router/           # Vue Router設定
 │   ├── store/            # Vuex Store
-│   │   └── modules/      # Vuexモジュール
-│   ├── services/         # ビジネスロジック・API呼び出し
+│   │   └── modules/      # auth / user / event / scroll
+│   ├── services/         # Firestoreアクセス・ビジネスロジック
 │   ├── firebase/         # Firebase設定・初期化
 │   ├── plugins/          # Vueプラグイン（Vuetify等）
-│   ├── data/             # 静的データ・定数
+│   ├── utils/            # 汎用ユーティリティ
 │   ├── assets/           # 静的リソース
-│   │   ├── rankings/     # ランキング画像
-│   │   ├── stamps/       # スタンプ画像
-│   │   └── userIcon/     # ユーザーアイコン
+│   │   ├── rankings/     # ランキングのリボン画像（1〜3位）
+│   │   ├── userIcon/     # ユーザーアイコン
+│   │   └── tutorial/     # PWAインストール手順の画像
 │   ├── App.vue           # ルートコンポーネント
 │   ├── main.js           # エントリーポイント
-│   └── registerServiceWorker.js  # Service Worker登録
-├── public/               # 静的ファイル（そのままコピーされる）
+│   └── registerServiceWorker.js
+├── public/
+│   └── stamps/           # スタンプ画像112枚（WebP）
 ├── dist/                 # ビルド出力先
 ├── docs/                 # ドキュメント
 ├── eslint.config.js      # ESLint設定（Flat Config形式）
 ├── .prettierrc.json      # Prettier設定
 ├── vite.config.js        # Vite設定
-├── jsconfig.json         # JavaScript設定（パスエイリアス等）
 └── package.json          # 依存関係・スクリプト
 ```
 
@@ -75,108 +79,77 @@ wadai-de-wadai/
 
 ## アーキテクチャパターン
 
-### コンポーネント設計
-
-- **Atomic Design風の階層構造**
-  - `components/`: 再利用可能なコンポーネント
-  - `pages/`: ページ単位のコンポーネント
-  - `templates/`: レイアウトテンプレート
-
-### 状態管理（Vuex）
-
-- **モジュール分割** (`store/modules/`)
-- グローバルな状態（ユーザー情報、認証状態等）を管理
-
-### ルーティング（Vue Router）
-
-- **ページベースのルーティング**
-- `pages/` 内の各コンポーネントがルートに対応
-
-### サービス層
-
-- **`services/`**: ビジネスロジックとAPI呼び出しを分離
-- コンポーネントから直接Firebaseを呼ばず、サービス経由でアクセス
-
----
-
-## データフロー
+### レイヤ構成
 
 ```
 User Interaction
       ↓
-  Component (Vue)
+  Page / Component (Vue)
+      ↓
+  Composable（ローディング・エラー・派生状態）
       ↓
   Service Layer → Firebase / External API
       ↓
-  Vuex Store (状態更新)
-      ↓
-  Component (再レンダリング)
+  Vuex Store（認証・イベントなど、画面をまたぐ状態のみ）
 ```
+
+- **`services/`**: Firestore アクセスとビジネスロジックを集約。コンポーネントから直接 Firestore を呼びません。
+- **`composables/`**: ページローカルな非同期状態（読み込み中・エラー・派生値）を扱います。
+- **`store/`**: 認証やイベントのように画面をまたいで共有する状態のみ。
+  スタンプとランキングは Vuex を使わず、サービス層とコンポーザブルで完結させています。
+
+### ルーティング（Vue Router）
+
+- 全ルートを動的インポートでコード分割
+- `/` は新歓日程（`EventCal.vue`）
+- 未定義パスは `/` にリダイレクト（削除済み機能のURLへの互換対応）
+- `beforeEach` はスクロール位置の保存のみ
+
+---
+
+## データモデル（Firestore）
+
+| パス                                   | 用途                                                              |
+| -------------------------------------- | ----------------------------------------------------------------- |
+| `users/{uid}`                          | プロフィール（本人のみ読み書き可）                                |
+| `users/{uid}/stampsReceived/{stampId}` | 取得済みスタンプ。`create` のみ許可し、二重取得をルールで拒否する |
+| `rankingEntries/{uid}`                 | ランキング表示用の公開プロジェクション（個人情報を含まない）      |
+| `groups/{groupId}`                     | 団体マスター（読み取り専用）                                      |
+| `events_monthly_hashed/{monthKey}`     | 新歓イベント（月単位で集約）                                      |
+
+### スタンプとランキングの設計方針
+
+- **スタンプのマスターは Firestore に置かない。** 不変データなので `src/data/stamps.js` に静的定義し、
+  Firestore は「誰がどの `stampId` を持つか」だけを保持します。
+  一覧表示に必要な Firestore 問い合わせは **1回**です。
+- **ランキングは取得時に増分更新する。** `grantStamp` が `stampsReceived` の作成と
+  `rankingEntries.stampCount` の `increment(1)` を `writeBatch` で原子的に行い、
+  表示側は `orderBy('stampCount','desc').limit(100)` を `onSnapshot` で購読します。
+  集計バッチも更新ボタンも不要で、スタンプを取った瞬間に順位が動きます。
 
 ---
 
 ## PWA（Progressive Web App）
 
-### 機能
-
-- **オフライン対応**: Service Workerによるキャッシュ
+- **オフライン対応**: Service Workerによるキャッシュ（`vite-plugin-pwa`）
 - **インストール可能**: ホーム画面に追加
-- **プッシュ通知**: Firebaseと連携
-
-### 設定
-
-- `vite-plugin-pwa`: PWA自動生成
-- `registerServiceWorker.js`: Service Worker登録
-
----
-
-## Firebase構成
-
-### 使用サービス（推定）
-
-- **Authentication**: ユーザー認証
-- **Firestore / Realtime Database**: データベース
-- **Cloud Storage**: 画像・ファイル保存
-- **Hosting**: デプロイ先
+- **スタンプ画像の扱い**: 112枚あるため `workbox.globIgnores` でプリキャッシュから除外し、
+  `runtimeCaching`（CacheFirst / `stamp-images`）で表示したものだけを保存します。
 
 ---
 
 ## ビルド・デプロイ
 
-### 開発
-
 ```bash
-npm run dev       # Vite開発サーバー起動（HMR有効）
+npm run dev                   # 開発サーバー起動（HMR有効）
+npm run build:revival         # 復刻版ビルド（.env.revival を読む）
+npm run preview               # ビルド結果をローカルでプレビュー
+npm run preview:revival       # 期間限定のプレビューURLへデプロイ
+npm run deploy:revival:rules  # Firestoreルール・インデックスをデプロイ
+npm run deploy:revival        # Firebase Hosting へデプロイ
+npm run lint                  # ESLint実行 + 自動修正
+npm run format                # Prettier実行
 ```
-
-### ビルド
-
-```bash
-npm run build     # 本番ビルド（dist/に出力）
-npm run preview   # ビルド結果をプレビュー
-```
-
-### リント・フォーマット
-
-```bash
-npm run lint      # ESLint実行 + 自動修正
-npm run format    # Prettier実行
-```
-
----
-
-## パフォーマンス最適化
-
-### Vite
-
-- **高速HMR**: モジュール単位の更新
-- **トリーシェイキング**: 未使用コードの削除
-- **コード分割**: 動的インポート対応
-
-### PWA
-
-- **キャッシュ戦略**: Service Workerによる効率的なキャッシュ
-- **遅延読み込み**: 必要なリソースのみ読み込み
 
 ---
 
@@ -184,24 +157,19 @@ npm run format    # Prettier実行
 
 ### 認証
 
-- **Firebase Authentication**: セキュアな認証フロー
-- **bcryptjs**: パスワードのハッシュ化
+- **Firebase Authentication**（メール/パスワード）
+
+### アクセス制御
+
+- `firestore.rules` で以下を担保しています。
+  - `users` は本人のみ読み書き可（email を含むため他者に開放しない）
+  - ランキングに必要な公開情報は `rankingEntries` に分離
+  - `stampsReceived` は `create` のみ許可・`update` は禁止
+  - `rankingEntries.stampCount` は自分のドキュメントに対して +1 ずつのみ許可
 
 ### 環境変数
 
-- Firebase API キー等は環境変数で管理（`.env` ファイル）
-
----
-
-## 拡張性
-
-### 新機能追加の流れ
-
-1. `services/` にビジネスロジックを追加
-2. `store/modules/` に状態管理を追加（必要に応じて）
-3. `components/` または `pages/` にUIを実装
-4. `router/` にルートを追加（ページの場合）
-5. ESLint・Prettierでコード品質を維持
+- Firebase の設定値は `.env.revival` で管理（`vite build --mode revival` が読み込む）
 
 ---
 

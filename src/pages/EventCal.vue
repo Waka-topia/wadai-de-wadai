@@ -1,61 +1,5 @@
 <template>
   <div class="event-list">
-    <!-- 団体代表者向け告知バナー -->
-    <v-card
-      v-if="showClaimBanner"
-      class="claim-banner mx-4 mt-4 mb-0"
-      rounded="lg"
-      variant="outlined"
-      color="orange"
-    >
-      <v-card-text class="pa-4">
-        <div class="d-flex align-center justify-space-between mb-3">
-          <div class="d-flex align-center">
-            <v-avatar color="orange" size="36" class="mr-3">
-              <v-icon color="white" size="20">mdi-bullhorn</v-icon>
-            </v-avatar>
-            <p class="text-body-1 font-weight-bold mb-0">団体の代表者さんへ</p>
-          </div>
-          <v-btn icon size="x-small" variant="text" @click="dismissBanner">
-            <v-icon size="18">mdi-close</v-icon>
-          </v-btn>
-        </div>
-
-        <div class="d-flex ga-3 mb-3 banner-steps">
-          <div class="banner-step">
-            <v-icon size="20" color="orange" class="mb-1">mdi-account-check</v-icon>
-            <p class="text-caption font-weight-bold mb-0">代表者証明</p>
-          </div>
-          <v-icon size="16" color="grey-lighten-1" class="align-self-center">
-            mdi-chevron-right
-          </v-icon>
-          <div class="banner-step">
-            <v-icon size="20" color="blue" class="mb-1">mdi-check-decagram</v-icon>
-            <p class="text-caption font-weight-bold mb-0">公式マーク</p>
-          </div>
-          <v-icon size="16" color="grey-lighten-1" class="align-self-center">
-            mdi-chevron-right
-          </v-icon>
-          <div class="banner-step">
-            <v-icon size="20" color="green" class="mb-1">mdi-arrow-up-bold-circle</v-icon>
-            <p class="text-caption font-weight-bold mb-0">上位表示</p>
-          </div>
-        </div>
-
-        <v-btn
-          color="orange"
-          variant="flat"
-          block
-          class="text-white font-weight-bold"
-          to="/prove-owner"
-          @click="onBannerCtaClick"
-        >
-          <v-icon start>mdi-arrow-right-circle</v-icon>
-          代表者証明を始める
-        </v-btn>
-      </v-card-text>
-    </v-card>
-
     <VueCal
       class="vuecal"
       :disable-views="['years', 'year', 'week', 'day']"
@@ -108,26 +52,6 @@ import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
 
 const store = useStore()
-
-// --- 告知バナーの表示制御 ---
-const bannerDismissedKey = 'event_claim_banner_dismissed'
-const isLoggedIn = computed(() => !!store.getters['auth/userId'])
-const bannerDismissed = ref(localStorage.getItem(bannerDismissedKey) === 'true')
-
-/** バナーを表示するかどうかの判定 ログイン済みかつ、バナーを閉じていない場合に表示 */
-const showClaimBanner = computed(() => isLoggedIn.value && !bannerDismissed.value)
-
-/** バナーを閉じてlocalStorageに記録する */
-const dismissBanner = () => {
-  bannerDismissed.value = true
-  localStorage.setItem(bannerDismissedKey, 'true')
-  void logFirebaseAnalyticsEvent('event_claim_banner_dismiss', {})
-}
-
-/** バナーのCTAボタンクリック時のアナリティクスイベント */
-const onBannerCtaClick = () => {
-  void logFirebaseAnalyticsEvent('event_claim_banner_cta_click', {})
-}
 
 /** 選択中の日付を日本語フォーマットで表示する */
 const formattedDate = computed(() => {
@@ -214,18 +138,6 @@ onMounted(() => {
 /* --- レイアウト --- */
 .event-list {
   height: 100%;
-}
-
-/* --- バナーステップ --- */
-.banner-steps {
-  justify-content: center;
-}
-
-.banner-step {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 64px;
 }
 
 /* --- 日付ナビゲーション --- */

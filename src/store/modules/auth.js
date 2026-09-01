@@ -28,7 +28,7 @@ export default {
     },
   },
   actions: {
-    initializeAuth({ commit, dispatch }) {
+    initializeAuth({ commit }) {
       return new Promise((resolve) => {
         authService.onAuthStateChanged((user) => {
           if (user) {
@@ -36,13 +36,10 @@ export default {
               commit('setUser', user)
               commit('setIdToken', idToken)
               commit('setUserId', user.uid)
-              console.log('User logged in:', user)
               resolve()
             })
           } else {
             commit('clearAuthState')
-            dispatch('timetable/resetCache', null, { root: true }) // キャッシュをリセット
-            console.log('No user logged in')
             resolve()
           }
         })
@@ -71,11 +68,10 @@ export default {
         throw new Error(error.message)
       }
     },
-    async logout({ commit, dispatch }) {
+    async logout({ commit }) {
       try {
         await authService.logout()
         commit('clearAuthState')
-        dispatch('timetable/resetCache', null, { root: true }) // キャッシュをリセット
       } catch (error) {
         throw new Error(error.message)
       }
@@ -92,10 +88,8 @@ export default {
       try {
         await authService.saveUserOrgs(state.userId, orgs)
         commit('setUserOrgs', orgs)
-        console.log('User organizations updated:', orgs)
       } catch (error) {
-        console.error('Error saving user organizations:', error)
-        throw error
+        throw new Error(`所属団体の保存に失敗しました。${error.message}`)
       }
     },
     async fetchUserOrgs({ commit, state }) {

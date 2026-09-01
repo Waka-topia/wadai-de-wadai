@@ -1,29 +1,30 @@
 <template>
   <v-layout>
     <v-bottom-navigation v-model="selectedIndex" class="bottom-nav" active color="orange" grow>
-      <v-btn to="/eventcal" value="eventcal" @click="logBottomNav('eventcal')">
+      <v-btn to="/" value="home" @click="logBottomNav('home')">
         <v-icon>mdi-calendar-month</v-icon>
         <span>新歓日程</span>
       </v-btn>
 
-      <v-btn to="/timetable" value="timetable" @click="logBottomNav('timetable')">
-        <v-icon>mdi-table-clock</v-icon>
-        <span>時間割</span>
+      <v-btn to="/ranking" value="ranking" @click="logBottomNav('ranking')">
+        <v-icon>mdi-trophy</v-icon>
+        <span>ランキング</span>
       </v-btn>
 
-      <div class="home-btn-wrapper">
-        <v-btn to="/" value="home" class="home-btn" :ripple="false" @click="logBottomNav('home')">
-          <div class="home-icon-bg">
-            <v-icon size="32" color="white">mdi-home</v-icon>
-            <span class="home-label-in-circle">ホーム</span>
+      <div class="scan-btn-wrapper">
+        <v-btn
+          to="/reader"
+          value="reader"
+          class="scan-btn"
+          :ripple="false"
+          @click="logBottomNav('reader')"
+        >
+          <div class="scan-icon-bg">
+            <v-icon size="32" color="white">mdi-qrcode-scan</v-icon>
+            <span class="scan-label-in-circle">読み取る</span>
           </div>
         </v-btn>
       </div>
-
-      <v-btn to="/jobs" value="jobs" @click="logBottomNav('jobs')">
-        <v-icon>mdi-briefcase-search</v-icon>
-        <span>求人情報</span>
-      </v-btn>
 
       <v-btn to="/mypage" value="mypage" @click="logBottomNav('mypage')">
         <v-icon>mdi-account</v-icon>
@@ -50,10 +51,8 @@ watch(
   () => route.path,
   (newPath) => {
     if (newPath === '/') selectedIndex.value = 'home'
-    else if (newPath === '/eventcal') selectedIndex.value = 'eventcal'
-    // else if (newPath === '/reader') selectedIndex.value = 'reader' // QR読み取り機能はフッターから非表示化
-    else if (newPath === '/jobs') selectedIndex.value = 'jobs'
-    else if (newPath === '/timetable') selectedIndex.value = 'timetable'
+    else if (newPath === '/ranking') selectedIndex.value = 'ranking'
+    else if (newPath === '/reader') selectedIndex.value = 'reader'
     else if (newPath === '/mypage') selectedIndex.value = 'mypage'
     else selectedIndex.value = undefined
   },
@@ -82,22 +81,22 @@ watch(
   font-size: 11px !important;
 }
 
-.home-btn-wrapper {
+.scan-btn-wrapper {
   position: relative;
   width: 80px; /* min-widthから固定幅へ */
   display: flex;
   justify-content: center;
-  align-items: center; /* flex-endからcenterに変更（あるいは指定なし） */
+  align-items: center;
   overflow: visible; /* はみ出しを許可 */
 }
 
-.home-btn {
+.scan-btn {
   /* 下の見切れを解消するために上に移動させる */
   transform: translateY(-8px) !important;
 
-  /* position: absolute を使うと親の高さ制限を無視して上に突き抜けます */
+  /* position: absolute を使うと親の高さ制限を無視して上に突き抜ける */
   position: absolute !important;
-  bottom: 10px !important; /* 数値を大きくするほど上に上がります */
+  bottom: 10px !important;
 
   height: auto !important;
   background: transparent !important;
@@ -105,7 +104,7 @@ watch(
   min-width: auto !important;
 }
 
-.home-icon-bg {
+.scan-icon-bg {
   width: 72px;
   height: 72px;
   background-color: #ff9800;
@@ -119,7 +118,7 @@ watch(
   border: 4px solid white;
 }
 
-.home-label-in-circle {
+.scan-label-in-circle {
   font-size: 10px;
   color: white;
   font-weight: bold;
@@ -127,8 +126,8 @@ watch(
   margin-top: 2px;
 }
 
-/* Hide the default overlay interaction for the custom button */
-:deep(.home-btn.v-btn--active) > .v-btn__overlay {
+/* 中央ボタンはデフォルトのアクティブ表示を出さない */
+:deep(.scan-btn.v-btn--active) > .v-btn__overlay {
   opacity: 0 !important;
 }
 </style>

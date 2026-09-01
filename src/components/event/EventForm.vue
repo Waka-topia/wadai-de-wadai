@@ -94,27 +94,11 @@
     >
       {{ isEditMode ? 'このイベントを更新する' : 'このイベントを登録する' }}
     </v-btn>
-    <div class="text-center pt-4">
-      <v-btn
-        block
-        size="large"
-        rounded="pill"
-        color="red-lighten-1"
-        class="text-white font-weight-bold text-body-2"
-        @click="goProveOwnerFromEventForm"
-      >
-        団体の代表者であることを証明する
-      </v-btn>
-    </div>
-    <p class="text-grey-darken-1 text-caption mt-3">
-      ※代表者証明をすることでイベントが上位に表示されやすくなります
-    </p>
   </v-form>
 </template>
 
 <script setup>
 import { computed, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
@@ -132,12 +116,6 @@ const props = defineProps({
 const emit = defineEmits(['success', 'cancel'])
 
 const store = useStore()
-const router = useRouter()
-
-const goProveOwnerFromEventForm = () => {
-  void logFirebaseAnalyticsEvent('event_form_prove_owner_link_click', {})
-  router.push('/prove-owner')
-}
 
 const isEditMode = computed(() => !!props.initialEvent)
 

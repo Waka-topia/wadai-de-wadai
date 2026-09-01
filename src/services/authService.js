@@ -199,8 +199,11 @@ export default {
       const currentUser = auth.currentUser
       if (!currentUser) throw new Error('ユーザーがログインしていません。')
 
-      await deleteUser(currentUser)
+      // Auth ユーザーを消すと認証が切れて Firestore の削除が拒否されるため、先に Firestore を消す。
+      // rankingEntries を残すとランキングに退会済みユーザーが並び続ける。
       await deleteDoc(doc(db, 'users', currentUser.uid))
+      await deleteDoc(doc(db, 'rankingEntries', currentUser.uid))
+      await deleteUser(currentUser)
     } catch (error) {
       switch (error.code) {
         case 'auth/requires-recent-login':

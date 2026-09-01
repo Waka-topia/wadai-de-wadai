@@ -2,6 +2,8 @@
   <div v-if="isAuthenticated" class="d-flex flex-column justify-center my-10 px-4">
     <ProfileHeader />
 
+    <StampsList class="mt-4" />
+
     <ContactBanner class="mt-4" />
 
     <BasicInfoPanel class="mt-4" />
@@ -32,6 +34,7 @@ import { useFirebasePageView } from '@/composables/useFirebasePageView'
 
 // 分割したコンポーネント群のインポート
 import ProfileHeader from '@/components/my-page/ProfileHeader.vue'
+import StampsList from '@/components/my-page/StampsList.vue'
 import BasicInfoPanel from '@/components/my-page/BasicInfoPanel.vue'
 import AppQRCode from '@/components/my-page/AppQRCode.vue'
 import ContactBanner from '@/components/my-page/ContactBanner.vue'

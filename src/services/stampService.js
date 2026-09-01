@@ -1,76 +1,85 @@
-import { collection, doc, getDoc, getDocs, serverTimestamp, setDoc } from 'firebase/firestore'
+import {
+  collection,
+  doc,
+  getDocs,
+  increment,
+  serverTimestamp,
+  writeBatch,
+} from 'firebase/firestore'
 import { db } from '@/firebase/config'
 
 /**
- * @param {string} userId
- * @param {string} displayName
- * @param {string} groupId
- * @param {string} stampId
+ * QRコードから読み取ったスタンプをユーザーに付与する
+ *
+ * StampsReceived の作成と rankingEntries のカウンタ更新を writeBatch で原子的に行う。
+ * 取得済みかどうかの事前確認（getDoc）は行わない。既に持っているスタンプに対する書き込みは セキュリティルール（stampsReceived は create のみ許可、update
+ * は禁止）が拒否し、 バッチ全体がロールバックするため、カウンタだけが増えることはない。
+ *
+ * @param {object} params - 付与に必要な情報
+ * @param {string} params.userId - Firebase Auth の UID
+ * @param {string} params.displayName - ランキング表示用に非正規化する表示名
+ * @param {string} params.groupId - QRコードに含まれる団体ID
+ * @param {string} params.stampId - QRコードに含まれるスタンプID
+ * @returns {Promise<{ granted: boolean; stampId: string }>} Granted が false の場合は取得済み
  */
-export async function addStampToUser(userId, displayName, groupId, stampId) {
+export const grantStamp = async ({ userId, displayName, groupId, stampId }) => {
+  if (!userId) throw new Error('スタンプの取得にはログインが必要です')
+  if (!stampId) throw new Error('スタンプIDが指定されていません')
+
+  const batch = writeBatch(db)
+
+  batch.set(doc(db, 'users', userId, 'stampsReceived', stampId), {
+    groupId: String(groupId ?? ''),
+    stampId,
+    receivedAt: serverTimestamp(),
+  })
+
+  batch.set(
+    doc(db, 'rankingEntries', userId),
+    {
+      userId,
+      displayName: displayName || '名前なし',
+      stampCount: increment(1),
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true },
+  )
+
   try {
-    const stampRef = doc(db, `users/${userId}/stampsReceived`, stampId)
-
-    // すでに同じ stampId が存在するか確認
-    const existingStamp = await getDoc(stampRef)
-    if (existingStamp.exists()) {
-      return { exists: true } // 既に存在する場合のフラグを返す
-    }
-
-    // stampsReceived サブコレクションにスタンプデータを追加
-    const stampData = {
-      groupId,
-      timestamp: serverTimestamp(),
-    }
-    await setDoc(stampRef, stampData)
-
-    // ユーザードキュメントに displayName を保存（merge: true で他フィールドを保護）
-    const userRef = doc(db, `users/${userId}`)
-    await setDoc(userRef, { displayName }, { merge: true })
-
-    return { exists: false, stampId } // 正常に追加された場合の情報を返す
+    await batch.commit()
+    return { granted: true, stampId }
   } catch (error) {
-    console.error('Error adding stamp: ', error)
-    throw error
+    // 取得済みスタンプへの書き込みはルールで拒否される
+    if (error.code === 'permission-denied') {
+      return { granted: false, stampId }
+    }
+    throw new Error(`スタンプの保存に失敗しました。${error.message}`)
   }
 }
 
-// Firestoreからユーザーのスタンプデータを取得
-/** @param {string} userId */
-export async function getUserStamps(userId) {
-  try {
-    const querySnapshot = await getDocs(collection(db, `users/${userId}/stampsReceived`))
-    let stamps = []
-    querySnapshot.forEach((doc) => {
-      stamps.push({ id: doc.id, ...doc.data() })
-    })
-    return stamps
-  } catch (error) {
-    throw new Error(`Failed to fetch stamps: ${error.message}`)
-  }
-}
+/**
+ * ユーザーが取得済みのスタンプ一覧を取得する
+ *
+ * スタンプの名前や画像は src/data/stamps.js の静的マスターから引くため、 ここでは Firestore への問い合わせは1回だけで済む。
+ *
+ * @param {string} userId - Firebase Auth の UID
+ * @returns {Promise<{ stampId: string; groupId: string; receivedAt: Date | null }[]>} 取得済みスタンプ
+ */
+export const fetchReceivedStamps = async (userId) => {
+  if (!userId) return []
 
-/** @param {string} userId */
-export async function getUserStampImages(userId) {
   try {
-    // ユーザーの stampsReceived コレクションを取得
-    const userStampsSnapshot = await getDocs(collection(db, `users/${userId}/stampsReceived`))
-    const userStamps = userStampsSnapshot.docs.map((doc) => doc.id) // stampId のリスト
+    const snapshot = await getDocs(collection(db, 'users', userId, 'stampsReceived'))
 
-    // stamps コレクションから該当するスタンプのデータを取得
-    const stampImages = []
-    for (const stampId of userStamps) {
-      const stampDoc = await getDoc(doc(db, 'stamps', stampId))
-      if (stampDoc.exists()) {
-        stampImages.push({
-          stampId,
-          ...stampDoc.data(), // imageUrl, name, description などを展開
-        })
+    return snapshot.docs.map((stampDoc) => {
+      const data = stampDoc.data()
+      return {
+        stampId: stampDoc.id,
+        groupId: data.groupId ?? '',
+        receivedAt: data.receivedAt?.toDate?.() ?? null,
       }
-    }
-    return stampImages
+    })
   } catch (error) {
-    console.error('Error fetching user stamp images: ', error)
-    throw error
+    throw new Error(`スタンプの取得に失敗しました。${error.message}`)
   }
 }

@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { adminUserId } from '@/config/constants'
 import store from '@/store'
 
 /** ルート定義 各ページコンポーネントは動的インポートでコード分割 */
@@ -7,7 +6,32 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    component: () => import('@/pages/HomePage.vue'),
+    component: () => import('@/pages/EventCal.vue'),
+  },
+  {
+    // 旧トップ（新歓日程）のパス。ブックマーク互換のためリダイレクトで残す
+    path: '/eventcal',
+    redirect: '/',
+  },
+  {
+    path: '/eventcal/:id',
+    name: 'EventDetail',
+    component: () => import('@/pages/EventDetail.vue'),
+  },
+  {
+    path: '/reader',
+    name: 'QrReader',
+    component: () => import('@/pages/ReaderPage.vue'),
+  },
+  {
+    path: '/ranking',
+    name: 'Ranking',
+    component: () => import('@/pages/RankingPage.vue'),
+  },
+  {
+    path: '/mypage',
+    name: 'MyPage',
+    component: () => import('@/pages/MyPage.vue'),
   },
   {
     path: '/login',
@@ -30,31 +54,6 @@ const routes = [
     component: () => import('@/pages/ResetPasswordPage.vue'),
   },
   {
-    path: '/mypage',
-    name: 'MyPage',
-    component: () => import('@/pages/MyPage.vue'),
-  },
-  {
-    path: '/tutorial',
-    name: 'Tutorial',
-    component: () => import('@/pages/TutorialPage.vue'),
-  },
-  {
-    path: '/testpage',
-    name: 'testpage',
-    component: () => import('@/pages/HomePage.vue'),
-  },
-  {
-    path: '/eventcal',
-    name: 'EventCal',
-    component: () => import('@/pages/EventCal.vue'),
-  },
-  {
-    path: '/eventcal/:id',
-    name: 'EventDetail',
-    component: () => import('@/pages/EventDetail.vue'),
-  },
-  {
     path: '/inquiry',
     name: 'InquiryPage',
     component: () => import('@/pages/InquiryPage.vue'),
@@ -65,47 +64,14 @@ const routes = [
     component: () => import('@/pages/RulePage.vue'),
   },
   {
-    path: '/jobs',
-    name: 'RecruitPage',
-    // component: () => import('@/pages/RecruitPage.vue'),
-    // 開発途中ページを代わりに表示
-    component: () => import('@/pages/WorkInProgressPage.vue'),
+    path: '/tutorial',
+    name: 'Tutorial',
+    component: () => import('@/pages/TutorialPage.vue'),
   },
   {
-    path: '/jobs/:id',
-    name: 'JobDetailPage',
-    component: () => import('@/pages/JobsDetailPage.vue'),
-  },
-  {
-    path: '/map',
-    name: 'Map',
-    component: () => import('@/pages/MapPage.vue'),
-  },
-  {
-    path: '/timetable',
-    name: 'Timetable',
-    component: () => import('@/pages/TimetablePage.vue'),
-  },
-  {
-    path: '/syllabus-search',
-    name: 'SyllabusSearch',
-    component: () => import('@/pages/SyllabusSearchPage.vue'),
-  },
-  {
-    path: '/prove-owner',
-    name: 'ProveOwner',
-    component: () => import('@/pages/ProveOwnerPage.vue'),
-  },
-  {
-    path: '/prove-owner/description',
-    name: 'ProveOwnerDescription',
-    component: () => import('@/pages/ProveOwnerDescriptionPage.vue'),
-  },
-  {
-    path: '/admin',
-    name: 'Admin',
-    meta: { requiresAdmin: true },
-    component: () => import('@/pages/AdminPage.vue'),
+    // 復刻版で削除した機能のパスへ来た場合はトップへ戻す
+    path: '/:pathMatch(.*)*',
+    redirect: '/',
   },
 ]
 
@@ -152,10 +118,10 @@ const router = createRouter({
   },
 })
 
-// ナビゲーションガード: ページを離れる前にスクロール位置を保存し、アクセス制御を実施
+// ナビゲーションガード: ページを離れる前にスクロール位置を保存
 router.beforeEach((to, from, next) => {
   // スクロール位置を保存するページのリスト
-  const saveScrollPages = ['/', '/ranking', '/mypage', '/eventcal']
+  const saveScrollPages = ['/', '/ranking', '/mypage']
 
   if (saveScrollPages.includes(from.path)) {
     // 現在のスクロール位置を取得
@@ -167,20 +133,6 @@ router.beforeEach((to, from, next) => {
       path: from.path,
       scrollTop,
     })
-  }
-
-  // Adminページのアクセス制御
-  if (to.matched.some((record) => record.meta.requiresAdmin)) {
-    const currentUserId = store.getters['auth/userId']
-    console.log('[DEBUG Admin Guard] currentUserId:', currentUserId)
-    console.log('[DEBUG Admin Guard] adminUserId (from env):', adminUserId)
-    if (currentUserId !== adminUserId) {
-      console.warn('[DEBUG Admin Guard] User is not admin. Redirecting to home.')
-      // 運営アカウントでなければホームにリダイレクト
-      next({ path: '/' })
-      return
-    }
-    console.log('[DEBUG Admin Guard] Access granted.')
   }
 
   next()

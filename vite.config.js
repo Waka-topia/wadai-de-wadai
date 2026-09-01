@@ -11,10 +11,27 @@ export default defineConfig({
     vueDevTools(),
     VitePWA({
       registerType: 'autoUpdate', // サービスワーカーの自動更新
+      workbox: {
+        // スタンプ画像は112枚あるためプリキャッシュせず、表示したものだけ実行時にキャッシュする
+        globIgnores: ['**/stamps/**'],
+        runtimeCaching: [
+          {
+            urlPattern: /\/stamps\/[\w-]+\.webp$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'stamp-images',
+              expiration: {
+                maxEntries: 120,
+                maxAgeSeconds: 60 * 60 * 24 * 30,
+              },
+            },
+          },
+        ],
+      },
       manifest: {
-        name: 'ワダイdeワダイ',
-        short_name: 'ワダイdeワダイ',
-        description: 'ワダイdeワダイは、新入生が友達に自慢をするためのツールです',
+        name: 'ワダイdeワダイ(2025年4月復刻版)',
+        short_name: 'ワダイ復刻版',
+        description: '2025年新歓シーズンのスタンプラリーを復刻したデモ版',
         theme_color: '#FF9900',
         icons: [
           {
@@ -38,15 +55,11 @@ export default defineConfig({
           // Vuetifyを別チャンクに分離
           vuetify: ['vuetify', 'vuetify/components', 'vuetify/directives'],
           // Firebaseを別チャンクに分離
-          firebase: [
-            'firebase/app',
-            'firebase/auth',
-            'firebase/firestore',
-            'firebase/storage',
-            'firebase/analytics',
-          ],
+          firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore', 'firebase/analytics'],
           // Vue関連を別チャンクに分離
           'vue-vendor': ['vue', 'vue-router', 'vuex'],
+          // QR読み取りは /reader を開いたときだけ必要なので分離
+          'qr-reader': ['vue-qrcode-reader'],
         },
       },
     },
