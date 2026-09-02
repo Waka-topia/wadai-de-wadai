@@ -25,14 +25,14 @@
       density="comfortable"
       bg-color="grey-lighten-4"
       base-color="grey-darken-2"
-      max="2026-05-31"
-      min="2025-04-01"
+      :max="maxDate"
+      :min="minDate"
       :rules="[required]"
       prepend-inner-icon="mdi-calendar"
     />
 
     <v-row dense>
-      <v-col cols="6">
+      <v-col cols="12" sm="6">
         <v-text-field
           v-model="newEvent.startTime"
           label="開始時刻"
@@ -42,10 +42,9 @@
           bg-color="grey-lighten-4"
           base-color="grey-darken-2"
           :rules="[required]"
-          prepend-inner-icon="mdi-clock-start"
         />
       </v-col>
-      <v-col cols="6">
+      <v-col cols="12" sm="6">
         <v-text-field
           v-model="newEvent.endTime"
           label="終了時刻"
@@ -55,7 +54,6 @@
           bg-color="grey-lighten-4"
           base-color="grey-darken-2"
           :rules="[required]"
-          prepend-inner-icon="mdi-clock-end"
         />
       </v-col>
     </v-row>
@@ -118,6 +116,34 @@ const emit = defineEmits(['success', 'cancel'])
 const store = useStore()
 
 const isEditMode = computed(() => !!props.initialEvent)
+
+/**
+ * Date を date 入力欄の形式（YYYY-MM-DD）に変換する
+ *
+ * ToISOString だとUTCに寄って日付がずれることがあるため、ローカル時刻から組み立てる
+ *
+ * @param {Date} date - 変換する日付
+ * @returns {string} YYYY-MM-DD
+ */
+const formatDateInput = (date) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+
+/**
+ * 選択できる日付の範囲を今日を基準に決める
+ *
+ * 固定値にすると年度をまたいだ時点でカレンダーから今日を選べなくなるため、相対で指定する
+ *
+ * @param {number} yearOffset - 今日から何年ずらすか
+ * @returns {string} YYYY-MM-DD
+ */
+const shiftYear = (yearOffset) => {
+  const date = new Date()
+  date.setFullYear(date.getFullYear() + yearOffset)
+  return formatDateInput(date)
+}
+
+const minDate = shiftYear(-1)
+const maxDate = shiftYear(2)
 
 const newEvent = ref({
   date: '',
