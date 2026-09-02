@@ -124,8 +124,12 @@
           <v-divider thickness="2" color="grey-darken-1" />
         </v-list>
         <div class="text-right mt-2">
+          <!--
+            2025年のイベントは団体単位で登録されており createdByName を持たない。
+            その場合は団体名を作成者として表示する。
+          -->
           <span class="text-caption text-grey-lighten-1">
-            作成者: {{ event.createdByName || '匿名ユーザー' }}
+            作成者: {{ event.createdByName || event.organizerName || '匿名ユーザー' }}
           </span>
         </div>
       </v-card-text>
