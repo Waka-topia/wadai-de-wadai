@@ -92,11 +92,15 @@ import BottomNavigation from '@/components/templates/BottomNavigation.vue'
 import DeleteAccountButton from '@/components/templates/DeleteAccountButton.vue'
 import LogOutButton from '@/components/templates/LogOut.vue'
 import { useSnackbar } from '@/composables/useSnackbar'
+import { useVirtualKeyboard } from '@/composables/useVirtualKeyboard'
 
 const router = useRouter()
 const route = useRoute()
 
 const { snackbarState, closeSnackbar } = useSnackbar()
+
+// キーボードの高さを --keyboard-inset として公開する（ボトムシートが隠れないように）
+useVirtualKeyboard()
 
 /** 復刻対象のバージョン。ヘッダーとドロワーに表示する */
 const appVersion = '1.0.0'
@@ -184,6 +188,12 @@ watch(
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Kaisei+Tokumin&display=swap');
+
+/* キーボード表示時にボトムシート全体をその分だけ押し上げる（iOS Safari 対策） */
+.v-bottom-sheet > .v-overlay__content {
+  padding-bottom: var(--keyboard-inset, 0px);
+  transition: padding-bottom 0.15s ease;
+}
 
 /* .vuecal__event {
   border: 1px solid #388e3c;

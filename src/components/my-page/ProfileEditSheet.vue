@@ -134,7 +134,8 @@ const save = async () => {
 
 <style scoped>
 .sheet-body {
-  max-height: 60vh;
+  /* キーボードが出ている分だけ縮めて、本文がその裏に回らないようにする */
+  max-height: calc(60dvh - var(--keyboard-inset, 0px));
   overflow-y: auto;
 }
 </style>

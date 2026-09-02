@@ -152,7 +152,8 @@ const onDelete = async () => {
 
 <style scoped>
 .sheet-body {
-  max-height: 70vh;
+  /* キーボードが出ている分だけ縮めて、本文がその裏に回らないようにする */
+  max-height: calc(70dvh - var(--keyboard-inset, 0px));
   overflow-y: auto;
 }
 </style>
