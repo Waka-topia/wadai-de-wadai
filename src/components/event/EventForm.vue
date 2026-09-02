@@ -102,6 +102,7 @@ import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { allGroups } from '@/data/groups'
 import { required } from '@/utils/forms/validate'
+import { selectableMaxDate, selectableMinDate, toDateInputValue } from '@/utils/dateRange'
 
 const props = defineProps({
   /** 編集時の初期データ（新規登録時はnull） */
@@ -117,33 +118,9 @@ const store = useStore()
 
 const isEditMode = computed(() => !!props.initialEvent)
 
-/**
- * Date を date 入力欄の形式（YYYY-MM-DD）に変換する
- *
- * ToISOString だとUTCに寄って日付がずれることがあるため、ローカル時刻から組み立てる
- *
- * @param {Date} date - 変換する日付
- * @returns {string} YYYY-MM-DD
- */
-const formatDateInput = (date) =>
-  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
-
-/**
- * 選択できる日付の範囲を今日を基準に決める
- *
- * 固定値にすると年度をまたいだ時点でカレンダーから今日を選べなくなるため、相対で指定する
- *
- * @param {number} yearOffset - 今日から何年ずらすか
- * @returns {string} YYYY-MM-DD
- */
-const shiftYear = (yearOffset) => {
-  const date = new Date()
-  date.setFullYear(date.getFullYear() + yearOffset)
-  return formatDateInput(date)
-}
-
-const minDate = shiftYear(-1)
-const maxDate = shiftYear(2)
+// 固定値にすると年度をまたいだ時点でカレンダーから今日を選べなくなるため、今日を基準にする
+const minDate = toDateInputValue(selectableMinDate())
+const maxDate = toDateInputValue(selectableMaxDate())
 
 const newEvent = ref({
   date: '',

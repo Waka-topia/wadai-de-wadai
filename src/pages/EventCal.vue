@@ -50,6 +50,7 @@ import EventSchedule from '@/components/event/EventSchedule.vue'
 import EditEventFormButton from '@/components/event/EditEventFormButton.vue'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import { selectableMaxDate, selectableMinDate, toDateInputValue } from '@/utils/dateRange'
 
 const store = useStore()
 
@@ -78,14 +79,7 @@ const events = computed(() => {
   }))
 })
 
-const toDateString = (date) => {
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
-}
-
-const selectedDate = ref(toDateString(new Date()))
+const selectedDate = ref(toDateInputValue(new Date()))
 
 watch(selectedDate, (newDate) => {
   const monthKey = newDate.substring(0, 7)
@@ -96,11 +90,12 @@ useFirebasePageView('view_event_calendar', () => ({
   initialDate: selectedDate.value,
 }))
 
-const minDate = ref(new Date('2025-04-01'))
-const maxDate = ref(new Date('2026-05-31'))
+// 固定値にすると年度をまたいだ時点で今日を含む月を選べなくなるため、今日を基準にする
+const minDate = ref(selectableMinDate())
+const maxDate = ref(selectableMaxDate())
 
 const onCellClick = (date) => {
-  const dateString = toDateString(date)
+  const dateString = toDateInputValue(date)
   selectedDate.value = dateString
 
   logFirebaseAnalyticsEvent('calendar_date_click', {
@@ -109,7 +104,7 @@ const onCellClick = (date) => {
 }
 
 const setToday = () => {
-  const todayString = toDateString(new Date())
+  const todayString = toDateInputValue(new Date())
   selectedDate.value = todayString
 
   logFirebaseAnalyticsEvent('calendar_set_today', {
@@ -120,7 +115,7 @@ const setToday = () => {
 const changeDate = (days) => {
   const currentDate = new Date(selectedDate.value)
   currentDate.setDate(currentDate.getDate() + days)
-  const newDateString = toDateString(currentDate)
+  const newDateString = toDateInputValue(currentDate)
   selectedDate.value = newDateString
   void logFirebaseAnalyticsEvent('calendar_nav_click', {
     direction: days > 0 ? 'next' : 'prev',
