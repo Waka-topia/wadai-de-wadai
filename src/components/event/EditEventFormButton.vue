@@ -1,5 +1,5 @@
 <template>
-  <v-bottom-sheet v-model:model-value="formDialogOpen" max-height="90vh">
+  <v-bottom-sheet v-model="isOpen">
     <template #activator="{ props: activatorProps }">
       <v-btn
         v-bind="activatorProps"
@@ -12,38 +12,46 @@
         団体向けフォーム
       </v-btn>
     </template>
-    <v-card rounded="t-xl" class="overflow-y-auto" style="max-height: 90vh">
-      <v-card-title class="text-subtitle-1 font-weight-bold d-flex align-center">
-        <v-btn icon variant="text" size="default" color="orange" @click="closeFormDialog">
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
-        <div class="d-flex align-center justify-center flex-grow-1">
-          <v-icon class="mr-2" size="small">mdi-calendar-outline</v-icon>
-          新歓イベントの登録
-        </div>
-        <div style="width: 40px" />
-      </v-card-title>
 
-      <v-divider />
-      <EventForm />
+    <v-card class="rounded-t-xl">
+      <SheetHeader
+        title="新歓イベントの登録"
+        :loading="isSubmitting"
+        @close="isOpen = false"
+        @submit="onSubmit"
+      />
+
+      <div class="sheet-body">
+        <EventForm ref="formRef" @success="isOpen = false" />
+      </div>
     </v-card>
   </v-bottom-sheet>
 </template>
 
 <script setup>
 import { ref, watch } from 'vue'
-import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import EventForm from '@/components/event/EventForm.vue'
+import SheetHeader from '@/components/templates/SheetHeader.vue'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 
-const formDialogOpen = ref(false)
+const isOpen = ref(false)
+const isSubmitting = ref(false)
+const formRef = ref(null)
 
-watch(formDialogOpen, (open) => {
+watch(isOpen, (open) => {
   if (open) {
     void logFirebaseAnalyticsEvent('event_edit_form_open', {})
   }
 })
-const closeFormDialog = () => {
-  formDialogOpen.value = false
+
+const onSubmit = async () => {
+  isSubmitting.value = true
+
+  try {
+    await formRef.value?.submit()
+  } finally {
+    isSubmitting.value = false
+  }
 }
 </script>
 
@@ -53,5 +61,10 @@ const closeFormDialog = () => {
   bottom: 100px;
   right: 16px;
   z-index: 1000;
+}
+
+.sheet-body {
+  max-height: 70vh;
+  overflow-y: auto;
 }
 </style>

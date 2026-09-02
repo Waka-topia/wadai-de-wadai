@@ -1,5 +1,5 @@
 <template>
-  <v-form class="pa-4" @submit.prevent="submitEvent">
+  <v-form ref="formRef" class="pa-4" @submit.prevent="submit">
     <v-autocomplete
       v-model="newEvent.organizerName"
       :items="allGroups"
@@ -82,16 +82,8 @@
       prepend-inner-icon="mdi-text"
     />
 
-    <v-btn
-      type="submit"
-      color="orange"
-      block
-      size="large"
-      rounded="pill"
-      class="text-white font-weight-bold text-body-2 mt-2"
-    >
-      {{ isEditMode ? 'このイベントを更新する' : 'このイベントを登録する' }}
-    </v-btn>
+    <!-- 送信はシート右上のチェックボタンから行う（type="submit" は Enter キー用に残す） -->
+    <button class="d-none" type="submit"></button>
   </v-form>
 </template>
 
@@ -156,10 +148,19 @@ watch(
 
 const { showSnackbar } = useSnackbar()
 
-const submitEvent = async (validationPromise) => {
+const formRef = ref(null)
+
+/**
+ * 入力内容を検証して登録・更新を行う
+ *
+ * シート右上のチェックボタンから呼べるように defineExpose で公開している
+ *
+ * @returns {Promise<void>}
+ */
+const submit = async () => {
   try {
-    const { valid } = await validationPromise
-    if (!valid) throw new Error('入力に誤りがあります。')
+    const result = await formRef.value?.validate()
+    if (!result?.valid) throw new Error('入力に誤りがあります。')
 
     const currentUserId = store.getters['auth/userId']
     const currentUserName = store.getters['auth/displayName']
@@ -205,6 +206,8 @@ const submitEvent = async (validationPromise) => {
     showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
   }
 }
+
+defineExpose({ submit })
 </script>
 
 <style scoped>

@@ -3,8 +3,8 @@
     <v-card rounded="lg" class="mb-4" elevation="0">
       <v-card-text>
         <div class="d-flex flex-column ga-3 mb-3">
-          <!-- 編集ボタン & ダイアログ -->
-          <v-dialog v-model="editDialogOpen" max-width="700">
+          <!-- 編集ボタン & ボトムシート -->
+          <v-bottom-sheet v-model="editDialogOpen">
             <template #activator="{ props: editProps }">
               <v-btn
                 v-bind="editProps"
@@ -16,20 +16,25 @@
                 このイベントを編集する
               </v-btn>
             </template>
-            <v-card rounded="lg">
-              <v-card-title class="text-h5 font-weight-bold pa-5 pb-3">
-                <v-icon class="mr-2" color="blue-darken-1">mdi-pencil-outline</v-icon>
-                イベントの編集
-              </v-card-title>
-              <v-divider />
-              <EventForm v-if="editDialogOpen" :initial-event="event" @success="onEditSuccess" />
-              <v-divider />
-              <v-card-actions class="pa-4">
-                <v-spacer />
-                <v-btn variant="text" @click="editDialogOpen = false">キャンセル</v-btn>
-              </v-card-actions>
+
+            <v-card class="rounded-t-xl">
+              <SheetHeader
+                title="イベントの編集"
+                :loading="isSubmitting"
+                @close="editDialogOpen = false"
+                @submit="onEditSubmit"
+              />
+
+              <div class="sheet-body">
+                <EventForm
+                  v-if="editDialogOpen"
+                  ref="editFormRef"
+                  :initial-event="event"
+                  @success="onEditSuccess"
+                />
+              </div>
             </v-card>
-          </v-dialog>
+          </v-bottom-sheet>
 
           <!-- 削除ボタン & ダイアログ -->
           <v-dialog v-model="deleteDialogOpen" max-width="500">
@@ -82,6 +87,7 @@ import { useStore } from 'vuex'
 import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import EventForm from '@/components/event/EventForm.vue'
+import SheetHeader from '@/components/templates/SheetHeader.vue'
 
 const props = defineProps({
   eventId: {
@@ -101,6 +107,18 @@ const router = useRouter()
 const store = useStore()
 const editDialogOpen = ref(false)
 const deleteDialogOpen = ref(false)
+const isSubmitting = ref(false)
+const editFormRef = ref(null)
+
+const onEditSubmit = async () => {
+  isSubmitting.value = true
+
+  try {
+    await editFormRef.value?.submit()
+  } finally {
+    isSubmitting.value = false
+  }
+}
 
 const onEditSuccess = () => {
   editDialogOpen.value = false
@@ -131,3 +149,10 @@ const onDelete = async () => {
   }
 }
 </script>
+
+<style scoped>
+.sheet-body {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+</style>

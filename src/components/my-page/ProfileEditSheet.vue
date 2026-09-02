@@ -12,14 +12,12 @@
 
     <v-bottom-sheet v-model="isOpen" :inset="false">
       <v-card class="rounded-t-xl text-left">
-        <div class="sheet-handle mx-auto my-2" />
-
-        <v-card-title class="text-body-1 font-weight-bold d-flex align-center pb-2">
-          <v-icon class="mr-2" color="orange">mdi-account</v-icon>
-          ユーザープロフィール
-        </v-card-title>
-
-        <v-divider />
+        <SheetHeader
+          title="ユーザープロフィール"
+          :loading="isSaving"
+          @close="isOpen = false"
+          @submit="save"
+        />
 
         <v-card-text class="sheet-body">
           <UserIconPicker v-model="form.iconId" class="mb-4" />
@@ -63,23 +61,6 @@
             登録するとランキングのカードに表示されます。
           </p>
         </v-card-text>
-
-        <v-divider />
-
-        <v-card-actions class="pa-4">
-          <v-btn variant="text" :disabled="isSaving" @click="isOpen = false">キャンセル</v-btn>
-          <v-spacer />
-          <v-btn
-            class="text-white font-weight-bold"
-            color="orange"
-            variant="flat"
-            rounded="pill"
-            :loading="isSaving"
-            @click="save"
-          >
-            保存する
-          </v-btn>
-        </v-card-actions>
       </v-card>
     </v-bottom-sheet>
   </div>
@@ -89,6 +70,7 @@
 import { computed, reactive, ref } from 'vue'
 import { useStore } from 'vuex'
 import UserIconPicker from '@/components/my-page/UserIconPicker.vue'
+import SheetHeader from '@/components/templates/SheetHeader.vue'
 import { useSnackbar } from '@/composables/useSnackbar'
 import { allGroups } from '@/data/groups'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
@@ -151,13 +133,6 @@ const save = async () => {
 </script>
 
 <style scoped>
-.sheet-handle {
-  width: 36px;
-  height: 4px;
-  border-radius: 2px;
-  background-color: rgba(0, 0, 0, 0.2);
-}
-
 .sheet-body {
   max-height: 60vh;
   overflow-y: auto;
