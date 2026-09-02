@@ -2,39 +2,41 @@
   <v-divider />
 
   <v-card class="ranking-card pb-3" elevation="0">
-    <!-- 順位リボン（カード左上に掛かる） -->
-    <v-img class="rank-ribbon" :src="ribbon" :alt="`${rank}位`" :width="ribbonWidth">
-      <div class="rank-number font-weight-bold text-white text-center">
-        {{ rank }}
+    <div class="d-flex">
+      <!-- 順位リボン。絶対配置にすると狭い画面でアイコンに重なるため、幅を持つ列として並べる -->
+      <div class="rank-column">
+        <v-img class="rank-ribbon" :src="ribbon" :alt="`${rank}位`" :width="ribbonWidth">
+          <div class="rank-number font-weight-bold text-white text-center">
+            {{ rank }}
+          </div>
+        </v-img>
       </div>
-    </v-img>
 
-    <v-row class="ma-0 pt-4" align="center" no-gutters>
-      <v-col class="d-flex justify-center" cols="5">
-        <v-avatar size="120">
+      <div class="d-flex align-center flex-grow-1 min-width-0 pt-4 pr-3">
+        <v-avatar class="ranking-avatar mr-3">
           <v-img class="rounded-circle" :src="iconUrl" alt="ユーザーのアイコン" />
         </v-avatar>
-      </v-col>
 
-      <v-col class="pr-3" cols="7">
-        <p class="text-h5 font-weight-bold mb-1 text-truncate">{{ name }}</p>
+        <div class="flex-grow-1 min-width-0">
+          <p class="text-h5 font-weight-bold mb-1 text-truncate">{{ name }}</p>
 
-        <div class="d-flex align-center mb-2">
-          <v-icon color="red" size="x-large">mdi-stamper</v-icon>
-          <span class="text-h6 text-red font-weight-bold ml-1">{{ count }}</span>
-          <small class="text-red font-weight-bold ml-1">スタンプ</small>
+          <div class="d-flex align-center mb-2">
+            <v-icon color="red" size="x-large">mdi-stamper</v-icon>
+            <span class="text-h6 text-red font-weight-bold ml-1">{{ count }}</span>
+            <small class="text-red font-weight-bold ml-1">スタンプ</small>
+          </div>
+
+          <div class="d-flex align-center mb-1">
+            <v-icon color="orange" size="x-small">mdi-triangle-down</v-icon>
+            <small class="text-orange font-weight-bold ml-1">次回参加予定の団体</small>
+          </div>
+
+          <v-chip class="next-shinkan-chip font-weight-bold" color="orange">
+            {{ status }}
+          </v-chip>
         </div>
-
-        <div class="d-flex align-center mb-1">
-          <v-icon color="orange" size="x-small">mdi-triangle-down</v-icon>
-          <small class="text-orange font-weight-bold ml-1">次回参加予定の団体</small>
-        </div>
-
-        <v-chip class="next-shinkan-chip font-weight-bold" color="orange">
-          {{ status }}
-        </v-chip>
-      </v-col>
-    </v-row>
+      </div>
+    </div>
   </v-card>
 </template>
 
@@ -93,15 +95,25 @@ const status = computed(() =>
 </script>
 
 <style scoped>
-.ranking-card {
-  position: relative;
+.rank-column {
+  /* リボンの幅ぶんを確保して、アイコンと重ならないようにする */
+  flex: 0 0 auto;
+  padding-left: 12px;
+  padding-right: 8px;
 }
 
 .rank-ribbon {
-  position: absolute;
-  top: 0;
-  left: 12px;
-  z-index: 1;
+  flex: 0 0 auto;
+}
+
+.ranking-avatar {
+  /* 画面幅に応じて縮める。固定120pxだと狭い画面で本文を圧迫する */
+  width: clamp(72px, 24vw, 120px);
+  height: clamp(72px, 24vw, 120px);
+}
+
+.min-width-0 {
+  min-width: 0;
 }
 
 .rank-number {
