@@ -1,6 +1,6 @@
 <template>
-  <div class="scanner-wrapper">
-    <v-card class="scanner-frame" rounded="lg" elevation="2">
+  <div>
+    <div class="scanner-stage">
       <QrcodeStream
         :formats="['qr_code']"
         :paused="paused"
@@ -11,8 +11,18 @@
         @detect="onDetect"
         @error="onError"
       >
+        <!-- 読み取り位置を示す枠 -->
+        <div class="scanner-overlay d-flex align-center justify-center">
+          <div class="scanner-frame">
+            <span class="frame-corner frame-corner--tl" />
+            <span class="frame-corner frame-corner--tr" />
+            <span class="frame-corner frame-corner--bl" />
+            <span class="frame-corner frame-corner--br" />
+          </div>
+        </div>
+
         <div v-if="!isCameraReady" class="camera-placeholder">
-          <v-progress-circular color="orange" indeterminate size="36" />
+          <v-progress-circular color="white" indeterminate size="36" />
           <p class="text-body-2 mt-3 mb-0">カメラを起動しています…</p>
         </div>
 
@@ -25,10 +35,10 @@
           @click="toggleTorch"
         />
       </QrcodeStream>
-    </v-card>
+    </div>
 
-    <p class="text-center text-body-2 text-grey-darken-1 mt-4 mb-0">
-      団体のQRコードを枠内に写してください
+    <p class="text-center text-body-1 font-weight-bold py-8 mb-0">
+      QRコードをスキャンして、スタンプを集めよう！
     </p>
   </div>
 </template>
@@ -131,20 +141,72 @@ const onError = (error) => {
 </script>
 
 <style scoped>
-.scanner-wrapper {
+.scanner-stage {
+  position: relative;
   width: 100%;
-  max-width: 420px;
-  margin: 0 auto;
+  aspect-ratio: 1;
+  /* 横長・低いビューポートで画面を占有しすぎないよう上限を設ける */
+  max-height: 55vh;
+  background-color: #808080;
+  overflow: hidden;
+}
+
+.scanner-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
 
 .scanner-frame {
+  position: relative;
+  /* 縦横どちらか短い方に合わせて正方形にする */
+  height: 72%;
+  max-width: min(72%, 320px);
   aspect-ratio: 1;
-  overflow: hidden;
-  background-color: #212121;
+}
+
+.frame-corner {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  border: 6px solid #fff;
+}
+
+.frame-corner--tl {
+  top: 0;
+  left: 0;
+  border-right: none;
+  border-bottom: none;
+  border-top-left-radius: 22px;
+}
+
+.frame-corner--tr {
+  top: 0;
+  right: 0;
+  border-left: none;
+  border-bottom: none;
+  border-top-right-radius: 22px;
+}
+
+.frame-corner--bl {
+  bottom: 0;
+  left: 0;
+  border-right: none;
+  border-top: none;
+  border-bottom-left-radius: 22px;
+}
+
+.frame-corner--br {
+  bottom: 0;
+  right: 0;
+  border-left: none;
+  border-top: none;
+  border-bottom-right-radius: 22px;
 }
 
 .camera-placeholder {
-  height: 100%;
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -154,7 +216,7 @@ const onError = (error) => {
 
 .torch-btn {
   position: absolute;
-  right: 12px;
-  bottom: 12px;
+  right: 16px;
+  bottom: 16px;
 }
 </style>

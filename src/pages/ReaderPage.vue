@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isAuthenticated" class="pa-4 pt-6">
+  <div v-if="isAuthenticated">
     <QrCodeScanner
       :paused="isPaused"
       @detected="onDetected"
