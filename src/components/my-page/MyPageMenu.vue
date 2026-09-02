@@ -46,7 +46,7 @@
 
     <v-divider />
 
-    <v-list class="py-0" density="compact">
+    <v-list class="menu-list py-0" density="compact">
       <v-list-item to="/tutorial" append-icon="mdi-chevron-right">
         <template #prepend>
           <v-icon color="grey-darken-1" size="small">mdi-cellphone-arrow-down</v-icon>
@@ -122,5 +122,14 @@ const openSurvey = () => {
 <style scoped>
 .qr-slot {
   min-height: 166px;
+}
+
+/* 展開パネル（左padding 24px）とリスト項目でアイコンと文字の開始位置を揃える */
+.menu-list :deep(.v-list-item) {
+  padding-inline-start: 24px;
+}
+
+.menu-list :deep(.v-list-item__spacer) {
+  width: 12px;
 }
 </style>

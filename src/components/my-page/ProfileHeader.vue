@@ -8,14 +8,14 @@
       {{ user.userName }}
     </div>
 
-    <ProfileEditDialog />
+    <ProfileEditSheet />
   </v-card>
 </template>
 
 <script setup>
 import { computed } from 'vue'
 import { useStore } from 'vuex'
-import ProfileEditDialog from '@/components/my-page/ProfileEditDialog.vue'
+import ProfileEditSheet from '@/components/my-page/ProfileEditSheet.vue'
 
 const store = useStore()
 const user = computed(() => store.getters['users/currentUserData'])

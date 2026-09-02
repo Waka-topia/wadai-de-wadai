@@ -10,19 +10,19 @@
       プロフィール編集
     </v-btn>
 
-    <v-dialog v-model="isOpen" max-width="560" scrollable>
-      <v-card rounded="lg">
-        <v-card-title class="text-h6 font-weight-bold d-flex align-center">
+    <v-bottom-sheet v-model="isOpen" :inset="false">
+      <v-card class="rounded-t-xl text-left">
+        <div class="sheet-handle mx-auto my-2" />
+
+        <v-card-title class="text-body-1 font-weight-bold d-flex align-center pb-2">
           <v-icon class="mr-2" color="orange">mdi-account</v-icon>
           ユーザープロフィール
         </v-card-title>
 
         <v-divider />
 
-        <v-card-text>
+        <v-card-text class="sheet-body">
           <UserIconPicker v-model="form.iconId" class="mb-4" />
-
-          <v-divider class="mb-4" />
 
           <v-text-field
             v-model="form.displayName"
@@ -33,9 +33,9 @@
             :rules="[required]"
           />
 
-          <div class="d-flex align-center mt-2 mb-3">
-            <v-icon class="mr-2" color="orange">mdi-map-marker</v-icon>
-            <span class="text-body-1 font-weight-bold">次に行く新歓</span>
+          <div class="d-flex align-center mt-1 mb-3">
+            <v-icon class="mr-2" color="orange" size="small">mdi-map-marker</v-icon>
+            <span class="text-body-2 font-weight-bold">次に行く新歓</span>
           </div>
 
           <v-autocomplete
@@ -56,22 +56,24 @@
             density="comfortable"
             prepend-inner-icon="mdi-calendar"
             :disabled="!form.groupName"
+            hide-details
           />
 
-          <p class="text-caption text-grey-darken-1 mb-0">
+          <p class="text-caption text-grey-darken-1 mt-2 mb-0">
             登録するとランキングのカードに表示されます。
           </p>
         </v-card-text>
 
         <v-divider />
 
-        <v-card-actions>
-          <v-spacer />
+        <v-card-actions class="pa-4">
           <v-btn variant="text" :disabled="isSaving" @click="isOpen = false">キャンセル</v-btn>
+          <v-spacer />
           <v-btn
             class="font-weight-bold"
             color="orange"
             variant="flat"
+            rounded="pill"
             :loading="isSaving"
             @click="save"
           >
@@ -79,7 +81,7 @@
           </v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
+    </v-bottom-sheet>
   </div>
 </template>
 
@@ -109,7 +111,7 @@ const form = reactive({
 const groupNames = computed(() => allGroups.map((group) => group.name))
 const userId = computed(() => store.getters['auth/userId'])
 
-/** 現在のプロフィールをフォームに読み込んでダイアログを開く */
+/** 現在のプロフィールをフォームに読み込んでシートを開く */
 const open = () => {
   const current = store.getters['users/currentUserData']
   form.displayName = current.userName === 'Unknown' ? '' : current.userName
@@ -147,3 +149,17 @@ const save = async () => {
   }
 }
 </script>
+
+<style scoped>
+.sheet-handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.sheet-body {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+</style>
