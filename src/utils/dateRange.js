@@ -27,8 +27,12 @@ export const shiftYears = (yearOffset) => {
   return date
 }
 
-/** 選択できる最も古い日付（今日の1年前） */
-export const selectableMinDate = () => shiftYears(-1)
+/**
+ * 選択できる最も古い日付
+ *
+ * 復刻対象である2025年の新歓シーズン（本番から取り込んだイベントが存在する期間）に カレンダーで戻れる必要があるため、下限はその開始日で固定する。
+ */
+export const selectableMinDate = () => new Date(2025, 3, 1)
 
 /** 選択できる最も新しい日付（今日の2年後） */
 export const selectableMaxDate = () => shiftYears(2)

@@ -18,6 +18,7 @@ export default [
       '**/coverage/**',
       '**/node_modules/**',
       'eslint.config.js',
+      'scripts/**',
     ],
   },
 
