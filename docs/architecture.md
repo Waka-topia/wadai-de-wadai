@@ -42,14 +42,14 @@ wadai-de-wadai/
 ├── src/
 │   ├── components/       # 再利用可能なUIコンポーネント
 │   │   ├── event/        # 新歓イベント関連
-│   │   ├── my-page/      # マイページ関連（スタンプコレクション含む）
+│   │   ├── my-page/      # マイページ関連（プロフィール編集・スタンプコレクション）
 │   │   ├── qr-reader/    # QR読み取りとスタンプ獲得演出
 │   │   ├── templates/    # 共通レイアウト（ボトムナビ等）
 │   │   ├── user-profile/ # プロフィール表示
-│   │   └── user-ranking/ # ランキング（表彰台・リスト行）
+│   │   └── user-ranking/ # ランキング（順位カード）
 │   ├── composables/      # ロジックの再利用単位
 │   ├── config/           # 定数
-│   ├── data/             # 静的マスターデータ（groups.js / stamps.js）
+│   ├── data/             # 静的マスターデータ（groups.js / stamps.js / userIcons.js）
 │   ├── pages/            # ページコンポーネント（ルートに対応）
 │   ├── router/           # Vue Router設定
 │   ├── store/            # Vuex Store
@@ -59,7 +59,7 @@ wadai-de-wadai/
 │   ├── plugins/          # Vueプラグイン（Vuetify等）
 │   ├── utils/            # 汎用ユーティリティ
 │   ├── assets/           # 静的リソース
-│   │   ├── rankings/     # ランキングのリボン画像（1〜3位）
+│   │   ├── rankings/     # ランキングのリボン画像（1〜3位＋4位以降）
 │   │   ├── userIcon/     # ユーザーアイコン
 │   │   └── tutorial/     # PWAインストール手順の画像
 │   ├── App.vue           # ルートコンポーネント
@@ -109,19 +109,25 @@ User Interaction
 
 ## データモデル（Firestore）
 
-| パス                                   | 用途                                                              |
-| -------------------------------------- | ----------------------------------------------------------------- |
-| `users/{uid}`                          | プロフィール（本人のみ読み書き可）                                |
-| `users/{uid}/stampsReceived/{stampId}` | 取得済みスタンプ。`create` のみ許可し、二重取得をルールで拒否する |
-| `rankingEntries/{uid}`                 | ランキング表示用の公開プロジェクション（個人情報を含まない）      |
-| `groups/{groupId}`                     | 団体マスター（読み取り専用）                                      |
-| `events_monthly_hashed/{monthKey}`     | 新歓イベント（月単位で集約）                                      |
+| パス                                   | 用途                                                                                                                                           |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `users/{uid}`                          | プロフィール（本人のみ読み書き可）。`displayName` / `iconId` / `nextShinkan`                                                                   |
+| `users/{uid}/stampsReceived/{stampId}` | 取得済みスタンプ。`create` のみ許可し、二重取得をルールで拒否する                                                                              |
+| `rankingEntries/{uid}`                 | ランキング表示用の公開プロジェクション（個人情報を含まない）。`userId` / `displayName` / `iconId` / `nextShinkan` / `stampCount` / `updatedAt` |
+| `groups/{groupId}`                     | 団体マスター（読み取り専用）                                                                                                                   |
+| `events_monthly_hashed/{monthKey}`     | 新歓イベント（月単位で集約）                                                                                                                   |
 
 ### スタンプとランキングの設計方針
 
 - **スタンプのマスターは Firestore に置かない。** 不変データなので `src/data/stamps.js` に静的定義し、
   Firestore は「誰がどの `stampId` を持つか」だけを保持します。
   一覧表示に必要な Firestore 問い合わせは **1回**です。
+- **ユーザーアイコンも同様に静的定義。** `src/data/userIcons.js` に8種類を持ち、
+  Firestore には `iconId`（例: `userIcon3`）だけを保存します。
+  パスを文字列で保存するとビルド後のハッシュ付きファイル名と一致しなくなるためです。
+- **プロフィールの更新はランキングにも同時反映する。** `saveProfile` が `users/{uid}` と
+  `rankingEntries/{uid}` を `writeBatch` でまとめて更新します。`rankingEntries` が未作成でも
+  `stampCount: increment(0)` により 0 で作られるため、スタンプ数を読み直す必要がありません。
 - **ランキングは取得時に増分更新する。** `grantStamp` が `stampsReceived` の作成と
   `rankingEntries.stampCount` の `increment(1)` を `writeBatch` で原子的に行い、
   表示側は `orderBy('stampCount','desc').limit(100)` を `onSnapshot` で購読します。
@@ -165,7 +171,7 @@ npm run format                # Prettier実行
   - `users` は本人のみ読み書き可（email を含むため他者に開放しない）
   - ランキングに必要な公開情報は `rankingEntries` に分離
   - `stampsReceived` は `create` のみ許可・`update` は禁止
-  - `rankingEntries.stampCount` は自分のドキュメントに対して +1 ずつのみ許可
+  - `rankingEntries.stampCount` は自分のドキュメントに対して +1 ずつのみ許可（プロフィール更新時は変更不可）
 
 ### 環境変数
 

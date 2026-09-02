@@ -1,8 +1,16 @@
 <template>
   <div v-if="isAuthenticated" class="d-flex flex-column justify-center my-10 px-4">
-    <ProfileHeader />
+    <ProfileHeader :stamp-count="ownedCount" />
 
-    <StampsList class="mt-4" />
+    <StampsList
+      class="mt-4"
+      :stamps="stamps"
+      :owned-count="ownedCount"
+      :total-count="totalCount"
+      :progress-ratio="progressRatio"
+      :is-loading="isLoading"
+      :error-message="errorMessage"
+    />
 
     <ContactBanner class="mt-4" />
 
@@ -31,6 +39,7 @@
 import { computed } from 'vue'
 import { useStore } from 'vuex'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import { useStampCollection } from '@/composables/useStampCollection'
 
 // 分割したコンポーネント群のインポート
 import ProfileHeader from '@/components/my-page/ProfileHeader.vue'
@@ -47,4 +56,9 @@ useFirebasePageView('view_mypage', () => ({
 }))
 
 const isAuthenticated = computed(() => store.getters['auth/isAuthenticated'])
+const userId = computed(() => store.getters['auth/userId'])
+
+// スタンプはヘッダーの獲得数と一覧の両方で使うため、ここで1回だけ読み込む
+const { stamps, ownedCount, totalCount, progressRatio, isLoading, errorMessage } =
+  useStampCollection(userId)
 </script>

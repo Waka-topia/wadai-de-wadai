@@ -44,7 +44,7 @@ import ribbonGold from '@/assets/rankings/ribbon1.png'
 import ribbonSilver from '@/assets/rankings/ribbon2.png'
 import ribbonBronze from '@/assets/rankings/ribbon3.png'
 import ribbonPlain from '@/assets/rankings/ribbon4.png'
-import defaultIcon from '@/assets/userIcon/defaultIcon.png'
+import { resolveUserIcon } from '@/data/userIcons'
 
 const props = defineProps({
   /** 順位（1始まり） */
@@ -62,15 +62,15 @@ const props = defineProps({
     type: Number,
     required: true,
   },
-  /** 次回参加予定の団体（未登録なら「情報なし」） */
-  status: {
-    type: String,
-    default: '情報なし',
+  /** 次回参加予定の団体（未登録なら null） */
+  nextShinkan: {
+    type: Object,
+    default: null,
   },
-  /** ユーザーアイコンのURL */
-  iconUrl: {
+  /** ユーザーアイコンのID（例: userIcon3） */
+  iconId: {
     type: String,
-    default: defaultIcon,
+    default: '',
   },
 })
 
@@ -81,6 +81,15 @@ const ribbon = computed(() => ribbons[props.rank - 1] ?? ribbonPlain)
 
 /** 上位ほどリボンを大きく見せる */
 const ribbonWidth = computed(() => (props.rank <= 3 ? 44 : 38))
+
+const iconUrl = computed(() => resolveUserIcon(props.iconId))
+
+/** 次回参加予定の団体。未登録の場合は当時と同じく「情報なし」と出す */
+const status = computed(() =>
+  props.nextShinkan?.groupName
+    ? `${props.nextShinkan.groupName} - ${props.nextShinkan.nextDate || '日程未定'}`
+    : '情報なし',
+)
 </script>
 
 <style scoped>

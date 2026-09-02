@@ -9,14 +9,14 @@ src/
 ├── assets/          # 静的アセット (リボン画像、ユーザーアイコン、チュートリアル画像など)
 ├── components/      # Vueコンポーネント
 │   ├── event/       # 新歓イベント（カレンダー・登録フォーム・編集削除）
-│   ├── my-page/     # マイページ（スタンプコレクション、プロフィール、アプリQR）
+│   ├── my-page/     # マイページ（プロフィール編集、スタンプコレクション、アプリQR）
 │   ├── qr-reader/   # QRコード読み取りとスタンプ獲得演出
 │   ├── templates/   # 共通レイアウト（BottomNavigation、ログアウト、利用規約など）
 │   ├── user-profile/# プロフィールの各項目
 │   └── user-ranking/# ランキング（表彰台・リスト行）
 ├── composables/     # ロジックの再利用単位（useStampCollection / useTopRanking など）
 ├── config/          # 定数（管理者UID、イベント優先度）
-├── data/            # 静的マスターデータ (groups.js / stamps.js)
+├── data/            # 静的マスターデータ (groups.js / stamps.js / userIcons.js)
 ├── pages/           # ルーティングに対応するページコンポーネント
 ├── router/          # Vue Routerの設定 (ルーティング定義)
 ├── store/           # Vuexストア (auth / users / event / scroll)
@@ -46,7 +46,8 @@ public/
 
 ### `src/data/`
 
-- `groups.js`: 団体マスター（114件）。イベント登録の団体セレクタに使用。
+- `groups.js`: 団体マスター（114件）。イベント登録と次回参加予定の団体セレクタに使用。
+- `userIcons.js`: 選択できるユーザーアイコン8種。Firestore には `iconId` だけを保存し、画像URLはここで解決します。
 - `stamps.js`: スタンプマスター（112件）。`stampId` と団体名・カテゴリ・画像URLの対応を持ちます。
   不変データなので Firestore ではなくリポジトリ内に置き、Firestore は「誰がどれを取得したか」だけを保持します。
 
@@ -55,6 +56,7 @@ public/
 Firestore へのアクセスはすべてここに集約します。コンポーネントから直接 Firestore を呼びません。
 
 - `stampService.js`: スタンプの付与（`grantStamp`）と取得済み一覧の読み込み。
+- `profileService.js`: プロフィール（表示名・アイコン・次回参加予定）の保存。users と rankingEntries を同時に更新。
 - `rankingService.js`: `rankingEntries` のリアルタイム購読と自分のエントリ取得。
 - `eventService.js` / `authService.js` / `userService.js` / `groupService.js` / `analyticsService.js`
 

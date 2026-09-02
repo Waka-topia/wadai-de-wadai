@@ -14,6 +14,8 @@ export const rankingLimit = 100
 const toRankingEntry = (data, index) => ({
   userId: data.userId ?? '',
   displayName: data.displayName || '名前なし',
+  iconId: data.iconId ?? '',
+  nextShinkan: data.nextShinkan ?? null,
   stampCount: data.stampCount ?? 0,
   rank: index + 1,
 })

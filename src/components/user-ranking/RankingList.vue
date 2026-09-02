@@ -19,6 +19,8 @@
         :rank="entry.rank"
         :name="entry.displayName"
         :count="entry.stampCount"
+        :icon-id="entry.iconId"
+        :next-shinkan="entry.nextShinkan"
       />
 
       <div v-if="hasMore" class="text-center mt-4">

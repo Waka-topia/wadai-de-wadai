@@ -71,16 +71,44 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
-import { useStampCollection } from '@/composables/useStampCollection'
 import { stampCategoryLabels } from '@/data/stamps'
+
+const props = defineProps({
+  /** 全スタンプ（取得済みフラグ付き） */
+  stamps: {
+    type: Array,
+    required: true,
+  },
+  /** 取得済みの数 */
+  ownedCount: {
+    type: Number,
+    default: 0,
+  },
+  /** スタンプの総数 */
+  totalCount: {
+    type: Number,
+    default: 0,
+  },
+  /** 進捗（パーセント） */
+  progressRatio: {
+    type: Number,
+    default: 0,
+  },
+  /** 読み込み中かどうか */
+  isLoading: {
+    type: Boolean,
+    default: false,
+  },
+  /** エラーメッセージ（空文字ならエラーなし） */
+  errorMessage: {
+    type: String,
+    default: '',
+  },
+})
 
 const store = useStore()
 
 const isAuthenticated = computed(() => store.getters['auth/isAuthenticated'])
-const userId = computed(() => store.getters['auth/userId'])
-
-const { stamps, ownedCount, totalCount, progressRatio, isLoading, errorMessage } =
-  useStampCollection(userId)
 
 const selectedCategory = ref('all')
 
@@ -91,8 +119,8 @@ const categoryTabs = computed(() => [
 
 const visibleStamps = computed(() =>
   selectedCategory.value === 'all'
-    ? stamps.value
-    : stamps.value.filter((stamp) => stamp.category === selectedCategory.value),
+    ? props.stamps
+    : props.stamps.filter((stamp) => stamp.category === selectedCategory.value),
 )
 </script>
 

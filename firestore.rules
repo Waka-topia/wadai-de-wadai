@@ -49,18 +49,25 @@ service cloud.firestore {
     match /rankingEntries/{uid} {
       allow read: if request.auth != null;
 
+      // 作成されるのは、初めてスタンプを取ったとき（1）か、
+      // 先にプロフィールを保存したとき（increment(0) により 0）のいずれか
       allow create: if request.auth != null
         && request.auth.uid == uid
         && request.resource.data.userId == uid
-        && request.resource.data.stampCount == 1
-        && request.resource.data.keys().hasOnly(['userId', 'displayName', 'stampCount', 'updatedAt']);
+        && request.resource.data.stampCount >= 0
+        && request.resource.data.stampCount <= 1
+        && hasOnlyRankingFields();
 
-      // 1回のスタンプ取得につき +1 のみ許可
       allow update: if request.auth != null
         && request.auth.uid == uid
         && request.resource.data.userId == uid
-        && request.resource.data.stampCount == resource.data.stampCount + 1
-        && request.resource.data.keys().hasOnly(['userId', 'displayName', 'stampCount', 'updatedAt']);
+        && hasOnlyRankingFields()
+        && (
+          // スタンプ取得: 1回につき +1 のみ許可
+          request.resource.data.stampCount == resource.data.stampCount + 1
+          // プロフィール更新: スタンプ数は変更できない
+          || request.resource.data.stampCount == resource.data.stampCount
+        );
 
       allow delete: if request.auth != null && request.auth.uid == uid;
     }
@@ -103,5 +110,21 @@ service cloud.firestore {
     // ============================================================
     // その他のコレクションはデフォルトで拒否（暗黙的）
     // ============================================================
+
+    // ============================================================
+    // ヘルパー関数
+    // ============================================================
+
+    /** rankingEntries に想定外のフィールドが混ざらないことを検証する */
+    function hasOnlyRankingFields() {
+      return request.resource.data.keys().hasOnly([
+        'userId',
+        'displayName',
+        'iconId',
+        'nextShinkan',
+        'stampCount',
+        'updatedAt'
+      ]);
+    }
   }
 }

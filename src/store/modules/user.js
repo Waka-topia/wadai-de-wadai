@@ -1,4 +1,4 @@
-import defaultIcon from '@/assets/userIcon/defaultIcon.png'
+import { defaultUserIcon } from '@/data/userIcons'
 import { fetchUserData } from '@/services/userService'
 
 const state = () => ({
@@ -6,7 +6,7 @@ const state = () => ({
     userName: 'Unknown',
     email: 'メールアドレスが設定されていません',
     userId: 'ユーザーIDが設定されていません',
-    userIconUrl: defaultIcon,
+    userIconUrl: defaultUserIcon,
     belongingOrgs: [],
   },
   isFetchedCurrentUserData: false,
@@ -61,6 +61,20 @@ const actions = {
     } catch (error) {
       throw new Error(error.message)
     }
+  },
+  /**
+   * キャッシュを無視して現在のユーザー情報を取り直す（プロフィール更新後に使う）
+   *
+   * @param {object} context - Vuexのコンテキスト
+   * @param {(type: string, payload?: unknown) => void} context.commit - Mutationをコミットする関数
+   * @param {string} userId - Firebase Auth の UID
+   */
+  async refreshCurrentUserData({ commit }, userId) {
+    if (!userId) return
+
+    const user = await fetchUserData(userId)
+    commit('setCurrentUserData', user)
+    commit('setIsFetchedCurrentUserData', true)
   },
 }
 
