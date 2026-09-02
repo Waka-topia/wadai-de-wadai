@@ -14,6 +14,7 @@
       persistent-hint
       prepend-inner-icon="mdi-domain"
       no-data-text="団体が見つかりません。一覧から選択するか正しい名称を入力してください。"
+      :menu-props="groupMenuProps"
       clearable
     />
 
@@ -91,6 +92,7 @@
 import { computed, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import { useSnackbar } from '@/composables/useSnackbar'
+import { useVirtualKeyboard } from '@/composables/useVirtualKeyboard'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { allGroups } from '@/data/groups'
 import { required } from '@/utils/forms/validate'
@@ -109,6 +111,18 @@ const emit = defineEmits(['success', 'cancel'])
 const store = useStore()
 
 const isEditMode = computed(() => !!props.initialEvent)
+
+const { isKeyboardOpen } = useVirtualKeyboard()
+
+/**
+ * 候補リストの出し方
+ *
+ * IOS Safari はキーボードが出てもビューポートが縮まないため、Vuetify が 「下に空きがある」と誤判定して候補をキーボードの裏に描画してしまう。
+ * この項目はシート上部にあり下向きに開くので、キーボードが出ている間は その上に収まる高さに抑える。
+ *
+ * @returns {object} V-autocomplete に渡す menu-props
+ */
+const groupMenuProps = computed(() => ({ maxHeight: isKeyboardOpen.value ? 160 : 300 }))
 
 // 固定値にすると年度をまたいだ時点でカレンダーから今日を選べなくなるため、今日を基準にする
 const minDate = toDateInputValue(selectableMinDate())

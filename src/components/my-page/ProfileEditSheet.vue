@@ -36,6 +36,11 @@
             <span class="text-body-2 font-weight-bold">次に行く新歓</span>
           </div>
 
+          <!--
+            iOS Safari はキーボードが出てもビューポートが縮まないため、Vuetify が
+            「下に空きがある」と判断して候補をキーボードの裏に描画してしまう。
+            シート下部の項目なので、常に上向きに開いて高さを抑える。
+          -->
           <v-autocomplete
             v-model="form.groupName"
             :items="groupNames"
@@ -43,6 +48,7 @@
             variant="outlined"
             density="comfortable"
             prepend-inner-icon="mdi-account-group-outline"
+            :menu-props="groupMenuProps"
             clearable
           />
 
@@ -72,6 +78,7 @@ import { useStore } from 'vuex'
 import UserIconPicker from '@/components/my-page/UserIconPicker.vue'
 import SheetHeader from '@/components/templates/SheetHeader.vue'
 import { useSnackbar } from '@/composables/useSnackbar'
+import { useVirtualKeyboard } from '@/composables/useVirtualKeyboard'
 import { allGroups } from '@/data/groups'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { saveProfile } from '@/services/profileService'
@@ -91,6 +98,20 @@ const form = reactive({
 })
 
 const groupNames = computed(() => allGroups.map((group) => group.name))
+
+const { isKeyboardOpen } = useVirtualKeyboard()
+
+/**
+ * 候補リストの出し方
+ *
+ * キーボードが出ている間は、下に開くとその裏に隠れてしまう。 iOS Safari はキーボードが出てもビューポートが縮まないため Vuetify が
+ * 「下に空きがある」と誤判定するので、上向きに固定し、 反転されない高さ（項目の上に必ず収まる高さ）に抑える。
+ *
+ * {object} v-autocomplete に渡す menu-props
+ */
+const groupMenuProps = computed(() =>
+  isKeyboardOpen.value ? { location: 'top', maxHeight: 160 } : { maxHeight: 300 },
+)
 const userId = computed(() => store.getters['auth/userId'])
 
 /** 現在のプロフィールをフォームに読み込んでシートを開く */
@@ -134,8 +155,9 @@ const save = async () => {
 
 <style scoped>
 .sheet-body {
-  /* キーボードが出ている分だけ縮めて、本文がその裏に回らないようにする */
-  max-height: calc(60dvh - var(--keyboard-inset, 0px));
+  /* 通常は 60dvh。キーボードが出ているときはその上に残る空間いっぱいまで使う
+     （ヘッダーぶんの 140px を差し引く） */
+  max-height: min(60dvh, calc(100dvh - var(--keyboard-inset, 0px) - 140px));
   overflow-y: auto;
 }
 </style>

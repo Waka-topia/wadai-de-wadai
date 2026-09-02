@@ -92,7 +92,7 @@ import BottomNavigation from '@/components/templates/BottomNavigation.vue'
 import DeleteAccountButton from '@/components/templates/DeleteAccountButton.vue'
 import LogOutButton from '@/components/templates/LogOut.vue'
 import { useSnackbar } from '@/composables/useSnackbar'
-import { useVirtualKeyboard } from '@/composables/useVirtualKeyboard'
+import { useVirtualKeyboard, useVirtualKeyboardWatcher } from '@/composables/useVirtualKeyboard'
 
 const router = useRouter()
 const route = useRoute()
@@ -100,6 +100,7 @@ const route = useRoute()
 const { snackbarState, closeSnackbar } = useSnackbar()
 
 // キーボードの高さを --keyboard-inset として公開する（ボトムシートが隠れないように）
+useVirtualKeyboardWatcher()
 const { isKeyboardOpen } = useVirtualKeyboard()
 
 /** 復刻対象のバージョン。ヘッダーとドロワーに表示する */
