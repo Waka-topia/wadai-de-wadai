@@ -16,7 +16,18 @@ export const fetchUserData = async (userId) => {
     const userSnap = await getDoc(userRef)
     const userData = userSnap.data()
 
-    if (!userSnap.exists()) throw new Error('ユーザーデータが見つかりません')
+    // 補完処理が終わる前に読まれることがあるため、未作成でもエラーにはしない
+    if (!userSnap.exists()) {
+      return {
+        userName: 'Unknown',
+        email: 'メールアドレスが設定されていません',
+        userId,
+        iconId: '',
+        userIconUrl: resolveUserIcon(''),
+        nextShinkan: null,
+        belongingOrgs: [],
+      }
+    }
 
     const user = {
       ...userData,

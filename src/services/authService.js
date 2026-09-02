@@ -66,6 +66,38 @@ export const resetPassword = async (oobCode, newPassword) => {
   }
 }
 
+/**
+ * ユーザードキュメントが無ければ作成する
+ *
+ * サインアップの途中で失敗した場合に Auth 側だけユーザーが残ることがあるため、 認証状態が確定するたびに補完する。描画をブロックしないよう await せずに呼び、
+ * 完了後にストアのユーザー情報を取り直す。
+ *
+ * @param {object} user - Firebase Auth のユーザー
+ * @returns {Promise<void>}
+ */
+const ensureUserDocument = async (user) => {
+  try {
+    const userRef = doc(db, 'users', user.uid)
+    const userSnap = await getDoc(userRef)
+
+    if (!userSnap.exists()) {
+      await setDoc(userRef, {
+        email: user.email,
+        displayName: user.displayName,
+        isOfficial: false,
+        isProvePending: false,
+        proveOwnerApplication: null,
+        belongingOrgs: [],
+      })
+    }
+
+    // 補完前に読み込まれた既定値（Unknown 等）を実データで置き換える
+    await store.dispatch('users/refreshCurrentUserData', user.uid)
+  } catch (error) {
+    console.error('Failed to ensure user document:', error)
+  }
+}
+
 export default {
   /**
    * 認証状態の変更を監視する
@@ -74,29 +106,21 @@ export default {
    * @returns {function(): void} 監視を解除するための unsubscribe 関数
    */
   onAuthStateChanged(callback) {
-    return onAuthStateChanged(auth, async (user) => {
+    return onAuthStateChanged(auth, (user) => {
       if (user) {
-        const idToken = await user.getIdToken()
         store.commit('auth/setUser', user)
-        store.commit('auth/setIdToken', idToken)
         store.commit('auth/setUserId', user.uid)
 
-        // 孤立ユーザー対策: signup 途中の失敗で Firestore ドキュメントが未作成の場合に補完
-        const userRef = doc(db, 'users', user.uid)
-        const userSnap = await getDoc(userRef)
-        if (!userSnap.exists()) {
-          await setDoc(userRef, {
-            email: user.email,
-            displayName: user.displayName,
-            isOfficial: false,
-            isProvePending: false,
-            proveOwnerApplication: null,
-            belongingOrgs: [],
-          })
-        }
+        // Firestore への往復を待つと初回起動が真っ白なまま数十秒止まるため、
+        // トークン取得とユーザードキュメントの補完は描画をブロックしない形で行う
+        void user.getIdToken().then((idToken) => {
+          store.commit('auth/setIdToken', idToken)
+        })
+        void ensureUserDocument(user)
       } else {
         store.commit('auth/clearAuthState')
       }
+
       if (callback) callback(user)
     })
   },
@@ -143,17 +167,20 @@ export default {
       // Firebase Authentication でユーザーを作成
       const userCredential = await createUserWithEmailAndPassword(auth, email, password)
       const user = userCredential.user
-      await updateProfile(user, { displayName: userName })
 
-      // Firestore にユーザードキュメントを作成
-      await setDoc(doc(db, 'users', user.uid), {
-        email,
-        displayName: userName,
-        isOfficial: false,
-        isProvePending: false,
-        proveOwnerApplication: null,
-        belongingOrgs: [],
-      })
+      // 表示名の更新と Firestore への登録は互いに依存しないため並列で行う
+      await Promise.all([
+        updateProfile(user, { displayName: userName }),
+        setDoc(doc(db, 'users', user.uid), {
+          email,
+          displayName: userName,
+          isOfficial: false,
+          isProvePending: false,
+          proveOwnerApplication: null,
+          belongingOrgs: [],
+        }),
+      ])
+
       return user
     } catch (error) {
       switch (error.code) {

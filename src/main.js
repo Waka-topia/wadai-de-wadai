@@ -9,25 +9,17 @@ import store from './store'
 
 let app
 
-// 認証状態の初回取得を待機してからアプリケーションをマウント
-authService.onAuthStateChanged(async (user) => {
-  if (user) {
-    const idToken = await user.getIdToken()
-    store.commit('auth/setUser', user)
-    store.commit('auth/setIdToken', idToken)
-    store.commit('auth/setUserId', user.uid)
-  } else {
-    store.commit('auth/clearAuthState')
-  }
+// 認証状態の初回確定を待ってからマウントする。
+// 認証情報のストアへの反映と Firestore のユーザードキュメント補完は
+// authService.onAuthStateChanged 側が受け持つ（後者は描画を待たせない）。
+authService.onAuthStateChanged(() => {
+  if (app) return
 
-  // 初回のみアプリをマウント
-  if (!app) {
-    app = createApp(App)
-    app.use(router)
-    app.use(store)
-    app.config.globalProperties.$authService = authService // authServiceを登録（任意）
-    app.use(vuetify)
-    setupFirebaseAnalyticsRouter(router) // analyticsのためのルート計測の登録
-    app.mount('#app')
-  }
+  app = createApp(App)
+  app.use(router)
+  app.use(store)
+  app.config.globalProperties.$authService = authService // authServiceを登録（任意）
+  app.use(vuetify)
+  setupFirebaseAnalyticsRouter(router) // analyticsのためのルート計測の登録
+  app.mount('#app')
 })
