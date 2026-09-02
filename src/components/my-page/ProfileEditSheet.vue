@@ -70,7 +70,7 @@
           <v-btn variant="text" :disabled="isSaving" @click="isOpen = false">キャンセル</v-btn>
           <v-spacer />
           <v-btn
-            class="font-weight-bold"
+            class="text-white font-weight-bold"
             color="orange"
             variant="flat"
             rounded="pill"
