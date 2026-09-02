@@ -56,7 +56,7 @@
           <component :is="Component" />
         </keep-alive>
       </router-view>
-      <div class="mb-6">
+      <div v-if="!isKeyboardOpen" class="mb-6">
         <v-footer app>
           <span>&copy; 2026 和大DE話題</span>
         </v-footer>
@@ -81,7 +81,7 @@
       </template>
     </v-snackbar>
   </v-app>
-  <BottomNavigation v-if="showBottomNavigation" />
+  <BottomNavigation v-if="showBottomNavigation && !isKeyboardOpen" />
 </template>
 
 <script setup>
@@ -100,7 +100,7 @@ const route = useRoute()
 const { snackbarState, closeSnackbar } = useSnackbar()
 
 // キーボードの高さを --keyboard-inset として公開する（ボトムシートが隠れないように）
-useVirtualKeyboard()
+const { isKeyboardOpen } = useVirtualKeyboard()
 
 /** 復刻対象のバージョン。ヘッダーとドロワーに表示する */
 const appVersion = '1.0.0'
