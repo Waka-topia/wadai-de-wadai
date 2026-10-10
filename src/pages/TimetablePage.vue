@@ -144,7 +144,7 @@ import LectureEditorModal from '@/components/timetable/LectureEditorModal.vue'
 
 const store = useStore()
 const router = useRouter()
-const { showSnackbar } = useSnackbar()
+const { notifySuccess } = useSnackbar()
 
 useFirebasePageView('view_timetable', () => ({ loggedIn: store.getters['auth/isAuthenticated'] }))
 const sheetState = ref({
@@ -257,13 +257,13 @@ const handleChoiceManual = () => {
 
 const handleLectureSave = ({ day, periods, lecture }) => {
   store.dispatch('timetable/saveLecture', { day, periods, lecture })
-  showSnackbar(`「${lecture.name}」を保存しました`, 'success', { icon: 'mdi-check-circle' })
+  notifySuccess(`「${lecture.name}」を保存しました`)
   sheetState.value.active = null
 }
 
 const handleLectureDelete = ({ day, periods, lectureId }) => {
   store.dispatch('timetable/removeLecture', { day, periods, lectureId })
-  showSnackbar('講義を削除しました', 'success', { icon: 'mdi-check-circle' })
+  notifySuccess('講義を削除しました')
   sheetState.value.active = null
 }
 </script>

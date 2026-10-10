@@ -243,7 +243,7 @@ const selectedLectureName = ref(null)
 const isSyllabusModalOpen = ref(false)
 const isSaving = ref(false)
 
-const { showSnackbar } = useSnackbar()
+const { notifySuccess, notifyError } = useSnackbar()
 
 // 手動追加フォーム用
 const isManualAddSheetOpen = ref(false)
@@ -326,9 +326,7 @@ const addAndRegisterSyllabus = async () => {
 /** 新規シラバスをマスターデータとして登録し、時間割にも追加する */
 const registerAndSave = async () => {
   if (!isLoggedIn.value) {
-    showSnackbar('シラバスを登録するにはログインが必要です。', 'error', {
-      icon: 'mdi-alert-circle',
-    })
+    notifyError('シラバスを登録するにはログインが必要です。')
     return
   }
 
@@ -348,9 +346,7 @@ const registerAndSave = async () => {
     })
 
     // 完了フィードバック
-    showSnackbar(`「${lectureName}」をみんなのシラバスに登録しました！`, 'success', {
-      icon: 'mdi-check-circle',
-    })
+    notifySuccess(`「${lectureName}」をみんなのシラバスに登録しました！`)
 
     // 再取得後に検索結果に反映
     searchQuery.value = lectureName

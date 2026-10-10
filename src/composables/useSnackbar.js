@@ -13,6 +13,8 @@ const showCloseButton = ref(false)
  *
  * @returns {{
  *   showSnackbar: (msg: string, clr?: string, options?: object) => void
+ *   notifySuccess: (msg: string, options?: object) => void
+ *   notifyError: (errorOrMsg: Error | string, options?: object) => void
  *   closeSnackbar: () => void
  *   snackbarState: object
  * }}
@@ -38,6 +40,27 @@ export const useSnackbar = () => {
     show.value = true
   }
 
+  /**
+   * 成功メッセージをチェックアイコン付きで表示する
+   *
+   * @param {string} msg - 表示するメッセージ
+   * @param {object} [options] - ShowSnackbar と同じ追加オプション
+   */
+  const notifySuccess = (msg, options = {}) => {
+    showSnackbar(msg, 'success', { icon: 'mdi-check-circle', ...options })
+  }
+
+  /**
+   * エラーメッセージを警告アイコン付きで表示する
+   *
+   * @param {Error | string} errorOrMsg - Error を渡した場合は message を表示する
+   * @param {object} [options] - ShowSnackbar と同じ追加オプション
+   */
+  const notifyError = (errorOrMsg, options = {}) => {
+    const msg = errorOrMsg instanceof Error ? errorOrMsg.message : errorOrMsg
+    showSnackbar(msg, 'error', { icon: 'mdi-alert-circle', ...options })
+  }
+
   /** スナックバーを閉じる */
   const closeSnackbar = () => {
     show.value = false
@@ -45,5 +68,5 @@ export const useSnackbar = () => {
 
   const snackbarState = reactive({ show, message, color, timeout, icon, showCloseButton })
 
-  return { showSnackbar, closeSnackbar, snackbarState }
+  return { showSnackbar, notifySuccess, notifyError, closeSnackbar, snackbarState }
 }

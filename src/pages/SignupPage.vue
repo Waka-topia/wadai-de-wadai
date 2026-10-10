@@ -172,7 +172,7 @@ const agree = ref(false)
 const isLoading = ref(false)
 const dialog = ref(false)
 
-const { showSnackbar } = useSnackbar()
+const { notifySuccess, notifyError } = useSnackbar()
 
 // ★ 追加: 規約を読んだかどうかを判定するフラグ
 const hasReadTerms = ref(false)
@@ -206,7 +206,7 @@ const onSubmit = async (validationPromise) => {
 
     void logFirebaseAnalyticsEvent('signup_submit_success', {})
 
-    showSnackbar('サインアップしました', 'success', { icon: 'mdi-check-circle' })
+    notifySuccess('サインアップしました')
 
     setTimeout(() => {
       router.push('/login')
@@ -215,7 +215,7 @@ const onSubmit = async (validationPromise) => {
     void logFirebaseAnalyticsEvent('signup_submit_error', {
       errorCode: String(error?.code || 'unknown'),
     })
-    showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
+    notifyError(error)
   } finally {
     isLoading.value = false
   }

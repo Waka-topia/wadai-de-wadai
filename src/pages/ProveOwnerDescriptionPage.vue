@@ -194,7 +194,7 @@ const userId = computed(() => store.getters['auth/userId'])
 const isLoading = ref(false)
 const copied = ref(false)
 
-const { showSnackbar } = useSnackbar()
+const { notifyError } = useSnackbar()
 
 const fetchApplicantData = async () => {
   try {
@@ -202,7 +202,7 @@ const fetchApplicantData = async () => {
 
     applicant.value = await getProveOwnerApplicantService(userId.value)
   } catch (error) {
-    showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
+    notifyError(error)
   } finally {
     isLoading.value = false
   }
@@ -220,7 +220,7 @@ const copyTempId = async () => {
       }, 2000)
     }
   } catch (error) {
-    showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
+    notifyError(error)
   }
 }
 

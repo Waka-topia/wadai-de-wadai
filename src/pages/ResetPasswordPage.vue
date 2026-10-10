@@ -63,7 +63,7 @@ const form = ref(false)
 const isLoading = ref(false)
 const oobCode = ref('')
 
-const { showSnackbar } = useSnackbar()
+const { notifySuccess, notifyError } = useSnackbar()
 
 const route = useRoute()
 const router = useRouter()
@@ -86,7 +86,7 @@ const onSubmit = async () => {
 
     void logFirebaseAnalyticsEvent('reset_password_submit_success', {})
 
-    showSnackbar('パスワードを変更しました。', 'success', { icon: 'mdi-check-circle' })
+    notifySuccess('パスワードを変更しました。')
 
     setTimeout(() => {
       router.push('/login')
@@ -95,7 +95,7 @@ const onSubmit = async () => {
     void logFirebaseAnalyticsEvent('reset_password_submit_error', {
       errorCode: String(error?.code || 'unknown'),
     })
-    showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
+    notifyError(error)
   } finally {
     isLoading.value = false
   }
