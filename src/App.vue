@@ -251,14 +251,17 @@ v-app-bar-title {
 
 /* --- PC 表示での本文の最大幅（md 以上） --- */
 @media (min-width: 960px) {
-  .page-frame--narrow {
+  .page-frame--narrow,
+  .page-frame--wide {
     max-width: 720px;
     margin: 0 auto;
   }
+}
 
+/* wide のページは 2 列になる lg 以上でだけ広げる（md では 1 列なので narrow と同じ幅にする） */
+@media (min-width: 1280px) {
   .page-frame--wide {
     max-width: 1200px;
-    margin: 0 auto;
   }
 }
 </style>
