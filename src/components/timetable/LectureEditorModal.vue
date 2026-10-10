@@ -142,7 +142,7 @@
     </div>
     <v-item-group v-model="form.color" class="mb-4 d-flex flex-wrap ga-2" mandatory>
       <v-item
-        v-for="(colorDef, colorKey) in colorPalette"
+        v-for="(colorDef, colorKey) in lectureColorPalette"
         v-slot="{ isSelected, toggle }"
         :key="colorKey"
         :value="colorKey"
@@ -204,6 +204,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { useStore } from 'vuex'
+import { lectureColorPalette, weekdays } from '@/config/timetable'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { required } from '@/utils/forms/validate'
 import LectureReviewPanel from '@/components/timetable/LectureReviewPanel.vue'
@@ -249,16 +250,6 @@ const quarterSelectValue = computed({
   },
 })
 
-const colorPalette = {
-  orange: { border: '#ff9800' },
-  red: { border: '#e91e63' },
-  blue: { border: '#2196f3' },
-  green: { border: '#4caf50' },
-  purple: { border: '#9c27b0' },
-  teal: { border: '#009688' },
-  indigo: { border: '#3f51b5' },
-  brown: { border: '#795548' },
-}
 const requiredItems = [
   { label: '必修', value: 'req' },
   { label: '選択必修', value: 'semi' },
@@ -324,13 +315,7 @@ const currentLectureName = computed(() =>
 
 // 既存講義の判定は「編集用IDを持っているか」で行う
 const isExistingLecture = computed(() => !!form.value.id)
-const dayOptions = [
-  { title: '月曜日', value: 'mon' },
-  { title: '火曜日', value: 'tue' },
-  { title: '水曜日', value: 'wed' },
-  { title: '木曜日', value: 'thu' },
-  { title: '金曜日', value: 'fri' },
-]
+const dayOptions = weekdays.map(({ value, label }) => ({ title: `${label}曜日`, value }))
 
 watch(
   () => props.selectedCell,

@@ -79,19 +79,19 @@
 <script setup>
 import { computed } from 'vue'
 import { useStore } from 'vuex'
-import { periodTimes } from '@/config/timetable'
+import {
+  getWeekdayCode,
+  lectureColorPalette,
+  periodTimes,
+  requiredColors,
+  weekdays,
+} from '@/config/timetable'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 
 defineProps({
   days: {
     type: Array,
-    default: () => [
-      { label: '月', value: 'mon' },
-      { label: '火', value: 'tue' },
-      { label: '水', value: 'wed' },
-      { label: '木', value: 'thu' },
-      { label: '金', value: 'fri' },
-    ],
+    default: () => [...weekdays],
   },
   periods: { type: Array, default: () => [1, 2, 3, 4, 5, 6] },
 })
@@ -114,8 +114,7 @@ const getLectures = (day, period) => store.getters['timetable/getLectures'](day,
 const getPeriodStart = (period) => periodTimes[period]?.start || ''
 const getPeriodEnd = (period) => periodTimes[period]?.end || ''
 
-const dayCodeMap = { 1: 'mon', 2: 'tue', 3: 'wed', 4: 'thu', 5: 'fri' }
-const todayCode = computed(() => dayCodeMap[new Date().getDay()] || '')
+const todayCode = computed(() => getWeekdayCode())
 const isToday = (dayValue) => todayCode.value === dayValue
 
 const isCurrentPeriod = (period) => {
@@ -126,28 +125,17 @@ const isCurrentPeriod = (period) => {
   return nowMin >= sh * 60 + sm && nowMin <= eh * 60 + em
 }
 
-const colorPalette = {
-  orange: { bg: '#fff3e0', border: '#ff9800', text: '#e65100', sub: '#ef6c00' },
-  red: { bg: '#fce4ec', border: '#e91e63', text: '#c2185b', sub: '#e91e63' },
-  blue: { bg: '#e3f2fd', border: '#2196f3', text: '#1565c0', sub: '#1976d2' },
-  green: { bg: '#e8f5e9', border: '#4caf50', text: '#2e7d32', sub: '#388e3c' },
-  purple: { bg: '#f3e5f5', border: '#9c27b0', text: '#6a1b9a', sub: '#8e24aa' },
-  teal: { bg: '#e0f2f1', border: '#009688', text: '#00695c', sub: '#00897b' },
-  indigo: { bg: '#e8eaf6', border: '#3f51b5', text: '#283593', sub: '#3949ab' },
-  brown: { bg: '#efebe9', border: '#795548', text: '#4e342e', sub: '#6d4c41' },
-}
-
 const getLectureCardStyle = (lecture) => {
   if (!lecture) return {}
-  const color = colorPalette[lecture.color] || colorPalette.orange
+  const color = lectureColorPalette[lecture.color] || lectureColorPalette.orange
   let leftBorderColor = color.border
   let leftBorderWidth = '4px'
 
   if (lecture.required === 'req' || lecture.required === 'required') {
-    leftBorderColor = '#e53935'
+    leftBorderColor = requiredColors.req
     leftBorderWidth = '6px'
   } else if (lecture.required === 'semi' || lecture.required === 'semi-required') {
-    leftBorderColor = '#8e24aa'
+    leftBorderColor = requiredColors.semi
     leftBorderWidth = '6px'
   }
 

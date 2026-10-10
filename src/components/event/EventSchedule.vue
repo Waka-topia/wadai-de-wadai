@@ -134,6 +134,7 @@ import { useRouter } from 'vue-router'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { adminUserId } from '@/config/constants'
 import { hashValue } from '@/utils/crypto'
+import { formatShortDateWeekday, parseDateKey } from '@/utils/dateFormatter'
 
 const router = useRouter()
 const store = useStore()
@@ -181,20 +182,12 @@ const displayEvents = computed(() => {
 })
 
 /**
- * 日付文字列を M/D 形式にフォーマットする
+ * 日付文字列を M/D(曜) 形式にフォーマットする
  *
  * @param {string} dateStr - YYYY-MM-DD 形式の日付文字列
- * @returns {string} M/D 形式
+ * @returns {string} M/D(曜) 形式
  */
-const formatDate = (dateStr) => {
-  if (!dateStr) return ''
-  const [year, month, day] = dateStr.split('-').map(Number)
-  // 'YYYY-MM-DD' を new Date に渡すと UTC として解釈されるため、現地時間で作る
-  const date = new Date(year, month - 1, day)
-  const weekdays = ['日', '月', '火', '水', '木', '金', '土']
-  const weekday = weekdays[date.getDay()]
-  return `${month}/${day}(${weekday})`
-}
+const formatDate = (dateStr) => (dateStr ? formatShortDateWeekday(parseDateKey(dateStr)) : '')
 </script>
 
 <style scoped>

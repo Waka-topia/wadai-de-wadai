@@ -72,6 +72,8 @@ import BottomNavigation from '@/components/templates/BottomNavigation.vue'
 import DeleteAccountButton from '@/components/templates/DeleteAccountButton.vue'
 import LogOutButton from '@/components/templates/LogOut.vue'
 import { useSnackbar } from '@/composables/useSnackbar'
+import { inquiryFormUrl, instagramUrl } from '@/config/constants'
+import { openExternalLink } from '@/utils/externalLink'
 
 const router = useRouter()
 const route = useRoute()
@@ -142,10 +144,7 @@ const checkFullscreenPage = (currentRoute) => {
 }
 
 const gotoinquiry = () => {
-  window.open(
-    'https://docs.google.com/forms/d/e/1FAIpQLScqjOjJ8B3XcSEH5d__94ucGD00FVqIbIJe2hq2MxUodczL7Q/viewform?usp=dialog',
-    '_blank',
-  )
+  openExternalLink(inquiryFormUrl)
 }
 
 const gotorule = () => {
@@ -154,7 +153,7 @@ const gotorule = () => {
 
 /** 公式Instagramを開く */
 const gotoInstagram = () => {
-  window.open('https://instagram.com/wakatopia_official', '_blank')
+  openExternalLink(instagramUrl)
 }
 
 watch(
