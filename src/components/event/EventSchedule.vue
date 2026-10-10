@@ -76,7 +76,7 @@
               >
                 {{ event.organizerName }}
               </p>
-              <!-- 概要が無い・短いときもカードの高さが変わらないよう、常に 2 行分を確保する -->
+              <!-- 概要は 1 行で、長いものは … で省略する。概要が無いときも 1 行分を確保して高さを揃える -->
               <p class="text-body-2 text-grey-darken-1 mb-2 pr-6 description-text">
                 {{ event.description }}
               </p>
@@ -230,13 +230,11 @@ const formatDate = (dateStr) => (dateStr ? formatShortDateWeekday(parseDateKey(d
 
 /* --- 概要テキスト --- */
 .description-text {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   line-height: 1.5;
-  min-height: 3em;
+  min-height: 1.5em;
 }
 
 .location-row {
