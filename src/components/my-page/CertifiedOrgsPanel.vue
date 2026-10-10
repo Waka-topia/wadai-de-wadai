@@ -2,10 +2,10 @@
   <!-- 代表者として証明（承認）された団体。承認時に users の belongingOrgs に追加される -->
   <ExpandableSection
     icon="mdi-domain"
-    title="代表者として証明済みの団体"
+    title="団体の代表者証明"
     content-class="bg-grey-lighten-4 pt-4"
   >
-    <ProfileInfoItem icon="mdi-check-decagram" label="団体名">
+    <ProfileInfoItem icon="mdi-check-decagram" label="証明済みの団体">
       <div v-if="orgNames.length === 0" class="text-body-2 text-grey">
         証明済みの団体はありません
       </div>
@@ -22,6 +22,8 @@
         </v-chip>
       </div>
     </ProfileInfoItem>
+
+    <ProveOwnerCard class="mt-2" />
   </ExpandableSection>
 </template>
 
@@ -31,6 +33,7 @@ import { useStore } from 'vuex'
 import { allGroups } from '@/data/groups'
 import ExpandableSection from '@/components/common/ExpandableSection.vue'
 import ProfileInfoItem from '@/components/my-page/ProfileInfoItem.vue'
+import ProveOwnerCard from '@/components/my-page/ProveOwnerCard.vue'
 
 const store = useStore()
 const user = computed(() => store.getters['users/currentUserData'])
