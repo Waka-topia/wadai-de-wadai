@@ -5,15 +5,7 @@
       <v-icon>mdi-arrow-left</v-icon>
     </v-btn>
 
-    <v-alert
-      v-if="fetchErrorMessage"
-      type="error"
-      variant="tonal"
-      class="mb-4"
-      icon="mdi-alert-circle"
-    >
-      {{ fetchErrorMessage }}
-    </v-alert>
+    <ErrorState v-if="fetchErrorMessage" :message="fetchErrorMessage" />
 
     <v-card
       v-else-if="event.eventId"
@@ -185,10 +177,7 @@
       </div>
     </v-card>
 
-    <v-card v-else rounded="lg" elevation="2" class="pa-6 text-center">
-      <v-progress-circular indeterminate color="orange" size="28" class="mr-2" />
-      読み込み中...
-    </v-card>
+    <LoadingState v-else message="読み込み中..." />
 
     <ClaimEventDialog
       v-model="claimDialogOpen"
@@ -226,6 +215,8 @@ import { isUserRepresentative } from '@/services/groupService'
 import { useSnackbar } from '@/composables/useSnackbar'
 import { useProxyEvent } from '@/composables/useProxyEvent'
 import EventStatusChips from '@/components/event/EventStatusChips.vue'
+import ErrorState from '@/components/common/ErrorState.vue'
+import LoadingState from '@/components/common/LoadingState.vue'
 import BaseBottomSheet from '@/components/common/BaseBottomSheet.vue'
 import BaseDialog from '@/components/common/BaseDialog.vue'
 import ClaimEventDialog from '@/components/event/ClaimEventDialog.vue'

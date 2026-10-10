@@ -32,20 +32,10 @@
     </v-alert>
 
     <!-- エラー表示 -->
-    <v-alert
-      v-if="syllabusError"
-      type="error"
-      variant="tonal"
-      class="mb-4 rounded-lg"
-      density="compact"
-    >
-      {{ syllabusError }}
-    </v-alert>
+    <ErrorState v-if="syllabusError" :message="syllabusError" />
 
     <!-- 検索中ローディング -->
-    <div v-if="isSearching" class="text-center py-8">
-      <v-progress-circular indeterminate color="orange" />
-    </div>
+    <LoadingState v-if="isSearching" />
 
     <!-- 検索結果リスト -->
     <div v-else-if="isSearched">
@@ -109,10 +99,11 @@
     </div>
 
     <!-- 初回表示（検索前）の案内 -->
-    <div v-else-if="!isSearched" class="text-center py-8">
-      <v-icon size="64" color="grey-lighten-1" class="mb-3">mdi-book-search</v-icon>
-      <p class="text-body-2 text-grey">気になる講義名を検索しましょう</p>
-    </div>
+    <EmptyState
+      v-else-if="!isSearched"
+      icon="mdi-book-search"
+      title="気になる講義名を検索しましょう"
+    />
 
     <!-- シラバス閲覧・登録用モーダル -->
     <BaseBottomSheet
@@ -193,6 +184,9 @@ import { dayLabels } from '@/config/timetable'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import BaseBottomSheet from '@/components/common/BaseBottomSheet.vue'
 import BaseDialog from '@/components/common/BaseDialog.vue'
+import EmptyState from '@/components/common/EmptyState.vue'
+import ErrorState from '@/components/common/ErrorState.vue'
+import LoadingState from '@/components/common/LoadingState.vue'
 import LectureEditorModal from '@/components/timetable/LectureEditorModal.vue'
 import LectureSyllabusPanel from '@/components/timetable/LectureSyllabusPanel.vue'
 

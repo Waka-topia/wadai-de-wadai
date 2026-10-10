@@ -1,21 +1,20 @@
 <template>
   <div class="event-schedule">
     <!-- 空状態 -->
-    <div v-if="displayEvents.length === 0" class="no-events-container">
-      <v-icon size="48" color="grey-lighten-1" class="mb-3">
-        {{ props.events ? 'mdi-calendar-search' : 'mdi-calendar-blank-outline' }}
-      </v-icon>
-      <p class="text-body-1 font-weight-bold text-grey-darken-1 mb-1">
-        {{ props.events ? '該当するイベントはありません' : 'この日のイベントはありません' }}
-      </p>
-      <p class="text-caption text-grey">
-        {{
-          props.events
-            ? '別のキーワードで試してみてください'
-            : '別の日をカレンダーから選択してください'
-        }}
-      </p>
-    </div>
+    <EmptyState
+      v-if="displayEvents.length === 0 && props.events"
+      class="no-events-container"
+      icon="mdi-calendar-search"
+      title="該当するイベントはありません"
+      message="別のキーワードで試してみてください"
+    />
+    <EmptyState
+      v-else-if="displayEvents.length === 0"
+      class="no-events-container"
+      icon="mdi-calendar-blank-outline"
+      title="この日のイベントはありません"
+      message="別の日をカレンダーから選択してください"
+    />
 
     <!-- イベントカードリスト -->
     <div v-else class="d-flex flex-column ga-3">
@@ -117,6 +116,7 @@ import { useRouter } from 'vue-router'
 import { useProxyEvent } from '@/composables/useProxyEvent'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { formatShortDateWeekday, parseDateKey } from '@/utils/dateFormatter'
+import EmptyState from '@/components/common/EmptyState.vue'
 import EventStatusChips from '@/components/event/EventStatusChips.vue'
 
 const router = useRouter()

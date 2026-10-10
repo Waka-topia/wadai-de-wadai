@@ -1,13 +1,9 @@
 <template>
   <v-container fluid class="pa-0">
-    <div v-if="!job && !error" class="text-center mt-16">
-      <v-progress-circular indeterminate color="orange" size="64"></v-progress-circular>
-      <p class="mt-4 text-grey">求人情報を読み込み中...</p>
-    </div>
+    <LoadingState v-if="!job && !error" class="mt-8" message="求人情報を読み込み中..." />
 
-    <div v-else-if="error" class="text-center mt-16 text-error">
-      <v-icon size="64" color="error">mdi-alert-circle</v-icon>
-      <p class="mt-4">{{ error }}</p>
+    <div v-else-if="error" class="pa-4">
+      <ErrorState :message="error" />
     </div>
 
     <div v-else class="bg-white position-relative">
@@ -149,6 +145,8 @@ import { computed, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { useRoute } from 'vue-router'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import ErrorState from '@/components/common/ErrorState.vue'
+import LoadingState from '@/components/common/LoadingState.vue'
 import BookMarkButton from '@/components/recruit/BookMarkButton.vue'
 import JobLocationMap from '@/components/recruit/JobLocationMap.vue'
 

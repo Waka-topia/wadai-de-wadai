@@ -53,17 +53,15 @@
                 </span>
               </td>
             </tr>
-
-            <tr v-if="!isLoading && applicants.length === 0">
-              <td class="text-center py-6" colspan="7">申請データはありません</td>
-            </tr>
           </tbody>
         </v-table>
       </div>
 
-      <div v-if="!isLoading && applicants.length === 0" class="d-md-none text-center py-6">
-        申請データはありません
-      </div>
+      <EmptyState
+        v-if="!isLoading && applicants.length === 0"
+        icon="mdi-inbox-outline"
+        title="申請データはありません"
+      />
 
       <v-row v-else class="d-md-none" dense>
         <v-col v-for="applicant in applicants" :key="applicant.applicationId" cols="12">
@@ -119,6 +117,7 @@ import { useFirebasePageView } from '@/composables/useFirebasePageView'
 import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { formatDateTimeJa } from '@/utils/dateFormatter'
+import EmptyState from '@/components/common/EmptyState.vue'
 import {
   getProveOwnerApplicantsService,
   updateProveOwnerApprovalService,
