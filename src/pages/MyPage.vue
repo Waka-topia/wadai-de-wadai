@@ -6,15 +6,17 @@
 
     <BasicInfoPanel class="mt-4" />
 
+    <CertifiedOrgsPanel class="mt-4" />
+
     <AppQRCode class="mt-4" />
     <div class="my-8 text-center">
       <v-btn
         to="/tutorial"
-        class="text-white font-weight-bold"
+        class="font-weight-bold"
         size="large"
-        color="orange"
-        elevation="3"
-        rounded
+        color="orange-darken-2"
+        elevation="0"
+        rounded="pill"
       >
         スマホアプリとして使う方法を見る
       </v-btn>
@@ -33,6 +35,7 @@ import { useFirebasePageView } from '@/composables/useFirebasePageView'
 // 分割したコンポーネント群のインポート
 import ProfileHeader from '@/components/my-page/ProfileHeader.vue'
 import BasicInfoPanel from '@/components/my-page/BasicInfoPanel.vue'
+import CertifiedOrgsPanel from '@/components/my-page/CertifiedOrgsPanel.vue'
 import AppQRCode from '@/components/my-page/AppQRCode.vue'
 import ContactBanner from '@/components/my-page/ContactBanner.vue'
 import RecommendLogin from '@/components/templates/RecommendLogin.vue'
