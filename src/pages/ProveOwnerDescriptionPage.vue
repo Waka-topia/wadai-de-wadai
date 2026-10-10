@@ -54,32 +54,7 @@
 
       <!-- 手順セクション -->
       <SectionLabel icon="mdi-format-list-numbered" title="申請の流れ" />
-      <div class="d-flex flex-column ga-3 mb-6">
-        <div class="d-flex align-center ga-3">
-          <v-avatar color="orange-darken-2" size="28" class="flex-shrink-0">
-            <span class="text-caption font-weight-bold text-white">1</span>
-          </v-avatar>
-          <p class="text-body-2 mb-0">上の一時IDをコピー</p>
-        </div>
-        <div class="d-flex align-center ga-3">
-          <v-avatar color="orange-darken-2" size="28" class="flex-shrink-0">
-            <span class="text-caption font-weight-bold text-white">2</span>
-          </v-avatar>
-          <p class="text-body-2 mb-0">団体の公式SNSを確認</p>
-        </div>
-        <div class="d-flex align-center ga-3">
-          <v-avatar color="orange-darken-2" size="28" class="flex-shrink-0">
-            <span class="text-caption font-weight-bold text-white">3</span>
-          </v-avatar>
-          <p class="text-body-2 mb-0">下記のアプリ運営アカウントにDMで一時IDを送信</p>
-        </div>
-        <div class="d-flex align-center ga-3">
-          <v-avatar color="orange-darken-2" size="28" class="flex-shrink-0">
-            <span class="text-caption font-weight-bold text-white">4</span>
-          </v-avatar>
-          <p class="text-body-2 mb-0">審査完了を待機</p>
-        </div>
-      </div>
+      <StepFlow class="mb-6" :steps="applicationSteps" vertical />
 
       <v-divider class="mb-6" />
 
@@ -178,10 +153,19 @@ import { openExternalLink } from '@/utils/externalLink'
 import EmptyState from '@/components/common/EmptyState.vue'
 import LoadingState from '@/components/common/LoadingState.vue'
 import SectionLabel from '@/components/common/SectionLabel.vue'
+import StepFlow from '@/components/event/StepFlow.vue'
 
 const store = useStore()
 
 useFirebasePageView('view_prove_owner_description', {})
+
+// 代表者証明の申請手順
+const applicationSteps = [
+  { label: '上の一時IDをコピー' },
+  { label: '団体の公式SNSを確認' },
+  { label: '下記のアプリ運営アカウントにDMで一時IDを送信' },
+  { label: '審査完了を待機' },
+]
 
 const applicant = ref(null)
 const userId = computed(() => store.getters['auth/userId'])

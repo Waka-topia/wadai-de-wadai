@@ -112,28 +112,7 @@
           </div>
 
           <!-- 3ステップ -->
-          <div class="d-flex align-center justify-center ga-1 mb-3 flex-nowrap">
-            <div class="step-item text-center">
-              <v-avatar color="orange" size="22" class="mb-1">
-                <span class="step-num font-weight-bold text-white">1</span>
-              </v-avatar>
-              <p class="step-label font-weight-bold mb-0">引き継ぎ申請</p>
-            </div>
-            <v-icon size="14" color="grey-darken-1">mdi-chevron-right</v-icon>
-            <div class="step-item text-center">
-              <v-avatar color="blue" size="22" class="mb-1">
-                <span class="step-num font-weight-bold text-white">2</span>
-              </v-avatar>
-              <p class="step-label font-weight-bold mb-0">公式マーク付与</p>
-            </div>
-            <v-icon size="14" color="grey-darken-1">mdi-chevron-right</v-icon>
-            <div class="step-item text-center">
-              <v-avatar color="green" size="22" class="mb-1">
-                <span class="step-num font-weight-bold text-white">3</span>
-              </v-avatar>
-              <p class="step-label font-weight-bold mb-0">自由に編集</p>
-            </div>
-          </div>
+          <StepFlow class="mb-3" :steps="claimSteps" />
 
           <v-btn
             color="orange"
@@ -215,6 +194,7 @@ import { isUserRepresentative } from '@/services/groupService'
 import { useSnackbar } from '@/composables/useSnackbar'
 import { useProxyEvent } from '@/composables/useProxyEvent'
 import EventStatusChips from '@/components/event/EventStatusChips.vue'
+import StepFlow from '@/components/event/StepFlow.vue'
 import ErrorState from '@/components/common/ErrorState.vue'
 import LoadingState from '@/components/common/LoadingState.vue'
 import BaseBottomSheet from '@/components/common/BaseBottomSheet.vue'
@@ -274,6 +254,13 @@ watch(
 
 /** イベントが運営による代理登録かどうかを判定する */
 const isProxyEvent = computed(() => checkProxyEvent(event.value))
+
+// 代理登録イベントを引き継ぐ流れ
+const claimSteps = [
+  { label: '引き継ぎ申請', color: 'orange' },
+  { label: '公式マーク付与', color: 'blue' },
+  { label: '自由に編集', color: 'green' },
+]
 
 /** 編集・削除権限があるかどうかを判定する (作成者本人 or 管理者 or 団体の代表者) */
 const canEdit = computed(() => {
@@ -343,14 +330,5 @@ onMounted(async () => {
   max-width: 720px;
   margin: 0 auto;
   padding: 8px 16px 40px;
-}
-
-.step-label {
-  font-size: 10px;
-  white-space: nowrap;
-}
-
-.step-num {
-  font-size: 10px;
 }
 </style>
