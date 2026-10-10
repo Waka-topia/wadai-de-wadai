@@ -132,6 +132,16 @@ const handleNext = () => {
   pointer-events: none;
 }
 
+/* PC ではサイドナビ（256px）を避け、本文と同じ 720px の範囲に収める。下部バーも無いので下端に寄せる */
+@media (min-width: 960px) {
+  .floating-nav-container {
+    left: 256px;
+    max-width: 720px;
+    margin: 0 auto;
+    bottom: 24px;
+  }
+}
+
 /* ボタン自体はクリック判定を有効化し、サイズを明示的に大きくする */
 .floating-nav-container .v-btn {
   pointer-events: auto;

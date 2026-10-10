@@ -116,10 +116,7 @@
 
       <div class="text-black text-h6 font-weight-bold text-wrap px-6 py-4">休日休暇</div>
 
-      <div
-        class="position-fixed d-flex align-center justify-center w-100 px-4"
-        style="z-index: 10; bottom: calc(10% + 24px); left: 0"
-      >
+      <div class="apply-bar d-flex align-center justify-center px-4">
         <v-btn
           color="orange"
           variant="elevated"
@@ -167,3 +164,24 @@ onMounted(() => {
 
 const job = computed(() => store.getters.currentJobWithBookmark)
 </script>
+
+<style scoped>
+/* 応募ボタンのバー。スマホでは下部バーの上に浮かせる */
+.apply-bar {
+  position: fixed;
+  z-index: 10;
+  bottom: calc(10% + 24px);
+  left: 0;
+  right: 0;
+}
+
+/* PC ではサイドナビ（256px）を避けて本文と同じ 720px の範囲に収め、下部バーが無いので下端に寄せる */
+@media (min-width: 960px) {
+  .apply-bar {
+    left: 256px;
+    max-width: 720px;
+    margin: 0 auto;
+    bottom: 24px;
+  }
+}
+</style>
