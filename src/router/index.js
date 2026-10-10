@@ -67,6 +67,16 @@ const routes = [
     component: () => import('@/pages/RulePage.vue'),
   },
   {
+    path: '/groups',
+    name: 'GroupListPage',
+    component: () => import('@/pages/GroupListPage.vue'),
+  },
+  {
+    path: '/groups/:id',
+    name: 'GroupDetailPage',
+    component: () => import('@/pages/GroupDetailPage.vue'),
+  },
+  {
     path: '/jobs',
     name: 'RecruitPage',
     // component: () => import('@/pages/RecruitPage.vue'),

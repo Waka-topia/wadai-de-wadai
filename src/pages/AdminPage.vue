@@ -2,7 +2,10 @@
   <v-progress-linear v-if="isLoading" color="success" indeterminate=""></v-progress-linear>
 
   <v-sheet class="pa-6" rounded>
-    <v-card class="pa-4">
+    <!-- =========================
+      代表者証明 申請者一覧
+      ========================== -->
+    <v-card class="pa-4 mb-6">
       <h1 class="text-h5 mb-4">代表者証明 申請者一覧</h1>
 
       <div class="mb-4">
@@ -109,6 +112,8 @@
         </v-col>
       </v-row>
     </v-card>
+    <!-- 団体情報管理 -->
+    <GroupManagementCard />
   </v-sheet>
 </template>
 
@@ -122,6 +127,7 @@ import {
   getProveOwnerApplicantsService,
   updateProveOwnerApprovalService,
 } from '@/services/proveService'
+import GroupManagementCard from '@/components/admin/GroupManagementCard.vue'
 
 useFirebasePageView('view_admin', {})
 
