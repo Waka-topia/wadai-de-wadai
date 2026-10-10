@@ -5,7 +5,7 @@
         <v-btn
           block
           variant="tonal"
-          color="teal"
+          color="orange-darken-2"
           class="text-body-2 font-weight-bold py-2"
           height="auto"
           @click="expandPanel"
@@ -17,8 +17,11 @@
 
       <template v-else>
         <div class="syllabus-header mb-3">
-          <v-icon color="teal" size="20" class="mr-2">mdi-book-open-variant</v-icon>
-          <span class="syllabus-title">みんなのシラバス</span>
+          <!-- ダイアログ内（hideToggle）ではタイトルに講義名が出ているので、見出しは重ねない -->
+          <template v-if="!hideToggle">
+            <v-icon color="orange-darken-2" size="20" class="mr-2">mdi-book-open-variant</v-icon>
+            <span class="syllabus-title">みんなのシラバス</span>
+          </template>
           <v-spacer></v-spacer>
           <v-btn
             v-if="!isEditing && !hideToggle"
@@ -36,7 +39,7 @@
             size="small"
             density="compact"
             variant="text"
-            color="teal"
+            color="orange-darken-2"
             @click="startEdit"
           >
             <v-icon left size="16">mdi-pencil</v-icon>編集
@@ -44,7 +47,11 @@
         </div>
 
         <div v-if="loading" class="text-center py-4">
-          <v-progress-circular indeterminate size="24" color="teal"></v-progress-circular>
+          <v-progress-circular
+            indeterminate
+            size="24"
+            color="orange-darken-2"
+          ></v-progress-circular>
         </div>
 
         <div v-else-if="!isEditing" class="syllabus-content">
@@ -52,43 +59,46 @@
           <LectureReviewPanel :lecture-name="lectureName" />
 
           <template v-if="hasContent">
-            <div v-if="syllabus.teacher" class="syllabus-section mt-2">
-              <div class="section-title">担当教員</div>
-              <div class="section-body">{{ syllabus.teacher }}</div>
-            </div>
-            <div v-if="syllabus.room" class="syllabus-section">
-              <div class="section-title">教室</div>
-              <div class="section-body">{{ syllabus.room }}</div>
-            </div>
-            <div
-              v-if="syllabus.categories && syllabus.categories.length > 0"
-              class="syllabus-section"
-            >
-              <div class="section-title">授業区分</div>
-              <div class="section-body d-flex flex-wrap gap-1 bg-transparent border-0 pa-0">
+            <!-- 担当教員・教室はマイページと同じ情報欄で並べる（PC では 2 列） -->
+            <v-row v-if="syllabus.teacher || syllabus.room" dense class="mt-2 mb-3">
+              <v-col v-if="syllabus.teacher" cols="12" md="6">
+                <InfoItem
+                  class="h-100 bg-grey-lighten-4"
+                  icon="mdi-account-tie"
+                  label="担当教員"
+                  :value="syllabus.teacher"
+                />
+              </v-col>
+              <v-col v-if="syllabus.room" cols="12" md="6">
+                <InfoItem
+                  class="h-100 bg-grey-lighten-4"
+                  icon="mdi-map-marker"
+                  label="教室"
+                  :value="syllabus.room"
+                />
+              </v-col>
+            </v-row>
+
+            <div v-if="syllabus.categories && syllabus.categories.length > 0" class="mb-4">
+              <SectionLabel icon="mdi-tag-outline" title="授業区分" />
+              <div class="d-flex flex-wrap ga-1">
                 <v-chip
                   v-for="cat in syllabus.categories"
                   :key="cat"
-                  size="x-small"
-                  color="teal"
-                  variant="flat"
+                  size="small"
+                  color="orange-darken-2"
+                  variant="tonal"
                   class="font-weight-bold"
                 >
                   {{ cat }}
                 </v-chip>
               </div>
             </div>
-            <div v-if="syllabus.description" class="syllabus-section">
-              <div class="section-title">授業概要</div>
-              <div class="section-body">{{ syllabus.description }}</div>
-            </div>
-            <div v-if="syllabus.grading" class="syllabus-section">
-              <div class="section-title">評価方法</div>
-              <div class="section-body">{{ syllabus.grading }}</div>
-            </div>
-            <div v-if="syllabus.textbook" class="syllabus-section">
-              <div class="section-title">教科書・参考書</div>
-              <div class="section-body">{{ syllabus.textbook }}</div>
+
+            <!-- 長い文章の項目は、共通の見出し＋本文で並べる -->
+            <div v-for="section in textSections" :key="section.title" class="mb-4">
+              <SectionLabel :icon="section.icon" :title="section.title" />
+              <p class="text-body-2 text-grey-darken-3 mb-0 syllabus-text">{{ section.body }}</p>
             </div>
 
             <div class="syllabus-footer mt-3">
@@ -157,7 +167,7 @@
               <v-btn
                 v-if="isLoggedIn"
                 variant="outlined"
-                color="teal"
+                color="orange-darken-2"
                 size="small"
                 class="mt-3"
                 @click="handleCreateClick"
@@ -171,7 +181,7 @@
           <template v-else-if="isLinkingMode">
             <div class="linking-view py-2">
               <div class="text-subtitle-2 font-weight-bold mb-1">
-                <v-icon size="18" color="teal" class="mr-1">mdi-magnify-plus</v-icon>
+                <v-icon size="18" color="orange-darken-2" class="mr-1">mdi-magnify-plus</v-icon>
                 既存のシラバスを探す
               </div>
               <p class="text-caption text-grey-darken-1 mb-3">
@@ -179,7 +189,7 @@
               </p>
 
               <div v-if="suggestedMatches.length > 0" class="mb-4">
-                <div class="text-caption font-weight-bold mb-2 text-teal-darken-1">
+                <div class="text-caption font-weight-bold mb-2 text-orange-darken-2">
                   もしかしてこれですか？
                 </div>
                 <v-list
@@ -194,13 +204,13 @@
                   >
                     <v-list-item-title class="text-body-2">{{ match.name }}</v-list-item-title>
                     <template #append>
-                      <v-btn size="x-small" variant="text" color="teal">紐付ける</v-btn>
+                      <v-btn size="x-small" variant="text" color="orange-darken-2">紐付ける</v-btn>
                     </template>
                   </v-list-item>
                 </v-list>
               </div>
 
-              <div class="new-registration-box pa-3 rounded-lg bg-teal-lighten-5 border">
+              <div class="new-registration-box pa-3 rounded-lg bg-orange-lighten-5 border">
                 <div class="text-caption font-weight-bold mb-2">新しくシラバスを登録する</div>
                 <v-text-field
                   v-model="formalNameInput"
@@ -218,7 +228,7 @@
                 </p>
                 <v-btn
                   block
-                  color="teal"
+                  color="orange-darken-2"
                   variant="flat"
                   size="small"
                   :disabled="
@@ -301,7 +311,7 @@
           <div class="d-flex justify-end gap-2 mt-2">
             <v-btn variant="text" size="small" @click="cancelEdit">キャンセル</v-btn>
             <v-btn
-              color="teal"
+              color="orange-darken-2"
               variant="flat"
               size="small"
               :loading="saving"
@@ -324,6 +334,8 @@ import { searchSuggestions } from '@/services/lectureIndexService'
 import LectureReviewPanel from '@/components/timetable/LectureReviewPanel.vue'
 import { formatYmdSlash, toJsDate } from '@/utils/dateFormatter'
 import FormFieldDefaults from '@/components/common/FormFieldDefaults.vue'
+import InfoItem from '@/components/common/InfoItem.vue'
+import SectionLabel from '@/components/common/SectionLabel.vue'
 
 const props = defineProps({
   lectureName: {
@@ -395,6 +407,15 @@ const hasContent = computed(() => {
     (syllabus.value.categories && syllabus.value.categories.length > 0)
   )
 })
+
+/** 見出し＋本文で表示する長い文章の項目（入力があるものだけ） */
+const textSections = computed(() =>
+  [
+    { icon: 'mdi-text-box-outline', title: '授業概要', body: syllabus.value.description },
+    { icon: 'mdi-clipboard-check-outline', title: '評価方法', body: syllabus.value.grading },
+    { icon: 'mdi-book-outline', title: '教科書・参考書', body: syllabus.value.textbook },
+  ].filter((section) => section.body),
+)
 
 const updatedDate = computed(() => {
   const date = toJsDate(syllabus.value.updatedAt)
@@ -607,30 +628,13 @@ const canSaveSyllabus = computed(() => {
 .syllabus-title {
   font-size: 0.95rem;
   font-weight: bold;
-  color: #00796b;
+  color: #ef6c00;
   white-space: nowrap;
 }
 
-.syllabus-section {
-  margin-bottom: 12px;
-}
-
-.section-title {
-  font-size: 0.75rem;
-  font-weight: bold;
-  color: #555;
-  margin-bottom: 4px;
-}
-
-.section-body {
-  font-size: 0.82rem;
-  color: #333;
-  line-height: 1.5;
+.syllabus-text {
   white-space: pre-wrap;
-  background: #f9fbfb;
-  padding: 8px 10px;
-  border-radius: 6px;
-  border-left: 3px solid #b2dfdb;
+  line-height: 1.6;
 }
 
 .syllabus-footer {
@@ -683,7 +687,7 @@ const canSaveSyllabus = computed(() => {
   cursor: pointer;
 }
 .match-item:hover {
-  background-color: #e0f2f1;
+  background-color: #fff3e0;
 }
 .border-bottom {
   border-bottom: 1px solid #eee;
