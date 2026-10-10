@@ -263,10 +263,9 @@ const verifyEventOwnership = async (eventId, userId) => {
   }
 
   const hashedUserId = await hashValue(userId)
-  const hashedAdminId = await hashValue(adminUserId)
 
   // 1. 運営アカウント（管理者）は全許可
-  if (event.createdBy === hashedAdminId) {
+  if (userId === adminUserId) {
     return
   }
 
