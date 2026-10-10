@@ -4,29 +4,19 @@
     <v-card class="py-8">
       <v-card-title class="text-center mb-4">新しいパスワードを設定</v-card-title>
       <v-form v-model="form" @submit.prevent="onSubmit">
-        <v-text-field
+        <PasswordField
           v-model="newPassword"
-          :append-inner-icon="visibleNew ? 'mdi-eye' : 'mdi-eye-off'"
           :rules="[required, passwordRule]"
-          :type="visibleNew ? 'text' : 'password'"
-          clearable
           class="mb-2"
           label="新しいパスワード"
           placeholder="Xa4%j87d"
-          prepend-inner-icon="mdi-lock-outline"
-          @click:append-inner="visibleNew = !visibleNew"
-        ></v-text-field>
-        <v-text-field
+        />
+        <PasswordField
           v-model="confirmPassword"
-          :append-inner-icon="visibleConfirm ? 'mdi-eye' : 'mdi-eye-off'"
           :rules="[required, confirmPasswordRule(newPassword)]"
-          :type="visibleConfirm ? 'text' : 'password'"
-          clearable
           label="パスワードを確認"
           placeholder="Xa4%j87d"
-          prepend-inner-icon="mdi-lock-outline"
-          @click:append-inner="visibleConfirm = !visibleConfirm"
-        ></v-text-field>
+        />
 
         <br />
 
@@ -54,11 +44,10 @@ import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { resetPassword } from '@/services/authService'
 import { confirmPasswordRule, passwordRule, required } from '@/utils/forms/validate'
+import PasswordField from '@/components/common/PasswordField.vue'
 
 const newPassword = ref('')
 const confirmPassword = ref('')
-const visibleNew = ref(false)
-const visibleConfirm = ref(false)
 const form = ref(false)
 const isLoading = ref(false)
 const oobCode = ref('')

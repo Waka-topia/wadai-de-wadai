@@ -96,20 +96,12 @@
               <v-icon size="13" class="mr-1 mb-1">mdi-lock-outline</v-icon>
               パスワード認証
             </p>
-            <v-text-field
+            <PasswordField
               v-model="password"
-              :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
               :rules="[required]"
-              :type="visible ? 'text' : 'password'"
-              clearable
               hint="団体の代表者から共有されたパスワードを入力してください。"
               label="団体パスワード"
-              variant="outlined"
-              density="comfortable"
-              color="orange-darken-2"
-              prepend-inner-icon="mdi-lock-outline"
-              @click:append-inner="visible = !visible"
-            ></v-text-field>
+            />
           </div>
 
           <!-- パスワード設定（初回: 新パスワードを設定） -->
@@ -118,36 +110,20 @@
               <v-icon size="13" class="mr-1 mb-1">mdi-lock-outline</v-icon>
               パスワードを新規設定
             </p>
-            <v-text-field
+            <PasswordField
               v-model="password"
-              :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
               :rules="[required, passwordRule]"
-              :type="visible ? 'text' : 'password'"
-              clearable
               hint="8文字以上にしてください。このパスワードは後から同じ団体のメンバーが登録する際に使います。"
               label="新しいパスワードを設定"
               placeholder="Xa4%j87d"
-              variant="outlined"
-              density="comfortable"
-              color="orange-darken-2"
-              prepend-inner-icon="mdi-lock-outline"
-              @click:append-inner="visible = !visible"
-            ></v-text-field>
-            <v-text-field
+            />
+            <PasswordField
               v-model="confirmPassword"
-              :append-inner-icon="confirmVisible ? 'mdi-eye' : 'mdi-eye-off'"
               :rules="[required, passwordRule, confirmPasswordRule(password)]"
-              :type="confirmVisible ? 'text' : 'password'"
-              clearable
               hint="パスワードの確認のため、もう一度入力してください。"
               label="パスワードの確認"
               placeholder="Xa4%j87d"
-              variant="outlined"
-              density="comfortable"
-              color="orange-darken-2"
-              prepend-inner-icon="mdi-lock-outline"
-              @click:append-inner="confirmVisible = !confirmVisible"
-            ></v-text-field>
+            />
           </div>
         </template>
 
@@ -204,12 +180,11 @@ import { useFirebasePageView } from '@/composables/useFirebasePageView'
 import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { allGroups } from '@/data/groups'
+import PasswordField from '@/components/common/PasswordField.vue'
 
 const selectedGroup = ref(null)
 const password = ref('')
 const confirmPassword = ref('')
-const visible = ref(false)
-const confirmVisible = ref(false)
 const isLoading = ref(false)
 const isCheckingGroup = ref(false)
 const registrationMode = ref(null) // 'initial' | 'subsequent'

@@ -31,20 +31,12 @@
           density="comfortable"
         ></v-text-field>
 
-        <v-text-field
+        <PasswordField
           v-model="loginData.password"
-          :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
           :rules="[required]"
-          :type="visible ? 'text' : 'password'"
-          clearable
           label="パスワード"
           placeholder="パスワードを入力"
-          prepend-inner-icon="mdi-lock-outline"
-          variant="outlined"
-          color="orange-darken-2"
-          density="comfortable"
-          @click:append-inner="visible = !visible"
-        ></v-text-field>
+        />
 
         <div class="d-flex justify-end mb-6 mt-n2">
           <a
@@ -109,12 +101,12 @@ import { useFirebasePageView } from '@/composables/useFirebasePageView'
 import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { required, emailDomainCheck } from '@/utils/forms/validate'
+import PasswordField from '@/components/common/PasswordField.vue'
 
 const loginData = ref({
   email: '',
   password: '',
 })
-const visible = ref(false)
 const isLoading = ref(false)
 
 const { notifySuccess, notifyError } = useSnackbar()

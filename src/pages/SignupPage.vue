@@ -46,22 +46,14 @@
           density="comfortable"
         ></v-text-field>
 
-        <v-text-field
+        <PasswordField
           v-model="signupData.password"
           class="mb-4"
-          :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
           :rules="[required, passwordRule]"
-          :type="visible ? 'text' : 'password'"
-          clearable
           hint="8文字以上にしてください。"
           label="パスワード"
           placeholder="パスワードを入力"
-          prepend-inner-icon="mdi-lock-outline"
-          variant="outlined"
-          color="orange-darken-2"
-          density="comfortable"
-          @click:append-inner="visible = !visible"
-        ></v-text-field>
+        />
 
         <div
           class="d-flex align-center justify-space-between mb-6 bg-grey-lighten-4 pa-3 rounded-lg"
@@ -159,13 +151,13 @@ import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { required, passwordRule, nameCheck, emailDomainCheck } from '@/utils/forms/validate'
 import BaseDialog from '@/components/common/BaseDialog.vue'
 import TermsRule from '@/components/templates/TermsRule.vue'
+import PasswordField from '@/components/common/PasswordField.vue'
 
 const signupData = ref({
   email: '',
   password: '',
   userName: '',
 })
-const visible = ref(false)
 const agree = ref(false)
 const isLoading = ref(false)
 const dialog = ref(false)
