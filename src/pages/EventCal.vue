@@ -21,26 +21,7 @@
           </v-btn>
         </div>
 
-        <div class="d-flex ga-3 mb-3 banner-steps">
-          <div class="banner-step">
-            <v-icon size="20" color="orange" class="mb-1">mdi-account-check</v-icon>
-            <p class="text-caption font-weight-bold mb-0">代表者証明</p>
-          </div>
-          <v-icon size="16" color="grey-lighten-1" class="align-self-center">
-            mdi-chevron-right
-          </v-icon>
-          <div class="banner-step">
-            <v-icon size="20" color="blue" class="mb-1">mdi-check-decagram</v-icon>
-            <p class="text-caption font-weight-bold mb-0">公式マーク</p>
-          </div>
-          <v-icon size="16" color="grey-lighten-1" class="align-self-center">
-            mdi-chevron-right
-          </v-icon>
-          <div class="banner-step">
-            <v-icon size="20" color="green" class="mb-1">mdi-arrow-up-bold-circle</v-icon>
-            <p class="text-caption font-weight-bold mb-0">上位表示</p>
-          </div>
-        </div>
+        <StepFlow class="mb-3" :steps="bannerSteps" />
 
         <v-btn
           color="orange"
@@ -154,6 +135,7 @@ import 'vue-cal/dist/vuecal.css'
 import BaseBottomSheet from '@/components/common/BaseBottomSheet.vue'
 import EventForm from '@/components/event/EventForm.vue'
 import EventSchedule from '@/components/event/EventSchedule.vue'
+import StepFlow from '@/components/event/StepFlow.vue'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
 import { eventDateMax, eventDateMin } from '@/config/constants'
@@ -231,6 +213,13 @@ const bannerDismissed = ref(localStorage.getItem(bannerDismissedKey) === 'true')
 
 /** バナーを表示するかどうかの判定 ログイン済みかつ、バナーを閉じていない場合に表示 */
 const showClaimBanner = computed(() => isLoggedIn.value && !bannerDismissed.value)
+
+// 代表者証明をすると得られるメリットの流れ
+const bannerSteps = [
+  { label: '代表者証明', icon: 'mdi-account-check', color: 'orange' },
+  { label: '公式マーク', icon: 'mdi-check-decagram', color: 'blue' },
+  { label: '上位表示', icon: 'mdi-arrow-up-bold-circle', color: 'green' },
+]
 
 /** バナーを閉じてlocalStorageに記録する */
 const dismissBanner = () => {
@@ -320,17 +309,6 @@ onMounted(() => {
 }
 
 /* --- バナーステップ --- */
-.banner-steps {
-  justify-content: center;
-}
-
-.banner-step {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 64px;
-}
-
 /* --- 日付ナビゲーション --- */
 .date-nav {
   display: flex;

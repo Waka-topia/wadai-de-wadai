@@ -28,10 +28,7 @@
       </v-alert>
 
       <!-- 一時IDセクション -->
-      <p class="text-caption text-uppercase text-grey-darken-1 font-weight-bold mb-3">
-        <v-icon size="13" class="mr-1 mb-1">mdi-identifier</v-icon>
-        あなたの一時ID
-      </p>
+      <SectionLabel icon="mdi-identifier" title="あなたの一時ID" />
       <v-card color="orange-lighten-5" variant="flat" rounded="lg" class="pa-4 mb-6">
         <div class="d-flex align-center justify-space-between ga-3">
           <p
@@ -56,44 +53,13 @@
       <v-divider class="mb-6" />
 
       <!-- 手順セクション -->
-      <p class="text-caption text-uppercase text-grey-darken-1 font-weight-bold mb-3">
-        <v-icon size="13" class="mr-1 mb-1">mdi-format-list-numbered</v-icon>
-        申請の流れ
-      </p>
-      <div class="d-flex flex-column ga-3 mb-6">
-        <div class="d-flex align-center ga-3">
-          <v-avatar color="orange-darken-2" size="28" class="flex-shrink-0">
-            <span class="text-caption font-weight-bold text-white">1</span>
-          </v-avatar>
-          <p class="text-body-2 mb-0">上の一時IDをコピー</p>
-        </div>
-        <div class="d-flex align-center ga-3">
-          <v-avatar color="orange-darken-2" size="28" class="flex-shrink-0">
-            <span class="text-caption font-weight-bold text-white">2</span>
-          </v-avatar>
-          <p class="text-body-2 mb-0">団体の公式SNSを確認</p>
-        </div>
-        <div class="d-flex align-center ga-3">
-          <v-avatar color="orange-darken-2" size="28" class="flex-shrink-0">
-            <span class="text-caption font-weight-bold text-white">3</span>
-          </v-avatar>
-          <p class="text-body-2 mb-0">下記のアプリ運営アカウントにDMで一時IDを送信</p>
-        </div>
-        <div class="d-flex align-center ga-3">
-          <v-avatar color="orange-darken-2" size="28" class="flex-shrink-0">
-            <span class="text-caption font-weight-bold text-white">4</span>
-          </v-avatar>
-          <p class="text-body-2 mb-0">審査完了を待機</p>
-        </div>
-      </div>
+      <SectionLabel icon="mdi-format-list-numbered" title="申請の流れ" />
+      <StepFlow class="mb-6" :steps="applicationSteps" vertical />
 
       <v-divider class="mb-6" />
 
       <!-- 運営公式SNSセクション -->
-      <p class="text-caption text-uppercase text-grey-darken-1 font-weight-bold mb-3">
-        <v-icon size="13" class="mr-1 mb-1">mdi-account-check</v-icon>
-        アプリ運営の公式SNS
-      </p>
+      <SectionLabel icon="mdi-account-check" title="アプリ運営の公式SNS" />
       <div class="d-flex flex-column ga-2 mb-6">
         <v-card
           variant="outlined"
@@ -186,10 +152,20 @@ import { instagramUrl, xUrl } from '@/config/constants'
 import { openExternalLink } from '@/utils/externalLink'
 import EmptyState from '@/components/common/EmptyState.vue'
 import LoadingState from '@/components/common/LoadingState.vue'
+import SectionLabel from '@/components/common/SectionLabel.vue'
+import StepFlow from '@/components/event/StepFlow.vue'
 
 const store = useStore()
 
 useFirebasePageView('view_prove_owner_description', {})
+
+// 代表者証明の申請手順
+const applicationSteps = [
+  { label: '上の一時IDをコピー' },
+  { label: '団体の公式SNSを確認' },
+  { label: '下記のアプリ運営アカウントにDMで一時IDを送信' },
+  { label: '審査完了を待機' },
+]
 
 const applicant = ref(null)
 const userId = computed(() => store.getters['auth/userId'])
