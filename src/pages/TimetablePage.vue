@@ -135,6 +135,7 @@ import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
 import { useSnackbar } from '@/composables/useSnackbar'
+import { periodTimes } from '@/config/timetable'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import BaseBottomSheet from '@/components/common/BaseBottomSheet.vue'
 import TimetableHeaderControls from '@/components/timetable/TimetableHeaderControls.vue'
@@ -220,8 +221,7 @@ const getTodayCardStyle = (lecture) => {
   return { backgroundColor: c.bg, borderLeftColor: c.border }
 }
 
-const periodStartMap = { 1: '09:10', 2: '10:40', 3: '13:10', 4: '14:50', 5: '16:20', 6: '18:00' }
-const getPeriodStart = (period) => periodStartMap[period] || ''
+const getPeriodStart = (period) => periodTimes[period]?.start || ''
 
 const todayDateLabel = computed(() => {
   const d = new Date()
