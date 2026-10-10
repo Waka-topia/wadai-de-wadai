@@ -10,11 +10,11 @@
     <div class="my-8 text-center">
       <v-btn
         to="/tutorial"
-        class="text-white font-weight-bold"
+        class="font-weight-bold"
         size="large"
-        color="orange"
-        elevation="3"
-        rounded
+        color="orange-darken-2"
+        elevation="0"
+        rounded="pill"
       >
         スマホアプリとして使う方法を見る
       </v-btn>
