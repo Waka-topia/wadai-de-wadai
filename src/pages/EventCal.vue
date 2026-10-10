@@ -307,7 +307,7 @@ onMounted(() => {
 @media (min-width: 1280px) {
   .eventcal-columns {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     align-items: start;
   }
 
