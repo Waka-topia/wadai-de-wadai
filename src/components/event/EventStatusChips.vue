@@ -1,7 +1,7 @@
 <template>
   <v-chip v-if="isOfficial" size="small" color="blue" variant="flat" label class="font-weight-bold">
     <v-icon start size="14">mdi-check-decagram</v-icon>
-    {{ long ? '公式認定' : '公式' }}
+    公式
   </v-chip>
   <v-chip
     v-if="isProxy"
@@ -12,7 +12,7 @@
     class="font-weight-bold text-white"
   >
     <v-icon start size="14">mdi-clipboard-text-outline</v-icon>
-    {{ long ? '代理登録 — 引き継ぎ募集中' : '代理登録' }}
+    代理登録
   </v-chip>
 </template>
 
@@ -22,7 +22,5 @@ defineProps({
   isOfficial: { type: Boolean, default: false },
   // 運営が代理登録したイベントか
   isProxy: { type: Boolean, default: false },
-  // 一覧など、補足の多い表記で表示するか
-  long: { type: Boolean, default: false },
 })
 </script>

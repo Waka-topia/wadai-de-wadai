@@ -5,19 +5,7 @@
       <!-- 戻るボタン -->
       <v-btn icon="mdi-arrow-left" variant="plain" rounded="lg" @click="router.back()" />
       <!-- 検索バー -->
-      <v-text-field
-        v-model="searchQuery"
-        variant="outlined"
-        density="compact"
-        label="講義名を検索"
-        placeholder="ロボット工学入門"
-        hide-details
-        clearable
-        rounded="xl"
-        prepend-inner-icon="mdi-magnify"
-        clear-icon="mdi-close"
-        @keyup.enter="executeSearch"
-      />
+      <SearchField v-model="searchQuery" placeholder="講義名で検索" @keyup.enter="executeSearch" />
     </div>
 
     <!-- ターゲットのコマが指定されている場合の専用バナー -->
@@ -187,6 +175,7 @@ import BaseDialog from '@/components/common/BaseDialog.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import ErrorState from '@/components/common/ErrorState.vue'
 import LoadingState from '@/components/common/LoadingState.vue'
+import SearchField from '@/components/common/SearchField.vue'
 import LectureEditorModal from '@/components/timetable/LectureEditorModal.vue'
 import LectureSyllabusPanel from '@/components/timetable/LectureSyllabusPanel.vue'
 

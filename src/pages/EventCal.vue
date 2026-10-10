@@ -38,27 +38,7 @@
     </v-card>
 
     <!-- 検索バーエリア -->
-    <div class="search-wrapper mx-4 mt-4 d-flex align-center ga-2">
-      <v-text-field
-        v-model="searchQuery"
-        placeholder="団体名で検索"
-        prepend-inner-icon="mdi-magnify"
-        variant="outlined"
-        density="comfortable"
-        hide-details
-        color="orange"
-        class="flex-grow-1 search-field"
-      ></v-text-field>
-      <v-btn
-        v-if="searchQuery"
-        variant="text"
-        color="grey-darken-1"
-        class="font-weight-bold px-1"
-        @click="searchQuery = ''"
-      >
-        キャンセル
-      </v-btn>
-    </div>
+    <SearchField v-model="searchQuery" class="mx-4 mt-4" placeholder="団体名で検索" />
 
     <!-- 検索情報の表示 -->
     <div v-if="searchQuery" class="mx-4 mt-2">
@@ -83,22 +63,27 @@
     <div v-show="!searchQuery">
       <v-divider class="my-4"></v-divider>
 
-      <v-btn class="font-weight-bold set-today-btn" rounded variant="outlined" @click="setToday">
-        <v-icon start size="18">mdi-calendar-today</v-icon>
-        今日の新歓イベント
-      </v-btn>
-
-      <!-- 改善された日付ナビゲーション -->
+      <!-- 日付ナビゲーション（前日・表示中の日付・翌日・今日へ戻る） -->
       <div class="date-nav">
-        <v-btn icon variant="text" size="small" @click="changeDate(-1)">
+        <v-btn icon variant="text" size="small" aria-label="前の日" @click="changeDate(-1)">
           <v-icon>mdi-chevron-left</v-icon>
         </v-btn>
         <div class="date-display">
-          <v-icon size="18" color="orange" class="mr-2">mdi-calendar</v-icon>
-          <span class="text-body-1 font-weight-bold">{{ formattedDate }}</span>
+          <span class="text-body-1 font-weight-bold text-no-wrap">{{ formattedDate }}</span>
         </div>
-        <v-btn icon variant="text" size="small" @click="changeDate(1)">
+        <v-btn icon variant="text" size="small" aria-label="次の日" @click="changeDate(1)">
           <v-icon>mdi-chevron-right</v-icon>
+        </v-btn>
+        <v-btn
+          size="small"
+          variant="tonal"
+          color="orange-darken-2"
+          rounded="pill"
+          class="font-weight-bold"
+          :disabled="isToday"
+          @click="setToday"
+        >
+          今日
         </v-btn>
       </div>
     </div>
@@ -133,6 +118,7 @@ import { useStore } from 'vuex'
 import VueCal from 'vue-cal'
 import 'vue-cal/dist/vuecal.css'
 import BaseBottomSheet from '@/components/common/BaseBottomSheet.vue'
+import SearchField from '@/components/common/SearchField.vue'
 import EventForm from '@/components/event/EventForm.vue'
 import EventSchedule from '@/components/event/EventSchedule.vue'
 import StepFlow from '@/components/event/StepFlow.vue'
@@ -233,10 +219,11 @@ const onBannerCtaClick = () => {
   void logFirebaseAnalyticsEvent('event_claim_banner_cta_click', {})
 }
 
-/** 選択中の日付を日本語フォーマットで表示する */
-const formattedDate = computed(() => {
-  return `${formatMonthDayWeekday(parseDateKey(selectedDate.value))}の新歓イベント`
-})
+/** 選択中の日付を日本語フォーマットで表示する（狭い画面でも折り返さないよう日付だけにする） */
+const formattedDate = computed(() => formatMonthDayWeekday(parseDateKey(selectedDate.value)))
+
+/** 今日を選択中か（「今日」ボタンを押せなくするために使う） */
+const isToday = computed(() => selectedDate.value === toDateKey(new Date()))
 
 const events = computed(() => {
   const storeEvents = store.getters['event/allEvents']
@@ -314,7 +301,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 4px;
   margin-bottom: 12px;
   padding: 0 16px;
 }
@@ -322,9 +309,7 @@ onMounted(() => {
 .date-display {
   display: flex;
   align-items: center;
-  background: #fff8e1;
-  border-radius: 20px;
-  padding: 6px 16px;
+  padding: 6px 12px;
 }
 
 /* --- VueCal コンテナ --- */
@@ -451,11 +436,6 @@ onMounted(() => {
 
 .vuecal__event {
   display: none;
-}
-
-/* --- 検索バーの調整 --- */
-.search-field :deep(.v-field__outline) {
-  --v-field-border-width: 2px;
 }
 
 .vuecal__no-event {

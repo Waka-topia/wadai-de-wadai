@@ -24,7 +24,6 @@
         rounded="lg"
         elevation="1"
         class="event-card"
-        :class="{ 'proxy-event-card': isProxyEvent(event) }"
         @click="goToEventDetail(event.eventId)"
       >
         <!-- 右上インフォボタン（代理登録のみ） -->
@@ -46,17 +45,6 @@
               </p>
             </v-card>
           </v-menu>
-        </div>
-
-        <!-- 上部バッジエリア -->
-        <div v-if="event.isOfficial || isProxyEvent(event)" class="badge-area px-4 pt-3 pb-0">
-          <div class="d-flex ga-2 flex-wrap">
-            <EventStatusChips
-              :is-official="event.isOfficial"
-              :is-proxy="isProxyEvent(event)"
-              long
-            />
-          </div>
         </div>
 
         <!-- メインコンテンツ -->
@@ -81,25 +69,34 @@
 
             <!-- 情報カラム -->
             <div class="info-column flex-grow-1 overflow-hidden">
-              <p class="text-h6 font-weight-bold mb-1 text-truncate">
+              <!-- 右端の矢印（代理登録のときは右上のインフォボタン）と重ならないよう右に余白を取る -->
+              <p
+                class="text-h6 font-weight-bold mb-1 text-truncate"
+                :class="isProxyEvent(event) ? 'pr-8' : 'pr-6'"
+              >
                 {{ event.organizerName }}
               </p>
-              <p
-                v-if="event.description"
-                class="text-body-2 text-grey-darken-1 mb-2 description-text"
-              >
+              <!-- 概要は 1 行で、長いものは … で省略する。概要が無いときも 1 行分を確保して高さを揃える -->
+              <p class="text-body-2 text-grey-darken-1 mb-2 pr-6 description-text">
                 {{ event.description }}
               </p>
-              <div class="d-flex align-center">
-                <v-icon size="16" color="orange" class="mr-1">mdi-map-marker</v-icon>
-                <span class="text-body-2 font-weight-medium text-orange">
+              <!-- バッジ（small チップ）の有無で高さが変わらないよう、行の高さをチップに合わせて固定する -->
+              <div class="d-flex align-center ga-1 location-row">
+                <v-icon size="16" color="orange" class="flex-shrink-0">mdi-map-marker</v-icon>
+                <span class="text-body-2 font-weight-medium text-orange text-truncate flex-grow-1">
                   {{ event.location }}
                 </span>
+                <div class="d-flex ga-1 flex-shrink-0">
+                  <EventStatusChips
+                    :is-official="event.isOfficial"
+                    :is-proxy="isProxyEvent(event)"
+                  />
+                </div>
               </div>
             </div>
 
-            <!-- 詳細矢印 -->
-            <v-icon size="20" color="grey-lighten-1" class="align-self-center ml-2 flex-shrink-0">
+            <!-- 詳細矢印。場所の行がカードの右端まで使えるよう、レイアウトの外に重ねて置く -->
+            <v-icon size="20" color="grey-lighten-1" class="detail-chevron">
               mdi-chevron-right
             </v-icon>
           </div>
@@ -203,11 +200,6 @@ const formatDate = (dateStr) => (dateStr ? formatShortDateWeekday(parseDateKey(d
   transform: translateY(0);
 }
 
-/* --- 代理登録カード --- */
-.proxy-event-card {
-  border-left: 3px solid #ff9800;
-}
-
 /* --- 時間カラム --- */
 .time-column {
   min-width: 60px;
@@ -226,7 +218,9 @@ const formatDate = (dateStr) => (dateStr ? formatShortDateWeekday(parseDateKey(d
 }
 
 /* --- 区切り線 --- */
+/* 組織名や概要が長いと flex で縮められて幅 0 になり消えるので、縮めない */
 .time-divider {
+  flex-shrink: 0;
   width: 2px;
   min-height: 48px;
   background: linear-gradient(180deg, #ff9800 0%, #ffe0b2 100%);
@@ -236,12 +230,23 @@ const formatDate = (dateStr) => (dateStr ? formatShortDateWeekday(parseDateKey(d
 
 /* --- 概要テキスト --- */
 .description-text {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   line-height: 1.5;
+  min-height: 1.5em;
+}
+
+.location-row {
+  height: 24px;
+}
+
+/* --- 詳細矢印 --- */
+.detail-chevron {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
 }
 
 /* --- 引き継ぎCTAのパルスアニメーション --- */
