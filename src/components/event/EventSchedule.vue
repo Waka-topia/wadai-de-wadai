@@ -20,6 +20,27 @@
         :class="{ 'proxy-event-card': isProxyEvent(event) }"
         @click="goToEventDetail(event.eventId)"
       >
+        <!-- 右上インフォボタン（代理登録のみ） -->
+        <div v-if="isProxyEvent(event)" class="info-btn-wrapper">
+          <v-menu location="bottom" :close-on-content-click="false" max-width="300">
+            <template #activator="{ props: activatorProps }">
+              <v-btn
+                v-bind="activatorProps"
+                icon="mdi-information-outline"
+                size="small"
+                variant="text"
+                color="grey-lighten-1"
+                @click.stop
+              />
+            </template>
+            <v-card rounded="lg" class="pa-3" max-width="300" @click.stop>
+              <p class="text-body-2 text-grey-darken-3 mb-0">
+                Waka-topiaが大学公式情報を元に代理投稿しています。団体の代表者は詳細画面から引き継ぎが可能です。
+              </p>
+            </v-card>
+          </v-menu>
+        </div>
+
         <!-- 上部バッジエリア -->
         <div v-if="event.isOfficial || isProxyEvent(event)" class="badge-area px-4 pt-3 pb-0">
           <div class="d-flex ga-2 flex-wrap">
@@ -46,13 +67,6 @@
               代理登録 — 引き継ぎ募集中
             </v-chip>
           </div>
-          <p
-            v-if="isProxyEvent(event)"
-            class="text-caption text-grey-darken-1 mt-2 mb-0 proxy-note"
-          >
-            <v-icon size="12" color="grey" class="mr-1">mdi-information-outline</v-icon>
-            Waka-topiaが大学公式情報を元に代理投稿しています。団体の代表者は詳細画面から引き継ぎが可能です。
-          </p>
         </div>
 
         <!-- メインコンテンツ -->
@@ -97,19 +111,6 @@
             </v-icon>
           </div>
         </v-card-text>
-
-        <!-- 代理登録イベント用の引き継ぎCTA -->
-        <div v-if="isProxyEvent(event)" class="claim-cta px-4 pb-3">
-          <v-divider class="mb-3" />
-          <div class="d-flex align-center">
-            <v-icon size="18" color="orange" class="mr-2 pulse-icon"
-              >mdi-hand-pointing-right</v-icon
-            >
-            <span class="text-body-2 font-weight-bold text-orange">
-              タップして引き継ぎ → 公式マーク＆上位表示
-            </span>
-          </div>
-        </div>
       </v-card>
     </div>
   </div>
@@ -179,10 +180,19 @@ const filteredEvents = computed(() => {
 /* --- イベントカード --- */
 .event-card {
   cursor: pointer;
+  position: relative;
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
   border: 1px solid #f0f0f0;
+}
+
+/* --- 代理登録インフォボタン --- */
+.info-btn-wrapper {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 1;
 }
 
 .event-card:hover {

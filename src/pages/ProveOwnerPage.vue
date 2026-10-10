@@ -1,25 +1,27 @@
 <template>
-  <v-progress-linear v-if="isLoading" color="orange" indeterminate=""></v-progress-linear>
+  <v-container class="fill-height d-flex align-start justify-center" fluid>
+    <v-card class="pa-6 pa-md-8 w-100" max-width="520" rounded="xl" elevation="1">
+      <v-progress-linear
+        v-if="isLoading"
+        color="orange-darken-2"
+        indeterminate
+        absolute
+        top
+      ></v-progress-linear>
 
-  <v-container class="px-3 py-8" style="max-width: 600px">
-    <div class="text-center mb-6">
-      <v-icon color="orange" size="48" class="mb-3">mdi-account-star</v-icon>
-      <h1 class="text-h5 font-weight-bold mb-3">団体・代表者としての認証</h1>
-      <p class="text-body-2 text-grey-darken-2" style="line-height: 1.6">
-        ここのページでは、自分たちの団体のメンバーとして登録・認証が行えます。<br />
-        認証が完了すると、<span class="font-weight-bold text-orange"
-          >代理登録された新歓情報の引き継ぎ</span
-        >や、新しいイベントを<span class="font-weight-bold text-orange">公式マーク付き</span
-        >で掲載できるようになります！
-      </p>
-    </div>
-
-    <v-card class="pa-6" rounded="lg" elevation="2">
-      <div class="d-flex align-center mb-5">
-        <v-avatar color="orange-lighten-4" size="32" class="mr-3">
-          <v-icon color="orange" size="18">mdi-account-check</v-icon>
+      <div class="text-center mb-8">
+        <v-avatar color="orange-lighten-5" size="72" class="mb-4">
+          <v-icon size="36" color="orange-darken-2">mdi-account-star</v-icon>
         </v-avatar>
-        <h2 class="text-subtitle-1 font-weight-bold mb-0">認証手続き</h2>
+        <h2 class="text-h5 font-weight-bold text-grey-darken-3">団体・代表者として認証</h2>
+        <div class="d-flex justify-center ga-2 mt-3">
+          <v-chip size="small" color="orange" variant="tonal" prepend-icon="mdi-hand-wave">
+            代理登録の引き継ぎ
+          </v-chip>
+          <v-chip size="small" color="blue" variant="tonal" prepend-icon="mdi-check-decagram">
+            公式マーク付与
+          </v-chip>
+        </div>
       </div>
 
       <v-form @submit.prevent="onSubmit">
@@ -33,100 +35,141 @@
           label="団体名"
           variant="outlined"
           density="comfortable"
+          color="orange-darken-2"
           persistent-hint
           prepend-inner-icon="mdi-domain"
           no-data-text="団体が見つかりません。正しい名称を入力してください。"
           clearable
+          class="mb-2"
           @update:model-value="onGroupSelected"
         />
 
+        <!-- 代表者の存在チェック中 -->
+        <div v-if="selectedGroup && isCheckingGroup" class="d-flex align-center ga-2 mb-4 px-1">
+          <v-progress-circular indeterminate color="orange-darken-2" size="18" width="2" />
+          <span class="text-body-2 text-grey-darken-1">団体情報を確認中...</span>
+        </div>
+
         <!-- 代表者の存在チェック結果を表示 -->
-        <v-alert
-          v-if="selectedGroup && registrationMode === 'subsequent'"
-          variant="tonal"
-          color="success"
-          icon="mdi-account-group"
-          density="compact"
-          class="mb-4"
-        >
-          <p class="text-body-2 mb-0">
-            この団体にはすでに代表者がいます。団体パスワードを入力するだけで即座に登録できます。
-          </p>
-        </v-alert>
+        <template v-if="selectedGroup && registrationMode && !isCheckingGroup">
+          <v-divider class="mb-4" />
 
-        <v-alert
-          v-if="selectedGroup && registrationMode === 'initial'"
-          variant="tonal"
-          color="info"
-          icon="mdi-account-plus"
-          density="compact"
-          class="mb-4"
-        >
-          <p class="text-body-2 mb-0">
-            この団体の最初の代表者になります。パスワードを新しく設定後、運営による承認が必要です。
-          </p>
-        </v-alert>
+          <!-- subsequent: すでに代表者あり -->
+          <div
+            v-if="registrationMode === 'subsequent'"
+            class="d-flex align-center ga-3 bg-green-lighten-5 rounded-lg pa-3 mb-4"
+          >
+            <v-avatar color="green" size="36" class="flex-shrink-0">
+              <v-icon color="white" size="18">mdi-account-check</v-icon>
+            </v-avatar>
+            <div>
+              <p class="text-body-2 font-weight-bold text-green-darken-2 mb-0">
+                すでに代表者がいます
+              </p>
+              <p class="text-caption text-green-darken-1 mb-0">
+                パスワードを入力するだけで即座に登録できます
+              </p>
+            </div>
+          </div>
 
-        <!-- パスワード入力（後続: 既存パスワードを入力） -->
-        <div v-if="registrationMode === 'subsequent'">
-          <v-text-field
-            v-model="password"
-            :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
-            :rules="[required]"
-            :type="visible ? 'text' : 'password'"
-            clearable
-            hint="団体の代表者から共有されたパスワードを入力してください。"
-            label="団体パスワード"
-            prepend-inner-icon="mdi-lock-outline"
-            @click:append-inner="visible = !visible"
-          ></v-text-field>
-        </div>
+          <!-- initial: 最初の代表者 -->
+          <div
+            v-if="registrationMode === 'initial'"
+            class="d-flex align-center ga-3 bg-orange-lighten-5 rounded-lg pa-3 mb-4"
+          >
+            <v-avatar color="orange-darken-1" size="36" class="flex-shrink-0">
+              <v-icon color="white" size="18">mdi-account-plus</v-icon>
+            </v-avatar>
+            <div>
+              <p class="text-body-2 font-weight-bold text-orange-darken-3 mb-0">
+                最初の代表者になります
+              </p>
+              <p class="text-caption text-orange-darken-2 mb-0">
+                パスワード設定後、運営による承認が必要です
+              </p>
+            </div>
+          </div>
 
-        <!-- パスワード設定（初回: 新パスワードを設定） -->
-        <div v-if="registrationMode === 'initial'">
-          <v-text-field
-            v-model="password"
-            :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
-            :rules="[required, passwordRule]"
-            :type="visible ? 'text' : 'password'"
-            clearable
-            hint="8文字以上にしてください。このパスワードは後から同じ団体のメンバーが登録する際に使います。"
-            label="新しいパスワードを設定"
-            placeholder="Xa4%j87d"
-            prepend-inner-icon="mdi-lock-outline"
-            @click:append-inner="visible = !visible"
-          ></v-text-field>
-          <v-text-field
-            v-model="confirmPassword"
-            :append-inner-icon="confirmVisible ? 'mdi-eye' : 'mdi-eye-off'"
-            :rules="[required, passwordRule, confirmPasswordRule(password)]"
-            :type="confirmVisible ? 'text' : 'password'"
-            clearable
-            hint="パスワードの確認のため、もう一度入力してください。"
-            label="パスワードの確認"
-            placeholder="Xa4%j87d"
-            prepend-inner-icon="mdi-lock-outline"
-            @click:append-inner="confirmVisible = !confirmVisible"
-          ></v-text-field>
-        </div>
+          <!-- パスワード入力（後続: 既存パスワードを入力） -->
+          <div v-if="registrationMode === 'subsequent'">
+            <p class="text-caption text-uppercase text-grey-darken-1 font-weight-bold mb-3">
+              <v-icon size="13" class="mr-1 mb-1">mdi-lock-outline</v-icon>
+              パスワード認証
+            </p>
+            <v-text-field
+              v-model="password"
+              :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
+              :rules="[required]"
+              :type="visible ? 'text' : 'password'"
+              clearable
+              hint="団体の代表者から共有されたパスワードを入力してください。"
+              label="団体パスワード"
+              variant="outlined"
+              density="comfortable"
+              color="orange-darken-2"
+              prepend-inner-icon="mdi-lock-outline"
+              @click:append-inner="visible = !visible"
+            ></v-text-field>
+          </div>
+
+          <!-- パスワード設定（初回: 新パスワードを設定） -->
+          <div v-if="registrationMode === 'initial'">
+            <p class="text-caption text-uppercase text-grey-darken-1 font-weight-bold mb-3">
+              <v-icon size="13" class="mr-1 mb-1">mdi-lock-outline</v-icon>
+              パスワードを新規設定
+            </p>
+            <v-text-field
+              v-model="password"
+              :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
+              :rules="[required, passwordRule]"
+              :type="visible ? 'text' : 'password'"
+              clearable
+              hint="8文字以上にしてください。このパスワードは後から同じ団体のメンバーが登録する際に使います。"
+              label="新しいパスワードを設定"
+              placeholder="Xa4%j87d"
+              variant="outlined"
+              density="comfortable"
+              color="orange-darken-2"
+              prepend-inner-icon="mdi-lock-outline"
+              @click:append-inner="visible = !visible"
+            ></v-text-field>
+            <v-text-field
+              v-model="confirmPassword"
+              :append-inner-icon="confirmVisible ? 'mdi-eye' : 'mdi-eye-off'"
+              :rules="[required, passwordRule, confirmPasswordRule(password)]"
+              :type="confirmVisible ? 'text' : 'password'"
+              clearable
+              hint="パスワードの確認のため、もう一度入力してください。"
+              label="パスワードの確認"
+              placeholder="Xa4%j87d"
+              variant="outlined"
+              density="comfortable"
+              color="orange-darken-2"
+              prepend-inner-icon="mdi-lock-outline"
+              @click:append-inner="confirmVisible = !confirmVisible"
+            ></v-text-field>
+          </div>
+        </template>
 
         <v-btn
           type="submit"
           :loading="isLoading"
           :disabled="!selectedGroup || isCheckingGroup"
           block
-          color="orange"
-          size="large"
-          variant="elevated"
+          color="orange-darken-2"
+          size="x-large"
+          rounded="pill"
+          class="font-weight-bold mt-2"
+          elevation="0"
         >
           <template v-if="registrationMode === 'subsequent'">
             <v-icon start>mdi-check-circle</v-icon>
             パスワードで即登録
           </template>
-          <template v-else> 申請する </template>
+          <template v-else>団体証明を申請する</template>
         </v-btn>
 
-        <p class="text-caption mt-4 px-2 text-grey">
+        <p v-if="registrationMode" class="text-caption mt-4 px-2 text-grey">
           <template v-if="registrationMode === 'initial'">
             このパスワードは団体ごとに任意のものを設定してください。
             団体メンバーのみで共有し、厳重に保管してください。
@@ -135,15 +178,19 @@
             パスワードは団体の既存代表者にお問い合わせください。
           </template>
         </p>
-
-        <v-btn
-          variant="plain"
-          class="mt-3"
-          @click="showSnackbar('パスワードリセット機能は現在準備中です。', 'info')"
-        >
-          パスワードを忘れた場合はこちら
-        </v-btn>
       </v-form>
+
+      <v-divider class="my-4"></v-divider>
+
+      <v-btn
+        variant="text"
+        color="grey-darken-1"
+        rounded="pill"
+        block
+        @click="showSnackbar('パスワードリセット機能は現在準備中です。', 'info')"
+      >
+        パスワードを忘れた場合はこちら
+      </v-btn>
     </v-card>
   </v-container>
 </template>

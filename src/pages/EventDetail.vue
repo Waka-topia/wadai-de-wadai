@@ -134,57 +134,46 @@
       <div v-if="isProxyEvent" class="px-5 pb-4">
         <v-card color="orange-lighten-5" rounded="lg" variant="flat" class="pa-4">
           <div class="d-flex align-center mb-3">
-            <v-avatar color="orange" size="32" class="mr-3">
-              <v-icon color="white" size="18">mdi-hand-wave</v-icon>
+            <v-avatar color="orange" size="28" class="mr-2 flex-shrink-0">
+              <v-icon color="white" size="16">mdi-hand-wave</v-icon>
             </v-avatar>
-            <p class="text-body-1 font-weight-bold mb-0">このイベントを引き継ぎませんか？</p>
+            <p class="text-body-2 font-weight-bold mb-0">このイベントを引き継ぎませんか？</p>
           </div>
 
           <!-- 3ステップ -->
-          <div class="d-flex align-center justify-center ga-2 mb-3 flex-wrap">
+          <div class="d-flex align-center justify-center ga-1 mb-3 flex-nowrap">
             <div class="step-item text-center">
-              <v-avatar color="orange" size="28" class="mb-1">
-                <span class="text-caption font-weight-bold text-white">1</span>
+              <v-avatar color="orange" size="22" class="mb-1">
+                <span class="step-num font-weight-bold text-white">1</span>
               </v-avatar>
-              <p class="text-caption font-weight-bold mb-0">引き継ぎ申請</p>
+              <p class="step-label font-weight-bold mb-0">引き継ぎ申請</p>
             </div>
-            <v-icon size="16" color="grey-darken-1">mdi-chevron-right</v-icon>
+            <v-icon size="14" color="grey-darken-1">mdi-chevron-right</v-icon>
             <div class="step-item text-center">
-              <v-avatar color="blue" size="28" class="mb-1">
-                <span class="text-caption font-weight-bold text-white">2</span>
+              <v-avatar color="blue" size="22" class="mb-1">
+                <span class="step-num font-weight-bold text-white">2</span>
               </v-avatar>
-              <p class="text-caption font-weight-bold mb-0">公式マーク付与</p>
+              <p class="step-label font-weight-bold mb-0">公式マーク付与</p>
             </div>
-            <v-icon size="16" color="grey-darken-1">mdi-chevron-right</v-icon>
+            <v-icon size="14" color="grey-darken-1">mdi-chevron-right</v-icon>
             <div class="step-item text-center">
-              <v-avatar color="green" size="28" class="mb-1">
-                <span class="text-caption font-weight-bold text-white">3</span>
+              <v-avatar color="green" size="22" class="mb-1">
+                <span class="step-num font-weight-bold text-white">3</span>
               </v-avatar>
-              <p class="text-caption font-weight-bold mb-0">自由に編集</p>
+              <p class="step-label font-weight-bold mb-0">自由に編集</p>
             </div>
           </div>
 
           <v-btn
-            v-if="isLoggedIn"
             color="orange"
             variant="elevated"
             block
             class="text-white font-weight-bold"
+            rounded="lg"
             @click="onClaimClick"
           >
-            <v-icon start>mdi-swap-horizontal</v-icon>
-            このイベントを引き継ぐ
-          </v-btn>
-          <v-btn
-            v-else
-            color="orange"
-            variant="outlined"
-            block
-            class="font-weight-bold"
-            to="/prove-owner"
-          >
-            <v-icon start>mdi-account-check</v-icon>
-            代表者証明をして引き継ぐ
+            引き継ぎ申請へ進む
+            <v-icon class="position-absolute right-0 mx-2">mdi-chevron-right</v-icon>
           </v-btn>
         </v-card>
       </div>
@@ -292,9 +281,15 @@ const handleBack = () => {
   router.back()
 }
 
+/** 引き継ぎボタンの遷移先を、代表者かどうかで振り分ける */
 const onClaimClick = () => {
   void logFirebaseAnalyticsEvent('event_detail_claim_click', { eventId: eventId.value })
-  claimDialogOpen.value = true
+  // 代表者はダイアログで引き継ぎを実行する。それ以外は代表者証明へ（未ログインはガードでログインへ）
+  if (isRepresentative.value) {
+    claimDialogOpen.value = true
+    return
+  }
+  router.push('/prove-owner')
 }
 
 const onTransferred = () => {
@@ -318,5 +313,14 @@ onMounted(async () => {
   max-width: 720px;
   margin: 0 auto;
   padding: 8px 16px 40px;
+}
+
+.step-label {
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.step-num {
+  font-size: 10px;
 }
 </style>
