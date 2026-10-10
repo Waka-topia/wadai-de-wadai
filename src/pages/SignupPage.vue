@@ -124,7 +124,7 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
-import { useSnackbar } from '@/composables/useSnackbar'
+import { useFormSubmit } from '@/composables/useFormSubmit'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { required, passwordRule, nameCheck, emailDomainCheck } from '@/utils/forms/validate'
 import AuthCard from '@/components/auth/AuthCard.vue'
@@ -138,10 +138,7 @@ const signupData = ref({
   userName: '',
 })
 const agree = ref(false)
-const isLoading = ref(false)
 const dialog = ref(false)
-
-const { notifySuccess, notifyError } = useSnackbar()
 
 // ★ 追加: 規約を読んだかどうかを判定するフラグ
 const hasReadTerms = ref(false)
@@ -164,31 +161,15 @@ const onLogin = () => {
   router.push('/login')
 }
 
-const onSubmit = async (validationPromise) => {
-  try {
-    isLoading.value = true
-
-    const { valid } = await validationPromise
-    if (!valid) throw new Error('入力に誤りがあります。')
-
+const { isLoading, submit: onSubmit } = useFormSubmit({
+  action: async () => {
     await store.dispatch('auth/signup', signupData.value)
-
     void logFirebaseAnalyticsEvent('signup_submit_success', {})
-
-    notifySuccess('サインアップしました')
-
-    setTimeout(() => {
-      router.push('/login')
-    }, 1000)
-  } catch (error) {
-    void logFirebaseAnalyticsEvent('signup_submit_error', {
-      errorCode: String(error?.code || 'unknown'),
-    })
-    notifyError(error)
-  } finally {
-    isLoading.value = false
-  }
-}
+  },
+  successMessage: 'サインアップしました',
+  redirectTo: '/login',
+  errorEvent: 'signup_submit_error',
+})
 
 const isFormValid = computed(() => {
   return Boolean(

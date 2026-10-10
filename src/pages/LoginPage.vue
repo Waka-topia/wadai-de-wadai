@@ -85,7 +85,7 @@ import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
-import { useSnackbar } from '@/composables/useSnackbar'
+import { useFormSubmit } from '@/composables/useFormSubmit'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { required, emailDomainCheck } from '@/utils/forms/validate'
 import AuthCard from '@/components/auth/AuthCard.vue'
@@ -95,9 +95,6 @@ const loginData = ref({
   email: '',
   password: '',
 })
-const isLoading = ref(false)
-
-const { notifySuccess, notifyError } = useSnackbar()
 
 const router = useRouter()
 const route = useRoute()
@@ -120,33 +117,16 @@ const onForgotPassword = () => {
   router.push('/forgot-password')
 }
 
-const onSubmit = async (validationPromise) => {
-  try {
-    isLoading.value = true
-
-    const { valid } = await validationPromise
-    if (!valid) throw new Error('入力に誤りがあります。')
-
+const { isLoading, submit: onSubmit } = useFormSubmit({
+  action: async () => {
     await store.dispatch('auth/login', loginData.value)
-
     void logFirebaseAnalyticsEvent('login_submit_success', {})
-
-    notifySuccess('ログインしました')
-
-    setTimeout(() => {
-      // ガードによるリダイレクト先がある場合はそこへ、なければトップへ
-      const redirectPath = route.query.redirect || '/'
-      router.push(String(redirectPath))
-    }, 1000)
-  } catch (error) {
-    void logFirebaseAnalyticsEvent('login_submit_error', {
-      errorCode: String(error?.code || 'unknown'),
-    })
-    notifyError(error)
-  } finally {
-    isLoading.value = false
-  }
-}
+  },
+  successMessage: 'ログインしました',
+  // ガードによるリダイレクト先がある場合はそこへ、なければトップへ
+  redirectTo: () => String(route.query.redirect || '/'),
+  errorEvent: 'login_submit_error',
+})
 
 const isFormValid = computed(() => {
   return Boolean(loginData.value.email && loginData.value.password)

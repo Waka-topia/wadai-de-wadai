@@ -163,11 +163,11 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, ref } from 'vue'
 import { required, passwordRule, confirmPasswordRule } from '@/utils/forms/validate'
 import { useStore } from 'vuex'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import { useFormSubmit } from '@/composables/useFormSubmit'
 import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { allGroups } from '@/data/groups'
@@ -177,13 +177,11 @@ import PasswordField from '@/components/common/PasswordField.vue'
 const selectedGroup = ref(null)
 const password = ref('')
 const confirmPassword = ref('')
-const isLoading = ref(false)
 const isCheckingGroup = ref(false)
 const registrationMode = ref(null) // 'initial' | 'subsequent'
 
-const { showSnackbar, notifySuccess, notifyError } = useSnackbar()
+const { showSnackbar, notifyError } = useSnackbar()
 
-const router = useRouter()
 const store = useStore()
 
 useFirebasePageView('view_prove_owner', {})
@@ -219,64 +217,58 @@ const onGroupSelected = async (group) => {
   }
 }
 
+// 後続登録: パスワード認証で即座に代表者として登録する
+const subsequentRegistration = useFormSubmit({
+  action: async () => {
+    const selected = selectedGroup.value
+    await store.dispatch('prove/submitPasswordRegistration', {
+      groupId: String(selected.id),
+      userId: store.getters['auth/userId'],
+      userName: store.getters['auth/displayName'],
+      password: password.value,
+    })
+    void logFirebaseAnalyticsEvent('prove_owner_instant_register_success', {
+      organizationId: String(selected.id),
+    })
+  },
+  successMessage: '代表者として登録されました！',
+  redirectTo: '/eventcal',
+  redirectDelay: 1500,
+  errorEvent: 'prove_owner_submit_error',
+})
+
+// 初回申請: 運営の承認が必要
+const initialApplication = useFormSubmit({
+  action: async () => {
+    const selected = selectedGroup.value
+    await store.dispatch('prove/submitInitialApplication', {
+      organizationId: selected.id,
+      password: password.value,
+      userId: store.getters['auth/userId'],
+      userNameSnapshot: store.getters['auth/displayName'],
+      emailSnapshot: store.getters['auth/email'],
+      groupNameSnapshot: selected.name,
+    })
+    void logFirebaseAnalyticsEvent('prove_owner_submit_success', {
+      organizationId: String(selected.id),
+    })
+  },
+  successMessage: '申請を受け付けました',
+  redirectTo: '/prove-owner/description',
+  errorEvent: 'prove_owner_submit_error',
+})
+
+const isLoading = computed(
+  () => subsequentRegistration.isLoading.value || initialApplication.isLoading.value,
+)
+
 /**
  * フォーム送信ハンドラ（初回申請 or パスワード即登録を分岐）
  *
  * @param {Promise} validationPromise バリデーション結果
  */
-const onSubmit = async (validationPromise) => {
-  try {
-    isLoading.value = true
-
-    const { valid } = await validationPromise
-    if (!valid) throw new Error('入力に誤りがあります。')
-
-    const selected = selectedGroup.value
-
-    if (registrationMode.value === 'subsequent') {
-      // 後続登録: パスワード認証で即座に登録
-      await store.dispatch('prove/submitPasswordRegistration', {
-        groupId: String(selected.id),
-        userId: store.getters['auth/userId'],
-        userName: store.getters['auth/displayName'],
-        password: password.value,
-      })
-
-      void logFirebaseAnalyticsEvent('prove_owner_instant_register_success', {
-        organizationId: String(selected.id),
-      })
-
-      notifySuccess('代表者として登録されました！')
-
-      setTimeout(() => {
-        router.push('/eventcal')
-      }, 1500)
-    } else {
-      // 初回申請: 運営承認が必要
-      await store.dispatch('prove/submitInitialApplication', {
-        organizationId: selected.id,
-        password: password.value,
-        userId: store.getters['auth/userId'],
-        userNameSnapshot: store.getters['auth/displayName'],
-        emailSnapshot: store.getters['auth/email'],
-        groupNameSnapshot: selected.name,
-      })
-
-      void logFirebaseAnalyticsEvent('prove_owner_submit_success', {
-        organizationId: String(selected.id),
-      })
-
-      notifySuccess('申請を受け付けました')
-
-      setTimeout(() => {
-        router.push('/prove-owner/description')
-      }, 1000)
-    }
-  } catch (error) {
-    void logFirebaseAnalyticsEvent('prove_owner_submit_error', {})
-    notifyError(error)
-  } finally {
-    isLoading.value = false
-  }
-}
+const onSubmit = (validationPromise) =>
+  registrationMode.value === 'subsequent'
+    ? subsequentRegistration.submit(validationPromise)
+    : initialApplication.submit(validationPromise)
 </script>

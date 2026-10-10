@@ -42,7 +42,7 @@
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
-import { useSnackbar } from '@/composables/useSnackbar'
+import { useFormSubmit } from '@/composables/useFormSubmit'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { resetPassword } from '@/services/authService'
 import { confirmPasswordRule, passwordRule, required } from '@/utils/forms/validate'
@@ -52,10 +52,7 @@ import PasswordField from '@/components/common/PasswordField.vue'
 const newPassword = ref('')
 const confirmPassword = ref('')
 const form = ref(false)
-const isLoading = ref(false)
 const oobCode = ref('')
-
-const { notifySuccess, notifyError } = useSnackbar()
 
 const route = useRoute()
 const router = useRouter()
@@ -71,25 +68,14 @@ onMounted(() => {
   oobCode.value = code
 })
 
-const onSubmit = async () => {
-  try {
-    isLoading.value = true
+const { isLoading, submit: onSubmit } = useFormSubmit({
+  action: async () => {
     await resetPassword(oobCode.value, newPassword.value)
-
     void logFirebaseAnalyticsEvent('reset_password_submit_success', {})
-
-    notifySuccess('パスワードを変更しました。')
-
-    setTimeout(() => {
-      router.push('/login')
-    }, 2000)
-  } catch (error) {
-    void logFirebaseAnalyticsEvent('reset_password_submit_error', {
-      errorCode: String(error?.code || 'unknown'),
-    })
-    notifyError(error)
-  } finally {
-    isLoading.value = false
-  }
-}
+  },
+  successMessage: 'パスワードを変更しました。',
+  redirectTo: '/login',
+  redirectDelay: 2000,
+  errorEvent: 'reset_password_submit_error',
+})
 </script>
