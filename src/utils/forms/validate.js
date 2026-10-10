@@ -1,4 +1,15 @@
-export const required = (value) => !!value || 'このフィールドは必須です。'
+/**
+ * 入力必須のバリデーション
+ *
+ * 複数選択（配列）の場合は 1 つ以上選ばれていることを求める
+ *
+ * @param {unknown} value - 入力値
+ * @returns {true | string} 有効なら true、無効ならエラーメッセージ
+ */
+export const required = (value) => {
+  const isFilled = Array.isArray(value) ? value.length > 0 : !!value
+  return isFilled || 'このフィールドは必須です。'
+}
 
 export const passwordRule = (value) => {
   if (value && value.length < 8) {
