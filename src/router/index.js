@@ -81,6 +81,8 @@ const routes = [
   {
     path: '/map',
     name: 'Map',
+    // 地図は画面全体に広げる（PC でも本文の最大幅を適用しない）
+    meta: { layout: 'full' },
     component: () => import('@/pages/MapPage.vue'),
   },
   {
@@ -110,7 +112,8 @@ const routes = [
   {
     path: '/admin',
     name: 'Admin',
-    meta: { requiresAdmin: true },
+    // 一覧の表を PC で広く見せる
+    meta: { requiresAdmin: true, layout: 'wide' },
     component: () => import('@/pages/AdminPage.vue'),
   },
 ]

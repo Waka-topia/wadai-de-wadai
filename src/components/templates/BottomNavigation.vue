@@ -1,33 +1,42 @@
 <template>
   <v-layout>
     <v-bottom-navigation v-model="selectedIndex" class="bottom-nav" active color="orange" grow>
-      <v-btn to="/eventcal" value="eventcal" @click="logBottomNav('eventcal')">
-        <v-icon>mdi-calendar-month</v-icon>
-        <span>新歓日程</span>
+      <v-btn
+        v-for="item in leftItems"
+        :key="item.value"
+        :to="item.to"
+        :value="item.value"
+        @click="logBottomNav(item.value)"
+      >
+        <v-icon>{{ item.icon }}</v-icon>
+        <span>{{ item.label }}</span>
       </v-btn>
 
-      <v-btn to="/timetable" value="timetable" @click="logBottomNav('timetable')">
-        <v-icon>mdi-table-clock</v-icon>
-        <span>時間割</span>
-      </v-btn>
-
+      <!-- ホームだけは中央の丸ボタンにする -->
       <div class="home-btn-wrapper">
-        <v-btn to="/" value="home" class="home-btn" :ripple="false" @click="logBottomNav('home')">
+        <v-btn
+          :to="homeItem.to"
+          :value="homeItem.value"
+          class="home-btn"
+          :ripple="false"
+          @click="logBottomNav(homeItem.value)"
+        >
           <div class="home-icon-bg">
-            <v-icon size="32" color="white">mdi-home</v-icon>
-            <span class="home-label-in-circle">ホーム</span>
+            <v-icon size="32" color="white">{{ homeItem.icon }}</v-icon>
+            <span class="home-label-in-circle">{{ homeItem.label }}</span>
           </div>
         </v-btn>
       </div>
 
-      <v-btn to="/jobs" value="jobs" @click="logBottomNav('jobs')">
-        <v-icon>mdi-briefcase-search</v-icon>
-        <span>求人情報</span>
-      </v-btn>
-
-      <v-btn to="/mypage" value="mypage" @click="logBottomNav('mypage')">
-        <v-icon>mdi-account</v-icon>
-        <span>マイページ</span>
+      <v-btn
+        v-for="item in rightItems"
+        :key="item.value"
+        :to="item.to"
+        :value="item.value"
+        @click="logBottomNav(item.value)"
+      >
+        <v-icon>{{ item.icon }}</v-icon>
+        <span>{{ item.label }}</span>
       </v-btn>
     </v-bottom-navigation>
   </v-layout>
@@ -36,9 +45,16 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { findNavValue, mainNavItems } from '@/config/navigation'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 
 const route = useRoute()
+
+const homeItem = mainNavItems.find((item) => item.value === 'home')
+const otherItems = mainNavItems.filter((item) => item.value !== 'home')
+// ホームの丸ボタンを中央に置くため、残りを左右 2 つずつに分ける
+const leftItems = otherItems.slice(0, 2)
+const rightItems = otherItems.slice(2)
 
 const logBottomNav = (destination) => {
   void logFirebaseAnalyticsEvent('bottom_nav_click', { destination })
@@ -49,13 +65,7 @@ const selectedIndex = ref('home')
 watch(
   () => route.path,
   (newPath) => {
-    if (newPath === '/') selectedIndex.value = 'home'
-    else if (newPath === '/eventcal') selectedIndex.value = 'eventcal'
-    // else if (newPath === '/reader') selectedIndex.value = 'reader' // QR読み取り機能はフッターから非表示化
-    else if (newPath === '/jobs') selectedIndex.value = 'jobs'
-    else if (newPath === '/timetable') selectedIndex.value = 'timetable'
-    else if (newPath === '/mypage') selectedIndex.value = 'mypage'
-    else selectedIndex.value = undefined
+    selectedIndex.value = findNavValue(newPath)
   },
   { immediate: true },
 )

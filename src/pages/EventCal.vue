@@ -449,4 +449,12 @@ onMounted(() => {
   right: 16px;
   z-index: 1000;
 }
+
+/* PC では下部バーが無いので下へ寄せる。ただし高さ 40px のフッターに隠れないよう、その上に出す */
+@media (min-width: 960px) {
+  .fab-btn {
+    bottom: 56px;
+    right: 24px;
+  }
+}
 </style>
