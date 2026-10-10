@@ -1,6 +1,6 @@
 <template>
   <v-skeleton-loader v-if="isLoading" type="card"></v-skeleton-loader>
-  <v-container class="pa-4 pb-16 search-page-container">
+  <v-container class="pa-4 pb-16">
     <div class="d-flex align-center gap-2 mb-4">
       <!-- 戻るボタン -->
       <v-btn icon="mdi-arrow-left" variant="plain" rounded="lg" @click="router.back()" />
@@ -100,15 +100,18 @@
       max-height="85vh"
       scrollable
     >
-      <div class="pa-4">
-        <LectureSyllabusPanel
-          v-if="selectedLectureName"
-          :lecture-name="selectedLectureName"
-          :default-expanded="true"
-          :hide-toggle="true"
-          class="mt-0"
-        />
-      </div>
+      <!-- 閉じたら作り直す（✕ で編集をやめたあと、開き直したときに編集中の状態を残さない） -->
+      <template #default="{ isOpen }">
+        <div class="pa-4">
+          <LectureSyllabusPanel
+            v-if="selectedLectureName && isOpen"
+            :lecture-name="selectedLectureName"
+            :default-expanded="true"
+            :hide-toggle="true"
+            class="mt-0"
+          />
+        </div>
+      </template>
       <template #actions>
         <v-btn
           block
@@ -331,10 +334,7 @@ const registerAndSave = async () => {
 </script>
 
 <style scoped>
-.search-page-container {
-  background-color: #fafafa;
-  min-height: 100vh;
-}
+/* 薄いグレーの背景はルートの meta.background で v-main 全体に付ける（PC で本文の外側まで広げるため） */
 .add-btn {
   letter-spacing: 1px;
 }
