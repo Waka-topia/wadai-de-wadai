@@ -1,69 +1,61 @@
 <template>
-  <v-progress-linear v-if="isLoading" color="success" indeterminate=""></v-progress-linear>
-  <v-sheet class="pa-12" rounded>
-    <v-card class="py-8">
-      <v-card-title class="text-center mb-4">新しいパスワードを設定</v-card-title>
+  <AuthCard
+    icon="mdi-lock-check"
+    title="新しいパスワードを設定"
+    subtitle="8文字以上の新しいパスワードを入力してください。"
+    :loading="isLoading"
+  >
+    <FormFieldDefaults>
       <v-form v-model="form" @submit.prevent="onSubmit">
-        <v-text-field
+        <PasswordField
           v-model="newPassword"
-          :append-inner-icon="visibleNew ? 'mdi-eye' : 'mdi-eye-off'"
           :rules="[required, passwordRule]"
-          :type="visibleNew ? 'text' : 'password'"
-          clearable
-          class="mb-2"
+          class="mb-4"
           label="新しいパスワード"
           placeholder="Xa4%j87d"
-          prepend-inner-icon="mdi-lock-outline"
-          @click:append-inner="visibleNew = !visibleNew"
-        ></v-text-field>
-        <v-text-field
+        />
+        <PasswordField
           v-model="confirmPassword"
-          :append-inner-icon="visibleConfirm ? 'mdi-eye' : 'mdi-eye-off'"
           :rules="[required, confirmPasswordRule(newPassword)]"
-          :type="visibleConfirm ? 'text' : 'password'"
-          clearable
+          class="mb-6"
           label="パスワードを確認"
           placeholder="Xa4%j87d"
-          prepend-inner-icon="mdi-lock-outline"
-          @click:append-inner="visibleConfirm = !visibleConfirm"
-        ></v-text-field>
-
-        <br />
+        />
 
         <v-btn
           type="submit"
           :disabled="!form"
           :loading="isLoading"
           block
-          color="success"
-          size="large"
-          variant="elevated"
+          color="green-darken-2"
+          size="x-large"
+          rounded="pill"
+          class="font-weight-bold"
+          elevation="0"
         >
           パスワードを変更する
         </v-btn>
       </v-form>
-    </v-card>
-  </v-sheet>
+    </FormFieldDefaults>
+  </AuthCard>
 </template>
 
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
-import { useSnackbar } from '@/composables/useSnackbar'
+import { useFormSubmit } from '@/composables/useFormSubmit'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { resetPassword } from '@/services/authService'
 import { confirmPasswordRule, passwordRule, required } from '@/utils/forms/validate'
+import AuthCard from '@/components/auth/AuthCard.vue'
+import PasswordField from '@/components/common/PasswordField.vue'
+import FormFieldDefaults from '@/components/common/FormFieldDefaults.vue'
 
 const newPassword = ref('')
 const confirmPassword = ref('')
-const visibleNew = ref(false)
-const visibleConfirm = ref(false)
 const form = ref(false)
-const isLoading = ref(false)
 const oobCode = ref('')
-
-const { notifySuccess, notifyError } = useSnackbar()
 
 const route = useRoute()
 const router = useRouter()
@@ -79,25 +71,14 @@ onMounted(() => {
   oobCode.value = code
 })
 
-const onSubmit = async () => {
-  try {
-    isLoading.value = true
+const { isLoading, submit: onSubmit } = useFormSubmit({
+  action: async () => {
     await resetPassword(oobCode.value, newPassword.value)
-
     void logFirebaseAnalyticsEvent('reset_password_submit_success', {})
-
-    notifySuccess('パスワードを変更しました。')
-
-    setTimeout(() => {
-      router.push('/login')
-    }, 2000)
-  } catch (error) {
-    void logFirebaseAnalyticsEvent('reset_password_submit_error', {
-      errorCode: String(error?.code || 'unknown'),
-    })
-    notifyError(error)
-  } finally {
-    isLoading.value = false
-  }
-}
+  },
+  successMessage: 'パスワードを変更しました。',
+  redirectTo: '/login',
+  redirectDelay: 2000,
+  errorEvent: 'reset_password_submit_error',
+})
 </script>
