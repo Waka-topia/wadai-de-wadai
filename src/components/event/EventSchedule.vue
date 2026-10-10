@@ -24,7 +24,6 @@
         rounded="lg"
         elevation="1"
         class="event-card"
-        :class="{ 'proxy-event-card': isProxyEvent(event) }"
         @click="goToEventDetail(event.eventId)"
       >
         <!-- 右上インフォボタン（代理登録のみ） -->
@@ -201,11 +200,6 @@ const formatDate = (dateStr) => (dateStr ? formatShortDateWeekday(parseDateKey(d
   transform: translateY(0);
 }
 
-/* --- 代理登録カード --- */
-.proxy-event-card {
-  border-left: 3px solid #ff9800;
-}
-
 /* --- 時間カラム --- */
 .time-column {
   min-width: 60px;
@@ -224,7 +218,9 @@ const formatDate = (dateStr) => (dateStr ? formatShortDateWeekday(parseDateKey(d
 }
 
 /* --- 区切り線 --- */
+/* 組織名や概要が長いと flex で縮められて幅 0 になり消えるので、縮めない */
 .time-divider {
+  flex-shrink: 0;
   width: 2px;
   min-height: 48px;
   background: linear-gradient(180deg, #ff9800 0%, #ffe0b2 100%);
