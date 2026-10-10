@@ -348,7 +348,7 @@ const registerAndSave = async () => {
     })
 
     // 完了フィードバック
-    showSnackbar(`「${lectureName}」をみんなのシラバスに登録しました！`, {
+    showSnackbar(`「${lectureName}」をみんなのシラバスに登録しました！`, 'success', {
       icon: 'mdi-check-circle',
     })
 
