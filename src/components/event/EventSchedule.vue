@@ -1,21 +1,20 @@
 <template>
   <div class="event-schedule">
     <!-- 空状態 -->
-    <div v-if="displayEvents.length === 0" class="no-events-container">
-      <v-icon size="48" color="grey-lighten-1" class="mb-3">
-        {{ props.events ? 'mdi-calendar-search' : 'mdi-calendar-blank-outline' }}
-      </v-icon>
-      <p class="text-body-1 font-weight-bold text-grey-darken-1 mb-1">
-        {{ props.events ? '該当するイベントはありません' : 'この日のイベントはありません' }}
-      </p>
-      <p class="text-caption text-grey">
-        {{
-          props.events
-            ? '別のキーワードで試してみてください'
-            : '別の日をカレンダーから選択してください'
-        }}
-      </p>
-    </div>
+    <EmptyState
+      v-if="displayEvents.length === 0 && props.events"
+      class="no-events-container"
+      icon="mdi-calendar-search"
+      title="該当するイベントはありません"
+      message="別のキーワードで試してみてください"
+    />
+    <EmptyState
+      v-else-if="displayEvents.length === 0"
+      class="no-events-container"
+      icon="mdi-calendar-blank-outline"
+      title="この日のイベントはありません"
+      message="別の日をカレンダーから選択してください"
+    />
 
     <!-- イベントカードリスト -->
     <div v-else class="d-flex flex-column ga-3">
@@ -52,28 +51,11 @@
         <!-- 上部バッジエリア -->
         <div v-if="event.isOfficial || isProxyEvent(event)" class="badge-area px-4 pt-3 pb-0">
           <div class="d-flex ga-2 flex-wrap">
-            <v-chip
-              v-if="event.isOfficial"
-              size="small"
-              color="blue"
-              variant="flat"
-              class="font-weight-bold"
-              label
-            >
-              <v-icon start size="14">mdi-check-decagram</v-icon>
-              公式認定
-            </v-chip>
-            <v-chip
-              v-if="isProxyEvent(event)"
-              size="small"
-              color="orange"
-              variant="flat"
-              class="font-weight-bold text-white"
-              label
-            >
-              <v-icon start size="14">mdi-clipboard-text-outline</v-icon>
-              代理登録 — 引き継ぎ募集中
-            </v-chip>
+            <EventStatusChips
+              :is-official="event.isOfficial"
+              :is-proxy="isProxyEvent(event)"
+              long
+            />
           </div>
         </div>
 
@@ -128,32 +110,19 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
+import { useProxyEvent } from '@/composables/useProxyEvent'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
-import { adminUserId } from '@/config/constants'
-import { hashValue } from '@/utils/crypto'
 import { formatShortDateWeekday, parseDateKey } from '@/utils/dateFormatter'
+import EmptyState from '@/components/common/EmptyState.vue'
+import EventStatusChips from '@/components/event/EventStatusChips.vue'
 
 const router = useRouter()
 const store = useStore()
 
-const hashedAdminUserId = ref('')
-
-onMounted(async () => {
-  hashedAdminUserId.value = await hashValue(adminUserId)
-})
-
-/**
- * イベントが運営による代理登録かどうかを判定する
- *
- * @param {object} event イベントデータ
- * @returns {boolean} 運営代理登録の場合true
- */
-const isProxyEvent = (event) => {
-  return event.createdBy === hashedAdminUserId.value
-}
+const { isProxyEvent } = useProxyEvent()
 
 const goToEventDetail = (eventId) => {
   void logFirebaseAnalyticsEvent('event_schedule_item_click', { eventId: String(eventId) })

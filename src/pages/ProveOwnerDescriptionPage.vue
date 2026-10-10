@@ -150,18 +150,16 @@
       rounded="xl"
       elevation="1"
     >
-      <v-progress-circular indeterminate color="orange-darken-2" size="28" class="mr-2" />
-      読み込み中...
+      <LoadingState message="読み込み中..." />
     </v-card>
 
     <!-- 空状態（申請なし） -->
     <v-card v-else class="pa-6 pa-md-8 w-100" max-width="560" rounded="xl" elevation="1">
-      <div class="text-center py-6">
-        <v-avatar color="grey-lighten-4" size="72" class="mb-4">
-          <v-icon size="36" color="grey-lighten-1">mdi-information-outline</v-icon>
-        </v-avatar>
-        <p class="text-h6 font-weight-bold text-grey-darken-3 mb-2">代表者証明を申請していません</p>
-        <p class="text-body-2 text-grey-darken-1 mb-6">まずは代表者証明の申請を完了してください</p>
+      <EmptyState
+        icon="mdi-information-outline"
+        title="代表者証明を申請していません"
+        message="まずは代表者証明の申請を完了してください"
+      >
         <v-btn
           color="orange-darken-2"
           elevation="0"
@@ -172,7 +170,7 @@
         >
           代表者証明を申請する
         </v-btn>
-      </div>
+      </EmptyState>
     </v-card>
   </v-container>
 </template>
@@ -186,6 +184,8 @@ import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { getProveOwnerApplicantService } from '@/services/proveService'
 import { instagramUrl, xUrl } from '@/config/constants'
 import { openExternalLink } from '@/utils/externalLink'
+import EmptyState from '@/components/common/EmptyState.vue'
+import LoadingState from '@/components/common/LoadingState.vue'
 
 const store = useStore()
 

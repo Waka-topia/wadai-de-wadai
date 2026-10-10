@@ -1,11 +1,6 @@
 <template>
   <div class="mb-6">
-    <div class="d-flex align-center justify-space-between mb-2">
-      <div class="d-flex align-center">
-        <v-icon color="orange" class="mr-2">mdi-map-marker-radius</v-icon>
-        <span class="font-weight-bold">勤務地マップ</span>
-      </div>
-    </div>
+    <SectionHeader title="勤務地マップ" icon="mdi-map-marker-radius" icon-color="orange" />
 
     <v-card
       flat
@@ -30,6 +25,7 @@
 import { onMounted, onUnmounted, ref, computed, markRaw } from 'vue'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { openExternalLink } from '@/utils/externalLink'
+import SectionHeader from '@/components/common/SectionHeader.vue'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 

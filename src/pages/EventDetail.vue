@@ -5,15 +5,7 @@
       <v-icon>mdi-arrow-left</v-icon>
     </v-btn>
 
-    <v-alert
-      v-if="fetchErrorMessage"
-      type="error"
-      variant="tonal"
-      class="mb-4"
-      icon="mdi-alert-circle"
-    >
-      {{ fetchErrorMessage }}
-    </v-alert>
+    <ErrorState v-if="fetchErrorMessage" :message="fetchErrorMessage" />
 
     <v-card
       v-else-if="event.eventId"
@@ -25,28 +17,7 @@
       <v-card-title class="pa-5 pb-2">
         <div class="d-flex align-center flex-wrap ga-2">
           <span class="text-h5 font-weight-bold">{{ event.title }}</span>
-          <v-chip
-            v-if="event.isOfficial"
-            size="small"
-            color="blue"
-            variant="flat"
-            label
-            class="font-weight-bold"
-          >
-            <v-icon start size="14">mdi-check-decagram</v-icon>
-            公式
-          </v-chip>
-          <v-chip
-            v-if="isProxyEvent"
-            size="small"
-            color="orange"
-            variant="flat"
-            label
-            class="font-weight-bold text-white"
-          >
-            <v-icon start size="14">mdi-clipboard-text-outline</v-icon>
-            代理登録
-          </v-chip>
+          <EventStatusChips :is-official="event.isOfficial" :is-proxy="isProxyEvent" />
         </div>
       </v-card-title>
 
@@ -206,10 +177,7 @@
       </div>
     </v-card>
 
-    <v-card v-else rounded="lg" elevation="2" class="pa-6 text-center">
-      <v-progress-circular indeterminate color="orange" size="28" class="mr-2" />
-      読み込み中...
-    </v-card>
+    <LoadingState v-else message="読み込み中..." />
 
     <ClaimEventDialog
       v-model="claimDialogOpen"
@@ -245,6 +213,10 @@ import { adminUserId } from '@/config/constants'
 import { hashValue } from '@/utils/crypto'
 import { isUserRepresentative } from '@/services/groupService'
 import { useSnackbar } from '@/composables/useSnackbar'
+import { useProxyEvent } from '@/composables/useProxyEvent'
+import EventStatusChips from '@/components/event/EventStatusChips.vue'
+import ErrorState from '@/components/common/ErrorState.vue'
+import LoadingState from '@/components/common/LoadingState.vue'
 import BaseBottomSheet from '@/components/common/BaseBottomSheet.vue'
 import BaseDialog from '@/components/common/BaseDialog.vue'
 import ClaimEventDialog from '@/components/event/ClaimEventDialog.vue'
@@ -268,13 +240,13 @@ const eventId = computed(() => String(route.params.id || ''))
 const isLoggedIn = computed(() => !!store.getters['auth/userId'])
 const currentUserId = computed(() => store.getters['auth/userId'])
 
-const hashedAdminId = ref('')
 const hashedCurrentUserId = ref('')
 const isRepresentative = ref(false)
 
-/** ハッシュ化したIDをあらかじめ計算しておく */
+const { isProxyEvent: checkProxyEvent } = useProxyEvent()
+
+/** 作成者との照合のため、ログイン中のユーザー ID をハッシュ化しておく */
 onMounted(async () => {
-  hashedAdminId.value = await hashValue(adminUserId)
   if (currentUserId.value) {
     hashedCurrentUserId.value = await hashValue(currentUserId.value)
   }
@@ -301,14 +273,12 @@ watch(
 )
 
 /** イベントが運営による代理登録かどうかを判定する */
-const isProxyEvent = computed(() => {
-  return event.value.createdBy === hashedAdminId.value
-})
+const isProxyEvent = computed(() => checkProxyEvent(event.value))
 
 /** 編集・削除権限があるかどうかを判定する (作成者本人 or 管理者 or 団体の代表者) */
 const canEdit = computed(() => {
   if (!isLoggedIn.value) return false
-  if (hashedCurrentUserId.value === hashedAdminId.value) return true // 運営は何でも消せる
+  if (currentUserId.value === adminUserId) return true // 運営は何でも消せる
 
   // 団体の代表者かつ公式イベントなら許可
   if (event.value.isOfficial && isRepresentative.value) return true
