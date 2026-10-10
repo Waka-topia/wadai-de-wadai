@@ -37,58 +37,66 @@
       </v-card-text>
     </v-card>
 
-    <!-- 検索バーエリア -->
-    <SearchField v-model="searchQuery" class="mx-4 mt-4" placeholder="団体名で検索" />
+    <!-- lg 以上では、左にカレンダー・右にその日のイベントの 2 列にする -->
+    <div class="eventcal-columns">
+      <div>
+        <!-- 検索バーエリア -->
+        <SearchField v-model="searchQuery" class="mx-4 mt-4" placeholder="団体名で検索" />
 
-    <!-- 検索情報の表示 -->
-    <div v-if="searchQuery" class="mx-4 mt-2">
-      <span class="text-caption font-weight-bold text-grey-darken-1">検索結果を表示中</span>
-    </div>
-
-    <VueCal
-      v-show="!searchQuery"
-      class="vuecal"
-      :disable-views="['years', 'year', 'week', 'day']"
-      :events="events"
-      :max-date="maxDate"
-      :min-date="minDate"
-      :selected-date="selectedDate"
-      active-view="month"
-      hide-view-selector
-      locale="en"
-      start-week-on-sunday
-      @cell-click="onCellClick"
-    ></VueCal>
-
-    <div v-show="!searchQuery">
-      <v-divider class="my-4"></v-divider>
-
-      <!-- 日付ナビゲーション（前日・表示中の日付・翌日・今日へ戻る） -->
-      <div class="date-nav">
-        <v-btn icon variant="text" size="small" aria-label="前の日" @click="changeDate(-1)">
-          <v-icon>mdi-chevron-left</v-icon>
-        </v-btn>
-        <div class="date-display">
-          <span class="text-body-1 font-weight-bold text-no-wrap">{{ formattedDate }}</span>
+        <!-- 検索情報の表示 -->
+        <div v-if="searchQuery" class="mx-4 mt-2">
+          <span class="text-caption font-weight-bold text-grey-darken-1">検索結果を表示中</span>
         </div>
-        <v-btn icon variant="text" size="small" aria-label="次の日" @click="changeDate(1)">
-          <v-icon>mdi-chevron-right</v-icon>
-        </v-btn>
-        <v-btn
-          size="small"
-          variant="tonal"
-          color="orange-darken-2"
-          rounded="pill"
-          class="font-weight-bold"
-          :disabled="isToday"
-          @click="setToday"
-        >
-          今日
-        </v-btn>
+
+        <VueCal
+          v-show="!searchQuery"
+          class="vuecal"
+          :disable-views="['years', 'year', 'week', 'day']"
+          :events="events"
+          :max-date="maxDate"
+          :min-date="minDate"
+          :selected-date="selectedDate"
+          active-view="month"
+          hide-view-selector
+          locale="en"
+          start-week-on-sunday
+          @cell-click="onCellClick"
+        ></VueCal>
+      </div>
+
+      <div class="eventcal-side">
+        <div v-show="!searchQuery">
+          <!-- 2 列のときは列の区切りがあるので、横線は不要 -->
+          <v-divider class="my-4 d-lg-none"></v-divider>
+
+          <!-- 日付ナビゲーション（前日・表示中の日付・翌日・今日へ戻る） -->
+          <div class="date-nav">
+            <v-btn icon variant="text" size="small" aria-label="前の日" @click="changeDate(-1)">
+              <v-icon>mdi-chevron-left</v-icon>
+            </v-btn>
+            <div class="date-display">
+              <span class="text-body-1 font-weight-bold text-no-wrap">{{ formattedDate }}</span>
+            </div>
+            <v-btn icon variant="text" size="small" aria-label="次の日" @click="changeDate(1)">
+              <v-icon>mdi-chevron-right</v-icon>
+            </v-btn>
+            <v-btn
+              size="small"
+              variant="tonal"
+              color="orange-darken-2"
+              rounded="pill"
+              class="font-weight-bold"
+              :disabled="isToday"
+              @click="setToday"
+            >
+              今日
+            </v-btn>
+          </div>
+        </div>
+
+        <EventSchedule v-model:selected-date="selectedDate" :events="searchedEvents" />
       </div>
     </div>
-
-    <EventSchedule v-model:selected-date="selectedDate" :events="searchedEvents" />
 
     <!-- イベント追加フォーム -->
     <BaseBottomSheet title="新歓イベントの登録">
@@ -293,6 +301,20 @@ onMounted(() => {
 /* --- レイアウト --- */
 .event-list {
   height: 100%;
+}
+
+/* --- PC（lg 以上）の 2 列レイアウト --- */
+@media (min-width: 1280px) {
+  .eventcal-columns {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  /* 右列の先頭を、左列の検索バーと高さを揃える */
+  .eventcal-side {
+    padding-top: 16px;
+  }
 }
 
 /* --- バナーステップ --- */
