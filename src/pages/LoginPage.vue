@@ -1,96 +1,83 @@
 <template>
-  <v-container class="fill-height d-flex align-start justify-center" fluid>
-    <v-card class="pa-6 pa-md-8 w-100" max-width="450" rounded="xl" elevation="1" outlined>
-      <v-progress-linear
-        v-if="isLoading"
+  <AuthCard
+    icon="mdi-login"
+    title="ログイン"
+    subtitle="ワダイdeワダイへようこそ"
+    :loading="isLoading"
+  >
+    <v-form @submit.prevent="onSubmit">
+      <v-text-field
+        v-model="loginData.email"
+        class="mb-4"
+        :rules="[required, emailDomainCheck]"
+        clearable
+        label="メールアドレス"
+        placeholder="sample@gmail.com"
+        prepend-inner-icon="mdi-email-outline"
+        variant="outlined"
         color="orange-darken-2"
-        indeterminate
-        absolute
-        top
-      ></v-progress-linear>
+        density="comfortable"
+      ></v-text-field>
 
-      <div class="text-center mb-8">
-        <v-avatar color="orange-lighten-5" size="72" class="mb-4">
-          <v-icon size="36" color="orange-darken-2">mdi-login</v-icon>
-        </v-avatar>
-        <h2 class="text-h5 font-weight-bold text-grey-darken-3">ログイン</h2>
-        <p class="text-caption text-grey-darken-1 mt-1">ワダイdeワダイへようこそ</p>
+      <PasswordField
+        v-model="loginData.password"
+        :rules="[required]"
+        label="パスワード"
+        placeholder="パスワードを入力"
+      />
+
+      <div class="d-flex justify-end mb-6 mt-n2">
+        <a
+          href="#"
+          class="text-caption text-orange-darken-2 font-weight-medium text-decoration-none"
+          @click.prevent="onForgotPassword"
+        >
+          パスワードをお忘れですか？
+        </a>
       </div>
 
-      <v-form @submit.prevent="onSubmit">
-        <v-text-field
-          v-model="loginData.email"
-          class="mb-4"
-          :rules="[required, emailDomainCheck]"
-          clearable
-          label="メールアドレス"
-          placeholder="sample@gmail.com"
-          prepend-inner-icon="mdi-email-outline"
-          variant="outlined"
-          color="orange-darken-2"
-          density="comfortable"
-        ></v-text-field>
+      <v-btn
+        type="submit"
+        :loading="isLoading"
+        :disabled="!isFormValid"
+        block
+        color="orange-darken-2"
+        size="x-large"
+        rounded="pill"
+        class="font-weight-bold mb-2"
+        elevation="0"
+      >
+        ログイン
+      </v-btn>
+    </v-form>
 
-        <PasswordField
-          v-model="loginData.password"
-          :rules="[required]"
-          label="パスワード"
-          placeholder="パスワードを入力"
-        />
+    <v-divider class="my-6"></v-divider>
 
-        <div class="d-flex justify-end mb-6 mt-n2">
-          <a
-            href="#"
-            class="text-caption text-orange-darken-2 font-weight-medium text-decoration-none"
-            @click.prevent="onForgotPassword"
-          >
-            パスワードをお忘れですか？
-          </a>
-        </div>
+    <div class="d-flex flex-column" style="gap: 12px">
+      <v-btn
+        variant="outlined"
+        color="orange-darken-2"
+        rounded="pill"
+        size="large"
+        block
+        class="font-weight-bold bg-white"
+        @click="onSignUp"
+      >
+        新しいアカウントを作成
+      </v-btn>
 
-        <v-btn
-          type="submit"
-          :loading="isLoading"
-          :disabled="!isFormValid"
-          block
-          color="orange-darken-2"
-          size="x-large"
-          rounded="pill"
-          class="font-weight-bold mb-2"
-          elevation="0"
-        >
-          ログイン
-        </v-btn>
-      </v-form>
-
-      <v-divider class="my-6"></v-divider>
-
-      <div class="d-flex flex-column" style="gap: 12px">
-        <v-btn
-          variant="outlined"
-          color="orange-darken-2"
-          rounded="pill"
-          size="large"
-          block
-          class="font-weight-bold bg-white"
-          @click="onSignUp"
-        >
-          新しいアカウントを作成
-        </v-btn>
-
-        <v-btn
-          variant="text"
-          color="grey-darken-1"
-          rounded="pill"
-          size="large"
-          block
-          @click="onStart"
-        >
-          ログインせずに開始する
-        </v-btn>
-      </div>
-    </v-card>
-  </v-container>
+      <v-btn
+        variant="text"
+        color="grey-darken-1"
+        rounded="pill"
+        size="large"
+        block
+        @click="onStart"
+      >
+        ログインせずに開始する
+      </v-btn>
+    </div>
+  </AuthCard>
 </template>
 
 <script setup>
@@ -101,6 +88,7 @@ import { useFirebasePageView } from '@/composables/useFirebasePageView'
 import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { required, emailDomainCheck } from '@/utils/forms/validate'
+import AuthCard from '@/components/auth/AuthCard.vue'
 import PasswordField from '@/components/common/PasswordField.vue'
 
 const loginData = ref({
