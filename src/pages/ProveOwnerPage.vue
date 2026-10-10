@@ -103,7 +103,7 @@
             />
             <PasswordField
               v-model="confirmPassword"
-              :rules="[required, passwordRule, confirmPasswordRule(password)]"
+              :confirm-of="password"
               hint="パスワードの確認のため、もう一度入力してください。"
               label="パスワードの確認"
               placeholder="Xa4%j87d"
@@ -157,7 +157,7 @@
 
 <script setup>
 import { computed, ref } from 'vue'
-import { required, passwordRule, confirmPasswordRule } from '@/utils/forms/validate'
+import { required, passwordRule } from '@/utils/forms/validate'
 import { useStore } from 'vuex'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
 import { useFormSubmit } from '@/composables/useFormSubmit'

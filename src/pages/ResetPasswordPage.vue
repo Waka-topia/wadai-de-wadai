@@ -6,7 +6,7 @@
     :loading="isLoading"
   >
     <FormFieldDefaults>
-      <v-form v-model="form" @submit.prevent="onSubmit">
+      <v-form v-model="isFormValid" @submit.prevent="onSubmit">
         <PasswordField
           v-model="newPassword"
           :rules="[required, passwordRule]"
@@ -16,7 +16,7 @@
         />
         <PasswordField
           v-model="confirmPassword"
-          :rules="[required, confirmPasswordRule(newPassword)]"
+          :confirm-of="newPassword"
           class="mb-6"
           label="パスワードを確認"
           placeholder="Xa4%j87d"
@@ -24,7 +24,7 @@
 
         <v-btn
           type="submit"
-          :disabled="!form"
+          :disabled="!isFormValid"
           :loading="isLoading"
           block
           color="green-darken-2"
@@ -47,14 +47,15 @@ import { useFirebasePageView } from '@/composables/useFirebasePageView'
 import { useFormSubmit } from '@/composables/useFormSubmit'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { resetPassword } from '@/services/authService'
-import { confirmPasswordRule, passwordRule, required } from '@/utils/forms/validate'
+import { passwordRule, required } from '@/utils/forms/validate'
 import AuthCard from '@/components/auth/AuthCard.vue'
 import PasswordField from '@/components/common/PasswordField.vue'
 import FormFieldDefaults from '@/components/common/FormFieldDefaults.vue'
 
 const newPassword = ref('')
 const confirmPassword = ref('')
-const form = ref(false)
+// 全項目が入力ルールを満たしているか（v-form が更新する）
+const isFormValid = ref(false)
 const oobCode = ref('')
 
 const route = useRoute()

@@ -6,7 +6,7 @@
     :loading="isLoading"
   >
     <FormFieldDefaults>
-      <v-form @submit.prevent="onSubmit">
+      <v-form v-model="isFormValid" @submit.prevent="onSubmit">
         <v-text-field
           v-model="signupData.userName"
           class="mb-4"
@@ -18,16 +18,11 @@
           prepend-inner-icon="mdi-account-outline"
         ></v-text-field>
 
-        <v-text-field
+        <EmailField
           v-model="signupData.email"
           class="mb-4"
-          :rules="[required, emailDomainCheck]"
-          clearable
           hint="大学のメールアドレス以外であれば構いません。"
-          label="メールアドレス"
-          placeholder="sample@gmail.com"
-          prepend-inner-icon="mdi-email-outline"
-        ></v-text-field>
+        />
 
         <PasswordField
           v-model="signupData.password"
@@ -36,6 +31,15 @@
           hint="8文字以上にしてください。"
           label="パスワード"
           placeholder="パスワードを入力"
+        />
+
+        <PasswordField
+          v-model="confirmPassword"
+          class="mb-4"
+          :confirm-of="signupData.password"
+          hint="確認のため、もう一度入力してください。"
+          label="パスワードの確認"
+          placeholder="パスワードを再入力"
         />
 
         <div
@@ -118,14 +122,15 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
 import { useFormSubmit } from '@/composables/useFormSubmit'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
-import { required, passwordRule, nameCheck, emailDomainCheck } from '@/utils/forms/validate'
+import { nameCheck, passwordRule, required } from '@/utils/forms/validate'
 import AuthCard from '@/components/auth/AuthCard.vue'
+import EmailField from '@/components/common/EmailField.vue'
 import BaseDialog from '@/components/common/BaseDialog.vue'
 import TermsRule from '@/components/templates/TermsRule.vue'
 import PasswordField from '@/components/common/PasswordField.vue'
@@ -136,8 +141,13 @@ const signupData = ref({
   password: '',
   userName: '',
 })
+// 確認用の再入力（送信はしない）
+const confirmPassword = ref('')
 const agree = ref(false)
 const dialog = ref(false)
+// 全項目が入力ルールを満たしているか（v-form が更新する）。
+// 規約への同意もチェックボックスの required ルールで判定される
+const isFormValid = ref(false)
 
 // ★ 追加: 規約を読んだかどうかを判定するフラグ
 const hasReadTerms = ref(false)
@@ -168,15 +178,5 @@ const { isLoading, submit: onSubmit } = useFormSubmit({
   successMessage: 'サインアップしました',
   redirectTo: '/login',
   errorEvent: 'signup_submit_error',
-})
-
-const isFormValid = computed(() => {
-  return Boolean(
-    signupData.value.userName &&
-    signupData.value.email &&
-    signupData.value.password &&
-    hasReadTerms.value &&
-    agree.value,
-  )
 })
 </script>
