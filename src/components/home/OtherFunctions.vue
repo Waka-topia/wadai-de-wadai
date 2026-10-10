@@ -53,6 +53,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
+import { openExternalLink } from '@/utils/externalLink'
 
 const router = useRouter()
 const showMapSection = ref(false) // マップセクションの表示状態
@@ -110,7 +111,7 @@ const openLink = (item) => {
     showMapSection.value = !showMapSection.value
   } else if (item.url) {
     void logFirebaseAnalyticsEvent('home_other_functions_external_link', { label: item.label })
-    window.open(item.url, '_blank')
+    openExternalLink(item.url)
   }
 }
 

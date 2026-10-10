@@ -17,11 +17,11 @@
 </template>
 
 <script setup>
-const surveyUrl =
-  'https://docs.google.com/forms/d/e/1FAIpQLScqjOjJ8B3XcSEH5d__94ucGD00FVqIbIJe2hq2MxUodczL7Q/viewform?usp=dialog'
+import { inquiryFormUrl } from '@/config/constants'
+import { openExternalLink } from '@/utils/externalLink'
 
 const goSurvey = () => {
-  window.open(surveyUrl, '_blank')
+  openExternalLink(inquiryFormUrl)
 }
 </script>
 

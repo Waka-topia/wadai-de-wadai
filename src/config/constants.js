@@ -6,3 +6,11 @@ export const adminUserId = import.meta.env.VITE_ADMIN_UID || ''
 
 // 将来的な機能拡張用（イベント優先度など）
 export const officialEventPriority = 10
+
+// お問い合わせ・アンケート用の Google フォーム
+export const inquiryFormUrl =
+  'https://docs.google.com/forms/d/e/1FAIpQLScqjOjJ8B3XcSEH5d__94ucGD00FVqIbIJe2hq2MxUodczL7Q/viewform?usp=dialog'
+
+// Waka-topia 公式 SNS
+export const instagramUrl = 'https://instagram.com/wakatopia_official'
+export const xUrl = 'https://x.com/wakatopia_off'

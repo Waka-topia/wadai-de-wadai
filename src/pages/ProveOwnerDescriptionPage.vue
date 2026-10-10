@@ -100,7 +100,7 @@
           rounded="lg"
           class="pa-4"
           style="cursor: pointer"
-          @click="openLink('https://x.com/wakatopia_off')"
+          @click="openLink(xUrl)"
         >
           <div class="d-flex align-center justify-space-between">
             <div class="d-flex align-center">
@@ -119,7 +119,7 @@
           rounded="lg"
           class="pa-4"
           style="cursor: pointer"
-          @click="openLink('https://instagram.com/wakatopia_official')"
+          @click="openLink(instagramUrl)"
         >
           <div class="d-flex align-center justify-space-between">
             <div class="d-flex align-center">
@@ -184,6 +184,8 @@ import { useFirebasePageView } from '@/composables/useFirebasePageView'
 import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { getProveOwnerApplicantService } from '@/services/proveService'
+import { instagramUrl, xUrl } from '@/config/constants'
+import { openExternalLink } from '@/utils/externalLink'
 
 const store = useStore()
 
@@ -234,7 +236,7 @@ const openLink = (url) => {
       }
     })(),
   })
-  window.open(url, '_blank')
+  openExternalLink(url)
 }
 
 watch(
