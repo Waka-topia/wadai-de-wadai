@@ -1,5 +1,5 @@
 <template>
-  <v-form class="pa-4" @submit.prevent="submitEvent">
+  <v-form class="pa-4" @submit.prevent="submitEvent($event)">
     <v-autocomplete
       v-model="newEvent.organizerName"
       :items="allGroups"
@@ -91,6 +91,7 @@
       size="large"
       rounded="pill"
       class="text-white font-weight-bold text-body-2 mt-2"
+      :disabled="!canSubmit"
     >
       {{ isEditMode ? 'このイベントを更新する' : 'このイベントを登録する' }}
     </v-btn>
@@ -224,6 +225,37 @@ const submitEvent = async (validationPromise) => {
     showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
   }
 }
+
+const isFormValid = computed(() => {
+  return Boolean(
+    newEvent.value.organizerName &&
+    newEvent.value.date &&
+    newEvent.value.startTime &&
+    newEvent.value.endTime &&
+    newEvent.value.location,
+  )
+})
+
+const isChanged = computed(() => {
+  if (!props.initialEvent) return true
+
+  return (
+    newEvent.value.organizerName !== (props.initialEvent.organizerName || '') ||
+    newEvent.value.date !== (props.initialEvent.date || '') ||
+    newEvent.value.startTime !== (props.initialEvent.startTime || '') ||
+    newEvent.value.endTime !== (props.initialEvent.endTime || '') ||
+    newEvent.value.location !== (props.initialEvent.location || '') ||
+    newEvent.value.description !== (props.initialEvent.description || '')
+  )
+})
+
+const canSubmit = computed(() => {
+  if (isEditMode.value) {
+    return isFormValid.value && isChanged.value
+  }
+
+  return isFormValid.value
+})
 </script>
 
 <style scoped>

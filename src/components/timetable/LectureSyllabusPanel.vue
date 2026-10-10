@@ -298,7 +298,13 @@
 
         <div class="d-flex justify-end gap-2 mt-2">
           <v-btn variant="text" size="small" @click="cancelEdit">キャンセル</v-btn>
-          <v-btn color="teal" variant="flat" size="small" :loading="saving" @click="saveEdition"
+          <v-btn
+            color="teal"
+            variant="flat"
+            size="small"
+            :loading="saving"
+            :disabled="!canSaveSyllabus"
+            @click="saveEdition"
             >保存</v-btn
           >
         </div>
@@ -556,6 +562,29 @@ onMounted(() => {
   if (isExpanded.value) {
     loadSyllabus()
   }
+})
+
+const isSyllabusChanged = computed(() => {
+  return (
+    editForm.value.description !== syllabus.value.description ||
+    editForm.value.grading !== syllabus.value.grading ||
+    editForm.value.textbook !== syllabus.value.textbook ||
+    editForm.value.teacher !== syllabus.value.teacher ||
+    editForm.value.room !== syllabus.value.room ||
+    JSON.stringify(editForm.value.categories) !== JSON.stringify(syllabus.value.categories || [])
+  )
+})
+
+const canSaveSyllabus = computed(() => {
+  return (
+    isSyllabusChanged.value &&
+    (editForm.value.description ||
+      editForm.value.grading ||
+      editForm.value.textbook ||
+      editForm.value.teacher ||
+      editForm.value.room ||
+      editForm.value.categories.length > 0)
+  )
 })
 </script>
 

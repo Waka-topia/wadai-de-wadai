@@ -104,6 +104,7 @@
         <v-btn
           type="submit"
           :loading="isLoading"
+          :disabled="!isFormValid"
           block
           color="blue-darken-2"
           size="x-large"
@@ -152,7 +153,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
@@ -219,4 +220,14 @@ const onSubmit = async (validationPromise) => {
     isLoading.value = false
   }
 }
+
+const isFormValid = computed(() => {
+  return Boolean(
+    signupData.value.userName &&
+    signupData.value.email &&
+    signupData.value.password &&
+    hasReadTerms.value &&
+    agree.value,
+  )
+})
 </script>

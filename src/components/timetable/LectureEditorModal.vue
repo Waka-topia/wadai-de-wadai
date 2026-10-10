@@ -173,6 +173,7 @@
       form="lecture-form"
       block
       rounded="pill"
+      :disabled="!canSubmit"
       >この講義を保存する</v-btn
     >
 
@@ -405,6 +406,65 @@ const handleDelete = () => {
     lectureId: form.value.id,
   })
 }
+
+const isFormValid = computed(() => {
+  return Boolean(
+    quarterSelectValue.value &&
+    form.value.day &&
+    form.value.periods.length > 0 &&
+    form.value.name &&
+    form.value.teacher &&
+    form.value.room,
+  )
+})
+
+const isChanged = computed(() => {
+  if (!isExistingLecture.value) return true
+
+  const originalLecture = store.getters['timetable/getLectures'](
+    props.selectedCell?.day,
+    props.selectedCell?.period,
+  )?.find((l) => l.id === form.value.id)
+
+  if (!originalLecture) return true
+
+  return (
+    JSON.stringify({
+      name: form.value.name,
+      teacher: form.value.teacher,
+      room: form.value.room,
+      memo: form.value.memo,
+      day: form.value.day,
+      periods: form.value.periods,
+      quarters: form.value.quarters,
+      color: form.value.color,
+      credits: form.value.credits,
+      required: form.value.required,
+      creditStatus: form.value.creditStatus,
+    }) !==
+    JSON.stringify({
+      name: originalLecture.name || '',
+      teacher: originalLecture.teacher || '',
+      room: originalLecture.room || '',
+      memo: originalLecture.memo || '',
+      day: props.selectedCell?.day || null,
+      periods: originalLecture.periods || [],
+      quarters: originalLecture.quarters || [],
+      color: originalLecture.color || 'orange',
+      credits: originalLecture.credits ?? 2,
+      required: originalLecture.required || 'none',
+      creditStatus: originalLecture.creditStatus || 'taking',
+    })
+  )
+})
+
+const canSubmit = computed(() => {
+  if (isExistingLecture.value) {
+    return isFormValid.value && isChanged.value
+  }
+
+  return isFormValid.value
+})
 </script>
 
 <style scoped>
