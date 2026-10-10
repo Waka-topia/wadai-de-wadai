@@ -100,15 +100,18 @@
       max-height="85vh"
       scrollable
     >
-      <div class="pa-4">
-        <LectureSyllabusPanel
-          v-if="selectedLectureName"
-          :lecture-name="selectedLectureName"
-          :default-expanded="true"
-          :hide-toggle="true"
-          class="mt-0"
-        />
-      </div>
+      <!-- 閉じたら作り直す（✕ で編集をやめたあと、開き直したときに編集中の状態を残さない） -->
+      <template #default="{ isOpen }">
+        <div class="pa-4">
+          <LectureSyllabusPanel
+            v-if="selectedLectureName && isOpen"
+            :lecture-name="selectedLectureName"
+            :default-expanded="true"
+            :hide-toggle="true"
+            class="mt-0"
+          />
+        </div>
+      </template>
       <template #actions>
         <v-btn
           block

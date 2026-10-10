@@ -308,18 +308,20 @@
             class="mb-2"
           ></v-textarea>
 
-          <div class="d-flex justify-end gap-2 mt-2">
-            <v-btn variant="text" size="small" @click="cancelEdit">キャンセル</v-btn>
-            <v-btn
-              color="orange-darken-2"
-              variant="flat"
-              size="small"
-              :loading="saving"
-              :disabled="!canSaveSyllabus"
-              @click="saveEdition"
-              >保存</v-btn
-            >
-          </div>
+          <!-- 編集をやめるときはダイアログ左上の ✕ で閉じるので、キャンセルボタンは置かない -->
+          <v-btn
+            block
+            color="orange-darken-2"
+            variant="flat"
+            size="large"
+            rounded="pill"
+            class="font-weight-bold mt-2"
+            :loading="saving"
+            :disabled="!canSaveSyllabus"
+            @click="saveEdition"
+          >
+            シラバスを保存する
+          </v-btn>
         </div>
       </template>
     </FormFieldDefaults>
