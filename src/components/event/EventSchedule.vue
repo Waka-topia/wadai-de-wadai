@@ -34,18 +34,9 @@
               />
             </template>
             <v-card rounded="lg" class="pa-3" max-width="300" @click.stop>
-              <p class="text-body-2 text-grey-darken-3 mb-2">
+              <p class="text-body-2 text-grey-darken-3 mb-0">
                 Waka-topiaが大学公式情報を元に代理投稿しています。団体の代表者は詳細画面から引き継ぎが可能です。
               </p>
-              <!-- <a
-                class="text-body-2 text-orange font-weight-medium"
-                href="/blog/announcing-vuetify-3.8/#vtooltip-interactive"
-                target="_blank"
-                rel="noopener noreferrer"
-                @click.stop
-                >
-                詳細はこちら
-                </a> -->
             </v-card>
           </v-menu>
         </div>
