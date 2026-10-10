@@ -7,6 +7,8 @@ const routes = [
   {
     path: '/',
     name: 'Home',
+    // PC では電車とバスなどを 2 列に並べる。背景のベージュは本文の外側まで広げる
+    meta: { layout: 'wide', background: '#fff8e1' },
     component: () => import('@/pages/HomePage.vue'),
   },
   {
@@ -44,6 +46,7 @@ const routes = [
   {
     path: '/testpage',
     name: 'testpage',
+    meta: { layout: 'wide', background: '#fff8e1' },
     component: () => import('@/pages/HomePage.vue'),
   },
   {

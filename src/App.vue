@@ -54,7 +54,8 @@
       </v-list>
     </v-navigation-drawer>
 
-    <v-main>
+    <!-- 背景色をページ単位で変えたいときはルートの meta.background で指定する（本文の外側まで塗る） -->
+    <v-main :style="{ backgroundColor: route.meta.background }">
       <!-- PC では本文の最大幅をルートの meta.layout で切り替える（スマホでは効かない） -->
       <div class="page-frame" :class="`page-frame--${route.meta.layout ?? 'narrow'}`">
         <router-view v-slot="{ Component }">

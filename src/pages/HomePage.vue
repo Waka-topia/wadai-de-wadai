@@ -1,5 +1,5 @@
 <template>
-  <v-container class="pa-4 pb-16 home-container">
+  <v-container class="pa-4 pb-16">
     <!-- みんなのシラバス検索へのリンクカード -->
     <v-card
       class="mb-4 rounded-xl elevation-2 syllabus-banner"
@@ -24,17 +24,20 @@
       </v-card-text>
     </v-card>
 
-    <TrainInfo />
-    <BusInfo />
-    <!-- 地図の読み込みは重いので、他の要素を描画してから表示する -->
-    <CampusMap v-if="isMapVisible" />
-    <v-skeleton-loader
-      v-else
-      type="image"
-      :height="mapPlaceholderHeight"
-      class="mb-6 rounded-lg elevation-1"
-    ></v-skeleton-loader>
-    <OtherFunctions />
+    <!-- lg 以上では、電車とバス・地図とその他の機能をそれぞれ横に並べる -->
+    <div class="home-grid">
+      <TrainInfo />
+      <BusInfo />
+      <!-- 地図の読み込みは重いので、他の要素を描画してから表示する -->
+      <CampusMap v-if="isMapVisible" />
+      <v-skeleton-loader
+        v-else
+        type="image"
+        :height="mapPlaceholderHeight"
+        class="mb-6 rounded-lg elevation-1"
+      ></v-skeleton-loader>
+      <OtherFunctions />
+    </div>
     <!-- <WakayamaMatch /> -->
   </v-container>
 </template>
@@ -77,9 +80,16 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.home-container {
-  background-color: #fff8e1; /* Light beige background */
-  min-height: 100vh;
+/* ベージュの背景はルートの meta.background で v-main 全体に付ける（PC で本文の外側まで広げるため） */
+
+/* --- PC（lg 以上）の 2 列レイアウト --- */
+@media (min-width: 1280px) {
+  .home-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 24px;
+    align-items: start;
+  }
 }
 .syllabus-banner {
   border: 1px solid #e0e0e0;
