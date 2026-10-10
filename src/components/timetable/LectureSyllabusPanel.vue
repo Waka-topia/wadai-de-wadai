@@ -238,21 +238,27 @@
         </div>
 
         <div v-else class="syllabus-edit-form">
-          <div class="field-label">担当教員</div>
-          <v-text-field
-            v-model="editForm.teacher"
-            density="compact"
-            placeholder="例：山田 太郎"
-            class="mb-2"
-          ></v-text-field>
-
-          <div class="field-label">教室</div>
-          <v-text-field
-            v-model="editForm.room"
-            density="compact"
-            placeholder="例：E101"
-            class="mb-2"
-          ></v-text-field>
+          <!-- PC では担当教員と教室を 1 行に並べる（スマホでは今までどおり縦に並ぶ） -->
+          <v-row dense>
+            <v-col cols="12" md="6" class="py-0">
+              <div class="field-label">担当教員</div>
+              <v-text-field
+                v-model="editForm.teacher"
+                density="compact"
+                placeholder="例：山田 太郎"
+                class="mb-2"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12" md="6" class="py-0">
+              <div class="field-label">教室</div>
+              <v-text-field
+                v-model="editForm.room"
+                density="compact"
+                placeholder="例：E101"
+                class="mb-2"
+              ></v-text-field>
+            </v-col>
+          </v-row>
 
           <div class="field-label">授業概要</div>
           <v-textarea

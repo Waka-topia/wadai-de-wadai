@@ -14,18 +14,20 @@
         clearable
       />
 
-      <v-text-field
-        v-model="newEvent.date"
-        label="日付"
-        type="date"
-        :max="eventDateMax"
-        :min="eventDateMin"
-        :rules="[required]"
-        prepend-inner-icon="mdi-calendar"
-      />
-
+      <!-- PC では日付と開始・終了時刻を 1 行に並べる -->
       <v-row dense>
-        <v-col cols="6">
+        <v-col cols="12" md="6">
+          <v-text-field
+            v-model="newEvent.date"
+            label="日付"
+            type="date"
+            :max="eventDateMax"
+            :min="eventDateMin"
+            :rules="[required]"
+            prepend-inner-icon="mdi-calendar"
+          />
+        </v-col>
+        <v-col cols="6" md="3">
           <v-text-field
             v-model="newEvent.startTime"
             label="開始時刻"
@@ -34,7 +36,7 @@
             prepend-inner-icon="mdi-clock-start"
           />
         </v-col>
-        <v-col cols="6">
+        <v-col cols="6" md="3">
           <v-text-field
             v-model="newEvent.endTime"
             label="終了時刻"
