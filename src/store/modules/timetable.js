@@ -7,6 +7,25 @@ const DISPLAY_QUARTER_KEY = 'timetable_display_quarter'
 
 const makeSemesterKey = (grade, semester) => `${grade}-${semester}`
 
+/**
+ * 時間割内の講義の単位数を合計する
+ *
+ * 同じIDの講義（連続コマ等）が複数コマにあっても1つとしてカウントする
+ *
+ * @param {object} timetable - セルキーごとの講義配列
+ * @param {function(object): boolean} [predicate] - 集計対象とする講義の条件
+ * @returns {number} 合計単位数
+ */
+const sumUniqueCredits = (timetable, predicate = () => true) => {
+  const uniqueLectures = new Map()
+  Object.values(timetable).forEach((arr) => {
+    arr.forEach((l) => uniqueLectures.set(l.id, l))
+  })
+  return Array.from(uniqueLectures.values())
+    .filter(predicate)
+    .reduce((sum, l) => sum + (Number(l.credits) || 0), 0)
+}
+
 export default {
   namespaced: true,
   state: () => ({
@@ -436,16 +455,26 @@ export default {
      * @param {object} getters - Vuex getters
      * @returns {number} 合計単位数
      */
-    totalCredits: (state, getters) => {
-      // 同じIDの講義（連続コマ等）が複数あっても1つとしてカウントする
-      const uniqueLectures = new Map()
-      Object.values(getters.fullTimetable).forEach((arr) => {
-        arr.forEach((l) => uniqueLectures.set(l.id, l))
-      })
-      return Array.from(uniqueLectures.values()).reduce(
-        (sum, l) => sum + (Number(l.credits) || 0),
-        0,
-      )
-    },
+    totalCredits: (state, getters) => sumUniqueCredits(getters.fullTimetable),
+
+    /**
+     * 表示中のクォーターで取得済みの単位数を計算する
+     *
+     * @param {object} state - Vuex state
+     * @param {object} getters - Vuex getters
+     * @returns {number} 取得単位数
+     */
+    earnedCredits: (state, getters) =>
+      sumUniqueCredits(getters.currentTimetable, (l) => l.creditStatus === 'earned'),
+
+    /**
+     * 表示中のクォーターで落とした単位数を計算する
+     *
+     * @param {object} state - Vuex state
+     * @param {object} getters - Vuex getters
+     * @returns {number} 落単数
+     */
+    failedCredits: (state, getters) =>
+      sumUniqueCredits(getters.currentTimetable, (l) => l.creditStatus === 'failed'),
   },
 }
