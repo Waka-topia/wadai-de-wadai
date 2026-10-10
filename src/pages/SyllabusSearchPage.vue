@@ -189,6 +189,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { useSnackbar } from '@/composables/useSnackbar'
+import { dayLabels } from '@/config/timetable'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import BaseBottomSheet from '@/components/common/BaseBottomSheet.vue'
 import BaseDialog from '@/components/common/BaseDialog.vue'
@@ -216,10 +217,7 @@ onMounted(async () => {
   })
 })
 
-const getDayName = (code) => {
-  const map = { mon: '月曜日', tue: '火曜日', wed: '水曜日', thu: '木曜日', fri: '金曜日' }
-  return map[code] || ''
-}
+const getDayName = (code) => (dayLabels[code] ? `${dayLabels[code]}曜日` : '')
 
 // 検索ステート
 const searchQuery = ref('')

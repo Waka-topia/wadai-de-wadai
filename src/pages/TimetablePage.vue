@@ -135,7 +135,7 @@ import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
 import { useSnackbar } from '@/composables/useSnackbar'
-import { periodTimes } from '@/config/timetable'
+import { dayLabels, lectureColorPalette, periodTimes, requiredColors } from '@/config/timetable'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import BaseBottomSheet from '@/components/common/BaseBottomSheet.vue'
 import TimetableHeaderControls from '@/components/timetable/TimetableHeaderControls.vue'
@@ -168,8 +168,6 @@ const isEditorSheetOpen = computed({
 
 const activeCell = computed(() => sheetState.value.cell)
 
-const dayLabels = { mon: '月', tue: '火', wed: '水', thu: '木', fri: '金' }
-
 const editorSheetTitle = computed(() => {
   if (!activeCell.value) return '講義を登録'
   const { day, period } = activeCell.value
@@ -191,18 +189,8 @@ const failedCredits = computed(() => store.getters['timetable/failedCredits'])
 
 const userId = computed(() => store.getters['auth/userId'])
 
-const colorMap = {
-  orange: { bg: '#fff3e0', border: '#ff9800' },
-  red: { bg: '#fce4ec', border: '#e91e63' },
-  blue: { bg: '#e3f2fd', border: '#2196f3' },
-  green: { bg: '#e8f5e9', border: '#4caf50' },
-  purple: { bg: '#f3e5f5', border: '#9c27b0' },
-  teal: { bg: '#e0f2f1', border: '#009688' },
-  indigo: { bg: '#e8eaf6', border: '#3f51b5' },
-  brown: { bg: '#efebe9', border: '#795548' },
-}
 const getTodayCardStyle = (lecture) => {
-  const c = colorMap[lecture.color] || colorMap.orange
+  const c = lectureColorPalette[lecture.color] || lectureColorPalette.orange
   return { backgroundColor: c.bg, borderLeftColor: c.border }
 }
 
@@ -372,10 +360,10 @@ const handleLectureDelete = ({ day, periods, lectureId }) => {
   display: inline-block;
 }
 .legend-color.required {
-  background-color: #e53935;
+  background-color: v-bind('requiredColors.req');
 }
 .legend-color.semi-required {
-  background-color: #8e24aa;
+  background-color: v-bind('requiredColors.semi');
 }
 .legend-color.elective {
   background-color: #ff9800;

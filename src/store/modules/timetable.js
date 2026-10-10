@@ -1,3 +1,4 @@
+import { getWeekdayCode } from '@/config/timetable'
 import { fetchTimetable } from '@/services/lectureService'
 
 // localStorage のキー
@@ -436,8 +437,7 @@ export default {
      * @returns {object[]} 今日の講義データの配列
      */
     todayLectures: (state, getters) => {
-      const dayMap = { 0: null, 1: 'mon', 2: 'tue', 3: 'wed', 4: 'thu', 5: 'fri', 6: null }
-      const todayCode = dayMap[new Date().getDay()]
+      const todayCode = getWeekdayCode()
       if (!todayCode) return []
 
       return [1, 2, 3, 4, 5, 6]
