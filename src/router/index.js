@@ -32,11 +32,13 @@ const routes = [
   {
     path: '/mypage',
     name: 'MyPage',
+    meta: { requiresAuth: true },
     component: () => import('@/pages/MyPage.vue'),
   },
   {
     path: '/tutorial',
     name: 'Tutorial',
+    meta: { requiresAuth: true },
     component: () => import('@/pages/TutorialPage.vue'),
   },
   {
@@ -94,11 +96,13 @@ const routes = [
   {
     path: '/prove-owner',
     name: 'ProveOwner',
+    meta: { requiresAuth: true },
     component: () => import('@/pages/ProveOwnerPage.vue'),
   },
   {
     path: '/prove-owner/description',
     name: 'ProveOwnerDescription',
+    meta: { requiresAuth: true },
     component: () => import('@/pages/ProveOwnerDescriptionPage.vue'),
   },
   {
@@ -169,18 +173,27 @@ router.beforeEach((to, from, next) => {
     })
   }
 
+  // 認証が必要なページのアクセス制御（未ログインならログインページへリダイレクト）
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
+    const isAuthenticated = store.getters['auth/isAuthenticated']
+    if (!isAuthenticated) {
+      next({ path: '/login', query: { redirect: to.fullPath } })
+      return
+    }
+  }
+
   // Adminページのアクセス制御
   if (to.matched.some((record) => record.meta.requiresAdmin)) {
     const currentUserId = store.getters['auth/userId']
-    console.log('[DEBUG Admin Guard] currentUserId:', currentUserId)
-    console.log('[DEBUG Admin Guard] adminUserId (from env):', adminUserId)
+    // console.log('[AdminGuard] currentUserId:', currentUserId)
+    // console.log('[AdminGuard] adminUserId:', adminUserId)
     if (currentUserId !== adminUserId) {
-      console.warn('[DEBUG Admin Guard] User is not admin. Redirecting to home.')
+      // console.warn('[AdminGuard] Not admin. Redirecting to home.')
       // 運営アカウントでなければホームにリダイレクト
       next({ path: '/' })
       return
     }
-    console.log('[DEBUG Admin Guard] Access granted.')
+    // console.log('[AdminGuard] Access granted.')
   }
 
   next()

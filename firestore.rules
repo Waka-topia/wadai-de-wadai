@@ -4,133 +4,213 @@ rules_version = '2';
 // ワダイdeワダイ - Firestore セキュリティルール
 // ============================================================
 // 設計方針:
-//   1. 認証済みユーザーのみ読み書き可
-//   2. 自分のデータ以外は読み書き不可（UID でアクセス制御）
-//   3. lecture_index は全認証ユーザーが読める（サジェスト用）
+//   1. 未ログインでも閲覧できる公開コレクションは明示的に allow read: if true
+//   2. ログインが必要な操作は request.auth != null で制御
+//   3. 自分のデータ以外の書き込みは原則禁止
+//   4. 管理者（ADMIN_UID）は全操作許可
+//   5. groups コレクションの write は現状認証済みに許可（Cloud Functions 移行までの暫定）
+//   6. 未定義コレクションはデフォルト拒否（Firestore の暗黙ルール）
 // ============================================================
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
     // ============================================================
-    // ユーザー時間割データ（最適化後：1学期1ドキュメント）
-    // user_timetables/{uid}/semesters/{semesterDocId}
-    //   ドキュメント構造: { lectures: { "mon-1": {...} }, updatedAt: "..." }
+    // ヘルパー関数
     // ============================================================
-    match /user_timetables/{uid}/{document=**} {
-      // 自分のデータのみ読み書き可能
-      allow read: if request.auth != null && request.auth.uid == uid;
-      allow write: if request.auth != null
-        && request.auth.uid == uid
-        && isValidTimetableWrite();
+
+    /** リクエスト元が認証済みユーザーかどうか */
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    /** リクエスト元が対象ユーザー本人かどうか */
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+
+    /**
+     * リクエスト元が管理者かどうか
+     * ※ このUIDはサーバーサイドで評価されるため、クライアントには公開されない
+     */
+    function isAdmin() {
+      return isAuthenticated() &&
+        request.auth.uid == "Nc9QmDtACiZc7wC4wXTiNRKztoP2";
     }
 
     // ============================================================
-    // 講義マスターインデックス（全ユーザー共有のサジェスト用）
+    // users コレクション（ユーザープロフィール・ブックマーク等）
+    // users/{uid}
     // ============================================================
-    match /lecture_index/{docId} {
-      // 認証済みユーザーなら誰でも読める
-      allow read: if request.auth != null;
+    match /users/{uid} {
+      // 読み取り・書き込みは本人または管理者のみ
+      allow read: if isOwner(uid) || isAdmin();
+      allow write: if isOwner(uid) || isAdmin();
 
-      // 書き込みは認証済みユーザーのみ
-      allow write: if request.auth != null;
-    }
-
-    // ============================================================
-    // 楽単レビュー
-    // ============================================================
-    match /lecture_reviews/{lectureName} {
-      allow read: if request.auth != null;
-      // 平均とカウントのトランザクション更新を許可
-      allow write: if request.auth != null;
-
-      match /ratings/{ratingUid} {
-        allow read: if request.auth != null;
-        allow write: if request.auth != null && request.auth.uid == ratingUid;
+      // stampsReceived サブコレクション
+      // 読み取り: 本人・管理者のみ
+      // 作成: QRスキャンの仕様上、認証済みユーザーなら他人のスタンプを付与できる
+      // 更新・削除: 管理者のみ
+      match /stampsReceived/{stampId} {
+        allow read: if isOwner(uid) || isAdmin();
+        allow create: if isAuthenticated();
+        allow update, delete: if isAdmin();
       }
     }
 
     // ============================================================
-    // Wikipedia型シラバス
+    // ユーザー時間割データ（1学期1ドキュメント構造）
+    // user_timetables/{uid}/semesters/{semesterDocId}
     // ============================================================
-    match /lecture_syllabuses/{lectureName} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null;
+    match /user_timetables/{uid}/{document=**} {
+      // 本人のデータのみ読み書き可能
+      allow read: if isOwner(uid) || isAdmin();
+      allow write: if (isOwner(uid) || isAdmin()) && isValidTimetableWrite();
     }
 
     // ============================================================
-    // 代表者証明申請（V2）
+    // スタンプマスタ
+    // stamps/{stampId}
+    // ============================================================
+    match /stamps/{stampId} {
+      // 読み取り: 認証済みユーザー（スタンプ画像取得に必要）
+      allow read: if isAuthenticated();
+      // 書き込み: 管理者のみ（スタンプ定義の追加・変更）
+      allow write: if isAdmin();
+    }
+
+    // ============================================================
+    // イベント（月別ハッシュ化コレクション）
+    // events_monthly_hashed/{monthKey}
+    // ============================================================
+    match /events_monthly_hashed/{monthKey} {
+      // 読み取り: 全員（未ログインでも閲覧可能 ― 設計方針通り）
+      allow read: if true;
+      // 書き込み: 認証済みユーザー
+      // ※ 所有権チェック（自分のイベントかどうか）はアプリ側 verifyEventOwnership で実施
+      allow write: if isAuthenticated();
+    }
+
+    // ============================================================
+    // イベント（旧コレクション・レガシー互換）
+    // events/{eventId}
+    // ============================================================
+    match /events/{eventId} {
+      // 読み取り: 全員（未ログインでも閲覧可能）
+      allow read: if true;
+      // 作成: ログイン済みユーザーが自分のIDで作成
+      allow create: if isAuthenticated() &&
+        request.resource.data.createdBy == request.auth.uid;
+      // 更新・削除: 作成者本人または管理者
+      allow update, delete: if isAuthenticated() &&
+        (resource.data.createdBy == request.auth.uid || isAdmin());
+    }
+
+    // ============================================================
+    // 代表者証明申請
     // proveApplications/{applicationId}
     // ============================================================
     match /proveApplications/{applicationId} {
-      allow read: if request.auth != null;
+      // 読み取り: 自分の申請のみ、または管理者
+      allow read: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid || isAdmin());
 
-      // 申請作成は認証済みユーザーのみ
-      allow create: if request.auth != null;
+      // 新規申請の作成: 認証済みユーザーが自分のUIDで申請
+      allow create: if isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid;
 
-      // 現行の管理画面運用に合わせ、申請更新は認証済みユーザーに許可
-      allow update: if request.auth != null;
-
-      // 申請削除は認証済みユーザーに許可
-      allow delete: if request.auth != null;
+      // 更新・削除: 管理者のみ（承認・却下操作）
+      allow update, delete: if isAdmin();
     }
 
     // ============================================================
-    // 承認済み代表者（V2 - レガシー互換）
+    // 承認済み代表者（レガシー互換）
     // groupRepresentatives/{groupId_userId}
     // ============================================================
     match /groupRepresentatives/{representativeId} {
-      allow read: if request.auth != null;
-
-      // 現行の管理画面運用に合わせ、作成/更新/削除は認証済みユーザーに許可
-      allow write: if request.auth != null;
+      // 読み取り: 自分のレコードまたは管理者
+      allow read: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid || isAdmin());
+      // 書き込み: 管理者のみ（承認フロー経由でのみ作成される）
+      allow write: if isAdmin();
     }
 
     // ============================================================
     // 団体マスターデータ・代表者管理
     // groups/{groupId}
+    // ⚠️ 暫定ルール: 代表者登録トランザクションがクライアントから実行されるため
+    //    書き込みを認証済みユーザーに許可している。
+    //    将来的に Cloud Functions へ移行後、isAdmin() に変更予定。
     // ============================================================
     match /groups/{groupId} {
-      // 認証済みユーザーなら誰でも読める（代表者の存在確認に使用）
-      allow read: if request.auth != null;
-
-      // 書き込みは認証済みユーザーに許可（代表者追加・パスワード設定）
-      allow write: if request.auth != null;
-    }
-
-    // ============================================================
-    // イベント
-    // events/{eventId}
-    // ============================================================
-    match /events/{eventId} {
-      // イベント一覧/詳細は誰でも閲覧可能
+      // 読み取り: 全員（団体一覧は公開 ― 未ログインでも閲覧可能）
       allow read: if true;
-
-      // イベント作成はログイン済みユーザーのみ
-      allow create: if request.auth != null
-        && request.resource.data.createdBy == request.auth.uid;
-
-      // 更新・削除は作成者本人のみ
-      allow update, delete: if request.auth != null
-        && resource.data.createdBy == request.auth.uid;
+      // 書き込み: 認証済みユーザー（暫定）
+      allow write: if isAuthenticated();
     }
 
     // ============================================================
-    // 月別イベント (ハッシュ化対応)
-    // events_monthly_hashed/{monthKey}
+    // 楽単レビュー
+    // lecture_reviews/{lectureName}
     // ============================================================
-    match /events_monthly_hashed/{monthKey} {
-      // イベント一覧/詳細は誰でも閲覧可能
-      allow read: if true;
+    match /lecture_reviews/{lectureName} {
+      // 読み取り: 認証済みユーザー
+      allow read: if isAuthenticated();
+      // 書き込み: 認証済みユーザー（平均・カウントのトランザクション更新を含む）
+      allow write: if isAuthenticated();
 
-      // 作成・更新・削除
-      allow write: if request.auth != null;
+      match /ratings/{ratingUid} {
+        // 読み取り: 認証済みユーザー
+        allow read: if isAuthenticated();
+        // 書き込み: 自分の評価のみ
+        allow write: if isOwner(ratingUid);
+      }
     }
 
     // ============================================================
-    // その他のコレクション
+    // 施設評価（マップ上のトイレ・勉強スペース等）
+    // ratings/{ratingId}
     // ============================================================
-    // デフォルトで拒否（暗黙的）
+    match /ratings/{ratingId} {
+      // 読み取り: 認証済みユーザー（地図機能はログイン後）
+      allow read: if isAuthenticated();
+      // 作成: 認証済みユーザーが自分のUIDで投稿
+      allow create: if isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid;
+      // 更新・削除: 管理者のみ
+      allow update, delete: if isAdmin();
+    }
+
+    // ============================================================
+    // Wikipedia型シラバス
+    // lecture_syllabuses/{lectureName}
+    // ============================================================
+    match /lecture_syllabuses/{lectureName} {
+      // 読み取り: 認証済みユーザー
+      allow read: if isAuthenticated();
+      // 書き込み: 認証済みユーザー（共同編集の仕様）
+      allow write: if isAuthenticated();
+    }
+
+    // ============================================================
+    // シラバス検索インデックス
+    // lecture_search/{docId}  ← lecture_search/all_lectures_index を使用
+    // ============================================================
+    match /lecture_search/{docId} {
+      // 読み取り: 認証済みユーザー
+      allow read: if isAuthenticated();
+      // 書き込み: 認証済みユーザー（saveSyllabusWithIndex のトランザクション）
+      allow write: if isAuthenticated();
+    }
+
+    // ============================================================
+    // 講義マスターインデックス（旧パス・レガシー互換）
+    // lecture_index/{docId}
+    // ============================================================
+    match /lecture_index/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
 
     // ============================================================
     // ヘルパー関数
@@ -138,15 +218,11 @@ service cloud.firestore {
 
     /**
      * 時間割ドキュメントのバリデーション
-     * lectures Map の更新として検証。Firestoreルールの制限により最小限の型チェック。
+     * 想定されたトップレベルフィールドを持つことを検証する
      */
     function isValidTimetableWrite() {
-      // 削除操作は常に許可
       return request.method == 'delete'
-        // 作成・更新時は想定されたトップレベルフィールドをもつことを検証
-        || (
-          request.resource.data.keys().hasAny(['lectures', 'updatedAt'])
-        );
+        || request.resource.data.keys().hasAny(['lectures', 'updatedAt']);
     }
 
   }
