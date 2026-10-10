@@ -162,22 +162,58 @@ const store = useStore()
 // --- 検索機能 ---
 const searchQuery = ref('')
 
+// 検索対象の期間（今月から前後何か月分か）
+const searchMonthRange = 1
+
+/**
+ * 今月から月数をずらした月の 1 日を返す
+ *
+ * @param {number} offset - ずらす月数（負の値で過去）
+ * @returns {Date} その月の 1 日
+ */
+const getMonthStart = (offset) => {
+  const today = new Date()
+  return new Date(today.getFullYear(), today.getMonth() + offset, 1)
+}
+
+/**
+ * 検索結果を表示する期間（前月の 1 日〜翌月の末日）を返す
+ *
+ * @returns {{ start: string; end: string }} YYYY-MM-DD 形式の開始日と終了日
+ */
+const getSearchPeriod = () => ({
+  start: toDateString(getMonthStart(-searchMonthRange)),
+  // 翌々月の 1 日の前日 = 翌月の末日
+  end: toDateString(new Date(getMonthStart(searchMonthRange + 1).getTime() - 1)),
+})
+
+// イベントは月単位で読み込むため、検索を始めたら期間内の月をまとめて読み込む
+watch(
+  () => !!searchQuery.value,
+  (isSearching) => {
+    if (!isSearching) return
+    for (let offset = -searchMonthRange; offset <= searchMonthRange; offset++) {
+      const monthKey = toDateString(getMonthStart(offset)).substring(0, 7)
+      store.dispatch('event/fetchEvents', { monthKey })
+    }
+  },
+)
+
 /** 検索ワードに基づいてイベントをフィルタリングする */
 const searchedEvents = computed(() => {
   if (!searchQuery.value) return null
   const query = searchQuery.value.toLowerCase()
   const rawEvents = store.getters['event/allEvents']
-  const today = toDateString(new Date())
+  const { start, end } = getSearchPeriod()
 
   return rawEvents
     .filter((event) => {
-      // 今日以降のイベントのみを表示
-      const isFuture = event.date >= today
+      const isInPeriod = event.date >= start && event.date <= end
       const matchesQuery =
         event.organizerName?.toLowerCase().includes(query) ||
         event.title?.toLowerCase().includes(query) ||
         event.description?.toLowerCase().includes(query)
-      return isFuture && matchesQuery
+      return isInPeriod && matchesQuery
     })
     .sort((a, b) => {
       // 日付と開始時間でソート
@@ -450,10 +486,6 @@ onMounted(() => {
 }
 
 /* --- 検索バーの調整 --- */
-.search-container {
-  margin-bottom: 8px;
-}
-
 .search-field :deep(.v-field__outline) {
   --v-field-border-width: 2px;
 }

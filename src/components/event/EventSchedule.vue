@@ -172,7 +172,7 @@ const props = defineProps({
   },
 })
 
-/** 表示対象のイベントリストを計算する プロップスで events が渡されている場合はそれを使用し、 そうでない場合はストアから selectedDate に基づいて取得する */
+/** 表示するイベント一覧（検索結果があればそれを、なければ選択日のイベントを使う） */
 const displayEvents = computed(() => {
   if (props.events) {
     return props.events
@@ -188,10 +188,9 @@ const displayEvents = computed(() => {
  */
 const formatDate = (dateStr) => {
   if (!dateStr) return ''
-  const parts = dateStr.split('-')
-  const month = parseInt(parts[1], 10)
-  const day = parseInt(parts[2], 10)
-  const date = new Date(dateStr)
+  const [year, month, day] = dateStr.split('-').map(Number)
+  // 'YYYY-MM-DD' を new Date に渡すと UTC として解釈されるため、現地時間で作る
+  const date = new Date(year, month - 1, day)
   const weekdays = ['日', '月', '火', '水', '木', '金', '土']
   const weekday = weekdays[date.getDay()]
   return `${month}/${day}(${weekday})`
