@@ -49,6 +49,8 @@ const routes = [
   {
     path: '/eventcal',
     name: 'EventCal',
+    // PC ではカレンダーとその日のイベントを 2 列に並べる
+    meta: { layout: 'wide' },
     component: () => import('@/pages/EventCal.vue'),
   },
   {
