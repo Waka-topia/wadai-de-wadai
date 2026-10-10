@@ -91,6 +91,8 @@ const routes = [
   {
     path: '/syllabus-search',
     name: 'SyllabusSearch',
+    // シラバスのデータは Security Rules で認証済みユーザーのみ読み取り可能
+    meta: { requiresAuth: true },
     component: () => import('@/pages/SyllabusSearchPage.vue'),
   },
   {
