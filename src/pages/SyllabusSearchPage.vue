@@ -1,6 +1,6 @@
 <template>
   <v-skeleton-loader v-if="isLoading" type="card"></v-skeleton-loader>
-  <v-container class="pa-4 pb-16 search-page-container">
+  <v-container class="pa-4 pb-16">
     <div class="d-flex align-center gap-2 mb-4">
       <!-- 戻るボタン -->
       <v-btn icon="mdi-arrow-left" variant="plain" rounded="lg" @click="router.back()" />
@@ -331,10 +331,7 @@ const registerAndSave = async () => {
 </script>
 
 <style scoped>
-.search-page-container {
-  background-color: #fafafa;
-  min-height: 100vh;
-}
+/* 薄いグレーの背景はルートの meta.background で v-main 全体に付ける（PC で本文の外側まで広げるため） */
 .add-btn {
   letter-spacing: 1px;
 }
