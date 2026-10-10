@@ -1,5 +1,11 @@
 <template>
-  <v-dialog max-width="500">
+  <BaseDialog
+    v-model="isDialogOpen"
+    title="注意"
+    message="ログアウトします。本当によろしいですか？"
+    confirm-label="ログアウト"
+    @confirm="onLogout"
+  >
     <template #activator="{ props: activatorProps }">
       <p v-if="user">
         <v-list-item
@@ -27,26 +33,16 @@
         </v-list-item>
       </p>
     </template>
-
-    <template #default="{ isActive }">
-      <v-card title="注意">
-        <v-card-text> ログアウトします。本当によろしいですか？ </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn text="キャンセル" @click="isActive.value = false"></v-btn>
-          <v-btn color="red" text="ログアウト" @click="onLogout(isActive)"></v-btn>
-        </v-card-actions>
-      </v-card>
-    </template>
-  </v-dialog>
+  </BaseDialog>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
+import BaseDialog from '@/components/common/BaseDialog.vue'
 
 const router = useRouter()
 const store = useStore()
@@ -57,10 +53,11 @@ const goLoginFromMenu = () => {
 }
 
 const user = computed(() => store.getters['auth/user'])
+const isDialogOpen = ref(false)
 
 const { notifySuccess, notifyError } = useSnackbar()
 
-const onLogout = async (isActive) => {
+const onLogout = async () => {
   try {
     void logFirebaseAnalyticsEvent('menu_logout_confirm', {})
     await store.dispatch('auth/logout')
@@ -75,7 +72,7 @@ const onLogout = async (isActive) => {
   } catch (error) {
     notifyError(error)
   } finally {
-    isActive.value = false
+    isDialogOpen.value = false
   }
 }
 </script>

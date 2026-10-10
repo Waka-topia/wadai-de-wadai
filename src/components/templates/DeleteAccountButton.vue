@@ -1,5 +1,12 @@
 <template>
-  <v-dialog v-model="isDialogOpen" max-width="500">
+  <BaseDialog
+    v-model="isDialogOpen"
+    title="アカウントを削除しますか？"
+    confirm-label="削除する"
+    confirm-color="error"
+    max-width="500"
+    @confirm="onDeleteAccount"
+  >
     <template #activator="{ props: activatorProps }">
       <p v-if="user">
         <v-list-item
@@ -15,36 +22,18 @@
       </p>
     </template>
 
-    <template #default>
-      <v-card>
-        <v-card-title class="bg-error text-white d-flex align-center">
-          <v-icon class="mr-2" color="white">mdi-alert-octagon</v-icon>
-          危険な操作
-        </v-card-title>
-        <v-card-text class="pt-5">
-          <v-alert class="mb-3" density="compact" type="error" variant="tonal">
-            この操作は取り消せません。
-          </v-alert>
-          <p class="text-body-2 mb-3">
-            アカウントを削除すると、プロフィールや利用履歴などのデータは復元できなくなります。
-          </p>
-          <p class="text-body-2 font-weight-bold mb-3">削除対象: {{ userEmail }}</p>
-          <p class="text-body-2 text-grey">削除後はログアウトし、ログイン画面へ移動します。</p>
-          <p class="text-body-2 text-grey">内容を確認し、問題なければ「削除」を押してください。</p>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn text="キャンセル" @click="isDialogOpen = false"></v-btn>
-          <v-btn
-            color="error"
-            prepend-icon="mdi-delete-alert"
-            text="削除"
-            @click="onDeleteAccount"
-          ></v-btn>
-        </v-card-actions>
-      </v-card>
-    </template>
-  </v-dialog>
+    <v-card-text class="px-5 pb-4">
+      <v-alert class="mb-3" density="compact" type="error" variant="tonal">
+        この操作は取り消せません。
+      </v-alert>
+      <p class="text-body-2 mb-3">
+        アカウントを削除すると、プロフィールや利用履歴などのデータは復元できなくなります。
+      </p>
+      <p class="text-body-2 font-weight-bold mb-3">削除対象: {{ userEmail }}</p>
+      <p class="text-body-2 text-grey">削除後はログアウトし、ログイン画面へ移動します。</p>
+      <p class="text-body-2 text-grey">内容を確認し、問題なければ「削除する」を押してください。</p>
+    </v-card-text>
+  </BaseDialog>
 </template>
 
 <script setup>
@@ -53,6 +42,7 @@ import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
+import BaseDialog from '@/components/common/BaseDialog.vue'
 
 const router = useRouter()
 const store = useStore()
