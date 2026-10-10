@@ -132,13 +132,13 @@ const handleNext = () => {
   pointer-events: none;
 }
 
-/* PC ではサイドナビ（256px）を避け、本文と同じ 720px の範囲に収める。下部バーも無いので下端に寄せる */
+/* PC ではサイドナビ（256px）を避け、本文と同じ 720px の範囲に収める。下部バーも無いので下へ寄せる（フッター 40px の上） */
 @media (min-width: 960px) {
   .floating-nav-container {
     left: 256px;
     max-width: 720px;
     margin: 0 auto;
-    bottom: 24px;
+    bottom: 56px;
   }
 }
 

@@ -175,13 +175,13 @@ const job = computed(() => store.getters.currentJobWithBookmark)
   right: 0;
 }
 
-/* PC ではサイドナビ（256px）を避けて本文と同じ 720px の範囲に収め、下部バーが無いので下端に寄せる */
+/* PC ではサイドナビ（256px）を避けて本文と同じ 720px の範囲に収め、下部バーが無いので下へ寄せる（フッター 40px の上） */
 @media (min-width: 960px) {
   .apply-bar {
     left: 256px;
     max-width: 720px;
     margin: 0 auto;
-    bottom: 24px;
+    bottom: 56px;
   }
 }
 </style>
