@@ -25,6 +25,12 @@
       <div class="overflow-y-auto flex-grow-1">
         <slot :close="() => (open = false)" :is-open="open" />
       </div>
+      <template v-if="$slots.actions">
+        <v-divider />
+        <v-card-actions class="pa-3 flex-shrink-0">
+          <slot name="actions" :close="() => (open = false)" />
+        </v-card-actions>
+      </template>
     </v-card>
   </v-bottom-sheet>
 </template>
@@ -52,3 +58,14 @@ const open = computed({
   },
 })
 </script>
+
+<style scoped>
+.bottom-sheet-handle {
+  width: 36px;
+  height: 4px;
+  background: #ddd;
+  border-radius: 2px;
+  margin: 8px auto 0;
+  flex-shrink: 0;
+}
+</style>

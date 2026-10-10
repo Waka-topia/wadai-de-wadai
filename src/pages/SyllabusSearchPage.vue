@@ -115,41 +115,35 @@
     </div>
 
     <!-- シラバス閲覧・登録用モーダル -->
-    <v-bottom-sheet v-model="isSyllabusModalOpen" scrollable>
-      <v-card class="modal-card" rounded="t-xl">
-        <div class="bottom-sheet-handle" />
-        <v-card-title class="d-flex align-center justify-space-between py-3 px-4">
-          <span class="text-subtitle-1 font-weight-bold text-truncate">
-            {{ selectedLectureName }}
-          </span>
-          <v-btn icon="mdi-close" variant="text" size="small" @click="closeModal"></v-btn>
-        </v-card-title>
-        <v-divider />
-        <v-card-text class="pa-4 modal-body">
-          <LectureSyllabusPanel
-            v-if="selectedLectureName"
-            :lecture-name="selectedLectureName"
-            :default-expanded="true"
-            :hide-toggle="true"
-            class="mt-0"
-          />
-        </v-card-text>
-        <v-divider />
-        <v-card-actions class="pa-3">
-          <v-btn
-            block
-            color="orange"
-            variant="flat"
-            rounded="lg"
-            class="font-weight-bold add-btn"
-            @click="openManualAddDialogFromSyllabus"
-          >
-            <v-icon left size="18" class="mr-1">mdi-calendar-plus</v-icon>
-            この授業を時間割に追加する
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-bottom-sheet>
+    <BaseBottomSheet
+      v-model="isSyllabusModalOpen"
+      :title="selectedLectureName || ''"
+      max-height="85vh"
+      scrollable
+    >
+      <div class="pa-4">
+        <LectureSyllabusPanel
+          v-if="selectedLectureName"
+          :lecture-name="selectedLectureName"
+          :default-expanded="true"
+          :hide-toggle="true"
+          class="mt-0"
+        />
+      </div>
+      <template #actions>
+        <v-btn
+          block
+          color="orange"
+          variant="flat"
+          rounded="lg"
+          class="font-weight-bold add-btn"
+          @click="openManualAddDialogFromSyllabus"
+        >
+          <v-icon left size="18" class="mr-1">mdi-calendar-plus</v-icon>
+          この授業を時間割に追加する
+        </v-btn>
+      </template>
+    </BaseBottomSheet>
 
     <!-- 授業を手動で追加するフォーム -->
     <BaseBottomSheet v-model="isManualAddSheetOpen" title="授業を手動で追加する" scrollable>
@@ -243,7 +237,7 @@ const selectedLectureName = ref(null)
 const isSyllabusModalOpen = ref(false)
 const isSaving = ref(false)
 
-const { showSnackbar } = useSnackbar()
+const { notifySuccess, notifyError } = useSnackbar()
 
 // 手動追加フォーム用
 const isManualAddSheetOpen = ref(false)
@@ -268,11 +262,6 @@ const executeSearch = () => {
 const openSyllabusModal = (lectureName) => {
   selectedLectureName.value = lectureName
   isSyllabusModalOpen.value = true
-}
-
-const closeModal = () => {
-  isSyllabusModalOpen.value = false
-  selectedLectureName.value = null
 }
 
 // シラバス閲覧モーダルの「この授業を時間割に追加する」から開く
@@ -326,9 +315,7 @@ const addAndRegisterSyllabus = async () => {
 /** 新規シラバスをマスターデータとして登録し、時間割にも追加する */
 const registerAndSave = async () => {
   if (!isLoggedIn.value) {
-    showSnackbar('シラバスを登録するにはログインが必要です。', 'error', {
-      icon: 'mdi-alert-circle',
-    })
+    notifyError('シラバスを登録するにはログインが必要です。')
     return
   }
 
@@ -348,9 +335,7 @@ const registerAndSave = async () => {
     })
 
     // 完了フィードバック
-    showSnackbar(`「${lectureName}」をみんなのシラバスに登録しました！`, 'success', {
-      icon: 'mdi-check-circle',
-    })
+    notifySuccess(`「${lectureName}」をみんなのシラバスに登録しました！`)
 
     // 再取得後に検索結果に反映
     searchQuery.value = lectureName
@@ -368,24 +353,6 @@ const registerAndSave = async () => {
 .search-page-container {
   background-color: #fafafa;
   min-height: 100vh;
-}
-.modal-card {
-  height: 85vh;
-  display: flex !important;
-  flex-direction: column !important;
-  overflow: hidden;
-}
-.modal-body {
-  flex: 1 1 auto;
-  overflow-y: auto;
-  scrollbar-gutter: stable;
-}
-.bottom-sheet-handle {
-  width: 36px;
-  height: 4px;
-  background: #ddd;
-  border-radius: 2px;
-  margin: 8px auto 0;
 }
 .add-btn {
   letter-spacing: 1px;

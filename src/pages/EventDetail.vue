@@ -253,7 +253,7 @@ import EventForm from '@/components/event/EventForm.vue'
 const route = useRoute()
 const router = useRouter()
 const store = useStore()
-const { showSnackbar } = useSnackbar()
+const { notifySuccess, notifyError } = useSnackbar()
 const fetchErrorMessage = ref('')
 const claimDialogOpen = ref(false)
 const editSheetOpen = ref(false)
@@ -346,14 +346,14 @@ const onDelete = async () => {
     const currentUserId = store.getters['auth/userId']
     void logFirebaseAnalyticsEvent('event_detail_delete_confirm', { eventId: eventId.value })
     await store.dispatch('event/deleteEvent', { eventId: eventId.value, currentUserId })
-    showSnackbar('イベントが正常に削除されました。', 'success', { icon: 'mdi-check-circle' })
+    notifySuccess('イベントが正常に削除されました。')
     deleteSheetOpen.value = false
     setTimeout(() => {
       router.push('/eventcal')
     }, 500)
   } catch (error) {
     deleteSheetOpen.value = false
-    showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
+    notifyError(error)
   }
 }
 

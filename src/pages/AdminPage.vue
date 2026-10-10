@@ -130,7 +130,7 @@ const isLoading = ref(false)
 const updatingUserId = ref('')
 const isRegisteringGroups = ref(false)
 
-const { showSnackbar } = useSnackbar()
+const { notifySuccess, notifyError } = useSnackbar()
 
 const formatDate = (value) => {
   if (!value) {
@@ -150,7 +150,7 @@ const loadApplicants = async () => {
     isLoading.value = true
     applicants.value = await getProveOwnerApplicantsService()
   } catch (error) {
-    showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
+    notifyError(error)
   } finally {
     isLoading.value = false
   }
@@ -160,13 +160,11 @@ const registerGroups = async () => {
   try {
     isRegisteringGroups.value = true
     const { registeredCount, skippedCount } = await registerAllGroupsService()
-    showSnackbar(
+    notifySuccess(
       `団体データを登録しました（新規: ${registeredCount}件 / 既存スキップ: ${skippedCount}件）`,
-      'success',
-      { icon: 'mdi-check-circle' },
     )
   } catch (error) {
-    showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
+    notifyError(error)
   } finally {
     isRegisteringGroups.value = false
   }
@@ -191,12 +189,10 @@ const toggleApproval = async (applicationId, nextValue) => {
       applicationId,
       approved: nextValue,
     })
-    showSnackbar(nextValue ? '承認しました' : '非承認に変更しました', 'success', {
-      icon: 'mdi-check-circle',
-    })
+    notifySuccess(nextValue ? '承認しました' : '非承認に変更しました')
   } catch (error) {
     targetApplicant.isOfficial = previousValue
-    showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
+    notifyError(error)
   } finally {
     updatingUserId.value = ''
   }

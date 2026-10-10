@@ -117,7 +117,7 @@ const loginData = ref({
 const visible = ref(false)
 const isLoading = ref(false)
 
-const { showSnackbar } = useSnackbar()
+const { notifySuccess, notifyError } = useSnackbar()
 
 const router = useRouter()
 const route = useRoute()
@@ -151,7 +151,7 @@ const onSubmit = async (validationPromise) => {
 
     void logFirebaseAnalyticsEvent('login_submit_success', {})
 
-    showSnackbar('ログインしました', 'success', { icon: 'mdi-check-circle' })
+    notifySuccess('ログインしました')
 
     setTimeout(() => {
       // ガードによるリダイレクト先がある場合はそこへ、なければトップへ
@@ -162,7 +162,7 @@ const onSubmit = async (validationPromise) => {
     void logFirebaseAnalyticsEvent('login_submit_error', {
       errorCode: String(error?.code || 'unknown'),
     })
-    showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
+    notifyError(error)
   } finally {
     isLoading.value = false
   }

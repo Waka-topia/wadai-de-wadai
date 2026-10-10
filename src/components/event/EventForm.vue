@@ -174,7 +174,7 @@ watch(
   { immediate: true, deep: true },
 )
 
-const { showSnackbar } = useSnackbar()
+const { notifySuccess, notifyError } = useSnackbar()
 
 const submitEvent = async (validationPromise) => {
   try {
@@ -212,17 +212,15 @@ const submitEvent = async (validationPromise) => {
         organizationId: eventData.organizationId,
       },
     )
-    showSnackbar(
+    notifySuccess(
       isEditMode.value ? 'イベントを更新しました！' : 'イベントが正常に登録されました！',
-      'success',
-      { icon: 'mdi-check-circle' },
     )
 
     // 成功イベントを通知（ダイアログを閉じるためなど）
     emit('success')
   } catch (error) {
     void logFirebaseAnalyticsEvent('event_form_submit_error', {})
-    showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
+    notifyError(error)
   }
 }
 

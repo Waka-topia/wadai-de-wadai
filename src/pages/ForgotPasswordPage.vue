@@ -70,7 +70,7 @@ import { sendPasswordReset } from '@/services/authService'
 const email = ref('')
 const isLoading = ref(false)
 
-const { showSnackbar } = useSnackbar()
+const { notifySuccess, notifyError } = useSnackbar()
 
 const router = useRouter()
 
@@ -92,9 +92,7 @@ const onSubmit = async (validationPromise) => {
 
     void logFirebaseAnalyticsEvent('forgot_password_submit_success', {})
 
-    showSnackbar('リセットメールを送信しました。メールをご確認ください。', 'success', {
-      icon: 'mdi-check-circle',
-    })
+    notifySuccess('リセットメールを送信しました。メールをご確認ください。')
 
     setTimeout(() => {
       router.push('/login')
@@ -103,7 +101,7 @@ const onSubmit = async (validationPromise) => {
     void logFirebaseAnalyticsEvent('forgot_password_submit_error', {
       errorCode: String(error?.code || 'unknown'),
     })
-    showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
+    notifyError(error)
   } finally {
     isLoading.value = false
   }

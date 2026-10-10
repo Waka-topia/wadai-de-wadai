@@ -130,25 +130,22 @@
       </v-btn>
     </v-card>
 
-    <v-dialog v-model="dialog" max-width="600px">
-      <v-card rounded="xl" class="pa-2">
-        <v-card-title class="text-h6 font-weight-bold text-center pt-4"> 利用規約 </v-card-title>
-        <v-card-text class="pt-2 pb-0">
-          <TermsRule />
-        </v-card-text>
-        <v-card-actions class="justify-center pb-4 pt-4">
-          <v-btn
-            color="orange-darken-2"
-            variant="flat"
-            rounded="pill"
-            class="px-8 font-weight-bold"
-            @click="dialog = false"
-          >
-            閉じる
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <BaseDialog v-model="dialog" title="利用規約" max-width="600">
+      <v-card-text class="px-5 pt-2 pb-0">
+        <TermsRule />
+      </v-card-text>
+      <v-card-actions class="justify-center pb-4 pt-4">
+        <v-btn
+          color="orange-darken-2"
+          variant="flat"
+          rounded="pill"
+          class="px-8 font-weight-bold"
+          @click="dialog = false"
+        >
+          閉じる
+        </v-btn>
+      </v-card-actions>
+    </BaseDialog>
   </v-container>
 </template>
 
@@ -160,6 +157,7 @@ import { useFirebasePageView } from '@/composables/useFirebasePageView'
 import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { required, passwordRule, nameCheck, emailDomainCheck } from '@/utils/forms/validate'
+import BaseDialog from '@/components/common/BaseDialog.vue'
 import TermsRule from '@/components/templates/TermsRule.vue'
 
 const signupData = ref({
@@ -172,7 +170,7 @@ const agree = ref(false)
 const isLoading = ref(false)
 const dialog = ref(false)
 
-const { showSnackbar } = useSnackbar()
+const { notifySuccess, notifyError } = useSnackbar()
 
 // ★ 追加: 規約を読んだかどうかを判定するフラグ
 const hasReadTerms = ref(false)
@@ -206,7 +204,7 @@ const onSubmit = async (validationPromise) => {
 
     void logFirebaseAnalyticsEvent('signup_submit_success', {})
 
-    showSnackbar('サインアップしました', 'success', { icon: 'mdi-check-circle' })
+    notifySuccess('サインアップしました')
 
     setTimeout(() => {
       router.push('/login')
@@ -215,7 +213,7 @@ const onSubmit = async (validationPromise) => {
     void logFirebaseAnalyticsEvent('signup_submit_error', {
       errorCode: String(error?.code || 'unknown'),
     })
-    showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
+    notifyError(error)
   } finally {
     isLoading.value = false
   }

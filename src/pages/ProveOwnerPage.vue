@@ -214,7 +214,7 @@ const isLoading = ref(false)
 const isCheckingGroup = ref(false)
 const registrationMode = ref(null) // 'initial' | 'subsequent'
 
-const { showSnackbar } = useSnackbar()
+const { showSnackbar, notifySuccess, notifyError } = useSnackbar()
 
 const router = useRouter()
 const store = useStore()
@@ -245,7 +245,7 @@ const onGroupSelected = async (group) => {
       mode: registrationMode.value,
     })
   } catch (error) {
-    showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
+    notifyError(error)
     registrationMode.value = 'initial'
   } finally {
     isCheckingGroup.value = false
@@ -279,7 +279,7 @@ const onSubmit = async (validationPromise) => {
         organizationId: String(selected.id),
       })
 
-      showSnackbar('代表者として登録されました！', 'success', { icon: 'mdi-check-circle' })
+      notifySuccess('代表者として登録されました！')
 
       setTimeout(() => {
         router.push('/eventcal')
@@ -299,7 +299,7 @@ const onSubmit = async (validationPromise) => {
         organizationId: String(selected.id),
       })
 
-      showSnackbar('申請を受け付けました', 'success', { icon: 'mdi-check-circle' })
+      notifySuccess('申請を受け付けました')
 
       setTimeout(() => {
         router.push('/prove-owner/description')
@@ -307,7 +307,7 @@ const onSubmit = async (validationPromise) => {
     }
   } catch (error) {
     void logFirebaseAnalyticsEvent('prove_owner_submit_error', {})
-    showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
+    notifyError(error)
   } finally {
     isLoading.value = false
   }
