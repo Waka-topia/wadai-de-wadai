@@ -26,26 +26,54 @@
 
     <TrainInfo />
     <BusInfo />
-    <CampusMap />
+    <!-- 地図の読み込みは重いので、他の要素を描画してから表示する -->
+    <CampusMap v-if="isMapVisible" />
+    <v-skeleton-loader
+      v-else
+      type="image"
+      :height="mapPlaceholderHeight"
+      class="mb-6 rounded-lg elevation-1"
+    ></v-skeleton-loader>
     <OtherFunctions />
     <!-- <WakayamaMatch /> -->
   </v-container>
 </template>
 
 <script setup>
+import { ref, onMounted, defineAsyncComponent } from 'vue'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import TrainInfo from '@/components/home/TrainInfo.vue'
 import BusInfo from '@/components/home/BusInfo.vue'
-import CampusMap from '@/components/home/CampusMap.vue'
 import OtherFunctions from '@/components/home/OtherFunctions.vue'
 // import WakayamaMatch from '@/components/home/WakayamaMatch.vue'
+
+const CampusMap = defineAsyncComponent(() => import('@/components/home/CampusMap.vue'))
 
 useFirebasePageView('view_home', {})
 
 const logSyllabusBannerClick = () => {
   void logFirebaseAnalyticsEvent('home_syllabus_search_banner_click', {})
 }
+
+// CampusMap の見出し行と地図（200px）を合わせた高さ。表示切り替え時のレイアウトのずれを防ぐ
+const mapPlaceholderHeight = 232
+// ブラウザが空くのを待つ最大時間。requestIdleCallback 非対応（Safari など）ではこの時間だけ待つ
+const mapMaxDelayMs = 2000
+
+const isMapVisible = ref(false)
+
+const showMap = () => {
+  isMapVisible.value = true
+}
+
+onMounted(() => {
+  if ('requestIdleCallback' in window) {
+    window.requestIdleCallback(showMap, { timeout: mapMaxDelayMs })
+  } else {
+    setTimeout(showMap, mapMaxDelayMs)
+  }
+})
 </script>
 
 <style scoped>

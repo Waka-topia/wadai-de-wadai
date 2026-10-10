@@ -37,3 +37,6 @@ coverage
 .env.*.local
 .env.dev*
 .env.prod*
+
+# Cloudflare Wrangler のローカル状態
+.wrangler/
