@@ -6,10 +6,20 @@
   >
     <v-row dense>
       <v-col cols="12" md="6">
-        <ProfileInfoItem icon="mdi-email" label="メールアドレス" :value="user.email" />
+        <ProfileInfoItem
+          class="h-100"
+          icon="mdi-email"
+          label="メールアドレス"
+          :value="user.email"
+        />
       </v-col>
       <v-col cols="12" md="6">
-        <ProfileInfoItem icon="mdi-account-box-outline" label="ユーザーID" :value="user.userId" />
+        <ProfileInfoItem
+          class="h-100"
+          icon="mdi-account-box-outline"
+          label="ユーザーID"
+          :value="user.userId"
+        />
       </v-col>
     </v-row>
   </ExpandableSection>

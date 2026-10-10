@@ -1,5 +1,5 @@
 <template>
-  <v-card class="h-100 pa-4" elevation="0" rounded="lg">
+  <v-card class="pa-4" elevation="0" rounded="lg">
     <v-row align="center" no-gutters>
       <v-col cols="auto" class="mr-4">
         <v-avatar color="blue-grey-lighten-5" rounded="lg">
