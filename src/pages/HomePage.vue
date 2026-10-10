@@ -1,5 +1,6 @@
 <template>
   <v-container class="pa-4 pb-16 home-container">
+    <!-- みんなのシラバス検索へのリンクカード -->
     <v-card
       class="mb-4 rounded-xl elevation-2 syllabus-banner"
       to="/syllabus-search"
@@ -25,18 +26,16 @@
 
     <TrainInfo />
     <BusInfo />
-
-    <div class="min-h-[300px] relative mb-4">
-      <CampusMap v-if="isMapVisible" />
-      <v-skeleton-loader
-        v-else
-        type="image"
-        height="300"
-        class="rounded-lg elevation-1"
-      ></v-skeleton-loader>
-    </div>
-
+    <!-- 地図の読み込みは重いので、他の要素を描画してから表示する -->
+    <CampusMap v-if="isMapVisible" />
+    <v-skeleton-loader
+      v-else
+      type="image"
+      :height="mapPlaceholderHeight"
+      class="mb-6 rounded-lg elevation-1"
+    ></v-skeleton-loader>
     <OtherFunctions />
+    <!-- <WakayamaMatch /> -->
   </v-container>
 </template>
 
@@ -57,13 +56,23 @@ const logSyllabusBannerClick = () => {
   void logFirebaseAnalyticsEvent('home_syllabus_search_banner_click', {})
 }
 
-// map遅延表示用
+// CampusMap の見出し行と地図（200px）を合わせた高さ。表示切り替え時のレイアウトのずれを防ぐ
+const mapPlaceholderHeight = 232
+// ブラウザが空くのを待つ最大時間。requestIdleCallback 非対応（Safari など）ではこの時間だけ待つ
+const mapMaxDelayMs = 2000
+
 const isMapVisible = ref(false)
 
+const showMap = () => {
+  isMapVisible.value = true
+}
+
 onMounted(() => {
-  setTimeout(() => {
-    isMapVisible.value = true
-  }, 2000)
+  if ('requestIdleCallback' in window) {
+    window.requestIdleCallback(showMap, { timeout: mapMaxDelayMs })
+  } else {
+    setTimeout(showMap, mapMaxDelayMs)
+  }
 })
 </script>
 
