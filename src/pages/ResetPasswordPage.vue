@@ -7,7 +7,7 @@
         <v-text-field
           v-model="newPassword"
           :append-inner-icon="visibleNew ? 'mdi-eye' : 'mdi-eye-off'"
-          :rules="[required]"
+          :rules="[required, passwordRule]"
           :type="visibleNew ? 'text' : 'password'"
           clearable
           class="mb-2"
@@ -19,7 +19,7 @@
         <v-text-field
           v-model="confirmPassword"
           :append-inner-icon="visibleConfirm ? 'mdi-eye' : 'mdi-eye-off'"
-          :rules="[required, passwordMatch]"
+          :rules="[required, confirmPasswordRule(newPassword)]"
           :type="visibleConfirm ? 'text' : 'password'"
           clearable
           label="パスワードを確認"
@@ -53,6 +53,7 @@ import { useFirebasePageView } from '@/composables/useFirebasePageView'
 import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { resetPassword } from '@/services/authService'
+import { confirmPasswordRule, passwordRule, required } from '@/utils/forms/validate'
 
 const newPassword = ref('')
 const confirmPassword = ref('')
@@ -68,9 +69,6 @@ const route = useRoute()
 const router = useRouter()
 
 useFirebasePageView('view_reset_password', {})
-
-const required = (value) => !!value || 'このフィールドは必須です。'
-const passwordMatch = (value) => value === newPassword.value || 'パスワードが一致しません。'
 
 onMounted(() => {
   const code = route.query.oobCode
