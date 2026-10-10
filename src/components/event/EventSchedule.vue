@@ -70,15 +70,15 @@
 
             <!-- 情報カラム -->
             <div class="info-column flex-grow-1 overflow-hidden">
-              <!-- 代理登録のときは右上のインフォボタンと重ならないよう右に余白を取る -->
+              <!-- 右端の矢印（代理登録のときは右上のインフォボタン）と重ならないよう右に余白を取る -->
               <p
                 class="text-h6 font-weight-bold mb-1 text-truncate"
-                :class="{ 'pr-6': isProxyEvent(event) }"
+                :class="isProxyEvent(event) ? 'pr-8' : 'pr-6'"
               >
                 {{ event.organizerName }}
               </p>
               <!-- 概要が無い・短いときもカードの高さが変わらないよう、常に 2 行分を確保する -->
-              <p class="text-body-2 text-grey-darken-1 mb-2 description-text">
+              <p class="text-body-2 text-grey-darken-1 mb-2 pr-6 description-text">
                 {{ event.description }}
               </p>
               <!-- バッジ（small チップ）の有無で高さが変わらないよう、行の高さをチップに合わせて固定する -->
@@ -96,8 +96,8 @@
               </div>
             </div>
 
-            <!-- 詳細矢印 -->
-            <v-icon size="20" color="grey-lighten-1" class="align-self-center ml-2 flex-shrink-0">
+            <!-- 詳細矢印。場所の行がカードの右端まで使えるよう、レイアウトの外に重ねて置く -->
+            <v-icon size="20" color="grey-lighten-1" class="detail-chevron">
               mdi-chevron-right
             </v-icon>
           </div>
@@ -245,6 +245,14 @@ const formatDate = (dateStr) => (dateStr ? formatShortDateWeekday(parseDateKey(d
 
 .location-row {
   height: 24px;
+}
+
+/* --- 詳細矢印 --- */
+.detail-chevron {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
 }
 
 /* --- 引き継ぎCTAのパルスアニメーション --- */

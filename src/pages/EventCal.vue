@@ -309,8 +309,6 @@ onMounted(() => {
 .date-display {
   display: flex;
   align-items: center;
-  background: #fff8e1;
-  border-radius: 20px;
   padding: 6px 12px;
 }
 
