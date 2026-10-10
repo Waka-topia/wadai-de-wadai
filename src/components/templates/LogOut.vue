@@ -58,7 +58,7 @@ const goLoginFromMenu = () => {
 
 const user = computed(() => store.getters['auth/user'])
 
-const { showSnackbar } = useSnackbar()
+const { notifySuccess, notifyError } = useSnackbar()
 
 const onLogout = async (isActive) => {
   try {
@@ -67,13 +67,13 @@ const onLogout = async (isActive) => {
     await store.dispatch('auth/initializeAuth')
     sessionStorage.removeItem('user')
 
-    showSnackbar('ログアウトしました', 'success', { icon: 'mdi-check-circle' })
+    notifySuccess('ログアウトしました')
 
     setTimeout(() => {
       router.push('/login')
     }, 1000)
   } catch (error) {
-    showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
+    notifyError(error)
   } finally {
     isActive.value = false
   }

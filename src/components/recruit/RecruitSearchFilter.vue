@@ -47,7 +47,7 @@
 import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 
-const { showSnackbar } = useSnackbar()
+const { showSnackbar, notifyError } = useSnackbar()
 
 const onFilterClick = (filterType) => {
   void logFirebaseAnalyticsEvent('recruit_filter_click', { filterType })
@@ -56,7 +56,7 @@ const onFilterClick = (filterType) => {
       icon: 'mdi-alert-circle',
     })
   } catch (error) {
-    showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
+    notifyError(error)
   }
 }
 
@@ -65,7 +65,7 @@ const onSearch = () => {
   try {
     showSnackbar('検索機能は現在準備中です', 'warning', { icon: 'mdi-alert-circle' })
   } catch (error) {
-    showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
+    notifyError(error)
   }
 }
 </script>

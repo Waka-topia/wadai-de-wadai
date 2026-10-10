@@ -119,7 +119,7 @@ const dialogOpen = computed({
 const isLoading = ref(false)
 const showRedirectPrompt = ref(false)
 
-const { showSnackbar } = useSnackbar()
+const { notifySuccess, notifyError } = useSnackbar()
 
 const onCancel = () => {
   dialogOpen.value = false
@@ -144,7 +144,7 @@ const onConfirm = async () => {
       organizationId: props.organizationId,
     })
 
-    showSnackbar('イベントの管理権限を引き継ぎました！', 'success', { icon: 'mdi-check-circle' })
+    notifySuccess('イベントの管理権限を引き継ぎました！')
 
     dialogOpen.value = false
     emit('transferred')
@@ -156,7 +156,7 @@ const onConfirm = async () => {
     if (error.message.includes('代表者証明が必要です')) {
       showRedirectPrompt.value = true
     } else {
-      showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
+      notifyError(error)
     }
   } finally {
     isLoading.value = false

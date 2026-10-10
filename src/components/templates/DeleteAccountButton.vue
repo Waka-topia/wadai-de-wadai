@@ -61,7 +61,7 @@ const user = computed(() => store.getters['auth/user'])
 const userEmail = computed(() => store.getters['users/currentUserData']?.email)
 const isDialogOpen = ref(false)
 
-const { showSnackbar } = useSnackbar()
+const { notifySuccess, notifyError } = useSnackbar()
 
 const onDeleteAccount = async () => {
   try {
@@ -70,13 +70,13 @@ const onDeleteAccount = async () => {
     await store.dispatch('auth/initializeAuth')
     sessionStorage.removeItem('user')
 
-    showSnackbar('アカウントを削除しました', 'success', { icon: 'mdi-check-circle' })
+    notifySuccess('アカウントを削除しました')
 
     setTimeout(() => {
       router.push('/login')
     }, 1000)
   } catch (error) {
-    showSnackbar(error.message, 'error', { icon: 'mdi-alert-circle' })
+    notifyError(error)
   } finally {
     isDialogOpen.value = false
   }
