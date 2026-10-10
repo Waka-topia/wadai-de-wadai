@@ -8,16 +8,8 @@
     </template>
 
     <FormFieldDefaults>
-      <v-form @submit.prevent="onSubmit">
-        <v-text-field
-          v-model="email"
-          class="mb-6"
-          :rules="[required]"
-          clearable
-          label="メールアドレス"
-          placeholder="sample@gmail.com"
-          prepend-inner-icon="mdi-email-outline"
-        ></v-text-field>
+      <v-form v-model="isFormValid" @submit.prevent="onSubmit">
+        <EmailField v-model="email" class="mb-6" />
 
         <v-btn
           type="submit"
@@ -44,17 +36,19 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
 import { useFormSubmit } from '@/composables/useFormSubmit'
-import { required } from '@/utils/forms/validate'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { sendPasswordReset } from '@/services/authService'
 import AuthCard from '@/components/auth/AuthCard.vue'
+import EmailField from '@/components/common/EmailField.vue'
 import FormFieldDefaults from '@/components/common/FormFieldDefaults.vue'
 
 const email = ref('')
+// 全項目が入力ルールを満たしているか（v-form が更新する）
+const isFormValid = ref(false)
 
 const router = useRouter()
 
@@ -74,9 +68,5 @@ const { isLoading, submit: onSubmit } = useFormSubmit({
   redirectTo: '/login',
   redirectDelay: 3000,
   errorEvent: 'forgot_password_submit_error',
-})
-
-const isFormValid = computed(() => {
-  return Boolean(email.value)
 })
 </script>

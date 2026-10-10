@@ -6,16 +6,8 @@
     :loading="isLoading"
   >
     <FormFieldDefaults>
-      <v-form @submit.prevent="onSubmit">
-        <v-text-field
-          v-model="loginData.email"
-          class="mb-4"
-          :rules="[required, emailDomainCheck]"
-          clearable
-          label="メールアドレス"
-          placeholder="sample@gmail.com"
-          prepend-inner-icon="mdi-email-outline"
-        ></v-text-field>
+      <v-form v-model="isFormValid" @submit.prevent="onSubmit">
+        <EmailField v-model="loginData.email" class="mb-4" />
 
         <PasswordField
           v-model="loginData.password"
@@ -80,14 +72,15 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
 import { useFormSubmit } from '@/composables/useFormSubmit'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
-import { required, emailDomainCheck } from '@/utils/forms/validate'
+import { required } from '@/utils/forms/validate'
 import AuthCard from '@/components/auth/AuthCard.vue'
+import EmailField from '@/components/common/EmailField.vue'
 import PasswordField from '@/components/common/PasswordField.vue'
 import FormFieldDefaults from '@/components/common/FormFieldDefaults.vue'
 
@@ -95,6 +88,8 @@ const loginData = ref({
   email: '',
   password: '',
 })
+// 全項目が入力ルールを満たしているか（v-form が更新する）
+const isFormValid = ref(false)
 
 const router = useRouter()
 const route = useRoute()
@@ -126,9 +121,5 @@ const { isLoading, submit: onSubmit } = useFormSubmit({
   // ガードによるリダイレクト先がある場合はそこへ、なければトップへ
   redirectTo: () => String(route.query.redirect || '/'),
   errorEvent: 'login_submit_error',
-})
-
-const isFormValid = computed(() => {
-  return Boolean(loginData.value.email && loginData.value.password)
 })
 </script>

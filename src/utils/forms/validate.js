@@ -32,6 +32,19 @@ export const nameCheck = (value) => {
   return true
 }
 
+/**
+ * メールアドレスの形式のバリデーション（空欄は required に任せる）
+ *
+ * @param {string} value - 入力値
+ * @returns {true | string} 有効なら true、無効ならエラーメッセージ
+ */
+export const emailFormat = (value) => {
+  if (value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+    return 'メールアドレスの形式が正しくありません'
+  }
+  return true
+}
+
 export const emailDomainCheck = (value) => {
   if (value && value.endsWith('@wakayama-u.ac.jp')) {
     return 'このドメインは使用できません'
