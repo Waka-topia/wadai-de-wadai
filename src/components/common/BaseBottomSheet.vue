@@ -1,15 +1,18 @@
 <template>
-  <v-bottom-sheet
+  <!-- スマホでは下から出るボトムシート、PC（md 以上）では画面中央のダイアログで開く -->
+  <component
+    :is="mdAndUp ? 'v-dialog' : 'v-bottom-sheet'"
     v-model:model-value="open"
     :max-height="maxHeight"
-    :max-width="maxWidth"
+    :max-width="mdAndUp ? (maxWidth ?? dialogMaxWidth) : maxWidth"
+    :width="mdAndUp ? '100%' : undefined"
     :scrollable="scrollable"
   >
     <template v-if="$slots.activator" #activator="{ props: activatorProps }">
       <slot :props="activatorProps" name="activator" />
     </template>
-    <v-card rounded="t-xl" class="d-flex flex-column overflow-hidden">
-      <div class="bottom-sheet-handle"></div>
+    <v-card :rounded="mdAndUp ? 'xl' : 't-xl'" class="d-flex flex-column overflow-hidden">
+      <div v-if="!mdAndUp" class="bottom-sheet-handle"></div>
       <template v-if="title || $slots['title-action']">
         <v-card-title class="text-subtitle-1 font-weight-bold d-flex align-center flex-shrink-0">
           <v-btn icon variant="text" size="default" color="orange" @click="open = false">
@@ -32,11 +35,12 @@
         </v-card-actions>
       </template>
     </v-card>
-  </v-bottom-sheet>
+  </component>
 </template>
 
 <script setup>
 import { computed, ref } from 'vue'
+import { useDisplay } from 'vuetify'
 
 const props = defineProps({
   modelValue: { type: Boolean, default: undefined },
@@ -46,6 +50,12 @@ const props = defineProps({
   scrollable: { type: Boolean, default: false },
 })
 const emit = defineEmits(['update:modelValue'])
+
+// md（960px）以上を PC 表示として扱い、ダイアログで開く
+const { mdAndUp } = useDisplay()
+// PC のダイアログの既定の幅（maxWidth が渡されたときはそちらを使う）。
+// 中身が狭くてもダイアログが縮まないよう、幅は 100% にして上限まで広げる
+const dialogMaxWidth = '640'
 
 // v-model が渡されない場合（activator のみ）は内部 ref で管理する
 const internalOpen = ref(false)
