@@ -2,32 +2,27 @@
   <div class="mb-6">
     <SectionHeader title="勤務地マップ" icon="mdi-map-marker-radius" icon-color="orange" />
 
-    <v-card
-      flat
-      class="rounded-lg overflow-hidden border position-relative cursor-pointer"
-      height="250"
-      color="#E0E0E0"
-      @click="openGoogleMaps"
-    >
-      <div ref="mapContainer" class="map-preview-wrapper" />
+    <MapPreviewCard height="250" clickable @click="openGoogleMaps">
+      <div ref="mapContainer" class="map-container" />
 
-      <div class="map-overlay d-flex align-center justify-center"></div>
-
-      <div class="map-action-chip">
-        Google Mapsで開く
-        <v-icon size="small" class="ml-1">mdi-open-in-new</v-icon>
-      </div>
-    </v-card>
+      <template #overlay>
+        <div class="map-action-chip">
+          Google Mapsで開く
+          <v-icon size="small" class="ml-1">mdi-open-in-new</v-icon>
+        </div>
+      </template>
+    </MapPreviewCard>
   </div>
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref, computed, markRaw } from 'vue'
+import { computed, ref } from 'vue'
+import maplibregl from 'maplibre-gl'
+import { useMapLibre } from '@/composables/useMapLibre'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { openExternalLink } from '@/utils/externalLink'
 import SectionHeader from '@/components/common/SectionHeader.vue'
-import maplibregl from 'maplibre-gl'
-import 'maplibre-gl/dist/maplibre-gl.css'
+import MapPreviewCard from '@/components/map/MapPreviewCard.vue'
 
 const props = defineProps({
   lat: {
@@ -45,8 +40,15 @@ const props = defineProps({
 })
 
 const mapContainer = ref(null)
-const map = ref(null)
-const apiKey = import.meta.env.VITE_MAPTILER_API_KEY
+
+// 勤務地を中心にした操作不可のプレビュー地図に、勤務地のマーカーを置く
+useMapLibre(
+  mapContainer,
+  { center: [props.lng, props.lat], zoom: 15, interactive: false },
+  (map) => {
+    new maplibregl.Marker({ color: '#FF9800' }).setLngLat([props.lng, props.lat]).addTo(map)
+  },
+)
 
 const googleMapsUrl = computed(() => {
   // destination に緯度経度を指定してルート検索モードにする
@@ -57,52 +59,12 @@ const openGoogleMaps = () => {
   void logFirebaseAnalyticsEvent('job_location_map_open_google', {})
   openExternalLink(googleMapsUrl.value)
 }
-
-onMounted(() => {
-  if (!apiKey || apiKey === 'YOUR_API_KEY_HERE') return
-
-  map.value = markRaw(
-    new maplibregl.Map({
-      container: mapContainer.value,
-      style: `https://api.maptiler.com/maps/basic-v2/style.json?key=${apiKey}`,
-      center: [props.lng, props.lat],
-      zoom: 15,
-      interactive: false,
-      attributionControl: false,
-    }),
-  )
-
-  new maplibregl.Marker({ color: '#FF9800' }).setLngLat([props.lng, props.lat]).addTo(map.value)
-})
-
-onUnmounted(() => {
-  if (map.value) {
-    map.value.remove()
-    map.value = null
-  }
-})
 </script>
 
 <style scoped>
-.map-preview-wrapper {
+.map-container {
   width: 100%;
   height: 100%;
-  pointer-events: none;
-}
-
-.map-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.02);
-  pointer-events: auto;
-  transition: background-color 0.2s;
-}
-
-.map-overlay:hover {
-  background-color: rgba(0, 0, 0, 0.08);
 }
 
 .map-action-chip {
