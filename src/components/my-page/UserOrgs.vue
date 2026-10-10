@@ -47,7 +47,7 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { allGroups } from '@/data/groups'
-import ProfileInfoItem from '@/components/user-profile/ProfileInfoItem.vue'
+import ProfileInfoItem from '@/components/my-page/ProfileInfoItem.vue'
 
 const props = defineProps({
   belongingOrgs: {

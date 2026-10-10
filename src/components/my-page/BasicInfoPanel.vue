@@ -32,8 +32,8 @@
 <script setup>
 import { computed } from 'vue'
 import { useStore } from 'vuex'
-import ProfileInfoItem from '@/components/user-profile/ProfileInfoItem.vue'
-import UserOrgs from '@/components/user-profile/UserOrgs.vue'
+import ProfileInfoItem from '@/components/my-page/ProfileInfoItem.vue'
+import UserOrgs from '@/components/my-page/UserOrgs.vue'
 
 const store = useStore()
 const user = computed(() => store.getters['users/currentUserData'])
