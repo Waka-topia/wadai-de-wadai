@@ -307,7 +307,8 @@ const resetForm = () => {
     creditStatus: 'taking',
     isFromSyllabus: false,
     quarters: defaultQuarters,
-    periods: props.selectedCell ? [props.selectedCell.period] : [],
+    // シラバス検索から開くとセル未指定（period: null）のことがあるため、null を初期値に入れない
+    periods: props.selectedCell?.period ? [props.selectedCell.period] : [],
     day: props.selectedCell?.day || null,
   }
 }
