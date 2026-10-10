@@ -8,8 +8,20 @@
 
       <v-expansion-panel-text class="bg-grey-lighten-4 pt-4">
         <v-row dense>
-          <UserAddress :email="user.email" />
-          <UserId :user-id="user.userId" />
+          <v-col cols="12" md="6">
+            <v-card class="pa-4 h-100" elevation="0" rounded="lg">
+              <ProfileInfoItem icon="mdi-email" label="メールアドレス" :value="user.email" />
+            </v-card>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-card class="pa-4 h-100" elevation="0" rounded="lg">
+              <ProfileInfoItem
+                icon="mdi-account-box-outline"
+                label="ユーザーID"
+                :value="user.userId"
+              />
+            </v-card>
+          </v-col>
           <UserOrgs :belonging-orgs="user.belongingOrgs ?? []" />
         </v-row>
       </v-expansion-panel-text>
@@ -20,8 +32,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useStore } from 'vuex'
-import UserAddress from '@/components/user-profile/UserAddress.vue'
-import UserId from '@/components/user-profile/UserId.vue'
+import ProfileInfoItem from '@/components/user-profile/ProfileInfoItem.vue'
 import UserOrgs from '@/components/user-profile/UserOrgs.vue'
 
 const store = useStore()
