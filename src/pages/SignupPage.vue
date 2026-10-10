@@ -5,94 +5,92 @@
     subtitle="ワダイdeワダイを始めよう！"
     :loading="isLoading"
   >
-    <v-form @submit.prevent="onSubmit">
-      <v-text-field
-        v-model="signupData.userName"
-        class="mb-4"
-        :rules="[required, nameCheck]"
-        clearable
-        hint="本名は使用しないでください。"
-        label="ユーザーネーム"
-        placeholder="わかやん"
-        prepend-inner-icon="mdi-account-outline"
-        variant="outlined"
-        color="orange-darken-2"
-        density="comfortable"
-      ></v-text-field>
+    <FormFieldDefaults>
+      <v-form @submit.prevent="onSubmit">
+        <v-text-field
+          v-model="signupData.userName"
+          class="mb-4"
+          :rules="[required, nameCheck]"
+          clearable
+          hint="本名は使用しないでください。"
+          label="ユーザーネーム"
+          placeholder="わかやん"
+          prepend-inner-icon="mdi-account-outline"
+        ></v-text-field>
 
-      <v-text-field
-        v-model="signupData.email"
-        class="mb-4"
-        :rules="[required, emailDomainCheck]"
-        clearable
-        hint="大学のメールアドレス以外であれば構いません。"
-        label="メールアドレス"
-        placeholder="sample@gmail.com"
-        prepend-inner-icon="mdi-email-outline"
-        variant="outlined"
-        color="orange-darken-2"
-        density="comfortable"
-      ></v-text-field>
+        <v-text-field
+          v-model="signupData.email"
+          class="mb-4"
+          :rules="[required, emailDomainCheck]"
+          clearable
+          hint="大学のメールアドレス以外であれば構いません。"
+          label="メールアドレス"
+          placeholder="sample@gmail.com"
+          prepend-inner-icon="mdi-email-outline"
+        ></v-text-field>
 
-      <PasswordField
-        v-model="signupData.password"
-        class="mb-4"
-        :rules="[required, passwordRule]"
-        hint="8文字以上にしてください。"
-        label="パスワード"
-        placeholder="パスワードを入力"
-      />
+        <PasswordField
+          v-model="signupData.password"
+          class="mb-4"
+          :rules="[required, passwordRule]"
+          hint="8文字以上にしてください。"
+          label="パスワード"
+          placeholder="パスワードを入力"
+        />
 
-      <div class="d-flex align-center justify-space-between mb-6 bg-grey-lighten-4 pa-3 rounded-lg">
-        <v-checkbox
-          v-model="agree"
-          :rules="[required]"
-          color="orange-darken-2"
-          hide-details
-          class="mt-0"
-          :disabled="!hasReadTerms"
+        <div
+          class="d-flex align-center justify-space-between mb-6 bg-grey-lighten-4 pa-3 rounded-lg"
         >
-          <template #label>
-            <span
-              class="text-caption font-weight-medium"
-              :class="hasReadTerms ? 'text-grey-darken-2' : 'text-grey-lighten-1'"
-            >
-              利用規約に同意する
+          <v-checkbox
+            v-model="agree"
+            :rules="[required]"
+            color="orange-darken-2"
+            hide-details
+            class="mt-0"
+            :disabled="!hasReadTerms"
+          >
+            <template #label>
               <span
-                v-if="!hasReadTerms"
-                class="text-orange-darken-2"
-                style="font-size: 0.85em; display: block; margin-top: 2px"
+                class="text-caption font-weight-medium"
+                :class="hasReadTerms ? 'text-grey-darken-2' : 'text-grey-lighten-1'"
               >
-                (先に規約をご確認ください)
+                利用規約に同意する
+                <span
+                  v-if="!hasReadTerms"
+                  class="text-orange-darken-2"
+                  style="font-size: 0.85em; display: block; margin-top: 2px"
+                >
+                  (先に規約をご確認ください)
+                </span>
               </span>
-            </span>
-          </template>
-        </v-checkbox>
-        <v-btn
-          variant="text"
-          color="orange-darken-2"
-          size="small"
-          class="font-weight-bold"
-          @click="openRules"
-        >
-          規約を読む
-        </v-btn>
-      </div>
+            </template>
+          </v-checkbox>
+          <v-btn
+            variant="text"
+            color="orange-darken-2"
+            size="small"
+            class="font-weight-bold"
+            @click="openRules"
+          >
+            規約を読む
+          </v-btn>
+        </div>
 
-      <v-btn
-        type="submit"
-        :loading="isLoading"
-        :disabled="!isFormValid"
-        block
-        color="blue-darken-2"
-        size="x-large"
-        rounded="pill"
-        class="font-weight-bold mb-2"
-        elevation="0"
-      >
-        アカウントを作成
-      </v-btn>
-    </v-form>
+        <v-btn
+          type="submit"
+          :loading="isLoading"
+          :disabled="!isFormValid"
+          block
+          color="blue-darken-2"
+          size="x-large"
+          rounded="pill"
+          class="font-weight-bold mb-2"
+          elevation="0"
+        >
+          アカウントを作成
+        </v-btn>
+      </v-form>
+    </FormFieldDefaults>
 
     <v-divider class="my-6"></v-divider>
 
@@ -131,6 +129,7 @@ import AuthCard from '@/components/auth/AuthCard.vue'
 import BaseDialog from '@/components/common/BaseDialog.vue'
 import TermsRule from '@/components/templates/TermsRule.vue'
 import PasswordField from '@/components/common/PasswordField.vue'
+import FormFieldDefaults from '@/components/common/FormFieldDefaults.vue'
 
 const signupData = ref({
   email: '',

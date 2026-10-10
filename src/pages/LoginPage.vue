@@ -5,51 +5,50 @@
     subtitle="ワダイdeワダイへようこそ"
     :loading="isLoading"
   >
-    <v-form @submit.prevent="onSubmit">
-      <v-text-field
-        v-model="loginData.email"
-        class="mb-4"
-        :rules="[required, emailDomainCheck]"
-        clearable
-        label="メールアドレス"
-        placeholder="sample@gmail.com"
-        prepend-inner-icon="mdi-email-outline"
-        variant="outlined"
-        color="orange-darken-2"
-        density="comfortable"
-      ></v-text-field>
+    <FormFieldDefaults>
+      <v-form @submit.prevent="onSubmit">
+        <v-text-field
+          v-model="loginData.email"
+          class="mb-4"
+          :rules="[required, emailDomainCheck]"
+          clearable
+          label="メールアドレス"
+          placeholder="sample@gmail.com"
+          prepend-inner-icon="mdi-email-outline"
+        ></v-text-field>
 
-      <PasswordField
-        v-model="loginData.password"
-        :rules="[required]"
-        label="パスワード"
-        placeholder="パスワードを入力"
-      />
+        <PasswordField
+          v-model="loginData.password"
+          :rules="[required]"
+          label="パスワード"
+          placeholder="パスワードを入力"
+        />
 
-      <div class="d-flex justify-end mb-6 mt-n2">
-        <a
-          href="#"
-          class="text-caption text-orange-darken-2 font-weight-medium text-decoration-none"
-          @click.prevent="onForgotPassword"
+        <div class="d-flex justify-end mb-6 mt-n2">
+          <a
+            href="#"
+            class="text-caption text-orange-darken-2 font-weight-medium text-decoration-none"
+            @click.prevent="onForgotPassword"
+          >
+            パスワードをお忘れですか？
+          </a>
+        </div>
+
+        <v-btn
+          type="submit"
+          :loading="isLoading"
+          :disabled="!isFormValid"
+          block
+          color="orange-darken-2"
+          size="x-large"
+          rounded="pill"
+          class="font-weight-bold mb-2"
+          elevation="0"
         >
-          パスワードをお忘れですか？
-        </a>
-      </div>
-
-      <v-btn
-        type="submit"
-        :loading="isLoading"
-        :disabled="!isFormValid"
-        block
-        color="orange-darken-2"
-        size="x-large"
-        rounded="pill"
-        class="font-weight-bold mb-2"
-        elevation="0"
-      >
-        ログイン
-      </v-btn>
-    </v-form>
+          ログイン
+        </v-btn>
+      </v-form>
+    </FormFieldDefaults>
 
     <v-divider class="my-6"></v-divider>
 
@@ -90,6 +89,7 @@ import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { required, emailDomainCheck } from '@/utils/forms/validate'
 import AuthCard from '@/components/auth/AuthCard.vue'
 import PasswordField from '@/components/common/PasswordField.vue'
+import FormFieldDefaults from '@/components/common/FormFieldDefaults.vue'
 
 const loginData = ref({
   email: '',

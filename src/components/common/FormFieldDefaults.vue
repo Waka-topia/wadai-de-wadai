@@ -1,5 +1,5 @@
 <template>
-  <!-- 中の入力欄に、グレー背景・outlined の共通スタイルを適用する -->
+  <!-- 中の入力欄に、グレー背景・outlined・フォーカス時オレンジの共通スタイルを適用する -->
   <v-defaults-provider :defaults="fieldDefaults">
     <div class="form-field-defaults">
       <slot />
@@ -13,6 +13,7 @@ const fieldStyle = {
   density: 'comfortable',
   bgColor: 'grey-lighten-4',
   baseColor: 'grey-darken-2',
+  color: 'orange-darken-2',
 }
 
 const fieldDefaults = {
@@ -20,6 +21,7 @@ const fieldDefaults = {
   VTextarea: fieldStyle,
   VSelect: fieldStyle,
   VAutocomplete: fieldStyle,
+  VCombobox: fieldStyle,
 }
 </script>
 

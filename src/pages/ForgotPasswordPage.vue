@@ -7,34 +7,33 @@
       </p>
     </template>
 
-    <v-form @submit.prevent="onSubmit">
-      <v-text-field
-        v-model="email"
-        class="mb-6"
-        :rules="[required]"
-        clearable
-        label="メールアドレス"
-        placeholder="sample@gmail.com"
-        prepend-inner-icon="mdi-email-outline"
-        variant="outlined"
-        color="orange-darken-2"
-        density="comfortable"
-      ></v-text-field>
+    <FormFieldDefaults>
+      <v-form @submit.prevent="onSubmit">
+        <v-text-field
+          v-model="email"
+          class="mb-6"
+          :rules="[required]"
+          clearable
+          label="メールアドレス"
+          placeholder="sample@gmail.com"
+          prepend-inner-icon="mdi-email-outline"
+        ></v-text-field>
 
-      <v-btn
-        type="submit"
-        :loading="isLoading"
-        :disabled="!isFormValid"
-        block
-        color="green-darken-2"
-        size="x-large"
-        rounded="pill"
-        class="font-weight-bold mb-2"
-        elevation="0"
-      >
-        リセットメールを送信
-      </v-btn>
-    </v-form>
+        <v-btn
+          type="submit"
+          :loading="isLoading"
+          :disabled="!isFormValid"
+          block
+          color="green-darken-2"
+          size="x-large"
+          rounded="pill"
+          class="font-weight-bold mb-2"
+          elevation="0"
+        >
+          リセットメールを送信
+        </v-btn>
+      </v-form>
+    </FormFieldDefaults>
 
     <v-divider class="my-6"></v-divider>
 
@@ -53,6 +52,7 @@ import { required } from '@/utils/forms/validate'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { sendPasswordReset } from '@/services/authService'
 import AuthCard from '@/components/auth/AuthCard.vue'
+import FormFieldDefaults from '@/components/common/FormFieldDefaults.vue'
 
 const email = ref('')
 
