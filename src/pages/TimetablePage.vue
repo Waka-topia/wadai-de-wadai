@@ -135,6 +135,7 @@ import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
 import { useSnackbar } from '@/composables/useSnackbar'
+import { periodTimes } from '@/config/timetable'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import BaseBottomSheet from '@/components/common/BaseBottomSheet.vue'
 import TimetableHeaderControls from '@/components/timetable/TimetableHeaderControls.vue'
@@ -177,7 +178,6 @@ const editorSheetTitle = computed(() => {
 
 const isAuthenticated = computed(() => store.getters['auth/isAuthenticated'])
 const todayLectures = computed(() => store.getters['timetable/todayLectures'])
-const currentTimetable = computed(() => store.getters['timetable/currentTimetable'])
 const totalCredits = computed(() => store.getters['timetable/totalCredits'])
 
 const currentSemester = computed(() => store.getters['timetable/semester'])
@@ -186,22 +186,8 @@ const activeQuarter = computed({
   set: (val) => store.commit('timetable/SET_DISPLAY_QUARTER', val),
 })
 
-const earnedCredits = computed(() => {
-  // 配列化されたためフラットにして計算
-  const arr = Object.values(currentTimetable.value || {}).flat()
-  return arr.reduce(
-    (sum, lec) => (lec.creditStatus === 'earned' ? sum + (Number(lec.credits) || 0) : sum),
-    0,
-  )
-})
-
-const failedCredits = computed(() => {
-  const arr = Object.values(currentTimetable.value || {}).flat()
-  return arr.reduce(
-    (sum, lec) => (lec.creditStatus === 'failed' ? sum + (Number(lec.credits) || 0) : sum),
-    0,
-  )
-})
+const earnedCredits = computed(() => store.getters['timetable/earnedCredits'])
+const failedCredits = computed(() => store.getters['timetable/failedCredits'])
 
 const userId = computed(() => store.getters['auth/userId'])
 
@@ -220,8 +206,7 @@ const getTodayCardStyle = (lecture) => {
   return { backgroundColor: c.bg, borderLeftColor: c.border }
 }
 
-const periodStartMap = { 1: '09:10', 2: '10:40', 3: '13:10', 4: '14:50', 5: '16:20', 6: '18:00' }
-const getPeriodStart = (period) => periodStartMap[period] || ''
+const getPeriodStart = (period) => periodTimes[period]?.start || ''
 
 const todayDateLabel = computed(() => {
   const d = new Date()

@@ -79,6 +79,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useStore } from 'vuex'
+import { periodTimes } from '@/config/timetable'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 
 defineProps({
@@ -110,14 +111,6 @@ const isLoggedIn = computed(() => store.getters['auth/isAuthenticated'])
 // 配列を取得するGetterに変更
 const getLectures = (day, period) => store.getters['timetable/getLectures'](day, period)
 
-const periodTimes = {
-  1: { start: '09:10', end: '10:40' },
-  2: { start: '10:50', end: '12:20' },
-  3: { start: '13:10', end: '14:40' },
-  4: { start: '14:50', end: '16:20' },
-  5: { start: '16:30', end: '18:00' },
-  6: { start: '18:10', end: '19:40' },
-}
 const getPeriodStart = (period) => periodTimes[period]?.start || ''
 const getPeriodEnd = (period) => periodTimes[period]?.end || ''
 
