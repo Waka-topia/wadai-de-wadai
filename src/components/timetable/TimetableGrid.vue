@@ -279,6 +279,13 @@ const getLectureCardStyle = (lecture) => {
   overflow: hidden;
   gap: 2px; /* 複数カードがある場合の隙間 */
 }
+/* PC ではセルが横に広くなり、縦横比のままだと縦に間延びするので高さを固定する（スマホのセルより少し高い程度） */
+@media (min-width: 960px) {
+  .grid-cell {
+    aspect-ratio: auto;
+    height: 96px;
+  }
+}
 .grid-cell:hover {
   background-color: #fff9f0;
 }
