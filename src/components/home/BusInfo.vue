@@ -1,9 +1,6 @@
 <template>
   <div class="mb-6">
-    <div class="d-flex align-center mb-2">
-      <v-icon color="#1976D2" class="mr-2">mdi-bus</v-icon>
-      <span class="font-weight-bold">バス情報</span>
-    </div>
+    <SectionHeader title="バス情報" icon="mdi-bus" icon-color="#1976D2" />
 
     <TransitRouteCard
       v-for="route in routes"
@@ -37,6 +34,7 @@
 <script setup>
 import { useDepartureCountdown } from '@/composables/useDepartureCountdown'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
+import SectionHeader from '@/components/common/SectionHeader.vue'
 import TransitRouteCard from '@/components/home/TransitRouteCard.vue'
 
 const timetableUrl = 'https://transfer-cloud.navitime.biz/wakayamabus/courses?busstop=00220063'

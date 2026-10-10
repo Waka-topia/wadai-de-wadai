@@ -1,10 +1,6 @@
 <template>
   <div class="mb-6">
-    <div class="d-flex align-center justify-space-between mb-2">
-      <div class="d-flex align-center">
-        <span class="font-weight-bold">その他の機能</span>
-      </div>
-    </div>
+    <SectionHeader title="その他の機能" />
 
     <!-- Features Grid -->
     <v-card flat class="rounded-xl pa-4 mb-4">
@@ -54,6 +50,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { openExternalLink } from '@/utils/externalLink'
+import SectionHeader from '@/components/common/SectionHeader.vue'
 
 const router = useRouter()
 const showMapSection = ref(false) // マップセクションの表示状態

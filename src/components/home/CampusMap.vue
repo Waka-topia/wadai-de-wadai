@@ -1,17 +1,16 @@
 <template>
   <div class="mb-6">
-    <div class="d-flex align-center justify-space-between mb-2">
-      <div class="d-flex align-center">
-        <span class="font-weight-bold">キャンパスマップ</span>
-      </div>
-      <router-link
-        to="/map"
-        class="text-decoration-none text-orange d-flex align-center text-body-2"
-      >
-        マップ全体を見る
-        <v-icon size="small">mdi-chevron-right</v-icon>
-      </router-link>
-    </div>
+    <SectionHeader title="キャンパスマップ">
+      <template #action>
+        <router-link
+          to="/map"
+          class="text-decoration-none text-orange d-flex align-center text-body-2"
+        >
+          マップ全体を見る
+          <v-icon size="small">mdi-chevron-right</v-icon>
+        </router-link>
+      </template>
+    </SectionHeader>
 
     <!-- Map Preview Widget -->
     <v-card
@@ -33,6 +32,7 @@
 
 <script setup>
 import BaseMap from '@/components/map/BaseMap.vue'
+import SectionHeader from '@/components/common/SectionHeader.vue'
 </script>
 
 <style scoped>
