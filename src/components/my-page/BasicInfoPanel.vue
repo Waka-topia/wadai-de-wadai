@@ -6,15 +6,10 @@
   >
     <v-row dense>
       <v-col cols="12" md="6">
-        <ProfileInfoItem
-          class="h-100"
-          icon="mdi-email"
-          label="メールアドレス"
-          :value="user.email"
-        />
+        <InfoItem class="h-100" icon="mdi-email" label="メールアドレス" :value="user.email" />
       </v-col>
       <v-col cols="12" md="6">
-        <ProfileInfoItem
+        <InfoItem
           class="h-100"
           icon="mdi-account-box-outline"
           label="ユーザーID"
@@ -29,7 +24,7 @@
 import { computed } from 'vue'
 import { useStore } from 'vuex'
 import ExpandableSection from '@/components/common/ExpandableSection.vue'
-import ProfileInfoItem from '@/components/my-page/ProfileInfoItem.vue'
+import InfoItem from '@/components/common/InfoItem.vue'
 
 const store = useStore()
 const user = computed(() => store.getters['users/currentUserData'])
