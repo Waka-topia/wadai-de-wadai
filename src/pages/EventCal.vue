@@ -93,7 +93,25 @@
 
     <EventSchedule v-model:selected-date="selectedDate" />
 
-    <EditEventFormButton />
+    <!-- イベント追加フォーム -->
+    <BaseBottomSheet title="新歓イベントの登録">
+      <template #activator="{ props: activatorProps }">
+        <v-btn
+          v-bind="activatorProps"
+          class="text-white font-weight-bold fab-btn py-7 px-5 d-flex align-center justify-center"
+          color="orange"
+          variant="elevated"
+          elevation="4"
+          rounded="pill"
+          @click="logFirebaseAnalyticsEvent('event_edit_form_open', {})"
+        >
+          団体向けフォーム
+        </v-btn>
+      </template>
+      <template #default="{ close, isOpen }">
+        <EventForm v-if="isOpen" @success="close" />
+      </template>
+    </BaseBottomSheet>
   </div>
 </template>
 
@@ -102,8 +120,9 @@ import { ref, onMounted, computed, watch } from 'vue'
 import { useStore } from 'vuex'
 import VueCal from 'vue-cal'
 import 'vue-cal/dist/vuecal.css'
+import BaseBottomSheet from '@/components/common/BaseBottomSheet.vue'
+import EventForm from '@/components/event/EventForm.vue'
 import EventSchedule from '@/components/event/EventSchedule.vue'
-import EditEventFormButton from '@/components/event/EditEventFormButton.vue'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
 
@@ -374,5 +393,13 @@ onMounted(() => {
 
 .vuecal__no-event {
   display: none;
+}
+
+/* --- FABボタン --- */
+.fab-btn {
+  position: fixed;
+  bottom: 100px;
+  right: 16px;
+  z-index: 1000;
 }
 </style>

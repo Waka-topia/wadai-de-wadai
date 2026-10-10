@@ -48,7 +48,7 @@
     </div>
 
     <!-- 検索結果リスト -->
-    <div v-else-if="hasSearched">
+    <div v-else-if="isSearched">
       <!-- 検索結果が見つからなかった場合 -->
       <div v-if="suggestions.length === 0" class="text-center py-8">
         <v-avatar color="amber-lighten-4" size="80" class="mb-4">
@@ -109,13 +109,13 @@
     </div>
 
     <!-- 初回表示（検索前）の案内 -->
-    <div v-else-if="!hasSearched" class="text-center py-8">
+    <div v-else-if="!isSearched" class="text-center py-8">
       <v-icon size="64" color="grey-lighten-1" class="mb-3">mdi-book-search</v-icon>
       <p class="text-body-2 text-grey">気になる講義名を検索しましょう</p>
     </div>
 
     <!-- シラバス閲覧・登録用モーダル -->
-    <v-bottom-sheet v-model="showSyllabusModal" scrollable>
+    <v-bottom-sheet v-model="isSyllabusModalOpen" scrollable>
       <v-card class="modal-card" rounded="t-xl">
         <div class="bottom-sheet-handle" />
         <v-card-title class="d-flex align-center justify-space-between py-3 px-4">
@@ -152,175 +152,41 @@
     </v-bottom-sheet>
 
     <!-- 授業を手動で追加するフォーム -->
-    <v-bottom-sheet v-model="showNewLectureNameDialog" scrollable>
-      <v-card class="register-sheet-card" rounded="t-xl">
-        <div class="bottom-sheet-handle" />
-        <v-card-title class="register-sheet-title">
-          <v-btn icon variant="text" @click="showNewLectureNameDialog = false">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-          <span class="text-subtitle-1 font-weight-bold">授業を手動で追加する</span>
-          <v-btn
-            color="orange"
-            variant="text"
-            class="font-weight-bold"
-            :disabled="!newLectureName || !newDay || newPeriods.length === 0"
-            :loading="saving"
-            @click="proceedToAddChoice"
-          >
-            追加する
-          </v-btn>
-        </v-card-title>
-        <v-divider />
-        <v-card-text class="pa-4 register-sheet-body">
-          <div class="mb-4">
-            <v-select
-              v-model="newQuarterSelectValue"
-              :items="quarterSelectOptions"
-              item-title="title"
-              item-value="value"
-              label="履修期間 *"
-              variant="outlined"
-              density="comfortable"
-            />
-          </div>
-
-          <div class="mb-4">
-            <v-select
-              v-model="newDay"
-              :items="days"
-              item-title="title"
-              item-value="value"
-              label="曜日 *"
-              variant="outlined"
-              density="comfortable"
-            />
-          </div>
-
-          <div class="mb-4">
-            <v-select
-              v-model="newPeriods"
-              :items="periods"
-              item-title="title"
-              item-value="value"
-              multiple
-              chips
-              closable-chips
-              label="時限（複数選択で連続コマ）*"
-              variant="outlined"
-              density="comfortable"
-            />
-          </div>
-
-          <v-text-field
-            v-model="newLectureName"
-            class="mb-2"
-            density="comfortable"
-            label="講義名 *"
-            placeholder="例：ロボット工学入門"
-            variant="outlined"
-          />
-
-          <v-text-field
-            v-model="newTeacher"
-            class="mb-2"
-            density="comfortable"
-            label="担当教員"
-            placeholder="例：山田 太郎"
-            variant="outlined"
-          />
-
-          <v-row class="mb-1" dense>
-            <v-col cols="8">
-              <v-text-field
-                v-model="newRoom"
-                density="comfortable"
-                label="教室"
-                placeholder="例：A棟101"
-                variant="outlined"
-              />
-            </v-col>
-            <v-col cols="4">
-              <v-select
-                v-model="newCredits"
-                :items="[0, 1, 2, 3, 4]"
-                density="comfortable"
-                label="単位数"
-                variant="outlined"
-              />
-            </v-col>
-          </v-row>
-
-          <v-row class="mb-1" dense>
-            <v-col cols="12">
-              <v-select
-                v-model="newRequired"
-                :items="requiredItems"
-                density="comfortable"
-                item-title="label"
-                item-value="value"
-                label="区分"
-                variant="outlined"
-              />
-            </v-col>
-            <v-col cols="12">
-              <v-select
-                v-model="newCreditStatus"
-                :items="creditStatusItems"
-                density="comfortable"
-                item-title="label"
-                item-value="value"
-                label="単位取得状況"
-                variant="outlined"
-              />
-            </v-col>
-          </v-row>
-
-          <v-textarea
-            v-model="newMemo"
-            auto-grow
-            density="comfortable"
-            label="メモ"
-            placeholder="例：出席必須, 教科書持参"
-            rows="2"
-            variant="outlined"
-          />
-        </v-card-text>
-      </v-card>
-    </v-bottom-sheet>
+    <BaseBottomSheet v-model="isManualAddSheetOpen" title="授業を手動で追加する" scrollable>
+      <LectureEditorModal
+        v-if="isManualAddSheetOpen"
+        :selected-cell="{ day: targetDay, period: targetPeriod, lectureId: null }"
+        :prefill-name="prefillLectureName"
+        @save="handleEditorSave"
+      />
+    </BaseBottomSheet>
 
     <!-- 二択確認ダイアログ -->
-    <v-dialog v-model="showAddChoiceDialog" max-width="320">
-      <v-card rounded="xl" class="pa-2">
-        <v-card-title class="text-subtitle-1 font-weight-bold text-center pt-4">
-          どちらで追加しますか？
-        </v-card-title>
-        <v-card-text class="d-flex flex-column ga-3 pb-2">
-          <v-btn
-            block
-            color="blue-grey"
-            variant="tonal"
-            rounded="lg"
-            class="font-weight-bold"
-            @click="addPersonalOnly"
-          >
-            <v-icon start>mdi-account</v-icon>
-            自分の時間割にだけ追加する
-          </v-btn>
-          <v-btn
-            block
-            color="teal"
-            variant="tonal"
-            rounded="lg"
-            class="font-weight-bold"
-            @click="addAndRegisterSyllabus"
-          >
-            <v-icon start>mdi-earth</v-icon>
-            みんなのシラバスにも登録する
-          </v-btn>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
+    <BaseDialog v-model="isAddChoiceDialogOpen" title="どちらで追加しますか？">
+      <div class="d-flex flex-column ga-3 pa-4 py-6">
+        <v-btn
+          block
+          color="orange"
+          variant="outlined"
+          rounded="pill"
+          class="font-weight-bold"
+          @click="addPersonalOnly"
+        >
+          <v-icon start>mdi-account</v-icon>
+          自分の時間割にだけ追加する
+        </v-btn>
+        <v-btn
+          block
+          color="orange"
+          rounded="pill"
+          class="font-weight-bold text-white"
+          @click="addAndRegisterSyllabus"
+        >
+          <v-icon start>mdi-earth</v-icon>
+          みんなのシラバスにも登録する
+        </v-btn>
+      </div>
+    </BaseDialog>
   </v-container>
 </template>
 
@@ -330,6 +196,9 @@ import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
+import BaseBottomSheet from '@/components/common/BaseBottomSheet.vue'
+import BaseDialog from '@/components/common/BaseDialog.vue'
+import LectureEditorModal from '@/components/timetable/LectureEditorModal.vue'
 import LectureSyllabusPanel from '@/components/timetable/LectureSyllabusPanel.vue'
 
 const store = useStore()
@@ -360,7 +229,7 @@ const getDayName = (code) => {
 
 // 検索ステート
 const searchQuery = ref('')
-const hasSearched = ref(false)
+const isSearched = ref(false)
 
 const suggestions = computed(() => store.getters['syllabus/searchResults'])
 const isLoading = computed(() => store.getters['syllabus/isLoading'])
@@ -371,88 +240,23 @@ const isLoggedIn = computed(() => store.getters['auth/isAuthenticated'])
 
 // シラバス表示・追加ステート
 const selectedLectureName = ref(null)
-const showSyllabusModal = ref(false)
-const saving = ref(false)
+const isSyllabusModalOpen = ref(false)
+const isSaving = ref(false)
 
 const { showSnackbar } = useSnackbar()
 
 // 手動追加フォーム用
-const showNewLectureNameDialog = ref(false)
-const showAddChoiceDialog = ref(false)
-const newLectureName = ref('')
-const newTeacher = ref('')
-const newRoom = ref('')
-const newCredits = ref(2)
-const newRequired = ref('none')
-const newCreditStatus = ref('taking')
-const newMemo = ref('')
-const newDay = ref(null)
-const newPeriods = ref([])
-const newQuarters = ref([])
-
-const requiredItems = [
-  { label: '必修', value: 'req' },
-  { label: '選択必修', value: 'semi' },
-  { label: 'その他', value: 'none' },
-]
-const creditStatusItems = [
-  { label: '履修中・未定', value: 'taking' },
-  { label: '取得済', value: 'earned' },
-  { label: '落単', value: 'failed' },
-]
-
-const currentSemester = computed(() => store.getters['timetable/semester'])
-const currentDisplayQuarter = computed(() => store.state.timetable.displayQuarter)
-const availableQuarters = computed(() =>
-  currentSemester.value === 'second' ? ['3Q', '4Q'] : ['1Q', '2Q'],
-)
-const quarterSelectOptions = computed(() => {
-  if (currentSemester.value === 'second') {
-    return [
-      { title: '3Q', value: '3Q' },
-      { title: '4Q', value: '4Q' },
-      { title: '後期（3Q・4Q）', value: '3Q,4Q' },
-    ]
-  } else {
-    return [
-      { title: '1Q', value: '1Q' },
-      { title: '2Q', value: '2Q' },
-      { title: '前期（1Q・2Q）', value: '1Q,2Q' },
-    ]
-  }
-})
-const newQuarterSelectValue = computed({
-  get() {
-    return (newQuarters.value ?? []).join(',')
-  },
-  set(val) {
-    newQuarters.value = val ? val.split(',') : [...availableQuarters.value]
-  },
-})
-
-const days = [
-  { title: '月曜日', value: 'mon' },
-  { title: '火曜日', value: 'tue' },
-  { title: '水曜日', value: 'wed' },
-  { title: '木曜日', value: 'thu' },
-  { title: '金曜日', value: 'fri' },
-]
-
-const periods = [
-  { title: '1限 (9:10~10:40)', value: 1 },
-  { title: '2限 (10:40~12:10)', value: 2 },
-  { title: '3限 (13:10~14:40)', value: 3 },
-  { title: '4限 (14:50~16:20)', value: 4 },
-  { title: '5限 (16:20~17:50)', value: 5 },
-  { title: '6限 (18:00~19:30)', value: 6 },
-]
+const isManualAddSheetOpen = ref(false)
+const prefillLectureName = ref('')
+const isAddChoiceDialogOpen = ref(false)
+const pendingSaveData = ref(null)
 
 // 定額課金対応の検索（ローカルフィルタリング）
 const executeSearch = () => {
   const queryText = searchQuery.value ? searchQuery.value.trim() : ''
   if (!queryText) return
 
-  hasSearched.value = true
+  isSearched.value = true
   store.dispatch('syllabus/searchLectures', queryText)
 
   void logFirebaseAnalyticsEvent('syllabus_search_execute', {
@@ -463,17 +267,17 @@ const executeSearch = () => {
 
 const openSyllabusModal = (lectureName) => {
   selectedLectureName.value = lectureName
-  showSyllabusModal.value = true
+  isSyllabusModalOpen.value = true
 }
 
 const closeModal = () => {
-  showSyllabusModal.value = false
+  isSyllabusModalOpen.value = false
   selectedLectureName.value = null
 }
 
 // シラバス閲覧モーダルの「この授業を時間割に追加する」から開く
 const openManualAddDialogFromSyllabus = () => {
-  showSyllabusModal.value = false
+  isSyllabusModalOpen.value = false
   // 選択中の授業名をプリフィル
   const prefill = selectedLectureName.value || ''
   selectedLectureName.value = null
@@ -482,70 +286,40 @@ const openManualAddDialogFromSyllabus = () => {
 
 // 統合エントリポイント（3ボタンすべてをこれで開く）
 const openManualAddDialog = (prefillName = '') => {
-  newLectureName.value = prefillName || (searchQuery.value ? searchQuery.value.trim() : '')
-  newTeacher.value = ''
-  newRoom.value = ''
-  newCredits.value = 2
-  newRequired.value = 'none'
-  newCreditStatus.value = 'taking'
-  newMemo.value = ''
-  newDay.value = targetDay.value || null
-  newPeriods.value = targetPeriod.value ? [targetPeriod.value] : []
-  const defaultQuarters =
-    currentDisplayQuarter.value !== 'all' && currentDisplayQuarter.value
-      ? [currentDisplayQuarter.value]
-      : [...availableQuarters.value]
-  newQuarters.value = defaultQuarters
-  showNewLectureNameDialog.value = true
+  prefillLectureName.value = prefillName || (searchQuery.value ? searchQuery.value.trim() : '')
+  isManualAddSheetOpen.value = true
 }
 
-// ヘッダーの「追加する」ボタン → 二択ダイアログを表示
-const proceedToAddChoice = () => {
-  if (!newLectureName.value) return
-  showAddChoiceDialog.value = true
+// LectureEditorModal の save イベント受け取り → 二択ダイアログへ
+const handleEditorSave = (saveData) => {
+  pendingSaveData.value = saveData
+  isManualAddSheetOpen.value = false
+  isAddChoiceDialogOpen.value = true
 }
 
 /** フォームの内容を時間割に保存する共通処理 */
 const saveToTimetable = async () => {
-  saving.value = true
+  isSaving.value = true
   try {
-    await store.dispatch('timetable/saveLecture', {
-      day: newDay.value,
-      periods: newPeriods.value,
-      lecture: {
-        name: newLectureName.value.trim(),
-        originalName: newLectureName.value.trim(),
-        color: 'orange',
-        room: newRoom.value.trim(),
-        memo: newMemo.value.trim(),
-        teacher: newTeacher.value.trim(),
-        credits: Number(newCredits.value),
-        required: newRequired.value,
-        creditStatus: newCreditStatus.value,
-        isFromSyllabus: false,
-        quarters: newQuarters.value,
-        periods: newPeriods.value,
-        day: newDay.value,
-      },
-    })
-    showNewLectureNameDialog.value = false
+    const { day, periods, lecture } = pendingSaveData.value
+    await store.dispatch('timetable/saveLecture', { day, periods, lecture })
     router.push('/timetable')
   } catch (error) {
     console.error('Failed to save lecture:', error)
   } finally {
-    saving.value = false
+    isSaving.value = false
   }
 }
 
 // 選択A：自分の時間割にだけ追加（シラバス登録なし）
 const addPersonalOnly = async () => {
-  showAddChoiceDialog.value = false
+  isAddChoiceDialogOpen.value = false
   await saveToTimetable()
 }
 
 // 選択B：みんなのシラバスにも登録してから時間割に追加
 const addAndRegisterSyllabus = async () => {
-  showAddChoiceDialog.value = false
+  isAddChoiceDialogOpen.value = false
   await registerAndSave()
 }
 
@@ -558,17 +332,18 @@ const registerAndSave = async () => {
     return
   }
 
-  saving.value = true
-  const lectureName = newLectureName.value.trim()
+  isSaving.value = true
+  const lectureName = pendingSaveData.value.lecture.name
   try {
+    const { lecture } = pendingSaveData.value
     await store.dispatch('syllabus/registerSyllabus', {
       lectureName,
       syllabusData: {
-        teacher: newTeacher.value.trim(),
-        room: newRoom.value.trim(),
-        credits: Number(newCredits.value),
+        teacher: lecture.teacher || '',
+        room: lecture.room || '',
+        credits: Number(lecture.credits),
         categories: [],
-        description: newMemo.value.trim(),
+        description: lecture.memo || '',
       },
     })
 

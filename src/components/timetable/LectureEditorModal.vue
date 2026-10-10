@@ -1,191 +1,203 @@
 <template>
-  <v-bottom-sheet v-model="dialog" scrollable>
-    <v-card class="modal-card" rounded="t-xl" height="65vh" min-height="480" max-height="600">
-      <div class="bottom-sheet-handle" />
-      <v-card-title class="modal-title">
-        <v-btn icon variant="text" @click="close"><v-icon>mdi-close</v-icon></v-btn>
-        <span>{{ selectedCell ? `${dayLabel} ${displayPeriods}限` : '講義を登録' }}</span>
-        <v-btn
-          color="orange"
-          variant="text"
-          class="font-weight-bold"
-          type="submit"
-          form="lecture-form"
-          >保存</v-btn
-        >
-      </v-card-title>
+  <v-form id="lecture-form" class="pa-4 editor-form" @submit.prevent="onSubmit">
+    <div class="mb-4">
+      <v-select
+        v-model="quarterSelectValue"
+        :items="quarterSelectOptions"
+        item-title="title"
+        item-value="value"
+        label="履修期間"
+        variant="outlined"
+        density="comfortable"
+        bg-color="grey-lighten-4"
+        base-color="grey-darken-2"
+        :rules="[required]"
+      />
+    </div>
 
-      <v-card-text class="modal-body">
-        <v-form id="lecture-form" class="editor-form" @submit.prevent="onSubmit">
-          <div class="mb-4">
-            <v-select
-              v-model="quarterSelectValue"
-              :items="quarterSelectOptions"
-              item-title="title"
-              item-value="value"
-              label="履修期間 *"
-              variant="outlined"
-              density="comfortable"
-              :rules="[(v) => !!v || '履修期間を選択してください']"
-            />
-          </div>
+    <div class="mb-4">
+      <v-select
+        v-model="form.day"
+        :items="dayOptions"
+        item-title="title"
+        item-value="value"
+        label="曜日"
+        variant="outlined"
+        density="comfortable"
+        bg-color="grey-lighten-4"
+        base-color="grey-darken-2"
+        :rules="[required]"
+      />
+    </div>
 
-          <div class="mb-4">
-            <v-select
-              v-model="form.day"
-              :items="dayOptions"
-              item-title="title"
-              item-value="value"
-              label="曜日 *"
-              variant="outlined"
-              density="comfortable"
-              :rules="[(v) => !!v || '曜日を選択してください']"
-            />
-          </div>
+    <div class="mb-4">
+      <v-select
+        v-model="form.periods"
+        :items="[1, 2, 3, 4, 5, 6]"
+        multiple
+        chips
+        closable-chips
+        label="時限（複数選択で連続コマ）"
+        variant="outlined"
+        density="comfortable"
+        bg-color="grey-lighten-4"
+        base-color="grey-darken-2"
+        :rules="[required]"
+      />
+    </div>
 
-          <div class="mb-4">
-            <v-select
-              v-model="form.periods"
-              :items="[1, 2, 3, 4, 5, 6]"
-              multiple
-              chips
-              closable-chips
-              label="時限（複数選択で連続コマ）*"
-              variant="outlined"
-              density="comfortable"
-              :rules="[(v) => v.length > 0 || '時限を選択してください']"
-            />
-          </div>
+    <v-text-field
+      v-model="form.name"
+      :rules="[required]"
+      class="mb-2"
+      density="comfortable"
+      label="講義名"
+      hint="検索せずに直接追加する場合は講義名を入力してください"
+      placeholder="例：基礎プログラミング"
+      variant="outlined"
+      bg-color="grey-lighten-4"
+      base-color="grey-darken-2"
+    />
 
-          <v-text-field
-            v-model="form.name"
-            :rules="[required]"
-            class="mb-2"
-            density="comfortable"
-            label="講義名 *"
-            hint="検索せずに直接追加する場合は講義名を入力してください"
-            placeholder="例：基礎プログラミング"
-            variant="outlined"
-          >
-          </v-text-field>
+    <v-text-field
+      v-model="form.teacher"
+      class="mb-2"
+      :rules="[required]"
+      density="comfortable"
+      label="担当教員"
+      placeholder="例：山田 太郎"
+      variant="outlined"
+      bg-color="grey-lighten-4"
+      base-color="grey-darken-2"
+    />
 
-          <v-text-field
-            v-model="form.teacher"
-            class="mb-2"
-            :rules="[required]"
-            density="comfortable"
-            label="担当教員"
-            placeholder="例：山田 太郎"
-            variant="outlined"
-          />
+    <v-row class="mb-1" dense>
+      <v-col cols="8"
+        ><v-text-field
+          v-model="form.room"
+          :rules="[required]"
+          density="comfortable"
+          label="教室"
+          placeholder="例：A棟101"
+          variant="outlined"
+          bg-color="grey-lighten-4"
+          base-color="grey-darken-2"
+      /></v-col>
+      <v-col cols="4"
+        ><v-select
+          v-model="form.credits"
+          :items="[0, 1, 2, 3, 4]"
+          :rules="[required]"
+          density="comfortable"
+          label="単位数"
+          variant="outlined"
+          bg-color="grey-lighten-4"
+          base-color="grey-darken-2"
+      /></v-col>
+    </v-row>
+    <v-row class="mb-1" dense>
+      <v-col cols="12"
+        ><v-select
+          v-model="form.required"
+          :items="requiredItems"
+          :rules="[required]"
+          density="comfortable"
+          item-title="label"
+          item-value="value"
+          label="区分"
+          variant="outlined"
+          bg-color="grey-lighten-4"
+          base-color="grey-darken-2"
+      /></v-col>
+      <v-col cols="12"
+        ><v-select
+          v-model="form.creditStatus"
+          :items="creditStatusItems"
+          :rules="[required]"
+          density="comfortable"
+          item-title="label"
+          item-value="value"
+          label="単位取得状況"
+          variant="outlined"
+          bg-color="grey-lighten-4"
+          base-color="grey-darken-2"
+      /></v-col>
+    </v-row>
 
-          <v-row class="mb-1" dense>
-            <v-col cols="8"
-              ><v-text-field
-                v-model="form.room"
-                :rules="[required]"
-                density="comfortable"
-                label="教室"
-                placeholder="例：A棟101"
-                variant="outlined"
-            /></v-col>
-            <v-col cols="4"
-              ><v-select
-                v-model="form.credits"
-                :items="[0, 1, 2, 3, 4]"
-                :rules="[required]"
-                density="comfortable"
-                label="単位数"
-                variant="outlined"
-            /></v-col>
-          </v-row>
-          <v-row class="mb-1" dense>
-            <v-col cols="12"
-              ><v-select
-                v-model="form.required"
-                :items="requiredItems"
-                :rules="[required]"
-                density="comfortable"
-                item-title="label"
-                item-value="value"
-                label="区分"
-                variant="outlined"
-            /></v-col>
-            <v-col cols="12"
-              ><v-select
-                v-model="form.creditStatus"
-                :items="creditStatusItems"
-                :rules="[required]"
-                density="comfortable"
-                item-title="label"
-                item-value="value"
-                label="単位取得状況"
-                variant="outlined"
-            /></v-col>
-          </v-row>
+    <v-textarea
+      v-model="form.memo"
+      auto-grow
+      density="comfortable"
+      label="メモ"
+      placeholder="例：出席必須, 教科書持参"
+      rows="2"
+      variant="outlined"
+      bg-color="grey-lighten-4"
+      base-color="grey-darken-2"
+    />
 
-          <v-textarea
-            v-model="form.memo"
-            auto-grow
-            density="comfortable"
-            label="メモ"
-            placeholder="例：出席必須, 教科書持参"
-            rows="2"
-            variant="outlined"
-          />
-
-          <div class="d-flex align-center justify-space-between mb-2">
-            <span class="text-caption font-weight-bold text-grey-darken-1">カラー</span
-            ><v-chip size="x-small" variant="tonal">{{ form.color }}</v-chip>
-          </div>
-          <v-item-group v-model="form.color" class="mb-4 d-flex flex-wrap ga-2" mandatory>
-            <v-item
-              v-for="(colorDef, colorKey) in colorPalette"
-              v-slot="{ isSelected, toggle }"
-              :key="colorKey"
-              :value="colorKey"
-            >
-              <v-btn
-                :aria-label="`${colorKey} を選択`"
-                :class="{ 'color-choice--selected': isSelected }"
-                :color="colorDef.border"
-                :variant="isSelected ? 'flat' : 'tonal'"
-                density="comfortable"
-                icon
-                size="small"
-                @click="toggle"
-              >
-                <v-icon :icon="isSelected ? 'mdi-check' : 'mdi-palette'" color="white" size="14" />
-              </v-btn>
-            </v-item>
-          </v-item-group>
-        </v-form>
-
-        <LectureReviewPanel v-if="currentLectureName" :lecture-name="currentLectureName" />
-      </v-card-text>
-      <v-card-actions v-if="isExistingLecture" class="modal-actions">
-        <v-btn color="error" variant="outlined" rounded="lg" block @click="confirmDelete"
-          >削除する</v-btn
-        >
-      </v-card-actions>
-    </v-card>
-  </v-bottom-sheet>
-
-  <v-dialog v-model="showDeleteConfirm" max-width="320">
-    <v-card rounded="xl">
-      <v-card-title class="confirm-title">講義を削除しますか？</v-card-title>
-      <v-card-text class="confirm-body"
-        >「{{
-          currentLectureName
-        }}」をこの時間から削除します。この操作は取り消せません。</v-card-text
+    <div class="d-flex align-center justify-space-between mb-2">
+      <span class="text-caption font-weight-bold text-grey-darken-1">カラー</span
+      ><v-chip size="x-small" variant="tonal">{{ form.color }}</v-chip>
+    </div>
+    <v-item-group v-model="form.color" class="mb-4 d-flex flex-wrap ga-2" mandatory>
+      <v-item
+        v-for="(colorDef, colorKey) in colorPalette"
+        v-slot="{ isSelected, toggle }"
+        :key="colorKey"
+        :value="colorKey"
       >
-      <v-card-actions>
-        <v-spacer />
-        <v-btn variant="text" @click="showDeleteConfirm = false">キャンセル</v-btn>
-        <v-btn color="error" class="font-weight-bold" @click="handleDelete">削除する</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+        <v-btn
+          :aria-label="`${colorKey} を選択`"
+          :class="{ 'color-choice--selected': isSelected }"
+          :color="colorDef.border"
+          :variant="isSelected ? 'flat' : 'tonal'"
+          density="comfortable"
+          icon
+          size="small"
+          @click="toggle"
+        >
+          <v-icon :icon="isSelected ? 'mdi-check' : 'mdi-palette'" color="white" size="14" />
+        </v-btn>
+      </v-item>
+    </v-item-group>
+
+    <LectureReviewPanel v-if="currentLectureName" :lecture-name="currentLectureName" />
+
+    <!-- 保存ボタン -->
+    <v-btn
+      color="orange"
+      variant="flat"
+      class="font-weight-bold text-white mt-3"
+      type="submit"
+      form="lecture-form"
+      block
+      rounded="pill"
+      >この講義を保存する</v-btn
+    >
+
+    <!-- 削除ボタン -->
+    <BaseDialog
+      v-if="isExistingLecture"
+      v-model="showDeleteConfirm"
+      :title="`${currentLectureName}を削除しますか？`"
+      :message="`「${currentLectureName}」をこの時間から削除します。この操作は取り消せません。`"
+      :confirm-label="`削除する`"
+      :confirm-color="`error`"
+      @confirm="handleDelete"
+    >
+      <template #activator="{ props: activatorProps }">
+        <v-btn
+          v-bind="activatorProps"
+          class="mt-3 font-weight-bold"
+          color="red-lighten-1"
+          rounded="pill"
+          block
+          >この講義を削除する</v-btn
+        >
+      </template>
+    </BaseDialog>
+  </v-form>
 </template>
 
 <script setup>
@@ -194,13 +206,13 @@ import { useStore } from 'vuex'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { required } from '@/utils/forms/validate'
 import LectureReviewPanel from '@/components/timetable/LectureReviewPanel.vue'
+import BaseDialog from '@/components/common/BaseDialog.vue'
 
 const props = defineProps({
-  modelValue: Boolean,
   selectedCell: { type: Object, default: null }, // { day, period, lectureId }
+  prefillName: { type: String, default: '' },
 })
-
-const emit = defineEmits(['update:modelValue', 'saved', 'deleted'])
+const emit = defineEmits(['save', 'delete'])
 const store = useStore()
 
 const currentSemester = computed(() => store.getters['timetable/semester'])
@@ -234,11 +246,6 @@ const quarterSelectValue = computed({
   set(val) {
     form.value.quarters = val ? val.split(',') : [...availableQuarters.value]
   },
-})
-
-const dialog = computed({
-  get: () => props.modelValue,
-  set: (val) => emit('update:modelValue', val),
 })
 
 const colorPalette = {
@@ -289,8 +296,8 @@ const resetForm = () => {
 
   form.value = {
     id: null,
-    name: '',
-    originalName: '',
+    name: props.prefillName || '',
+    originalName: props.prefillName || '',
     color: 'orange',
     room: '',
     memo: '',
@@ -300,7 +307,8 @@ const resetForm = () => {
     creditStatus: 'taking',
     isFromSyllabus: false,
     quarters: defaultQuarters,
-    periods: props.selectedCell ? [props.selectedCell.period] : [],
+    // シラバス検索から開くとセル未指定（period: null）のことがあるため、null を初期値に入れない
+    periods: props.selectedCell?.period ? [props.selectedCell.period] : [],
     day: props.selectedCell?.day || null,
   }
 }
@@ -322,16 +330,6 @@ const dayOptions = [
   { title: '木曜日', value: 'thu' },
   { title: '金曜日', value: 'fri' },
 ]
-
-const dayLabel = computed(() => {
-  const labels = { mon: '月', tue: '火', wed: '水', thu: '木', fri: '金' }
-  return form.value.day ? labels[form.value.day] || '' : ''
-})
-const displayPeriods = computed(() =>
-  form.value.periods && form.value.periods.length > 0
-    ? [...form.value.periods].sort((a, b) => a - b).join(', ')
-    : props.selectedCell?.period || '',
-)
 
 watch(
   () => props.selectedCell,
@@ -371,6 +369,7 @@ watch(
       resetForm()
     }
   },
+  { immediate: true },
 )
 
 const onSubmit = async (validationPromise) => {
@@ -386,17 +385,12 @@ const executeFinalSave = () => {
     periods: form.value.periods,
     isExisting: isExistingLecture.value,
   })
-
-  store.dispatch('timetable/saveLecture', {
+  emit('save', {
     day: form.value.day,
     periods: form.value.periods,
     lecture: { ...form.value, name, originalName: form.value.originalName || name },
   })
-  emit('saved', name)
-  close()
 }
-
-const confirmDelete = () => (showDeleteConfirm.value = true)
 
 const handleDelete = () => {
   if (!props.selectedCell) return
@@ -404,50 +398,25 @@ const handleDelete = () => {
     day: form.value.day,
     periods: form.value.periods,
   })
-
-  // 対象のIDを持つ授業だけを削除する
-  store.dispatch('timetable/removeLecture', {
+  showDeleteConfirm.value = false
+  emit('delete', {
     day: form.value.day,
     periods: form.value.periods,
     lectureId: form.value.id,
   })
-  showDeleteConfirm.value = false
-  emit('deleted')
-  close()
 }
-
-const close = () => (dialog.value = false)
 </script>
 
 <style scoped>
-.modal-card {
-  overflow: hidden;
-  display: flex !important;
-  flex-direction: column !important;
+:deep(.v-field--variant-outlined .v-field__outline) {
+  --v-field-border-width: 2px;
 }
-.bottom-sheet-handle {
-  width: 36px;
-  height: 4px;
-  background: #ddd;
-  border-radius: 2px;
-  margin: 8px auto 0;
+
+:deep(.v-field:not(.v-field--focused) .v-label) {
+  color: #616161;
+  opacity: 1;
 }
-.modal-title {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 12px 0;
-  font-size: 1.1rem;
-  font-weight: bold;
-  color: #333;
-}
-.modal-body {
-  padding: 16px 20px;
-  overflow-x: hidden;
-  flex: 1 1 auto;
-  overflow-y: auto;
-  scrollbar-gutter: stable;
-}
+
 .editor-form {
   display: flex;
   flex-direction: column;
