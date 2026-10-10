@@ -55,9 +55,48 @@
       </div>
     </header>
 
-    <main class="page-content">
-      <TimetableGrid @cell-click="handleCellClick" />
-    </main>
+    <!-- lg 以上では、左に時間割・右に今日の授業の 2 列にする -->
+    <div class="timetable-columns" :class="{ 'timetable-columns--split': isAuthenticated }">
+      <main class="page-content">
+        <TimetableGrid @cell-click="handleCellClick" />
+      </main>
+
+      <!-- 今日の授業が無い日、スマホでは何も出さず、PC では右の列に「ありません」と出す -->
+      <section
+        v-if="isAuthenticated"
+        class="today-section"
+        :class="{ 'today-section--empty': todayLectures.length === 0 }"
+      >
+        <div class="today-section-title">
+          <v-icon size="16" color="orange">mdi-calendar-today</v-icon>今日の授業<span
+            class="today-date"
+            >{{ todayDateLabel }}</span
+          >
+        </div>
+        <div v-if="todayLectures.length > 0" class="today-cards">
+          <div
+            v-for="lecture in todayLectures"
+            :key="lecture.id"
+            class="today-card"
+            :style="getTodayCardStyle(lecture)"
+          >
+            <div class="today-card-period">{{ lecture.period }}限</div>
+            <div class="today-card-info">
+              <div class="today-card-name">{{ lecture.name }}</div>
+              <div class="today-card-meta">
+                <span v-if="lecture.room"
+                  ><v-icon size="11" style="opacity: 0.7">mdi-map-marker</v-icon
+                  >{{ lecture.room }}</span
+                >
+                <span v-if="lecture.teacher">{{ lecture.teacher }}</span>
+              </div>
+            </div>
+            <div class="today-card-time">{{ getPeriodStart(lecture.period) }}</div>
+          </div>
+        </div>
+        <p v-else class="text-caption text-grey mb-0">今日の授業はありません</p>
+      </section>
+    </div>
 
     <!-- 時間割の入力方法の選択シート -->
     <BaseBottomSheet v-model="isChoiceSheetOpen" :title="`${choiceCellLabel}に追加する方法`">
@@ -96,36 +135,6 @@
         @delete="handleLectureDelete"
       />
     </BaseBottomSheet>
-
-    <section v-if="isAuthenticated && todayLectures.length > 0" class="today-section">
-      <div class="today-section-title">
-        <v-icon size="16" color="orange">mdi-calendar-today</v-icon>今日の授業<span
-          class="today-date"
-          >{{ todayDateLabel }}</span
-        >
-      </div>
-      <div class="today-cards">
-        <div
-          v-for="lecture in todayLectures"
-          :key="lecture.id"
-          class="today-card"
-          :style="getTodayCardStyle(lecture)"
-        >
-          <div class="today-card-period">{{ lecture.period }}限</div>
-          <div class="today-card-info">
-            <div class="today-card-name">{{ lecture.name }}</div>
-            <div class="today-card-meta">
-              <span v-if="lecture.room"
-                ><v-icon size="11" style="opacity: 0.7">mdi-map-marker</v-icon
-                >{{ lecture.room }}</span
-              >
-              <span v-if="lecture.teacher">{{ lecture.teacher }}</span>
-            </div>
-          </div>
-          <div class="today-card-time">{{ getPeriodStart(lecture.period) }}</div>
-        </div>
-      </div>
-    </section>
   </div>
 </template>
 
@@ -263,6 +272,25 @@ const handleLectureDelete = ({ day, periods, lectureId }) => {
 }
 .today-section {
   margin-bottom: 0.75rem;
+}
+
+/* スマホでは、今日の授業が無い日はセクションごと出さない（今までどおり） */
+.today-section--empty {
+  display: none;
+}
+
+/* --- PC（lg 以上）の 2 列レイアウト --- */
+@media (min-width: 1280px) {
+  .timetable-columns--split {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    column-gap: 24px;
+    align-items: start;
+  }
+
+  .today-section--empty {
+    display: block;
+  }
 }
 .today-section-title {
   font-size: 0.85rem;

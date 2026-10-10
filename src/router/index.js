@@ -93,6 +93,8 @@ const routes = [
   {
     path: '/timetable',
     name: 'Timetable',
+    // PC では時間割と今日の授業を 2 列に並べる
+    meta: { layout: 'wide' },
     component: () => import('@/pages/TimetablePage.vue'),
   },
   {
