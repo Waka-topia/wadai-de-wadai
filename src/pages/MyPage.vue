@@ -6,6 +6,8 @@
 
     <BasicInfoPanel class="mt-4" />
 
+    <ProveOwnerCard class="mt-4" />
+
     <AppQRCode class="mt-4" />
     <div class="my-8 text-center">
       <v-btn
@@ -35,6 +37,7 @@ import ProfileHeader from '@/components/my-page/ProfileHeader.vue'
 import BasicInfoPanel from '@/components/my-page/BasicInfoPanel.vue'
 import AppQRCode from '@/components/my-page/AppQRCode.vue'
 import ContactBanner from '@/components/my-page/ContactBanner.vue'
+import ProveOwnerCard from '@/components/my-page/ProveOwnerCard.vue'
 import RecommendLogin from '@/components/templates/RecommendLogin.vue'
 
 const store = useStore()

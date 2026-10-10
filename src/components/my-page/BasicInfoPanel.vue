@@ -1,7 +1,7 @@
 <template>
   <ExpandableSection
     icon="mdi-card-account-details-outline"
-    title="基本情報・所属団体（証明等）"
+    title="基本情報・証明済みの団体"
     content-class="bg-grey-lighten-4 pt-4"
   >
     <v-row dense>

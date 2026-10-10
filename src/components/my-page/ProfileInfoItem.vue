@@ -1,6 +1,6 @@
 <template>
-  <v-card class="h-100 overflow-hidden" elevation="0" rounded="lg">
-    <v-row align="center" no-gutters class="pa-4">
+  <v-card class="h-100 pa-4" elevation="0" rounded="lg">
+    <v-row align="center" no-gutters>
       <v-col cols="auto" class="mr-4">
         <v-avatar color="blue-grey-lighten-5" rounded="lg">
           <v-icon color="blue-grey-darken-2">{{ icon }}</v-icon>
@@ -14,12 +14,6 @@
         </slot>
       </v-col>
     </v-row>
-
-    <!-- カード下部の補足や導線 -->
-    <template v-if="$slots.footer">
-      <v-divider />
-      <slot name="footer" />
-    </template>
   </v-card>
 </template>
 
