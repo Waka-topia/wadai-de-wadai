@@ -319,6 +319,7 @@ import { useStore } from 'vuex'
 import { getSyllabus, saveSyllabus } from '@/services/syllabusService'
 import { searchSuggestions } from '@/services/lectureIndexService'
 import LectureReviewPanel from '@/components/timetable/LectureReviewPanel.vue'
+import { formatYmdSlash, toJsDate } from '@/utils/dateFormatter'
 
 const props = defineProps({
   lectureName: {
@@ -392,11 +393,8 @@ const hasContent = computed(() => {
 })
 
 const updatedDate = computed(() => {
-  if (!syllabus.value.updatedAt) return ''
-  const d = syllabus.value.updatedAt.toDate
-    ? syllabus.value.updatedAt.toDate()
-    : new Date(syllabus.value.updatedAt)
-  return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`
+  const date = toJsDate(syllabus.value.updatedAt)
+  return date ? formatYmdSlash(date) : ''
 })
 
 const loadSyllabus = async () => {

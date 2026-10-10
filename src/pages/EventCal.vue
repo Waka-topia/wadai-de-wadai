@@ -156,6 +156,7 @@ import EventForm from '@/components/event/EventForm.vue'
 import EventSchedule from '@/components/event/EventSchedule.vue'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import { formatMonthDayWeekday, parseDateKey, toDateKey } from '@/utils/dateFormatter'
 
 const store = useStore()
 
@@ -182,9 +183,9 @@ const getMonthStart = (offset) => {
  * @returns {{ start: string; end: string }} YYYY-MM-DD 形式の開始日と終了日
  */
 const getSearchPeriod = () => ({
-  start: toDateString(getMonthStart(-searchMonthRange)),
+  start: toDateKey(getMonthStart(-searchMonthRange)),
   // 翌々月の 1 日の前日 = 翌月の末日
-  end: toDateString(new Date(getMonthStart(searchMonthRange + 1).getTime() - 1)),
+  end: toDateKey(new Date(getMonthStart(searchMonthRange + 1).getTime() - 1)),
 })
 
 // イベントは月単位で読み込むため、検索を始めたら期間内の月をまとめて読み込む
@@ -193,7 +194,7 @@ watch(
   (isSearching) => {
     if (!isSearching) return
     for (let offset = -searchMonthRange; offset <= searchMonthRange; offset++) {
-      const monthKey = toDateString(getMonthStart(offset)).substring(0, 7)
+      const monthKey = toDateKey(getMonthStart(offset)).substring(0, 7)
       store.dispatch('event/fetchEvents', { monthKey })
     }
   },
@@ -244,12 +245,7 @@ const onBannerCtaClick = () => {
 
 /** 選択中の日付を日本語フォーマットで表示する */
 const formattedDate = computed(() => {
-  const d = new Date(selectedDate.value)
-  const month = d.getMonth() + 1
-  const day = d.getDate()
-  const weekdays = ['日', '月', '火', '水', '木', '金', '土']
-  const weekday = weekdays[d.getDay()]
-  return `${month}月${day}日（${weekday}）の新歓イベント`
+  return `${formatMonthDayWeekday(parseDateKey(selectedDate.value))}の新歓イベント`
 })
 
 const events = computed(() => {
@@ -267,14 +263,7 @@ const events = computed(() => {
   }))
 })
 
-const toDateString = (date) => {
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
-}
-
-const selectedDate = ref(toDateString(new Date()))
+const selectedDate = ref(toDateKey(new Date()))
 
 watch(selectedDate, (newDate) => {
   const monthKey = newDate.substring(0, 7)
@@ -289,7 +278,7 @@ const minDate = ref(new Date('2025-04-01'))
 const maxDate = ref(new Date('2026-05-31'))
 
 const onCellClick = (date) => {
-  const dateString = toDateString(date)
+  const dateString = toDateKey(date)
   selectedDate.value = dateString
 
   logFirebaseAnalyticsEvent('calendar_date_click', {
@@ -298,7 +287,7 @@ const onCellClick = (date) => {
 }
 
 const setToday = () => {
-  const todayString = toDateString(new Date())
+  const todayString = toDateKey(new Date())
   selectedDate.value = todayString
 
   logFirebaseAnalyticsEvent('calendar_set_today', {
@@ -307,9 +296,9 @@ const setToday = () => {
 }
 
 const changeDate = (days) => {
-  const currentDate = new Date(selectedDate.value)
+  const currentDate = parseDateKey(selectedDate.value)
   currentDate.setDate(currentDate.getDate() + days)
-  const newDateString = toDateString(currentDate)
+  const newDateString = toDateKey(currentDate)
   selectedDate.value = newDateString
   void logFirebaseAnalyticsEvent('calendar_nav_click', {
     direction: days > 0 ? 'next' : 'prev',

@@ -38,7 +38,7 @@
               <td>{{ applicant.organizationName }}</td>
               <td>{{ applicant.userName }}</td>
               <td>{{ applicant.email }}</td>
-              <td>{{ formatDate(applicant.requestedAt) }}</td>
+              <td>{{ formatDateTimeJa(applicant.requestedAt) }}</td>
               <td class="d-flex align-center">
                 <v-switch
                   :disabled="updatingUserId === applicant.applicationId"
@@ -91,7 +91,7 @@
 
             <p class="text-subtitle-2 mb-1">申請日時</p>
             <p class="mb-3 text-body-2">
-              {{ formatDate(applicant.requestedAt) }}
+              {{ formatDateTimeJa(applicant.requestedAt) }}
             </p>
 
             <div class="d-flex align-center justify-space-between">
@@ -118,6 +118,7 @@ import { registerAllGroupsService } from '@/services/groupService'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
 import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
+import { formatDateTimeJa } from '@/utils/dateFormatter'
 import {
   getProveOwnerApplicantsService,
   updateProveOwnerApprovalService,
@@ -131,19 +132,6 @@ const updatingUserId = ref('')
 const isRegisteringGroups = ref(false)
 
 const { notifySuccess, notifyError } = useSnackbar()
-
-const formatDate = (value) => {
-  if (!value) {
-    return '-'
-  }
-
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) {
-    return '-'
-  }
-
-  return date.toLocaleString('ja-JP')
-}
 
 const loadApplicants = async () => {
   try {

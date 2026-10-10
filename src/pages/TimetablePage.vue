@@ -137,6 +137,7 @@ import { useFirebasePageView } from '@/composables/useFirebasePageView'
 import { useSnackbar } from '@/composables/useSnackbar'
 import { dayLabels, lectureColorPalette, periodTimes, requiredColors } from '@/config/timetable'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
+import { formatMonthDayWeekday } from '@/utils/dateFormatter'
 import BaseBottomSheet from '@/components/common/BaseBottomSheet.vue'
 import TimetableHeaderControls from '@/components/timetable/TimetableHeaderControls.vue'
 import TimetableGrid from '@/components/timetable/TimetableGrid.vue'
@@ -196,11 +197,7 @@ const getTodayCardStyle = (lecture) => {
 
 const getPeriodStart = (period) => periodTimes[period]?.start || ''
 
-const todayDateLabel = computed(() => {
-  const d = new Date()
-  const dayNames = ['日', '月', '火', '水', '木', '金', '土']
-  return `${d.getMonth() + 1}月${d.getDate()}日（${dayNames[d.getDay()]}）`
-})
+const todayDateLabel = computed(() => formatMonthDayWeekday(new Date()))
 
 watch(
   userId,
