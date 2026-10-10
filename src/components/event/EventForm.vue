@@ -25,8 +25,8 @@
       density="comfortable"
       bg-color="grey-lighten-4"
       base-color="grey-darken-2"
-      max="2026-05-31"
-      min="2025-04-01"
+      :max="eventDateMax"
+      :min="eventDateMin"
       :rules="[required]"
       prepend-inner-icon="mdi-calendar"
     />
@@ -118,6 +118,7 @@ import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { useSnackbar } from '@/composables/useSnackbar'
+import { eventDateMax, eventDateMin } from '@/config/constants'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { allGroups } from '@/data/groups'
 import { required } from '@/utils/forms/validate'

@@ -156,6 +156,7 @@ import EventForm from '@/components/event/EventForm.vue'
 import EventSchedule from '@/components/event/EventSchedule.vue'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import { eventDateMax, eventDateMin } from '@/config/constants'
 import { formatMonthDayWeekday, parseDateKey, toDateKey } from '@/utils/dateFormatter'
 
 const store = useStore()
@@ -274,8 +275,8 @@ useFirebasePageView('view_event_calendar', () => ({
   initialDate: selectedDate.value,
 }))
 
-const minDate = ref(new Date('2025-04-01'))
-const maxDate = ref(new Date('2026-05-31'))
+const minDate = ref(parseDateKey(eventDateMin))
+const maxDate = ref(parseDateKey(eventDateMax))
 
 const onCellClick = (date) => {
   const dateString = toDateKey(date)
