@@ -48,17 +48,6 @@
           </v-menu>
         </div>
 
-        <!-- 上部バッジエリア -->
-        <div v-if="event.isOfficial || isProxyEvent(event)" class="badge-area px-4 pt-3 pb-0">
-          <div class="d-flex ga-2 flex-wrap">
-            <EventStatusChips
-              :is-official="event.isOfficial"
-              :is-proxy="isProxyEvent(event)"
-              long
-            />
-          </div>
-        </div>
-
         <!-- メインコンテンツ -->
         <v-card-text class="pa-4">
           <div class="d-flex align-start">
@@ -81,20 +70,29 @@
 
             <!-- 情報カラム -->
             <div class="info-column flex-grow-1 overflow-hidden">
-              <p class="text-h6 font-weight-bold mb-1 text-truncate">
+              <!-- 代理登録のときは右上のインフォボタンと重ならないよう右に余白を取る -->
+              <p
+                class="text-h6 font-weight-bold mb-1 text-truncate"
+                :class="{ 'pr-6': isProxyEvent(event) }"
+              >
                 {{ event.organizerName }}
               </p>
-              <p
-                v-if="event.description"
-                class="text-body-2 text-grey-darken-1 mb-2 description-text"
-              >
+              <!-- 概要が無い・短いときもカードの高さが変わらないよう、常に 2 行分を確保する -->
+              <p class="text-body-2 text-grey-darken-1 mb-2 description-text">
                 {{ event.description }}
               </p>
-              <div class="d-flex align-center">
-                <v-icon size="16" color="orange" class="mr-1">mdi-map-marker</v-icon>
-                <span class="text-body-2 font-weight-medium text-orange">
+              <!-- バッジ（small チップ）の有無で高さが変わらないよう、行の高さをチップに合わせて固定する -->
+              <div class="d-flex align-center ga-1 location-row">
+                <v-icon size="16" color="orange" class="flex-shrink-0">mdi-map-marker</v-icon>
+                <span class="text-body-2 font-weight-medium text-orange text-truncate flex-grow-1">
                   {{ event.location }}
                 </span>
+                <div class="d-flex ga-1 flex-shrink-0">
+                  <EventStatusChips
+                    :is-official="event.isOfficial"
+                    :is-proxy="isProxyEvent(event)"
+                  />
+                </div>
               </div>
             </div>
 
@@ -242,6 +240,11 @@ const formatDate = (dateStr) => (dateStr ? formatShortDateWeekday(parseDateKey(d
   -webkit-box-orient: vertical;
   overflow: hidden;
   line-height: 1.5;
+  min-height: 3em;
+}
+
+.location-row {
+  height: 24px;
 }
 
 /* --- 引き継ぎCTAのパルスアニメーション --- */
