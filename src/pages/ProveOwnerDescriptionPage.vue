@@ -28,10 +28,7 @@
       </v-alert>
 
       <!-- 一時IDセクション -->
-      <p class="text-caption text-uppercase text-grey-darken-1 font-weight-bold mb-3">
-        <v-icon size="13" class="mr-1 mb-1">mdi-identifier</v-icon>
-        あなたの一時ID
-      </p>
+      <SectionLabel icon="mdi-identifier" title="あなたの一時ID" />
       <v-card color="orange-lighten-5" variant="flat" rounded="lg" class="pa-4 mb-6">
         <div class="d-flex align-center justify-space-between ga-3">
           <p
@@ -56,10 +53,7 @@
       <v-divider class="mb-6" />
 
       <!-- 手順セクション -->
-      <p class="text-caption text-uppercase text-grey-darken-1 font-weight-bold mb-3">
-        <v-icon size="13" class="mr-1 mb-1">mdi-format-list-numbered</v-icon>
-        申請の流れ
-      </p>
+      <SectionLabel icon="mdi-format-list-numbered" title="申請の流れ" />
       <div class="d-flex flex-column ga-3 mb-6">
         <div class="d-flex align-center ga-3">
           <v-avatar color="orange-darken-2" size="28" class="flex-shrink-0">
@@ -90,10 +84,7 @@
       <v-divider class="mb-6" />
 
       <!-- 運営公式SNSセクション -->
-      <p class="text-caption text-uppercase text-grey-darken-1 font-weight-bold mb-3">
-        <v-icon size="13" class="mr-1 mb-1">mdi-account-check</v-icon>
-        アプリ運営の公式SNS
-      </p>
+      <SectionLabel icon="mdi-account-check" title="アプリ運営の公式SNS" />
       <div class="d-flex flex-column ga-2 mb-6">
         <v-card
           variant="outlined"
@@ -186,6 +177,7 @@ import { instagramUrl, xUrl } from '@/config/constants'
 import { openExternalLink } from '@/utils/externalLink'
 import EmptyState from '@/components/common/EmptyState.vue'
 import LoadingState from '@/components/common/LoadingState.vue'
+import SectionLabel from '@/components/common/SectionLabel.vue'
 
 const store = useStore()
 

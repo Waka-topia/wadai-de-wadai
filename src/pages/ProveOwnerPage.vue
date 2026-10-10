@@ -82,10 +82,7 @@
 
           <!-- パスワード入力（後続: 既存パスワードを入力） -->
           <div v-if="registrationMode === 'subsequent'">
-            <p class="text-caption text-uppercase text-grey-darken-1 font-weight-bold mb-3">
-              <v-icon size="13" class="mr-1 mb-1">mdi-lock-outline</v-icon>
-              パスワード認証
-            </p>
+            <SectionLabel icon="mdi-lock-outline" title="パスワード認証" />
             <PasswordField
               v-model="password"
               :rules="[required]"
@@ -96,10 +93,7 @@
 
           <!-- パスワード設定（初回: 新パスワードを設定） -->
           <div v-if="registrationMode === 'initial'">
-            <p class="text-caption text-uppercase text-grey-darken-1 font-weight-bold mb-3">
-              <v-icon size="13" class="mr-1 mb-1">mdi-lock-outline</v-icon>
-              パスワードを新規設定
-            </p>
+            <SectionLabel icon="mdi-lock-outline" title="パスワードを新規設定" />
             <PasswordField
               v-model="password"
               :rules="[required, passwordRule]"
@@ -172,6 +166,7 @@ import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { allGroups } from '@/data/groups'
 import AuthCard from '@/components/auth/AuthCard.vue'
 import PasswordField from '@/components/common/PasswordField.vue'
+import SectionLabel from '@/components/common/SectionLabel.vue'
 import FormFieldDefaults from '@/components/common/FormFieldDefaults.vue'
 
 const selectedGroup = ref(null)
