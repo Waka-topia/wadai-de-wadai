@@ -1,5 +1,6 @@
 <template>
-  <div class="mt-4" :class="isExpanded ? 'syllabus-panel' : ''">
+  <div :class="{ 'mt-4': !hideToggle, 'syllabus-panel': isExpanded }">
+    <!-- ダイアログ内（hideToggle）では上に余白を足さない -->
     <FormFieldDefaults>
       <template v-if="!isExpanded && !hideToggle">
         <v-btn

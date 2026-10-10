@@ -108,7 +108,6 @@
             :lecture-name="selectedLectureName"
             :default-expanded="true"
             :hide-toggle="true"
-            class="mt-0"
           />
         </div>
       </template>
