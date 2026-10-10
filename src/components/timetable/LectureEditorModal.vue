@@ -1,56 +1,61 @@
 <template>
   <FormFieldDefaults>
     <v-form id="lecture-form" class="pa-4 editor-form" @submit.prevent="onSubmit">
-      <div class="mb-4">
-        <v-select
-          v-model="quarterSelectValue"
-          :items="quarterSelectOptions"
-          item-title="title"
-          item-value="value"
-          label="履修期間"
-          :rules="[required]"
-        />
-      </div>
+      <!-- PC では履修期間・曜日・時限を 1 行に並べる（スマホでは今までどおり縦に並ぶ） -->
+      <v-row dense>
+        <v-col cols="12" md="4" class="py-0 mb-4">
+          <v-select
+            v-model="quarterSelectValue"
+            :items="quarterSelectOptions"
+            item-title="title"
+            item-value="value"
+            label="履修期間"
+            :rules="[required]"
+          />
+        </v-col>
+        <v-col cols="12" md="4" class="py-0 mb-4">
+          <v-select
+            v-model="form.day"
+            :items="dayOptions"
+            item-title="title"
+            item-value="value"
+            label="曜日"
+            :rules="[required]"
+          />
+        </v-col>
+        <v-col cols="12" md="4" class="py-0 mb-4">
+          <v-select
+            v-model="form.periods"
+            :items="[1, 2, 3, 4, 5, 6]"
+            multiple
+            chips
+            closable-chips
+            label="時限（複数選択で連続コマ）"
+            :rules="[required]"
+          />
+        </v-col>
+      </v-row>
 
-      <div class="mb-4">
-        <v-select
-          v-model="form.day"
-          :items="dayOptions"
-          item-title="title"
-          item-value="value"
-          label="曜日"
-          :rules="[required]"
-        />
-      </div>
-
-      <div class="mb-4">
-        <v-select
-          v-model="form.periods"
-          :items="[1, 2, 3, 4, 5, 6]"
-          multiple
-          chips
-          closable-chips
-          label="時限（複数選択で連続コマ）"
-          :rules="[required]"
-        />
-      </div>
-
-      <v-text-field
-        v-model="form.name"
-        :rules="[required]"
-        class="mb-2"
-        label="講義名"
-        hint="検索せずに直接追加する場合は講義名を入力してください"
-        placeholder="例：基礎プログラミング"
-      />
-
-      <v-text-field
-        v-model="form.teacher"
-        class="mb-2"
-        :rules="[required]"
-        label="担当教員"
-        placeholder="例：山田 太郎"
-      />
+      <!-- PC では講義名と担当教員を 1 行に並べる -->
+      <v-row dense>
+        <v-col cols="12" md="6" class="py-0 mb-2">
+          <v-text-field
+            v-model="form.name"
+            :rules="[required]"
+            label="講義名"
+            hint="検索せずに直接追加する場合は講義名を入力してください"
+            placeholder="例：基礎プログラミング"
+          />
+        </v-col>
+        <v-col cols="12" md="6" class="py-0 mb-2">
+          <v-text-field
+            v-model="form.teacher"
+            :rules="[required]"
+            label="担当教員"
+            placeholder="例：山田 太郎"
+          />
+        </v-col>
+      </v-row>
 
       <v-row class="mb-1" dense>
         <v-col cols="8"
@@ -69,7 +74,7 @@
         /></v-col>
       </v-row>
       <v-row class="mb-1" dense>
-        <v-col cols="12"
+        <v-col cols="12" md="6"
           ><v-select
             v-model="form.required"
             :items="requiredItems"
@@ -78,7 +83,7 @@
             item-value="value"
             label="区分"
         /></v-col>
-        <v-col cols="12"
+        <v-col cols="12" md="6"
           ><v-select
             v-model="form.creditStatus"
             :items="creditStatusItems"
