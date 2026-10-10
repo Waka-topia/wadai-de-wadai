@@ -38,27 +38,7 @@
     </v-card>
 
     <!-- 検索バーエリア -->
-    <div class="search-wrapper mx-4 mt-4 d-flex align-center ga-2">
-      <v-text-field
-        v-model="searchQuery"
-        placeholder="団体名で検索"
-        prepend-inner-icon="mdi-magnify"
-        variant="outlined"
-        density="comfortable"
-        hide-details
-        color="orange"
-        class="flex-grow-1 search-field"
-      ></v-text-field>
-      <v-btn
-        v-if="searchQuery"
-        variant="text"
-        color="grey-darken-1"
-        class="font-weight-bold px-1"
-        @click="searchQuery = ''"
-      >
-        キャンセル
-      </v-btn>
-    </div>
+    <SearchField v-model="searchQuery" class="mx-4 mt-4" placeholder="団体名で検索" />
 
     <!-- 検索情報の表示 -->
     <div v-if="searchQuery" class="mx-4 mt-2">
@@ -133,6 +113,7 @@ import { useStore } from 'vuex'
 import VueCal from 'vue-cal'
 import 'vue-cal/dist/vuecal.css'
 import BaseBottomSheet from '@/components/common/BaseBottomSheet.vue'
+import SearchField from '@/components/common/SearchField.vue'
 import EventForm from '@/components/event/EventForm.vue'
 import EventSchedule from '@/components/event/EventSchedule.vue'
 import StepFlow from '@/components/event/StepFlow.vue'
@@ -451,11 +432,6 @@ onMounted(() => {
 
 .vuecal__event {
   display: none;
-}
-
-/* --- 検索バーの調整 --- */
-.search-field :deep(.v-field__outline) {
-  --v-field-border-width: 2px;
 }
 
 .vuecal__no-event {
