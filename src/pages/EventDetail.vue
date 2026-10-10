@@ -165,13 +165,12 @@
           </div>
 
           <v-btn
-            v-if="isLoggedIn"
             color="orange"
             variant="elevated"
             block
             class="text-white font-weight-bold"
             rounded="lg"
-            to="/prove-owner"
+            @click="onClaimClick"
           >
             引き継ぎ申請へ進む
             <v-icon class="position-absolute right-0 mx-2">mdi-chevron-right</v-icon>
@@ -187,6 +186,14 @@
       <v-progress-circular indeterminate color="orange" size="28" class="mr-2" />
       読み込み中...
     </v-card>
+
+    <ClaimEventDialog
+      v-model="claimDialogOpen"
+      :event-id="eventId"
+      :event-organizer="event.organizerName || ''"
+      :organization-id="event.organizationId || ''"
+      @transferred="onTransferred"
+    />
   </v-container>
 </template>
 
@@ -200,11 +207,13 @@ import { adminUserId } from '@/config/constants'
 import { hashValue } from '@/utils/crypto'
 import { isUserRepresentative } from '@/services/groupService'
 import EditDeleteForm from '@/components/event/EditDeleteForm.vue'
+import ClaimEventDialog from '@/components/event/ClaimEventDialog.vue'
 
 const route = useRoute()
 const router = useRouter()
 const store = useStore()
 const fetchErrorMessage = ref('')
+const claimDialogOpen = ref(false)
 
 const event = computed(() => {
   return store.getters['event/event'] || {}
@@ -270,6 +279,22 @@ useFirebasePageView('view_event_detail', () => ({
 const handleBack = () => {
   void logFirebaseAnalyticsEvent('event_detail_back_click', { eventId: eventId.value })
   router.back()
+}
+
+/** 引き継ぎボタンの遷移先を、代表者かどうかで振り分ける */
+const onClaimClick = () => {
+  void logFirebaseAnalyticsEvent('event_detail_claim_click', { eventId: eventId.value })
+  // 代表者はダイアログで引き継ぎを実行する。それ以外は代表者証明へ（未ログインはガードでログインへ）
+  if (isRepresentative.value) {
+    claimDialogOpen.value = true
+    return
+  }
+  router.push('/prove-owner')
+}
+
+const onTransferred = () => {
+  // 引き継ぎ完了後にイベントデータを再取得して画面を更新
+  store.dispatch('event/fetchEvent', eventId.value)
 }
 
 onMounted(async () => {
