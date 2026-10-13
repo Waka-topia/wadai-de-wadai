@@ -22,7 +22,7 @@
 ### UI/UX
 
 - **Leaflet 1.9.4** - 地図表示（OpenStreetMap）
-- **Mapbox GL 3.8.0** - 高度な地図機能
+- **MapLibre GL 5.17** - 高度な地図機能（MapTiler のタイルを使用）
 - **QRコードリーダー** (`vue-qrcode-reader`, `jsqr`)
 - **Font Awesome & MDI** - アイコンライブラリ
 
