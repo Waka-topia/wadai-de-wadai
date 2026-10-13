@@ -33,7 +33,7 @@ npm run dev
 - **Firebase** (認証・データベース・ホスティング)
 - **Vuex** (状態管理)
 - **Vue Router** (ルーティング)
-- **Leaflet / Mapbox GL** (地図表示)
+- **Leaflet / MapLibre GL** (地図表示)
 - **PWA** (Service Worker対応)
 
 ---
