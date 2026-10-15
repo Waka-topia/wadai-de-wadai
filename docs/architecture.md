@@ -1,213 +1,92 @@
 # アーキテクチャ
 
-## 技術スタック
+ワダイdeワダイは、Vue 3 で作った SPA（PWA）です。バックエンドは Firebase（Authentication、Cloud Firestore、Hosting、Analytics）だけで、独自のサーバーはありません。使っているライブラリとバージョンは [`package.json`](../package.json) を見てください。
 
-### フロントエンド
-
-- **Vue 3.5.12** - プログレッシブフレームワーク
-- **Vuetify 3.7.4** - マテリアルデザインUIフレームワーク
-- **Vue Router 4.4.5** - 公式ルーター
-- **Vuex 4.0.2** - 状態管理
-
-### ビルド/開発ツール
-
-- **Vite 6.0.0** - 高速ビルドツール
-- **Vite PWA Plugin** - Progressive Web App対応
-
-### バックエンド/インフラ
-
-- **Firebase 11.0.2** - 認証・データベース・ホスティング
-- **Service Worker** - オフライン対応・プッシュ通知
-
-### UI/UX
-
-- **Leaflet 1.9.4** - 地図表示（OpenStreetMap）
-- **MapLibre GL 5.17** - 高度な地図機能（MapTiler のタイルを使用）
-- **QRコードリーダー** (`vue-qrcode-reader`, `jsqr`)
-- **Font Awesome & MDI** - アイコンライブラリ
-
-### ユーティリティ
-
-- **Turf.js** - 地理空間解析
-- **bcryptjs** - パスワードハッシュ化
-- **uuid** - 一意識別子生成
-
----
-
-## ディレクトリ構造
+## 層の構成
 
 ```
-wadai-de-wadai/
-├── src/
-│   ├── components/       # 再利用可能なUIコンポーネント
-│   │   ├── EditForm/     # 編集フォーム関連
-│   │   ├── Event/        # イベント関連
-│   │   ├── MyPage/       # マイページ関連
-│   │   ├── UserRanking/  # ユーザーランキング関連
-│   │   ├── icons/        # カスタムアイコン
-│   │   └── templates/    # テンプレートコンポーネント
-│   ├── pages/            # ページコンポーネント（ルートに対応）
-│   ├── router/           # Vue Router設定
-│   ├── store/            # Vuex Store
-│   │   └── modules/      # Vuexモジュール
-│   ├── services/         # ビジネスロジック・API呼び出し
-│   ├── firebase/         # Firebase設定・初期化
-│   ├── plugins/          # Vueプラグイン（Vuetify等）
-│   ├── data/             # 静的データ・定数
-│   ├── assets/           # 静的リソース
-│   │   ├── rankings/     # ランキング画像
-│   │   ├── stamps/       # スタンプ画像
-│   │   └── userIcon/     # ユーザーアイコン
-│   ├── App.vue           # ルートコンポーネント
-│   ├── main.js           # エントリーポイント
-│   └── registerServiceWorker.js  # Service Worker登録
-├── public/               # 静的ファイル（そのままコピーされる）
-├── dist/                 # ビルド出力先
-├── docs/                 # ドキュメント
-├── eslint.config.js      # ESLint設定（Flat Config形式）
-├── .prettierrc.json      # Prettier設定
-├── vite.config.js        # Vite設定
-├── jsconfig.json         # JavaScript設定（パスエイリアス等）
-└── package.json          # 依存関係・スクリプト
+pages / components（画面）
+  └─ store（Vuex）           状態とキャッシュ
+       └─ services            Firestore・Auth へのアクセス
+            └─ firebase/config.js   Firebase の初期化
 ```
 
----
+- **Firebase の SDK を呼ぶのは `src/services/` だけ**にしています。画面や store から Firestore を直接触らないので、データの形やコレクション名を変えるときに見る場所が 1 か所で済みます。
+- 画面からサービスを呼ぶ経路は 2 通りあります。一覧のように複数の画面で共有するデータは、store の action を経由して呼びます（イベント、時間割、シラバス）。管理画面のように 1 画面でしか使わない処理は、画面から直接呼んでいます（例：`src/pages/AdminPage.vue`）。
+- Firestore の `db` は `@/firebase/config` から import します。`reviewService.js` と `syllabusService.js` は `getFirestore()` を直接呼んでいますが、同じインスタンスが返るので動きは変わりません。
 
-## アーキテクチャパターン
+## ディレクトリ
 
-### コンポーネント設計
+| ディレクトリ       | 役割                                                                                                                                                          |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/pages/`       | ルートに対応する画面                                                                                                                                          |
+| `src/components/`  | 機能ごとのフォルダ（`event`、`timetable`、`home` など）。`common/` には、`BaseBottomSheet`・`BaseDialog`・各種の State 表示など、画面をまたいで使う部品を置く |
+| `src/store/`       | Vuex。`index.js` でモジュールを登録する                                                                                                                       |
+| `src/services/`    | Firestore・Auth・Analytics へのアクセス                                                                                                                       |
+| `src/composables/` | 画面をまたいで使うロジック（`useSnackbar`、`useFormSubmit`、`useMapLibre` など）                                                                              |
+| `src/config/`      | 定数とナビゲーションの定義                                                                                                                                    |
+| `src/data/`        | 静的なマスタデータ（団体、キャンパスの建物、電車・バスの時刻表）                                                                                              |
+| `src/utils/`       | 副作用のない関数（日付の整形、ハッシュ、入力チェックなど）                                                                                                    |
+| `src/plugins/`     | Vuetify の初期化                                                                                                                                              |
 
-- **Atomic Design風の階層構造**
-  - `components/`: 再利用可能なコンポーネント
-  - `pages/`: ページ単位のコンポーネント
-  - `templates/`: レイアウトテンプレート
+## 状態管理（Vuex）
 
-### 状態管理（Vuex）
+モジュールは [`src/store/index.js`](../src/store/index.js) で登録しています。名前空間の付け方がモジュールごとに違うので、`dispatch` や `getters` の名前を書く前に `index.js` を確認してください。
 
-- **モジュール分割** (`store/modules/`)
-- グローバルな状態（ユーザー情報、認証状態等）を管理
+- `timetable`、`users`、`event` は、`index.js` の側で `namespaced: true` を付けています。user モジュールの登録名は `users` です。
+- `jobs` には名前空間がありません。
 
-### ルーティング（Vue Router）
+主なキャッシュの方法：
 
-- **ページベースのルーティング**
-- `pages/` 内の各コンポーネントがルートに対応
+- **event**：取得済みの月を `fetchedMonths` に記録し、同じ月を何度も読まないようにしています。
+- **timetable**：選んでいる学年・学期・クォーターを localStorage に保存し、次に開いたときに復元します。
+- **syllabus**：検索用インデックス（`lecture_search/all_lectures_index`）を丸ごと読み込み、検索はクライアントで行います。
 
-### サービス層
+## ルーティングとレイアウト
 
-- **`services/`**: ビジネスロジックとAPI呼び出しを分離
-- コンポーネントから直接Firebaseを呼ばず、サービス経由でアクセス
+ルートは [`src/router/index.js`](../src/router/index.js) にあり、すべての画面を動的 import で読み込みます。ルートの `meta` で、次のことを指定します。
 
----
+| meta                            | 用途                                                                        |
+| ------------------------------- | --------------------------------------------------------------------------- |
+| `requiresAuth`、`requiresAdmin` | アクセス制御（[認証と権限](auth-and-roles.md)）                             |
+| `layout`                        | PC での本文の最大幅（`narrow`（既定）・`wide`・`full`）。スマホでは効かない |
+| `background`                    | 画面の背景色。本文の外側まで塗る                                            |
 
-## データフロー
+スマホでは画面下のナビゲーションバー、PC（Vuetify の `md` 以上）では左のサイドナビを表示します。項目は [`src/config/navigation.js`](../src/config/navigation.js) で共通に定義しています。フォームは、スマホではボトムシート、PC では中央のダイアログで開きます（`BaseBottomSheet`）。
 
-```
-User Interaction
-      ↓
-  Component (Vue)
-      ↓
-  Service Layer → Firebase / External API
-      ↓
-  Vuex Store (状態更新)
-      ↓
-  Component (再レンダリング)
-```
+## 主な機能
 
----
+| 機能             | 画面                         | 補足                                                                                                   |
+| ---------------- | ---------------------------- | ------------------------------------------------------------------------------------------------------ |
+| ホーム           | `/`                          | 電車・バスの発車までの時間（`src/data/rawTimetables.js` の静的な時刻表）、キャンパスマップ、外部リンク |
+| 新歓カレンダー   | `/eventcal`、`/eventcal/:id` | イベントの登録・編集・削除、代理登録イベントの引き継ぎ                                                 |
+| 時間割           | `/timetable`                 | 学年・学期・クォーターごとの時間割と単位の集計                                                         |
+| シラバス検索     | `/syllabus-search`           | みんなで編集するシラバスと、授業の評価                                                                 |
+| 地図             | `/map`                       | MapLibre GL と MapTiler のキャンパス地図                                                               |
+| マイページ       | `/mypage`                    | プロフィール、所属団体、アプリの QR コード                                                             |
+| 代表者証明・管理 | `/prove-owner`、`/admin`     | [認証と権限](auth-and-roles.md)                                                                        |
 
-## PWA（Progressive Web App）
+### 今は画面から使っていない機能
 
-### 機能
+次の機能はコードが残っていますが、今は画面から使っていません。今後戻す予定があるので、削除せずに残しています。
 
-- **オフライン対応**: Service Workerによるキャッシュ
-- **インストール可能**: ホーム画面に追加
-- **プッシュ通知**: Firebaseと連携
+- **求人**：`/jobs` は「準備中」の画面を表示しています。一覧（`RecruitPage.vue`）はルートから外しています。詳細ページ（`/jobs/:id`）のデータは `src/services/jobsService.js` に直接書かれています。
+- **スタンプと QR の読み取り**：`stampService.js` と `ReaderPage.vue` があります。`ReaderPage.vue` は存在しない `components/templates/QRScanner.vue` を import しているので、このままでは動きません。動く版は `revival/2025-04` ブランチにあります。
+- **地図上の施設評価**：store の `location`・`rating` と、`locationService.js`・`ratingService.js` があります。`locations` コレクションはルールに定義がないので、読み書きは拒否されます。
 
-### 設定
+## PWA
 
-- `vite-plugin-pwa`: PWA自動生成
-- `registerServiceWorker.js`: Service Worker登録
+[vite-plugin-pwa](https://vite-pwa-org.netlify.app/) で Service Worker と manifest を生成しています（`vite.config.js`、`registerType: 'autoUpdate'`）。
 
----
+既知の課題があります。`src/registerServiceWorker.js` が、存在しない `service-worker.js` を別に登録しようとしています。また、`index.html` が存在しない `/manifest.json` を参照しています。vite-plugin-pwa が生成するのは `sw.js` と `manifest.webmanifest` です。manifest の説明文も、今の機能と合っていません。
 
-## Firebase構成
+## アクセス解析
 
-### 使用サービス（推定）
+Firebase Analytics で、ページの表示を記録しています（`src/composables/useFirebasePageView.js`、`src/services/analyticsService.js`）。
 
-- **Authentication**: ユーザー認証
-- **Firestore / Realtime Database**: データベース
-- **Cloud Storage**: 画像・ファイル保存
-- **Hosting**: デプロイ先
+## 関連する文書
 
----
-
-## ビルド・デプロイ
-
-### 開発
-
-```bash
-npm run dev       # Vite開発サーバー起動（HMR有効）
-```
-
-### ビルド
-
-```bash
-npm run build     # 本番ビルド（dist/に出力）
-npm run preview   # ビルド結果をプレビュー
-```
-
-### リント・フォーマット
-
-```bash
-npm run lint      # ESLint実行 + 自動修正
-npm run format    # Prettier実行
-```
-
----
-
-## パフォーマンス最適化
-
-### Vite
-
-- **高速HMR**: モジュール単位の更新
-- **トリーシェイキング**: 未使用コードの削除
-- **コード分割**: 動的インポート対応
-
-### PWA
-
-- **キャッシュ戦略**: Service Workerによる効率的なキャッシュ
-- **遅延読み込み**: 必要なリソースのみ読み込み
-
----
-
-## セキュリティ
-
-### 認証
-
-- **Firebase Authentication**: セキュアな認証フロー
-- **bcryptjs**: パスワードのハッシュ化
-
-### 環境変数
-
-- Firebase API キー等は環境変数で管理（`.env` ファイル）
-
----
-
-## 拡張性
-
-### 新機能追加の流れ
-
-1. `services/` にビジネスロジックを追加
-2. `store/modules/` に状態管理を追加（必要に応じて）
-3. `components/` または `pages/` にUIを実装
-4. `router/` にルートを追加（ページの場合）
-5. ESLint・Prettierでコード品質を維持
-
----
-
-## 参考リンク
-
-- [Vue 3 公式ドキュメント](https://ja.vuejs.org/)
-- [Vuetify 3 公式ドキュメント](https://vuetifyjs.com/)
-- [Vite 公式ドキュメント](https://ja.vitejs.dev/)
-- [Firebase 公式ドキュメント](https://firebase.google.com/docs)
+- [データモデル](data-model.md)：Firestore のコレクションと権限
+- [認証と権限](auth-and-roles.md)
+- [環境](environments.md)：Firebase プロジェクト、環境変数、ブランチ、CI
+- [コーディング規約](coding-style.md)
