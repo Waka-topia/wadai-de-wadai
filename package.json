@@ -15,15 +15,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^7.1.0",
     "@mdi/font": "^7.4.47",
-    "@mdi/js": "^7.4.47",
-    "@turf/turf": "^7.3.1",
     "bcryptjs": "^3.0.3",
     "firebase": "^12.7.0",
-    "jsqr": "^1.4.0",
-    "leaflet": "^1.9.4",
-    "leaflet-control-geocoder": "^3.3.1",
     "maplibre-gl": "^5.17.0",
     "register-service-worker": "^1.7.2",
     "uuid": "^13.0.0",
