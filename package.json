@@ -30,7 +30,6 @@
     "vite-plugin-pwa": "^1.2.0",
     "vue": "^3.5.26",
     "vue-cal": "^4.10.2",
-    "vue-qr-reader": "^1.6.2",
     "vue-qrcode-reader": "^5.7.3",
     "vue-router": "^4.6.4",
     "vuetify": "^3.11.6",
