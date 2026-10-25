@@ -40,7 +40,7 @@ Firebase の API キーと MapTiler のキーには、配信元のドメイン�
 
 ## 開発環境
 
-- Node.js は [`.node-version`](../.node-version) のバージョンを使います。[mise](https://mise.jdx.dev/) を使うと、[`mise.toml`](../mise.toml) から同じバージョンが入ります。
+- Node.js は [`mise.toml`](../mise.toml) のバージョンを使います。[mise](https://mise.jdx.dev/) で `mise install` を実行すると入ります。CI も [mise-action](https://github.com/jdx/mise-action) で同じファイルを読みます。
 - パッケージマネージャーは npm です（`package-lock.json`）。
 - `git commit` のたびに、Husky が `npm run format` を実行します（[`.husky/pre-commit`](../.husky/pre-commit)）。lint は実行しないので、コミット前に `npm run lint` を実行してください。
 
