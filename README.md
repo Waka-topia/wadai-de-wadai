@@ -22,7 +22,7 @@ Vue 3（`<script setup>`）、Vuetify 3、Vuex 4、Vue Router 4、Vite、vite-pl
 
 ## セットアップ
 
-1. Node.js を用意します。バージョンは [`.node-version`](.node-version) にあります。[mise](https://mise.jdx.dev/) を使う場合は `mise install` で入ります。
+1. Node.js を用意します。バージョンは [`mise.toml`](mise.toml) にあります。[mise](https://mise.jdx.dev/) を使う場合は `mise install` で入ります。
 2. 依存を入れます。
 
    ```bash
