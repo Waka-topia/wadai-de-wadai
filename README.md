@@ -1,172 +1,70 @@
-# wadai-de-wadai
+# ワダイdeワダイ
 
-**Vue 3 + Vuetify + Firebase** で構築されたプログレッシブWebアプリケーション（PWA）
+和歌山大学の学生向けの PWA です。新歓イベントのカレンダー、時間割、みんなで編集するシラバス、キャンパスマップ、電車とバスの発車時刻を、1 つのアプリにまとめています。学生団体 Waka-topia が開発・運営しています。
 
----
+**デモ：https://wadai-de-wadai.web.app**
 
-## クイックスタート
+## 主な機能
 
-### 前提条件
+- **新歓カレンダー**：団体が新歓イベントを登録し、新入生が日付から探せます。代表者として認められた団体のイベントは、優先して表示されます。
+- **時間割**：学年・学期・クォーターごとに授業を登録し、取得単位を集計します。
+- **シラバス検索**：授業の情報を学生どうしで編集し、授業を評価できます。
+- **ホーム**：最寄り駅とバス停の、次の発車までの時間と、キャンパスマップを表示します。
+- **地図**：キャンパスの地図を表示します。
 
-- **Node.js** 18.x 以上
-- **npm** または **yarn**
+画面の一覧と、今は使っていない機能については [docs/architecture.md](docs/architecture.md#主な機能) を見てください。
 
-### セットアップ
+## 技術スタック
 
-```bash
-# 依存関係のインストール
-npm install
+Vue 3（`<script setup>`）、Vuetify 3、Vuex 4、Vue Router 4、Vite、vite-plugin-pwa、Firebase（Authentication・Cloud Firestore・Hosting・Analytics）、MapLibre GL（地図タイルは MapTiler）。
 
-# 開発サーバー起動
-npm run dev
+バージョンは [`package.json`](package.json) を見てください。独自のサーバーはなく、権限は Firestore のセキュリティルールで守っています。
 
-# ブラウザで http://localhost:5173 にアクセス
-```
+## セットアップ
 
----
+1. Node.js を用意します。バージョンは [`mise.toml`](mise.toml) にあります。[mise](https://mise.jdx.dev/) を使う場合は `mise install` で入ります。
+2. 依存を入れます。
 
-## 主な技術スタック
+   ```bash
+   npm ci
+   ```
 
-- **Vue 3** (Composition API / `<script setup>`)
-- **Vuetify 3** (マテリアルデザインUIフレームワーク)
-- **Vite** (高速ビルドツール)
-- **Firebase** (認証・データベース・ホスティング)
-- **Vuex** (状態管理)
-- **Vue Router** (ルーティング)
-- **Leaflet / Mapbox GL** (地図表示)
-- **PWA** (Service Worker対応)
+3. 環境変数を用意します。値はチームの 1Password で管理していて、`.env.development` として置かれます。変数の名前と仕組みは [docs/environments.md](docs/environments.md#環境変数) を見てください。
+4. 開発サーバーを起動します。
 
----
+   ```bash
+   npm run dev
+   ```
 
-## 利用可能なコマンド
+エディタは VS Code を想定しています。推奨する拡張機能は [`.vscode/extensions.json`](.vscode/extensions.json) にあります（Vue・ESLint・Prettier・EditorConfig）。
 
-| コマンド          | 説明                      |
-| ----------------- | ------------------------- |
-| `npm run dev`     | 開発サーバー起動          |
-| `npm run build`   | 本番ビルド                |
-| `npm run preview` | ビルド結果のプレビュー    |
-| `npm run lint`    | ESLintチェック + 自動修正 |
-| `npm run format`  | Prettierフォーマット      |
+## よく使うコマンド
 
----
+| コマンド                                     | 内容                                                  |
+| -------------------------------------------- | ----------------------------------------------------- |
+| `npm run dev`                                | 開発サーバー                                          |
+| `npm run format`                             | Prettier で整形する（コミット時にも自動で実行される） |
+| `npm run lint`                               | ESLint で検査し、直せるところは直す                   |
+| `npm run build:dev` / `npm run build:prod`   | dev 向け / 本番向けのビルド                           |
+| `npm run deploy:dev` / `npm run deploy:prod` | ビルドして Firebase Hosting にデプロイする            |
 
-## ドキュメント
+## 文書
 
-プロジェクトの詳細は以下のドキュメントを参照してください:
+| 文書                                             | 内容                                                 |
+| ------------------------------------------------ | ---------------------------------------------------- |
+| [AGENTS.md](AGENTS.md)                           | 作業を始める前に読むもの。守ること、文書と手順の一覧 |
+| [docs/architecture.md](docs/architecture.md)     | 層の構成、ディレクトリ、状態管理、ルーティング       |
+| [docs/data-model.md](docs/data-model.md)         | Firestore のコレクションと権限                       |
+| [docs/auth-and-roles.md](docs/auth-and-roles.md) | 一般ユーザー・団体代表者・管理者                     |
+| [docs/environments.md](docs/environments.md)     | Firebase プロジェクト、環境変数、ブランチ、CI        |
+| [docs/coding-style.md](docs/coding-style.md)     | lint で検査できない規約                              |
 
-### 人間向け
+デプロイ、PR、Firestore ルールの変更の手順は、[`.agents/skills/`](.agents/skills) にまとめています。
 
-- **[コーディングスタイルガイド](docs/coding-style.md)** - ESLint/Prettier設定の詳細
-- **[アーキテクチャ](docs/architecture.md)** - 技術スタックとディレクトリ構造
-- **[開発ワークフロー](docs/workflow.md)** - 開発フロー・コミット規約・CI/CD
+## 既知の課題
 
-### AI向け
+Firestore のセキュリティルールに、ログインしていれば他人のデータを書き換えられる箇所が残っています（団体の代表者、新歓イベントなど）。内容と直し方の方針は [docs/data-model.md](docs/data-model.md#既知の課題) にあります。
 
-- **[CLAUDE.md](CLAUDE.md)** - AIエディタ向けガイド（Claude Code等）
-- **[AGENTS.md](AGENTS.md)** - 自律型エージェント向けガイド
+## 2025 年 4 月版（復刻）
 
----
-
-## ディレクトリ構造（概要）
-
-```
-wadai-de-wadai/
-├── src/
-│   ├── components/     # 再利用可能なUIコンポーネント
-│   ├── pages/          # ページコンポーネント
-│   ├── router/         # ルーティング設定
-│   ├── store/          # Vuex Store
-│   ├── services/       # ビジネスロジック
-│   ├── firebase/       # Firebase設定
-│   └── assets/         # 静的リソース
-├── docs/               # ドキュメント
-├── dist/               # ビルド出力
-└── public/             # 静的ファイル
-```
-
-詳細は [docs/architecture.md](docs/architecture.md) を参照
-
----
-
-## コーディング規約
-
-このプロジェクトは厳格なESLint・Prettier設定を使用しています:
-
-- **セミコロンなし**
-- **シングルクォート**
-- **camelCase強制** (変数・関数)
-- **PascalCase強制** (Vueコンポーネント)
-- **アロー関数推奨**
-- **`<script setup>` 推奨**
-
-詳細は [docs/coding-style.md](docs/coding-style.md) を参照
-
----
-
-## Git Hooks（Husky）
-
-コミット時に自動的にLint・フォーマットが実行されます:
-
-- エラーがある場合、コミットが中断されます
-- 手動で `npm run lint` を実行して事前にチェック可能
-
----
-
-## 環境変数
-
-`.env` ファイルを作成してFirebase設定を追加:
-
-```bash
-VITE_FIREBASE_API_KEY=your_api_key
-VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
-VITE_FIREBASE_PROJECT_ID=your_project_id
-# ...その他のFirebase設定
-```
-
----
-
-## デプロイ
-
-### Firebase Hosting
-
-```bash
-# ビルド
-npm run build
-
-# デプロイ（Firebase CLI必要）
-firebase deploy --only hosting
-```
-
----
-
-## トラブルシューティング
-
-### ESLintエラーでコミットできない
-
-```bash
-npm run lint  # エラーを確認・自動修正
-```
-
-### Huskyが動作しない
-
-```bash
-npm run prepare  # Huskyを再初期化
-```
-
----
-
-## ライセンス
-
-Private
-
----
-
-## コントリビューション
-
-プルリクエストを作成する前に:
-
-1. [docs/coding-style.md](docs/coding-style.md) に準拠していることを確認
-2. `npm run lint` でエラーがないことを確認
-3. ブラウザで動作確認
-
-詳細は [docs/workflow.md](docs/workflow.md) を参照
+2025 年の新歓シーズンに公開していた版（QR コードのスタンプラリー、ランキング）を、[`revival/2025-04`](https://github.com/Waka-topia/wadai-de-wadai/tree/revival/2025-04) ブランチで復刻しています。デモは https://wadai-de-wadai-v1.web.app です。

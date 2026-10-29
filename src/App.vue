@@ -1,18 +1,47 @@
 <template>
   <v-app>
     <v-app-bar v-if="!isFullscreenPage" color="orange">
-      <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer"> </v-app-bar-nav-icon>
+      <!-- PC ではサイドナビを常時表示するので、開閉ボタンは不要 -->
+      <v-app-bar-nav-icon v-if="!mdAndUp" variant="text" @click.stop="drawer = !drawer">
+      </v-app-bar-nav-icon>
 
       <v-app-bar-title class="font-weight-bold text-h7 text-white">
-        ワダイdeワダイ-{{ title }}-
+        ワダイdeワダイ(大学非公式)-{{ title }}-
       </v-app-bar-title>
     </v-app-bar>
 
-    <v-navigation-drawer v-if="!isFullscreenPage" v-model="drawer" class="bg-white">
+    <v-navigation-drawer
+      v-if="!isFullscreenPage"
+      v-model="drawer"
+      :permanent="mdAndUp"
+      class="bg-white"
+    >
+      <!-- PC では下部バーの代わりに、主要画面へのナビをここに出す -->
+      <template v-if="mdAndUp">
+        <v-list nav color="orange-darken-2">
+          <v-list-item
+            v-for="item in mainNavItems"
+            :key="item.value"
+            :to="item.to"
+            :prepend-icon="item.icon"
+            :title="item.label"
+            :active="findNavValue(route.path) === item.value"
+            class="font-weight-bold"
+            rounded="lg"
+            @click="logSideNav(item.value)"
+          />
+        </v-list>
+        <v-divider />
+      </template>
       <v-list>
         <v-list-item class="position-relative my-1" block size="large" @click="gotoinquiry">
           <v-icon> mdi-email-outline </v-icon>
           お問い合わせ
+          <v-icon class="position-absolute right-0 mx-2"> mdi-open-in-new </v-icon>
+        </v-list-item>
+        <v-list-item class="position-relative my-1" block size="large" @click="gotoInstagram">
+          <v-icon color="pink"> mdi-instagram </v-icon>
+          運営Instagram
           <v-icon class="position-absolute right-0 mx-2"> mdi-open-in-new </v-icon>
         </v-list-item>
         <v-list-item class="position-relative my-1" block size="large" @click="gotorule">
@@ -25,32 +54,74 @@
       </v-list>
     </v-navigation-drawer>
 
-    <v-main>
-      <router-view v-slot="{ Component }">
-        <keep-alive include="HomePage,RankingPage,MyPage,EventCal,TimetablePage">
-          <component :is="Component" />
-        </keep-alive>
-      </router-view>
+    <!-- 背景色をページ単位で変えたいときはルートの meta.background で指定する（本文の外側まで塗る） -->
+    <v-main :style="{ backgroundColor: route.meta.background }">
+      <!-- PC では本文の最大幅をルートの meta.layout で切り替える（スマホでは効かない） -->
+      <div class="page-frame" :class="`page-frame--${route.meta.layout ?? 'narrow'}`">
+        <router-view v-slot="{ Component }">
+          <keep-alive include="HomePage,RankingPage,MyPage,EventCal,TimetablePage">
+            <component :is="Component" />
+          </keep-alive>
+        </router-view>
+      </div>
       <div v-if="!isFullscreenPage" class="mb-6">
         <v-footer app>
-          <span>&copy; 2025 ワダイdeワダイ</span>
+          <span>&copy; 2026 ワダイdeワダイ(大学非公式)</span>
         </v-footer>
       </div>
     </v-main>
+
+    <v-snackbar
+      v-model="snackbarState.show"
+      :color="snackbarState.color"
+      :timeout="snackbarState.timeout"
+      location="top"
+      rounded="pill"
+    >
+      <span class="d-flex align-center">
+        <v-icon v-if="snackbarState.icon" class="mr-2" size="18">
+          {{ snackbarState.icon }}
+        </v-icon>
+        {{ snackbarState.message }}
+      </span>
+      <template v-if="snackbarState.showCloseButton" #actions>
+        <v-btn color="white" variant="text" @click="closeSnackbar">閉じる</v-btn>
+      </template>
+    </v-snackbar>
   </v-app>
-  <BottomNavigation v-if="showBottomNavigation && !isFullscreenPage" />
+  <BottomNavigation v-if="showBottomNavigation && !isFullscreenPage && !mdAndUp" />
 </template>
 
 <script setup>
 import { computed, ref, watch } from 'vue'
-import { useStore } from 'vuex'
 import { useRouter, useRoute } from 'vue-router'
+import { useStore } from 'vuex'
+import { useDisplay } from 'vuetify'
 import BottomNavigation from '@/components/templates/BottomNavigation.vue'
 import DeleteAccountButton from '@/components/templates/DeleteAccountButton.vue'
 import LogOutButton from '@/components/templates/LogOut.vue'
+import { useSnackbar } from '@/composables/useSnackbar'
+import { inquiryFormUrl, instagramUrl } from '@/config/constants'
+import { findNavValue, mainNavItems } from '@/config/navigation'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
+import { openExternalLink } from '@/utils/externalLink'
 
 const router = useRouter()
 const route = useRoute()
+
+// md（960px）以上を PC 表示として扱う
+const { mdAndUp } = useDisplay()
+
+/**
+ * サイドナビのクリックを記録する
+ *
+ * @param {string} destination - 遷移先の項目の value
+ */
+const logSideNav = (destination) => {
+  void logFirebaseAnalyticsEvent('side_nav_click', { destination })
+}
+
+const { snackbarState, closeSnackbar } = useSnackbar()
 
 const drawer = ref(null)
 const title = ref('ホーム')
@@ -116,14 +187,16 @@ const checkFullscreenPage = (currentRoute) => {
 }
 
 const gotoinquiry = () => {
-  window.open(
-    'https://docs.google.com/forms/d/e/1FAIpQLScqjOjJ8B3XcSEH5d__94ucGD00FVqIbIJe2hq2MxUodczL7Q/viewform?usp=dialog',
-    '_blank',
-  )
+  openExternalLink(inquiryFormUrl)
 }
 
 const gotorule = () => {
   router.push('/rule')
+}
+
+/** 公式Instagramを開く */
+const gotoInstagram = () => {
+  openExternalLink(instagramUrl)
 }
 
 watch(
@@ -175,5 +248,21 @@ watch(
 v-app-bar-title {
   font-family: 'Kaisei Tokumin', sans-serif;
   /* Poppins フォントを指定 */
+}
+
+/* --- PC 表示での本文の最大幅（md 以上） --- */
+@media (min-width: 960px) {
+  .page-frame--narrow,
+  .page-frame--wide {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+}
+
+/* wide のページは 2 列になる lg 以上でだけ広げる（md では 1 列なので narrow と同じ幅にする） */
+@media (min-width: 1280px) {
+  .page-frame--wide {
+    max-width: 1200px;
+  }
 }
 </style>

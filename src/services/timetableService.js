@@ -5,7 +5,7 @@ class TimetableService {
   constructor() {
     // Initialize by converting the raw data to rich object structure
     this.timetables = convertTimetables(rawTimetables)
-    console.log('[TimetableService] Initialized with keys:', Object.keys(this.timetables))
+    // console.log('[TimetableService] Initialized with keys:', Object.keys(this.timetables))
   }
 
   isWeekend(date) {
@@ -48,8 +48,8 @@ class TimetableService {
         `[TimetableService] No upcoming for ${targetInfo} at ${now.toLocaleTimeString()}. Checked ${scheduleList.length} items.`,
       )
       if (scheduleList.length > 0) {
-        const last = scheduleList[scheduleList.length - 1]
-        console.log(`[TimetableService] Last scheduled item: ${last.h}:${last.m}`)
+        // const last = scheduleList[scheduleList.length - 1]
+        // console.log(`[TimetableService] Last scheduled item: ${last.h}:${last.m}`)
       }
     } else {
       // Optional: Log success once in a while or strictly on change?

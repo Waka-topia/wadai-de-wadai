@@ -1,25 +1,53 @@
 <template>
-  <div class="d-flex flex-column justify-center align-center my-10">
-    <p class="text-center text-emphasis pb-6">
-      &#92; <span class="font-weight-bold">ワダイdeワダイ</span>でみんなと新歓に行こう &frasl;
-    </p>
-    <p class="text-center text-medium-emphasis pb-6">
-      自分のアカウントを作成し <br />
-      ログインすることで<br />
-      たくさんの便利機能が利用できます!
-    </p>
-    <v-btn
-      class="mx-3 px-3 my-6 font-weight-bold text-white"
-      color="orange"
-      elevation="15"
-      prepend-icon="mdi-email"
-      rounded
-      size="x-large"
-      @click="goLogin"
+  <div class="d-flex flex-column justify-center align-center my-10 px-4 h-100">
+    <v-card
+      class="pa-6 pa-md-8 text-center w-100"
+      max-width="400"
+      elevation="0"
+      rounded="xl"
+      color="orange-lighten-5"
     >
-      メールアドレスでログイン
-    </v-btn>
-    <v-btn size="large" variant="plain" @click="goSignup">アカウントを作成</v-btn>
+      <v-avatar color="orange-lighten-4" size="80" class="mb-6">
+        <v-icon size="40" color="orange-darken-2">mdi-account-group</v-icon>
+      </v-avatar>
+
+      <h2 class="text-h6 font-weight-bold text-orange-darken-4 mb-2">
+        ワダイdeワダイで<br />みんなと新歓に行こう！
+      </h2>
+
+      <p class="text-body-2 text-medium-emphasis mb-8">
+        アカウントを作成してログインすると、<br />
+        新歓イベントの参加やスケジュールの管理など<br />
+        すべての便利機能が利用できます。
+      </p>
+
+      <div class="d-flex flex-column w-100" style="gap: 16px">
+        <v-btn
+          color="orange-darken-2"
+          elevation="0"
+          rounded="pill"
+          size="x-large"
+          block
+          class="font-weight-bold"
+          @click="goSignup"
+        >
+          アカウントを作成する
+        </v-btn>
+
+        <v-btn
+          color="orange-darken-2"
+          variant="outlined"
+          rounded="pill"
+          size="large"
+          block
+          prepend-icon="mdi-email"
+          class="font-weight-bold bg-white"
+          @click="goLogin"
+        >
+          メールアドレスでログイン
+        </v-btn>
+      </div>
+    </v-card>
   </div>
 </template>
 

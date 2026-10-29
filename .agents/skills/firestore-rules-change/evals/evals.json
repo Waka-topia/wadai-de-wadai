@@ -1,0 +1,32 @@
+{
+  "skill_name": "firestore-rules-change",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "lecture_syllabuses がログインしていれば誰でも削除できるのはまずい。削除は管理者だけにして、編集は今までどおりできるようにしたい",
+      "expected_output": "write を create/update/delete に分け、delete を isAdmin() にするルールの差分、dry-run でのコンパイル確認、docs/data-model.md の更新",
+      "files": [],
+      "assertions": [
+        "lecture_syllabuses の write を分け、delete を isAdmin() に限定する差分がある",
+        "create と update は、ログイン済みなら今までどおりできる",
+        "ルールのコンパイル確認に firebase deploy --dry-run を使う（Emulator の起動だけで済ませない）",
+        "docs/data-model.md を、ルールと同じ PR で更新する差分がある",
+        "lecture_syllabuses に書き込むサービス（syllabusService / lectureIndexService）を確かめている",
+        "デプロイのコマンドより前に【承認待ち】がある"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "運営からのお知らせを出すために announcements コレクションを新しく作りたい。誰でも読めて、書けるのは管理者だけ",
+      "expected_output": "announcements の match を追加し read は全員、write は isAdmin()、dry-run でのコンパイル確認、docs/data-model.md のコレクション一覧への追加",
+      "files": [],
+      "assertions": [
+        "announcements の match を追加し、read は全員、write は isAdmin() にする差分がある",
+        "ルールのコンパイル確認に firebase deploy --dry-run を使う（Emulator の起動だけで済ませない）",
+        "docs/data-model.md のコレクション一覧に announcements を追加する差分がある",
+        "デプロイのコマンドより前に【承認待ち】がある",
+        "書けるフィールドと型を hasOnly などで検証する"
+      ]
+    }
+  ]
+}

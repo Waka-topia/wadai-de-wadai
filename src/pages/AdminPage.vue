@@ -38,7 +38,7 @@
               <td>{{ applicant.organizationName }}</td>
               <td>{{ applicant.userName }}</td>
               <td>{{ applicant.email }}</td>
-              <td>{{ formatDate(applicant.requestedAt) }}</td>
+              <td>{{ formatDateTimeJa(applicant.requestedAt) }}</td>
               <td class="d-flex align-center">
                 <v-switch
                   :disabled="updatingUserId === applicant.applicationId"
@@ -53,17 +53,15 @@
                 </span>
               </td>
             </tr>
-
-            <tr v-if="!isLoading && applicants.length === 0">
-              <td class="text-center py-6" colspan="7">申請データはありません</td>
-            </tr>
           </tbody>
         </v-table>
       </div>
 
-      <div v-if="!isLoading && applicants.length === 0" class="d-md-none text-center py-6">
-        申請データはありません
-      </div>
+      <EmptyState
+        v-if="!isLoading && applicants.length === 0"
+        icon="mdi-inbox-outline"
+        title="申請データはありません"
+      />
 
       <v-row v-else class="d-md-none" dense>
         <v-col v-for="applicant in applicants" :key="applicant.applicationId" cols="12">
@@ -91,7 +89,7 @@
 
             <p class="text-subtitle-2 mb-1">申請日時</p>
             <p class="mb-3 text-body-2">
-              {{ formatDate(applicant.requestedAt) }}
+              {{ formatDateTimeJa(applicant.requestedAt) }}
             </p>
 
             <div class="d-flex align-center justify-space-between">
@@ -110,17 +108,16 @@
       </v-row>
     </v-card>
   </v-sheet>
-
-  <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
-    {{ snackbar.message }}
-  </v-snackbar>
 </template>
 
 <script setup>
 import { onMounted, ref } from 'vue'
 import { registerAllGroupsService } from '@/services/groupService'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
+import { formatDateTimeJa } from '@/utils/dateFormatter'
+import EmptyState from '@/components/common/EmptyState.vue'
 import {
   getProveOwnerApplicantsService,
   updateProveOwnerApprovalService,
@@ -132,39 +129,15 @@ const applicants = ref([])
 const isLoading = ref(false)
 const updatingUserId = ref('')
 const isRegisteringGroups = ref(false)
-const snackbar = ref({
-  show: false,
-  color: '',
-  message: '',
-})
 
-const formatDate = (value) => {
-  if (!value) {
-    return '-'
-  }
-
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) {
-    return '-'
-  }
-
-  return date.toLocaleString('ja-JP')
-}
-
-const showSnackbar = (color, message) => {
-  snackbar.value = {
-    show: true,
-    color,
-    message,
-  }
-}
+const { notifySuccess, notifyError } = useSnackbar()
 
 const loadApplicants = async () => {
   try {
     isLoading.value = true
     applicants.value = await getProveOwnerApplicantsService()
   } catch (error) {
-    showSnackbar('error', error.message)
+    notifyError(error)
   } finally {
     isLoading.value = false
   }
@@ -174,12 +147,11 @@ const registerGroups = async () => {
   try {
     isRegisteringGroups.value = true
     const { registeredCount, skippedCount } = await registerAllGroupsService()
-    showSnackbar(
-      'success',
+    notifySuccess(
       `団体データを登録しました（新規: ${registeredCount}件 / 既存スキップ: ${skippedCount}件）`,
     )
   } catch (error) {
-    showSnackbar('error', error.message)
+    notifyError(error)
   } finally {
     isRegisteringGroups.value = false
   }
@@ -204,10 +176,10 @@ const toggleApproval = async (applicationId, nextValue) => {
       applicationId,
       approved: nextValue,
     })
-    showSnackbar('success', nextValue ? '承認しました' : '非承認に変更しました')
+    notifySuccess(nextValue ? '承認しました' : '非承認に変更しました')
   } catch (error) {
     targetApplicant.isOfficial = previousValue
-    showSnackbar('error', error.message)
+    notifyError(error)
   } finally {
     updatingUserId.value = ''
   }

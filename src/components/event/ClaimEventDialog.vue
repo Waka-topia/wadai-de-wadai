@@ -1,94 +1,54 @@
 <template>
-  <v-dialog v-model="dialogOpen" max-width="500" persistent>
-    <v-card rounded="lg">
-      <v-card-title class="text-h6 font-weight-bold pa-5 pb-3">
-        <v-icon class="mr-2" color="orange">
-          {{ showRedirectPrompt ? 'mdi-alert-circle' : 'mdi-swap-horizontal' }}
-        </v-icon>
-        {{ showRedirectPrompt ? '代表者認証が必要です' : 'イベントの管理権限を引き継ぐ' }}
-      </v-card-title>
+  <BaseDialog
+    v-model="dialogOpen"
+    :title="showRedirectPrompt ? '代表者認証が必要です' : 'イベントの管理権限を引き継ぐ'"
+    :confirm-label="showRedirectPrompt ? '認証ページへ進む' : '引き継ぐ'"
+    confirm-color="orange"
+    :loading="isLoading"
+    max-width="500"
+    persistent
+    @confirm="showRedirectPrompt ? onRedirect() : onConfirm()"
+  >
+    <v-card-text v-if="!showRedirectPrompt" class="px-5 pb-4">
+      <p class="text-body-2 mb-4">
+        <strong>{{ eventOrganizer }}</strong>
+        のイベント管理権限をあなたに引き継ぎます。
+      </p>
 
-      <v-divider />
+      <v-alert variant="tonal" color="success" icon="mdi-check-circle" class="mb-4">
+        <div class="text-body-2">
+          <p class="font-weight-bold mb-2">引き継ぐと以下のことができます:</p>
+          <ul class="pl-4">
+            <li>イベント内容の自由な編集・更新</li>
+            <li>公式マーク付きで上位表示</li>
+            <li>最新情報を直接発信</li>
+          </ul>
+        </div>
+      </v-alert>
 
-      <div v-if="!showRedirectPrompt">
-        <v-card-text class="pa-5">
-          <p class="text-body-2 mb-4">
-            <strong>{{ eventOrganizer }}</strong>
-            のイベント管理権限をあなたに引き継ぎます。
-          </p>
+      <v-alert variant="tonal" color="warning" icon="mdi-alert" density="compact">
+        <p class="text-body-2 mb-0">引き継ぎ後は、あなたのみがこのイベントを編集・削除できます。</p>
+      </v-alert>
+    </v-card-text>
 
-          <v-alert variant="tonal" color="success" icon="mdi-check-circle" class="mb-4">
-            <div class="text-body-2">
-              <p class="font-weight-bold mb-2">引き継ぐと以下のことができます:</p>
-              <ul class="pl-4">
-                <li>イベント内容の自由な編集・更新</li>
-                <li>公式マーク付きで上位表示</li>
-                <li>最新情報を直接発信</li>
-              </ul>
-            </div>
-          </v-alert>
-
-          <v-alert variant="tonal" color="warning" icon="mdi-alert" density="compact">
-            <p class="text-body-2 mb-0">
-              引き継ぎ後は、あなたのみがこのイベントを編集・削除できます。
-            </p>
-          </v-alert>
-        </v-card-text>
-
-        <v-divider />
-
-        <v-card-actions class="pa-4">
-          <v-spacer />
-          <v-btn variant="text" :disabled="isLoading" @click="onCancel">キャンセル</v-btn>
-          <v-btn
-            color="orange"
-            variant="elevated"
-            :loading="isLoading"
-            class="text-white font-weight-bold"
-            @click="onConfirm"
-          >
-            <v-icon start>mdi-check</v-icon>
-            引き継ぐ
-          </v-btn>
-        </v-card-actions>
-      </div>
-
-      <div v-else>
-        <v-card-text class="pa-5">
-          <p class="text-body-2 mb-4">
-            この機能を利用するには、あなたが
-            <strong>{{ eventOrganizer }}</strong>
-            の公式メンバー（代表者）であることの認証が必要です。
-          </p>
-          <p class="text-body-2 text-grey-darken-1 mb-0">
-            認証ページへ移動して手続きを行いますか？
-          </p>
-        </v-card-text>
-
-        <v-divider />
-
-        <v-card-actions class="pa-4">
-          <v-spacer />
-          <v-btn variant="text" @click="onCancel">キャンセル</v-btn>
-          <v-btn color="orange" variant="elevated" @click="onRedirect">
-            <v-icon start>mdi-arrow-right</v-icon>
-            認証ページへ進む
-          </v-btn>
-        </v-card-actions>
-      </div>
-    </v-card>
-  </v-dialog>
-
-  <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
-    {{ snackbar.message }}
-  </v-snackbar>
+    <v-card-text v-else class="px-5 pb-4">
+      <p class="text-body-2 mb-4">
+        この機能を利用するには、あなたが
+        <strong>{{ eventOrganizer }}</strong>
+        の公式メンバー（代表者）であることの認証が必要です。
+      </p>
+      <p class="text-body-2 text-grey-darken-1 mb-0">認証ページへ移動して手続きを行いますか？</p>
+    </v-card-text>
+  </BaseDialog>
 </template>
 
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { useStore } from 'vuex'
-import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { useRouter } from 'vue-router'
+import { useSnackbar } from '@/composables/useSnackbar'
+import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
+import BaseDialog from '@/components/common/BaseDialog.vue'
 
 const router = useRouter()
 const store = useStore()
@@ -121,15 +81,8 @@ const dialogOpen = computed({
 
 const isLoading = ref(false)
 const showRedirectPrompt = ref(false)
-const snackbar = ref({
-  show: false,
-  color: '',
-  message: '',
-})
 
-const onCancel = () => {
-  dialogOpen.value = false
-}
+const { notifySuccess, notifyError } = useSnackbar()
 
 const onConfirm = async () => {
   try {
@@ -150,11 +103,7 @@ const onConfirm = async () => {
       organizationId: props.organizationId,
     })
 
-    snackbar.value = {
-      show: true,
-      color: 'success',
-      message: 'イベントの管理権限を引き継ぎました！',
-    }
+    notifySuccess('イベントの管理権限を引き継ぎました！')
 
     dialogOpen.value = false
     emit('transferred')
@@ -166,11 +115,7 @@ const onConfirm = async () => {
     if (error.message.includes('代表者証明が必要です')) {
       showRedirectPrompt.value = true
     } else {
-      snackbar.value = {
-        show: true,
-        color: 'error',
-        message: error.message,
-      }
+      notifyError(error)
     }
   } finally {
     isLoading.value = false

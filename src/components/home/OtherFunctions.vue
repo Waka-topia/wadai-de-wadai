@@ -1,10 +1,6 @@
 <template>
   <div class="mb-6">
-    <div class="d-flex align-center justify-space-between mb-2">
-      <div class="d-flex align-center">
-        <span class="font-weight-bold">その他の機能</span>
-      </div>
-    </div>
+    <SectionHeader title="その他の機能" />
 
     <!-- Features Grid -->
     <v-card flat class="rounded-xl pa-4 mb-4">
@@ -53,6 +49,8 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
+import { openExternalLink } from '@/utils/externalLink'
+import SectionHeader from '@/components/common/SectionHeader.vue'
 
 const router = useRouter()
 const showMapSection = ref(false) // マップセクションの表示状態
@@ -63,6 +61,12 @@ const features = ref([
     icon: 'mdi-school',
     color: 'orange',
     url: 'https://moodle.wakayama-u.ac.jp/',
+  },
+  {
+    label: 'シラバス',
+    icon: 'mdi-book-open-variant',
+    color: 'deep-purple',
+    url: 'https://web.wakayama-u.ac.jp/syllabus/',
   },
   {
     label: '教育サポート',
@@ -104,7 +108,7 @@ const openLink = (item) => {
     showMapSection.value = !showMapSection.value
   } else if (item.url) {
     void logFirebaseAnalyticsEvent('home_other_functions_external_link', { label: item.label })
-    window.open(item.url, '_blank')
+    openExternalLink(item.url)
   }
 }
 

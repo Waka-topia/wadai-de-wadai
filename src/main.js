@@ -16,10 +16,10 @@ authService.onAuthStateChanged(async (user) => {
     store.commit('auth/setUser', user)
     store.commit('auth/setIdToken', idToken)
     store.commit('auth/setUserId', user.uid)
-    console.log('User authenticated:', user)
+    // console.log('[Auth] User authenticated:', user.uid)
   } else {
     store.commit('auth/clearAuthState')
-    console.log('No user authenticated')
+    // console.log('[Auth] No user authenticated')
   }
 
   // 初回のみアプリをマウント

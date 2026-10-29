@@ -1,106 +1,107 @@
 <template>
-  <v-form class="pa-4" @submit.prevent="submitEvent">
-    <v-autocomplete
-      v-model="newEvent.organizerName"
-      :items="allGroups"
-      item-title="name"
-      item-value="name"
-      label="団体名"
-      variant="outlined"
-      density="comfortable"
-      :rules="[required]"
-      persistent-hint
-      prepend-inner-icon="mdi-domain"
-      no-data-text="団体が見つかりません。一覧から選択するか正しい名称を入力してください。"
-      clearable
-    />
+  <FormFieldDefaults>
+    <v-form class="pa-4" @submit.prevent="submitEvent($event)">
+      <v-autocomplete
+        v-model="newEvent.organizerName"
+        :items="allGroups"
+        item-title="name"
+        item-value="name"
+        label="団体名"
+        :rules="[required]"
+        persistent-hint
+        prepend-inner-icon="mdi-domain"
+        no-data-text="団体が見つかりません。一覧から選択するか正しい名称を入力してください。"
+        clearable
+      />
 
-    <v-text-field
-      v-model="newEvent.date"
-      label="日付"
-      type="date"
-      variant="outlined"
-      density="comfortable"
-      max="2026-05-31"
-      min="2025-04-01"
-      :rules="[required]"
-      prepend-inner-icon="mdi-calendar"
-    />
+      <!-- PC では日付と開始・終了時刻を 1 行に並べる -->
+      <v-row dense>
+        <v-col cols="12" md="6">
+          <v-text-field
+            v-model="newEvent.date"
+            label="日付"
+            type="date"
+            :max="eventDateMax"
+            :min="eventDateMin"
+            :rules="[required]"
+            prepend-inner-icon="mdi-calendar"
+          />
+        </v-col>
+        <v-col cols="6" md="3">
+          <v-text-field
+            v-model="newEvent.startTime"
+            label="開始時刻"
+            type="time"
+            :rules="[required]"
+            prepend-inner-icon="mdi-clock-start"
+          />
+        </v-col>
+        <v-col cols="6" md="3">
+          <v-text-field
+            v-model="newEvent.endTime"
+            label="終了時刻"
+            type="time"
+            :rules="[required]"
+            prepend-inner-icon="mdi-clock-end"
+          />
+        </v-col>
+      </v-row>
 
-    <v-row dense>
-      <v-col cols="6">
-        <v-text-field
-          v-model="newEvent.startTime"
-          label="開始時刻"
-          type="time"
-          variant="outlined"
-          density="comfortable"
-          :rules="[required]"
-          prepend-inner-icon="mdi-clock-start"
-        />
-      </v-col>
-      <v-col cols="6">
-        <v-text-field
-          v-model="newEvent.endTime"
-          label="終了時刻"
-          type="time"
-          variant="outlined"
-          density="comfortable"
-          :rules="[required]"
-          prepend-inner-icon="mdi-clock-end"
-        />
-      </v-col>
-    </v-row>
+      <v-text-field
+        v-model="newEvent.location"
+        label="場所"
+        placeholder="イベントの場所"
+        :rules="[required]"
+        prepend-inner-icon="mdi-map-marker"
+      />
 
-    <v-text-field
-      v-model="newEvent.location"
-      label="場所"
-      variant="outlined"
-      density="comfortable"
-      placeholder="イベントの場所"
-      :rules="[required]"
-      prepend-inner-icon="mdi-map-marker"
-    />
+      <v-textarea
+        v-model="newEvent.description"
+        label="概要"
+        rows="4"
+        placeholder="イベントの概要を入力"
+        prepend-inner-icon="mdi-text"
+      />
 
-    <v-textarea
-      v-model="newEvent.description"
-      label="概要"
-      variant="outlined"
-      density="comfortable"
-      rows="4"
-      placeholder="イベントの概要を入力"
-      prepend-inner-icon="mdi-text"
-    />
-
-    <v-btn type="submit" color="orange" block size="large" class="text-white font-weight-bold mt-2">
-      <v-icon start>{{ isEditMode ? 'mdi-update' : 'mdi-check-circle' }}</v-icon>
-      {{ isEditMode ? 'イベントを更新' : 'イベントを登録' }}
-    </v-btn>
-    <div class="text-center pt-4">
       <v-btn
-        variant="text"
-        class="text-button text-decoration-underline"
-        @click="goProveOwnerFromEventForm"
+        type="submit"
+        color="orange"
+        block
+        size="large"
+        rounded="pill"
+        class="text-white font-weight-bold text-body-2 mt-2"
+        :disabled="!canSubmit"
       >
-        団体の代表者であることを証明する
+        {{ isEditMode ? 'このイベントを更新する' : 'このイベントを登録する' }}
       </v-btn>
-    </div>
-    <p class="text-grey text-caption">
-      代表者証明をすることでイベントが上位に表示されやすくなります
-    </p>
-  </v-form>
-
-  <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
-    {{ snackbar.message }}
-  </v-snackbar>
+      <div class="text-center pt-4">
+        <v-btn
+          block
+          size="large"
+          rounded="pill"
+          color="red-lighten-1"
+          class="text-white font-weight-bold text-body-2"
+          @click="goProveOwnerFromEventForm"
+        >
+          団体の代表者であることを証明する
+        </v-btn>
+      </div>
+      <p class="text-grey-darken-1 text-caption mt-3">
+        ※代表者証明をすることでイベントが上位に表示されやすくなります
+      </p>
+    </v-form>
+  </FormFieldDefaults>
 </template>
 
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
+import { useSnackbar } from '@/composables/useSnackbar'
+import { eventDateMax, eventDateMin } from '@/config/constants'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { allGroups } from '@/data/groups'
+import FormFieldDefaults from '@/components/common/FormFieldDefaults.vue'
 import { required } from '@/utils/forms/validate'
 
 const props = defineProps({
@@ -155,11 +156,7 @@ watch(
   { immediate: true, deep: true },
 )
 
-const snackbar = ref({
-  show: false,
-  color: '',
-  message: '',
-})
+const { notifySuccess, notifyError } = useSnackbar()
 
 const submitEvent = async (validationPromise) => {
   try {
@@ -197,21 +194,46 @@ const submitEvent = async (validationPromise) => {
         organizationId: eventData.organizationId,
       },
     )
-    snackbar.value = {
-      show: true,
-      color: 'success',
-      message: isEditMode.value ? 'イベントを更新しました！' : 'イベントが正常に登録されました！',
-    }
+    notifySuccess(
+      isEditMode.value ? 'イベントを更新しました！' : 'イベントが正常に登録されました！',
+    )
 
     // 成功イベントを通知（ダイアログを閉じるためなど）
     emit('success')
   } catch (error) {
     void logFirebaseAnalyticsEvent('event_form_submit_error', {})
-    snackbar.value = {
-      show: true,
-      color: 'error',
-      message: error.message,
-    }
+    notifyError(error)
   }
 }
+
+const isFormValid = computed(() => {
+  return Boolean(
+    newEvent.value.organizerName &&
+    newEvent.value.date &&
+    newEvent.value.startTime &&
+    newEvent.value.endTime &&
+    newEvent.value.location,
+  )
+})
+
+const isChanged = computed(() => {
+  if (!props.initialEvent) return true
+
+  return (
+    newEvent.value.organizerName !== (props.initialEvent.organizerName || '') ||
+    newEvent.value.date !== (props.initialEvent.date || '') ||
+    newEvent.value.startTime !== (props.initialEvent.startTime || '') ||
+    newEvent.value.endTime !== (props.initialEvent.endTime || '') ||
+    newEvent.value.location !== (props.initialEvent.location || '') ||
+    newEvent.value.description !== (props.initialEvent.description || '')
+  )
+})
+
+const canSubmit = computed(() => {
+  if (isEditMode.value) {
+    return isFormValid.value && isChanged.value
+  }
+
+  return isFormValid.value
+})
 </script>

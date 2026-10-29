@@ -1,5 +1,5 @@
 <template>
-  <v-container class="pa-4 pb-16 home-container">
+  <v-container class="pa-4 pb-16">
     <!-- みんなのシラバス検索へのリンクカード -->
     <v-card
       class="mb-4 rounded-xl elevation-2 syllabus-banner"
@@ -24,36 +24,72 @@
       </v-card-text>
     </v-card>
 
-    <TrainInfo />
-    <BusInfo />
-    <CampusMap />
-    <OtherFunctions />
-    <TutorialModal />
+    <!-- lg 以上では、電車とバス・地図とその他の機能をそれぞれ横に並べる -->
+    <div class="home-grid">
+      <TrainInfo />
+      <BusInfo />
+      <!-- 地図の読み込みは重いので、他の要素を描画してから表示する -->
+      <CampusMap v-if="isMapVisible" />
+      <v-skeleton-loader
+        v-else
+        type="image"
+        :height="mapPlaceholderHeight"
+        class="mb-6 rounded-lg elevation-1"
+      ></v-skeleton-loader>
+      <OtherFunctions />
+    </div>
     <!-- <WakayamaMatch /> -->
   </v-container>
 </template>
 
 <script setup>
+import { ref, onMounted, defineAsyncComponent } from 'vue'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import TrainInfo from '@/components/home/TrainInfo.vue'
 import BusInfo from '@/components/home/BusInfo.vue'
-import CampusMap from '@/components/home/CampusMap.vue'
 import OtherFunctions from '@/components/home/OtherFunctions.vue'
-import TutorialModal from '@/components/home/TutorialModal.vue'
 // import WakayamaMatch from '@/components/home/WakayamaMatch.vue'
+
+const CampusMap = defineAsyncComponent(() => import('@/components/home/CampusMap.vue'))
 
 useFirebasePageView('view_home', {})
 
 const logSyllabusBannerClick = () => {
   void logFirebaseAnalyticsEvent('home_syllabus_search_banner_click', {})
 }
+
+// CampusMap の見出し行と地図（200px）を合わせた高さ。表示切り替え時のレイアウトのずれを防ぐ
+const mapPlaceholderHeight = 232
+// ブラウザが空くのを待つ最大時間。requestIdleCallback 非対応（Safari など）ではこの時間だけ待つ
+const mapMaxDelayMs = 2000
+
+const isMapVisible = ref(false)
+
+const showMap = () => {
+  isMapVisible.value = true
+}
+
+onMounted(() => {
+  if ('requestIdleCallback' in window) {
+    window.requestIdleCallback(showMap, { timeout: mapMaxDelayMs })
+  } else {
+    setTimeout(showMap, mapMaxDelayMs)
+  }
+})
 </script>
 
 <style scoped>
-.home-container {
-  background-color: #fff8e1; /* Light beige background */
-  min-height: 100vh;
+/* ベージュの背景はルートの meta.background で v-main 全体に付ける（PC で本文の外側まで広げるため） */
+
+/* --- PC（lg 以上）の 2 列レイアウト --- */
+@media (min-width: 1280px) {
+  .home-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 24px;
+    align-items: start;
+  }
 }
 .syllabus-banner {
   border: 1px solid #e0e0e0;

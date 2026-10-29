@@ -51,9 +51,9 @@ export default [
     rules: {
       // 戻り値の説明は任意とする
       'jsdoc/require-returns': 'off',
-      // パラメータの説明は警告レベル
+      // パラメータの説明は任意とする
       'jsdoc/require-param-description': 'off',
-      // パラメータ名の整合性はエラー
+      // パラメータ名と JSDoc の一致は検査しない
       'jsdoc/check-param-names': 'off',
       // Prettierが空行を追加するため、ESLintは空行を許可
       'jsdoc/tag-lines': ['warn', 'any', { startLines: 1 }],
@@ -91,9 +91,9 @@ export default [
       // -------------------------------------------
       // インポート/エクスポート
       // -------------------------------------------
-      // default exportを禁止（名前付きexportを推奨）
+      // default export は許可する（store・router・一部の service が使っている）
       'import/no-default-export': 'off',
-      // exportをファイル末尾に配置
+      // export の位置は問わない
       'import/exports-last': 'off',
       // export文のグループ化は無効
       'import/group-exports': 'off',
@@ -103,7 +103,7 @@ export default [
       // -------------------------------------------
       // 関数定義
       // -------------------------------------------
-      // 関数は式として定義（const fn = () => {} 形式）
+      // 関数宣言とアロー関数式のどちらも許可する
       'func-style': 'off',
       // アロー関数を優先
       'prefer-arrow-callback': 'error',
@@ -129,7 +129,7 @@ export default [
       // -------------------------------------------
       // script setupまたはComposition APIのみ許可（既存コードの互換性のため警告レベル）
       'vue/component-api-style': ['warn', ['script-setup', 'composition']],
-      // definePropsの型チェック
+      // defineProps の書き方が正しいかを検査する
       'vue/valid-define-props': 'error',
 
       // -------------------------------------------
@@ -154,8 +154,6 @@ export default [
       // -------------------------------------------
       // Vue専用の上書き設定
       // -------------------------------------------
-      // Vueファイルはdefault exportを許可
-      'import/no-default-export': 'off',
       // 変数名はcamelCaseまたはPascalCase（コンポーネント名）を許可
       // URL, IDなどの略語も許可（Firebaseプロパティ名との互換性のため）
       'id-match': [

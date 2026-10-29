@@ -5,25 +5,18 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref, markRaw } from 'vue'
+import { onUnmounted, ref } from 'vue'
 import maplibregl from 'maplibre-gl'
-import 'maplibre-gl/dist/maplibre-gl.css'
+import { useMapLibre } from '@/composables/useMapLibre'
 import { campusBuildings } from '@/data/campusBuildings'
 
-// MapLibre GL JS Version: ^5.17.0 (Verified in package.json)
-// MapTiler API Documentation: https://docs.maptiler.com/maplibre-gl-js/
-
 const mapContainer = ref(null)
-const map = ref(null)
 const mapLoaded = ref(false)
 const geolocateControl = ref(null)
 
 // Wakayama University Coordinates
 const center = [135.15167, 34.26583] // Lng, Lat
 const zoom = 15
-
-// MapTiler API Key from environment variable
-const apiKey = import.meta.env.VITE_MAPTILER_API_KEY
 
 const emit = defineEmits(['userLocationUpdate', 'locationError'])
 
@@ -53,32 +46,7 @@ function handleGeolocateError(event) {
   // console.error('Location error:', error)
 }
 
-onMounted(() => {
-  // Validate API Key
-  if (!apiKey || apiKey === 'YOUR_API_KEY_HERE') {
-    console.error('MapTiler API Key is not set. Please add VITE_MAPTILER_API_KEY to .env file.')
-    return
-  }
-
-  // Initialize Map with MapTiler Vector Tiles
-  const initialState = {
-    lng: center[0],
-    lat: center[1],
-    zoom: zoom,
-  }
-
-  map.value = markRaw(
-    new maplibregl.Map({
-      container: mapContainer.value,
-      // MapTiler Basic Style (Minimal, customizable)
-      // Alternative styles: 'streets-v2', 'outdoor-v2', 'satellite-v2'
-      style: `https://api.maptiler.com/maps/basic-v2/style.json?key=${apiKey}`,
-      center: [initialState.lng, initialState.lat],
-      zoom: initialState.zoom,
-      attributionControl: false, // 後でcompactモードで追加
-    }),
-  )
-
+const map = useMapLibre(mapContainer, { center, zoom }, () => {
   // Attribution control をコンパクトモード(iアイコン)で追加
   map.value.addControl(
     new maplibregl.AttributionControl({
@@ -173,7 +141,7 @@ onMounted(() => {
         navigator.clipboard
           .writeText(`Coordinates: { lat: ${lat}, lng: ${lng} }`)
           .then(() => {
-            console.log('Coordinates copied to clipboard')
+            // console.log('Coordinates copied to clipboard')
             // 簡単なフィードバック（オプション）
             // alert('Copied!')
           })
@@ -186,11 +154,6 @@ onUnmounted(() => {
   if (geolocateControl.value) {
     geolocateControl.value.off('geolocate', handleGeolocate)
     geolocateControl.value.off('error', handleGeolocateError)
-  }
-
-  if (map.value) {
-    map.value.remove()
-    map.value = null
   }
 })
 </script>

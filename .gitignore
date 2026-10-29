@@ -14,6 +14,7 @@ dist-ssr
 coverage
 *.local
 .cache
+.firebase
 
 /cypress/videos/
 /cypress/screenshots/
@@ -34,3 +35,12 @@ coverage
 .env
 .env.local
 .env.*.local
+.env.dev*
+.env.prod*
+
+# Cloudflare Wrangler のローカル状態
+.wrangler/
+
+# エージェントの個人設定（.claude/skills と .claude/rules は .agents への symlink なので管理する）
+.claude/settings.local.json
+.claude/plans/

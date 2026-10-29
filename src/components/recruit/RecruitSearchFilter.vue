@@ -40,53 +40,32 @@
         </v-btn>
       </div>
     </v-card>
-    <v-snackbar v-model="snackbar.show" :color="snackbar.color">
-      {{ snackbar.message }}
-    </v-snackbar>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 
-const snackbar = ref({
-  show: false,
-  message: '',
-  color: 'success',
-})
+const { showSnackbar, notifyError } = useSnackbar()
 
 const onFilterClick = (filterType) => {
   void logFirebaseAnalyticsEvent('recruit_filter_click', { filterType })
   try {
-    snackbar.value = {
-      show: true,
-      message: `${filterType}の絞り込み機能は現在準備中です`,
-      color: 'warning',
-    }
+    showSnackbar(`${filterType}の絞り込み機能は現在準備中です`, 'warning', {
+      icon: 'mdi-alert-circle',
+    })
   } catch (error) {
-    snackbar.value = {
-      show: true,
-      message: `エラー: ${error.message}`,
-      color: 'error',
-    }
+    notifyError(error)
   }
 }
 
 const onSearch = () => {
   void logFirebaseAnalyticsEvent('recruit_search_icon_click', {})
   try {
-    snackbar.value = {
-      show: true,
-      message: '検索機能は現在準備中です',
-      color: 'warning',
-    }
+    showSnackbar('検索機能は現在準備中です', 'warning', { icon: 'mdi-alert-circle' })
   } catch (error) {
-    snackbar.value = {
-      show: true,
-      message: `エラー: ${error.message}`,
-      color: 'error',
-    }
+    notifyError(error)
   }
 }
 </script>

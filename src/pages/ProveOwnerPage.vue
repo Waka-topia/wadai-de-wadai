@@ -1,27 +1,22 @@
 <template>
-  <v-progress-linear v-if="isLoading" color="orange" indeterminate=""></v-progress-linear>
-
-  <v-container class="px-3 py-8" style="max-width: 600px">
-    <div class="text-center mb-6">
-      <v-icon color="orange" size="48" class="mb-3">mdi-account-star</v-icon>
-      <h1 class="text-h5 font-weight-bold mb-3">団体・代表者としての認証</h1>
-      <p class="text-body-2 text-grey-darken-2" style="line-height: 1.6">
-        ここのページでは、自分たちの団体のメンバーとして登録・認証が行えます。<br />
-        認証が完了すると、<span class="font-weight-bold text-orange"
-          >代理登録された新歓情報の引き継ぎ</span
-        >や、新しいイベントを<span class="font-weight-bold text-orange">公式マーク付き</span
-        >で掲載できるようになります！
-      </p>
-    </div>
-
-    <v-card class="pa-6" rounded="lg" elevation="2">
-      <div class="d-flex align-center mb-5">
-        <v-avatar color="orange-lighten-4" size="32" class="mr-3">
-          <v-icon color="orange" size="18">mdi-account-check</v-icon>
-        </v-avatar>
-        <h2 class="text-subtitle-1 font-weight-bold mb-0">認証手続き</h2>
+  <AuthCard
+    icon="mdi-account-star"
+    title="団体・代表者として認証"
+    max-width="520"
+    :loading="isLoading"
+  >
+    <template #subtitle>
+      <div class="d-flex justify-center ga-2 mt-3">
+        <v-chip size="small" color="orange" variant="tonal" prepend-icon="mdi-hand-wave">
+          代理登録の引き継ぎ
+        </v-chip>
+        <v-chip size="small" color="blue" variant="tonal" prepend-icon="mdi-check-decagram">
+          公式マーク付与
+        </v-chip>
       </div>
+    </template>
 
+    <FormFieldDefaults>
       <v-form @submit.prevent="onSubmit">
         <v-autocomplete
           v-model="selectedGroup"
@@ -31,102 +26,110 @@
           item-value="id"
           return-object
           label="団体名"
-          variant="outlined"
-          density="comfortable"
           persistent-hint
           prepend-inner-icon="mdi-domain"
           no-data-text="団体が見つかりません。正しい名称を入力してください。"
           clearable
+          class="mb-2"
           @update:model-value="onGroupSelected"
         />
 
+        <!-- 代表者の存在チェック中 -->
+        <div v-if="selectedGroup && isCheckingGroup" class="d-flex align-center ga-2 mb-4 px-1">
+          <v-progress-circular indeterminate color="orange-darken-2" size="18" width="2" />
+          <span class="text-body-2 text-grey-darken-1">団体情報を確認中...</span>
+        </div>
+
         <!-- 代表者の存在チェック結果を表示 -->
-        <v-alert
-          v-if="selectedGroup && registrationMode === 'subsequent'"
-          variant="tonal"
-          color="success"
-          icon="mdi-account-group"
-          density="compact"
-          class="mb-4"
-        >
-          <p class="text-body-2 mb-0">
-            この団体にはすでに代表者がいます。団体パスワードを入力するだけで即座に登録できます。
-          </p>
-        </v-alert>
+        <template v-if="selectedGroup && registrationMode && !isCheckingGroup">
+          <v-divider class="mb-4" />
 
-        <v-alert
-          v-if="selectedGroup && registrationMode === 'initial'"
-          variant="tonal"
-          color="info"
-          icon="mdi-account-plus"
-          density="compact"
-          class="mb-4"
-        >
-          <p class="text-body-2 mb-0">
-            この団体の最初の代表者になります。パスワードを新しく設定後、運営による承認が必要です。
-          </p>
-        </v-alert>
+          <!-- subsequent: すでに代表者あり -->
+          <div
+            v-if="registrationMode === 'subsequent'"
+            class="d-flex align-center ga-3 bg-green-lighten-5 rounded-lg pa-3 mb-4"
+          >
+            <v-avatar color="green" size="36" class="flex-shrink-0">
+              <v-icon color="white" size="18">mdi-account-check</v-icon>
+            </v-avatar>
+            <div>
+              <p class="text-body-2 font-weight-bold text-green-darken-2 mb-0">
+                すでに代表者がいます
+              </p>
+              <p class="text-caption text-green-darken-1 mb-0">
+                パスワードを入力するだけで即座に登録できます
+              </p>
+            </div>
+          </div>
 
-        <!-- パスワード入力（後続: 既存パスワードを入力） -->
-        <div v-if="registrationMode === 'subsequent'">
-          <v-text-field
-            v-model="password"
-            :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
-            :rules="[required]"
-            :type="visible ? 'text' : 'password'"
-            clearable
-            hint="団体の代表者から共有されたパスワードを入力してください。"
-            label="団体パスワード"
-            prepend-inner-icon="mdi-lock-outline"
-            @click:append-inner="visible = !visible"
-          ></v-text-field>
-        </div>
+          <!-- initial: 最初の代表者 -->
+          <div
+            v-if="registrationMode === 'initial'"
+            class="d-flex align-center ga-3 bg-orange-lighten-5 rounded-lg pa-3 mb-4"
+          >
+            <v-avatar color="orange-darken-1" size="36" class="flex-shrink-0">
+              <v-icon color="white" size="18">mdi-account-plus</v-icon>
+            </v-avatar>
+            <div>
+              <p class="text-body-2 font-weight-bold text-orange-darken-3 mb-0">
+                最初の代表者になります
+              </p>
+              <p class="text-caption text-orange-darken-2 mb-0">
+                パスワード設定後、運営による承認が必要です
+              </p>
+            </div>
+          </div>
 
-        <!-- パスワード設定（初回: 新パスワードを設定） -->
-        <div v-if="registrationMode === 'initial'">
-          <v-text-field
-            v-model="password"
-            :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
-            :rules="[required, passwordRule]"
-            :type="visible ? 'text' : 'password'"
-            clearable
-            hint="8文字以上にしてください。このパスワードは後から同じ団体のメンバーが登録する際に使います。"
-            label="新しいパスワードを設定"
-            placeholder="Xa4%j87d"
-            prepend-inner-icon="mdi-lock-outline"
-            @click:append-inner="visible = !visible"
-          ></v-text-field>
-          <v-text-field
-            v-model="confirmPassword"
-            :append-inner-icon="confirmVisible ? 'mdi-eye' : 'mdi-eye-off'"
-            :rules="[required, passwordRule, confirmPasswordRule(password)]"
-            :type="confirmVisible ? 'text' : 'password'"
-            clearable
-            hint="パスワードの確認のため、もう一度入力してください。"
-            label="パスワードの確認"
-            placeholder="Xa4%j87d"
-            prepend-inner-icon="mdi-lock-outline"
-            @click:append-inner="confirmVisible = !confirmVisible"
-          ></v-text-field>
-        </div>
+          <!-- パスワード入力（後続: 既存パスワードを入力） -->
+          <div v-if="registrationMode === 'subsequent'">
+            <SectionLabel icon="mdi-lock-outline" title="パスワード認証" />
+            <PasswordField
+              v-model="password"
+              :rules="[required]"
+              hint="団体の代表者から共有されたパスワードを入力してください。"
+              label="団体パスワード"
+            />
+          </div>
+
+          <!-- パスワード設定（初回: 新パスワードを設定） -->
+          <div v-if="registrationMode === 'initial'">
+            <SectionLabel icon="mdi-lock-outline" title="パスワードを新規設定" />
+            <PasswordField
+              v-model="password"
+              :rules="[required, passwordRule]"
+              hint="8文字以上にしてください。このパスワードは後から同じ団体のメンバーが登録する際に使います。"
+              label="新しいパスワードを設定"
+              placeholder="Xa4%j87d"
+            />
+            <PasswordField
+              v-model="confirmPassword"
+              :confirm-of="password"
+              hint="パスワードの確認のため、もう一度入力してください。"
+              label="パスワードの確認"
+              placeholder="Xa4%j87d"
+            />
+          </div>
+        </template>
 
         <v-btn
           type="submit"
           :loading="isLoading"
           :disabled="!selectedGroup || isCheckingGroup"
           block
-          color="orange"
-          size="large"
-          variant="elevated"
+          color="orange-darken-2"
+          size="x-large"
+          rounded="pill"
+          class="font-weight-bold mt-2"
+          elevation="0"
         >
           <template v-if="registrationMode === 'subsequent'">
             <v-icon start>mdi-check-circle</v-icon>
             パスワードで即登録
           </template>
-          <template v-else> 申請する </template>
+          <template v-else>団体証明を申請する</template>
         </v-btn>
 
-        <p class="text-caption mt-4 px-2 text-grey">
+        <p v-if="registrationMode" class="text-caption mt-4 px-2 text-grey">
           <template v-if="registrationMode === 'initial'">
             このパスワードは団体ごとに任意のものを設定してください。
             団体メンバーのみで共有し、厳重に保管してください。
@@ -135,53 +138,45 @@
             パスワードは団体の既存代表者にお問い合わせください。
           </template>
         </p>
-
-        <v-btn
-          variant="plain"
-          class="mt-3"
-          @click="
-            snackbar = {
-              show: true,
-              color: 'info',
-              message: 'パスワードリセット機能は現在準備中です。',
-            }
-          "
-        >
-          パスワードを忘れた場合はこちら
-        </v-btn>
       </v-form>
-    </v-card>
-  </v-container>
+    </FormFieldDefaults>
 
-  <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
-    {{ snackbar.message }}
-  </v-snackbar>
+    <v-divider class="my-4"></v-divider>
+
+    <v-btn
+      variant="text"
+      color="grey-darken-1"
+      rounded="pill"
+      block
+      @click="showSnackbar('パスワードリセット機能は現在準備中です。', 'info')"
+    >
+      パスワードを忘れた場合はこちら
+    </v-btn>
+  </AuthCard>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { required, passwordRule, confirmPasswordRule } from '@/utils/forms/validate'
+import { computed, ref } from 'vue'
+import { required, passwordRule } from '@/utils/forms/validate'
 import { useStore } from 'vuex'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import { useFormSubmit } from '@/composables/useFormSubmit'
+import { useSnackbar } from '@/composables/useSnackbar'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { allGroups } from '@/data/groups'
+import AuthCard from '@/components/auth/AuthCard.vue'
+import PasswordField from '@/components/common/PasswordField.vue'
+import SectionLabel from '@/components/common/SectionLabel.vue'
+import FormFieldDefaults from '@/components/common/FormFieldDefaults.vue'
 
 const selectedGroup = ref(null)
 const password = ref('')
 const confirmPassword = ref('')
-const visible = ref(false)
-const confirmVisible = ref(false)
-const isLoading = ref(false)
 const isCheckingGroup = ref(false)
 const registrationMode = ref(null) // 'initial' | 'subsequent'
-const snackbar = ref({
-  show: false,
-  color: '',
-  message: '',
-})
 
-const router = useRouter()
+const { showSnackbar, notifyError } = useSnackbar()
+
 const store = useStore()
 
 useFirebasePageView('view_prove_owner', {})
@@ -210,87 +205,65 @@ const onGroupSelected = async (group) => {
       mode: registrationMode.value,
     })
   } catch (error) {
-    snackbar.value = {
-      show: true,
-      color: 'error',
-      message: error.message,
-    }
+    notifyError(error)
     registrationMode.value = 'initial'
   } finally {
     isCheckingGroup.value = false
   }
 }
 
+// 後続登録: パスワード認証で即座に代表者として登録する
+const subsequentRegistration = useFormSubmit({
+  action: async () => {
+    const selected = selectedGroup.value
+    await store.dispatch('prove/submitPasswordRegistration', {
+      groupId: String(selected.id),
+      userId: store.getters['auth/userId'],
+      userName: store.getters['auth/displayName'],
+      password: password.value,
+    })
+    void logFirebaseAnalyticsEvent('prove_owner_instant_register_success', {
+      organizationId: String(selected.id),
+    })
+  },
+  successMessage: '代表者として登録されました！',
+  redirectTo: '/eventcal',
+  redirectDelay: 1500,
+  errorEvent: 'prove_owner_submit_error',
+})
+
+// 初回申請: 運営の承認が必要
+const initialApplication = useFormSubmit({
+  action: async () => {
+    const selected = selectedGroup.value
+    await store.dispatch('prove/submitInitialApplication', {
+      organizationId: selected.id,
+      password: password.value,
+      userId: store.getters['auth/userId'],
+      userNameSnapshot: store.getters['auth/displayName'],
+      emailSnapshot: store.getters['auth/email'],
+      groupNameSnapshot: selected.name,
+    })
+    void logFirebaseAnalyticsEvent('prove_owner_submit_success', {
+      organizationId: String(selected.id),
+    })
+  },
+  successMessage: '申請を受け付けました',
+  redirectTo: '/prove-owner/description',
+  errorEvent: 'prove_owner_submit_error',
+})
+
+const isLoading = computed(
+  () => subsequentRegistration.isLoading.value || initialApplication.isLoading.value,
+)
+
 /**
  * フォーム送信ハンドラ（初回申請 or パスワード即登録を分岐）
  *
  * @param {Promise} validationPromise バリデーション結果
  */
-const onSubmit = async (validationPromise) => {
-  try {
-    isLoading.value = true
-
-    const { valid } = await validationPromise
-    if (!valid) throw new Error('入力に誤りがあります。')
-
-    const selected = selectedGroup.value
-
-    if (registrationMode.value === 'subsequent') {
-      // 後続登録: パスワード認証で即座に登録
-      await store.dispatch('prove/submitPasswordRegistration', {
-        groupId: String(selected.id),
-        userId: store.getters['auth/userId'],
-        userName: store.getters['auth/displayName'],
-        password: password.value,
-      })
-
-      void logFirebaseAnalyticsEvent('prove_owner_instant_register_success', {
-        organizationId: String(selected.id),
-      })
-
-      snackbar.value = {
-        show: true,
-        color: 'success',
-        message: '代表者として登録されました！🎉',
-      }
-
-      setTimeout(() => {
-        router.push('/eventcal')
-      }, 1500)
-    } else {
-      // 初回申請: 運営承認が必要
-      await store.dispatch('prove/submitInitialApplication', {
-        organizationId: selected.id,
-        password: password.value,
-        userId: store.getters['auth/userId'],
-        userNameSnapshot: store.getters['auth/displayName'],
-        emailSnapshot: store.getters['auth/email'],
-        groupNameSnapshot: selected.name,
-      })
-
-      void logFirebaseAnalyticsEvent('prove_owner_submit_success', {
-        organizationId: String(selected.id),
-      })
-
-      snackbar.value = {
-        show: true,
-        color: 'success',
-        message: '申請を受け付けました',
-      }
-
-      setTimeout(() => {
-        router.push('/prove-owner/description')
-      }, 1000)
-    }
-  } catch (error) {
-    void logFirebaseAnalyticsEvent('prove_owner_submit_error', {})
-    snackbar.value = {
-      show: true,
-      color: 'error',
-      message: error.message,
-    }
-  } finally {
-    isLoading.value = false
-  }
-}
+const onSubmit = (validationPromise) =>
+  registrationMode.value === 'subsequent'
+    ? subsequentRegistration.submit(validationPromise)
+    : initialApplication.submit(validationPromise)
 </script>

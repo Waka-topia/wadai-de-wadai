@@ -4,32 +4,25 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "vite build",
-    "dev": "vite",
+    "build:dev": "set -a && eval \"$(cat .env.development)\" && set +a && vite build --mode development",
+    "build:prod": "set -a && eval \"$(cat .env.production)\" && set +a && vite build --mode production",
+    "deploy:dev": "firebase use dev && npm run build:dev && firebase deploy --only hosting",
+    "deploy:prod": "firebase use prod && npm run build:prod && firebase deploy --only hosting",
+    "dev": "set -a && eval \"$(cat .env.development)\" && set +a && vite",
     "format": "prettier --write .",
     "lint": "eslint . --fix",
     "prepare": "husky",
     "preview": "vite preview"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^7.1.0",
     "@mdi/font": "^7.4.47",
-    "@mdi/js": "^7.4.47",
-    "@turf/turf": "^7.3.1",
     "bcryptjs": "^3.0.3",
     "firebase": "^12.7.0",
-    "jsqr": "^1.4.0",
-    "leaflet": "^1.9.4",
-    "leaflet-control-geocoder": "^3.3.1",
-    "mapbox-gl": "^3.17.0",
     "maplibre-gl": "^5.17.0",
-    "npm-check-updates": "^19.3.1",
     "register-service-worker": "^1.7.2",
     "uuid": "^13.0.0",
-    "vite-plugin-pwa": "^1.2.0",
     "vue": "^3.5.26",
     "vue-cal": "^4.10.2",
-    "vue-qr-reader": "^1.6.2",
     "vue-qrcode-reader": "^5.7.3",
     "vue-router": "^4.6.4",
     "vuetify": "^3.11.6",
@@ -39,7 +32,6 @@
     "@eslint/js": "^9.39.2",
     "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
     "@vitejs/plugin-vue": "^6.0.3",
-    "@vue/cli-plugin-pwa": "^5.0.9",
     "@vue/eslint-config-prettier": "^10.2.0",
     "eslint": "^9.39.2",
     "eslint-plugin-check-file": "^3.3.1",
@@ -47,14 +39,16 @@
     "eslint-plugin-jsdoc": "^62.0.0",
     "eslint-plugin-vue": "^10.6.2",
     "husky": "^9.1.7",
+    "npm-check-updates": "^19.6.6",
     "prettier": "^3.7.4",
     "prettier-plugin-jsdoc": "^1.8.0",
     "prettier-plugin-organize-attributes": "^1.0.0",
     "prettier-plugin-packagejson": "^2.5.20",
     "vite": "^7.3.1",
+    "vite-plugin-pwa": "^1.2.0",
     "vite-plugin-vue-devtools": "^8.0.5"
   },
   "engines": {
-    "node": ">=24.0.0"
+    "node": "24.x"
   }
 }

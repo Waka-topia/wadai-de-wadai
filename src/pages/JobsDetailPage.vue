@@ -1,13 +1,9 @@
 <template>
   <v-container fluid class="pa-0">
-    <div v-if="!job && !error" class="text-center mt-16">
-      <v-progress-circular indeterminate color="orange" size="64"></v-progress-circular>
-      <p class="mt-4 text-grey">求人情報を読み込み中...</p>
-    </div>
+    <LoadingState v-if="!job && !error" class="mt-8" message="求人情報を読み込み中..." />
 
-    <div v-else-if="error" class="text-center mt-16 text-error">
-      <v-icon size="64" color="error">mdi-alert-circle</v-icon>
-      <p class="mt-4">{{ error }}</p>
+    <div v-else-if="error" class="pa-4">
+      <ErrorState :message="error" />
     </div>
 
     <div v-else class="bg-white position-relative">
@@ -120,10 +116,7 @@
 
       <div class="text-black text-h6 font-weight-bold text-wrap px-6 py-4">休日休暇</div>
 
-      <div
-        class="position-fixed d-flex align-center justify-center w-100 px-4"
-        style="z-index: 10; bottom: calc(10% + 24px); left: 0"
-      >
+      <div class="apply-bar d-flex align-center justify-center px-4">
         <v-btn
           color="orange"
           variant="elevated"
@@ -149,6 +142,8 @@ import { computed, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { useRoute } from 'vue-router'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import ErrorState from '@/components/common/ErrorState.vue'
+import LoadingState from '@/components/common/LoadingState.vue'
 import BookMarkButton from '@/components/recruit/BookMarkButton.vue'
 import JobLocationMap from '@/components/recruit/JobLocationMap.vue'
 
@@ -169,3 +164,24 @@ onMounted(() => {
 
 const job = computed(() => store.getters.currentJobWithBookmark)
 </script>
+
+<style scoped>
+/* 応募ボタンのバー。スマホでは下部バーの上に浮かせる */
+.apply-bar {
+  position: fixed;
+  z-index: 10;
+  bottom: calc(10% + 24px);
+  left: 0;
+  right: 0;
+}
+
+/* PC ではサイドナビ（256px）を避けて本文と同じ 720px の範囲に収め、下部バーが無いので下へ寄せる（フッター 40px の上） */
+@media (min-width: 960px) {
+  .apply-bar {
+    left: 256px;
+    max-width: 720px;
+    margin: 0 auto;
+    bottom: 56px;
+  }
+}
+</style>

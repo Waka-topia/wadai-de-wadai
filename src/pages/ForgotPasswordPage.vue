@@ -1,59 +1,54 @@
 <template>
-  <v-progress-linear v-if="isLoading" color="success" indeterminate=""></v-progress-linear>
-  <v-sheet class="pa-12" rounded>
-    <v-card class="py-8">
-      <v-card-title class="text-center mb-4">パスワードをリセット</v-card-title>
-      <v-card-text class="text-center text-body-2 mb-2">
-        登録済みのメールアドレスを入力してください。パスワードリセット用のリンクを送信します。
-      </v-card-text>
-      <v-form @submit.prevent="onSubmit">
-        <v-text-field
-          v-model="email"
-          class="mb-2"
-          :rules="[required]"
-          clearable
-          label="Email"
-          placeholder="sample@gmail.com"
-          prepend-inner-icon="mdi-email-outline"
-        ></v-text-field>
+  <AuthCard icon="mdi-lock-reset" title="パスワードをリセット" :loading="isLoading">
+    <template #subtitle>
+      <p class="text-caption text-grey-darken-1 mt-2">
+        登録済みのメールアドレスを入力してください。<br />
+        パスワード再設定用のリンクを送信します。
+      </p>
+    </template>
 
-        <br />
+    <FormFieldDefaults>
+      <v-form v-model="isFormValid" @submit.prevent="onSubmit">
+        <EmailField v-model="email" class="mb-6" />
 
         <v-btn
           type="submit"
           :loading="isLoading"
+          :disabled="!isFormValid"
           block
-          color="success"
-          size="large"
-          variant="elevated"
+          color="green-darken-2"
+          size="x-large"
+          rounded="pill"
+          class="font-weight-bold mb-2"
+          elevation="0"
         >
           リセットメールを送信
         </v-btn>
       </v-form>
-      <v-divider class="mt-10"></v-divider>
-      <v-btn variant="text" @click="onBack">ログインに戻る</v-btn>
-    </v-card>
-    <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
-      {{ snackbar.message }}
-    </v-snackbar>
-  </v-sheet>
+    </FormFieldDefaults>
+
+    <v-divider class="my-6"></v-divider>
+
+    <v-btn variant="text" color="grey-darken-1" rounded="pill" size="large" block @click="onBack">
+      ログイン画面に戻る
+    </v-btn>
+  </AuthCard>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
-import { required } from '@/utils/forms/validate'
+import { useFormSubmit } from '@/composables/useFormSubmit'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { sendPasswordReset } from '@/services/authService'
+import AuthCard from '@/components/auth/AuthCard.vue'
+import EmailField from '@/components/common/EmailField.vue'
+import FormFieldDefaults from '@/components/common/FormFieldDefaults.vue'
 
 const email = ref('')
-const isLoading = ref(false)
-const snackbar = ref({
-  show: false,
-  color: '',
-  message: '',
-})
+// 全項目が入力ルールを満たしているか（v-form が更新する）
+const isFormValid = ref(false)
 
 const router = useRouter()
 
@@ -64,37 +59,14 @@ const onBack = () => {
   router.push('/login')
 }
 
-const onSubmit = async (validationPromise) => {
-  try {
-    isLoading.value = true
-
-    const { valid } = await validationPromise
-    if (!valid) throw new Error('入力に誤りがあります。')
-
+const { isLoading, submit: onSubmit } = useFormSubmit({
+  action: async () => {
     await sendPasswordReset(email.value)
-
     void logFirebaseAnalyticsEvent('forgot_password_submit_success', {})
-
-    snackbar.value = {
-      show: true,
-      color: 'success',
-      message: 'リセットメールを送信しました。メールをご確認ください。',
-    }
-
-    setTimeout(() => {
-      router.push('/login')
-    }, 3000)
-  } catch (error) {
-    void logFirebaseAnalyticsEvent('forgot_password_submit_error', {
-      errorCode: String(error?.code || 'unknown'),
-    })
-    snackbar.value = {
-      show: true,
-      color: 'error',
-      message: `送信に失敗しました: ${error.message}`,
-    }
-  } finally {
-    isLoading.value = false
-  }
-}
+  },
+  successMessage: 'リセットメールを送信しました。メールをご確認ください。',
+  redirectTo: '/login',
+  redirectDelay: 3000,
+  errorEvent: 'forgot_password_submit_error',
+})
 </script>

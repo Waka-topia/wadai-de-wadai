@@ -5,43 +5,19 @@
       <v-icon>mdi-arrow-left</v-icon>
     </v-btn>
 
-    <v-alert
-      v-if="fetchErrorMessage"
-      type="error"
-      variant="tonal"
-      class="mb-4"
-      icon="mdi-alert-circle"
-    >
-      {{ fetchErrorMessage }}
-    </v-alert>
+    <ErrorState v-if="fetchErrorMessage" :message="fetchErrorMessage" />
 
-    <v-card v-else-if="event.eventId" rounded="lg" elevation="2">
+    <v-card
+      v-else-if="event.eventId"
+      rounded="lg"
+      variant="outlined"
+      style="border-width: 2px; border-color: #bdbdbd"
+    >
       <!-- Title + ステータスバッジ -->
       <v-card-title class="pa-5 pb-2">
         <div class="d-flex align-center flex-wrap ga-2">
           <span class="text-h5 font-weight-bold">{{ event.title }}</span>
-          <v-chip
-            v-if="event.isOfficial"
-            size="small"
-            color="blue"
-            variant="flat"
-            label
-            class="font-weight-bold"
-          >
-            <v-icon start size="14">mdi-check-decagram</v-icon>
-            公式
-          </v-chip>
-          <v-chip
-            v-if="isProxyEvent"
-            size="small"
-            color="orange"
-            variant="flat"
-            label
-            class="font-weight-bold text-white"
-          >
-            <v-icon start size="14">mdi-clipboard-text-outline</v-icon>
-            代理登録
-          </v-chip>
+          <EventStatusChips :is-official="event.isOfficial" :is-proxy="isProxyEvent" />
         </div>
       </v-card-title>
 
@@ -59,7 +35,7 @@
           </v-list-item-title>
         </v-list-item>
 
-        <v-divider inset />
+        <v-divider thickness="2" color="grey-darken-1" />
 
         <v-list lines="two" class="pa-0">
           <v-list-item class="px-0">
@@ -74,7 +50,7 @@
             </v-list-item-title>
           </v-list-item>
 
-          <v-divider inset />
+          <v-divider thickness="2" color="grey-darken-1" />
 
           <v-list-item class="px-0">
             <template #prepend>
@@ -88,7 +64,7 @@
             </v-list-item-title>
           </v-list-item>
 
-          <v-divider inset />
+          <v-divider thickness="2" color="grey-darken-1" />
 
           <v-list-item class="px-0">
             <template #prepend>
@@ -102,103 +78,85 @@
             </v-list-item-title>
           </v-list-item>
 
-          <v-list-item class="px-0">
-            <template #prepend>
-              <v-avatar color="orange" size="40" rounded="lg" class="align-self-start mt-1">
-                <v-icon color="white" size="20">mdi-text-long</v-icon>
-              </v-avatar>
-            </template>
-            <v-list-item-subtitle class="text-caption text-uppercase"> 概要 </v-list-item-subtitle>
-            <v-list-item-title class="font-weight-bold text-wrap" style="line-height: 1.6">
-              {{ event.description }}
-            </v-list-item-title>
-          </v-list-item>
+          <v-divider thickness="2" color="grey-darken-1" />
 
-          <v-divider inset />
+          <div class="d-flex align-start ga-4 px-0 py-2">
+            <v-avatar color="orange" size="40" rounded="lg" class="flex-shrink-0 mt-1">
+              <v-icon color="white" size="20">mdi-text-long</v-icon>
+            </v-avatar>
+            <div>
+              <div class="text-caption text-uppercase text-medium-emphasis mb-1">概要</div>
+              <div class="font-weight-bold text-wrap" style="line-height: 1.6">
+                {{ event.description }}
+              </div>
+            </div>
+          </div>
 
-          <v-list-item class="px-0">
-            <template #prepend>
-              <v-avatar color="blue-grey" size="40" rounded="lg">
-                <v-icon color="white" size="20">mdi-account-edit</v-icon>
-              </v-avatar>
-            </template>
-            <v-list-item-subtitle class="text-caption text-uppercase">
-              作成者
-            </v-list-item-subtitle>
-            <v-list-item-title class="font-weight-medium">
-              {{ event.createdByName || '匿名ユーザー' }}
-            </v-list-item-title>
-          </v-list-item>
+          <v-divider thickness="2" color="grey-darken-1" />
         </v-list>
+        <div class="text-right mt-2">
+          <span class="text-caption text-grey-lighten-1">
+            作成者: {{ event.createdByName || '匿名ユーザー' }}
+          </span>
+        </div>
       </v-card-text>
 
       <!-- 運営代理登録の引き継ぎ誘導 (3ステップガイド形式) -->
       <div v-if="isProxyEvent" class="px-5 pb-4">
         <v-card color="orange-lighten-5" rounded="lg" variant="flat" class="pa-4">
           <div class="d-flex align-center mb-3">
-            <v-avatar color="orange" size="32" class="mr-3">
-              <v-icon color="white" size="18">mdi-hand-wave</v-icon>
+            <v-avatar color="orange" size="28" class="mr-2 flex-shrink-0">
+              <v-icon color="white" size="16">mdi-hand-wave</v-icon>
             </v-avatar>
-            <p class="text-body-1 font-weight-bold mb-0">このイベントを引き継ぎませんか？</p>
+            <p class="text-body-2 font-weight-bold mb-0">このイベントを引き継ぎませんか？</p>
           </div>
 
           <!-- 3ステップ -->
-          <div class="d-flex align-center justify-center ga-2 mb-3 flex-wrap">
-            <div class="step-item text-center">
-              <v-avatar color="orange" size="28" class="mb-1">
-                <span class="text-caption font-weight-bold text-white">1</span>
-              </v-avatar>
-              <p class="text-caption font-weight-bold mb-0">引き継ぎ申請</p>
-            </div>
-            <v-icon size="16" color="grey-lighten-1">mdi-chevron-right</v-icon>
-            <div class="step-item text-center">
-              <v-avatar color="blue" size="28" class="mb-1">
-                <span class="text-caption font-weight-bold text-white">2</span>
-              </v-avatar>
-              <p class="text-caption font-weight-bold mb-0">公式マーク付与</p>
-            </div>
-            <v-icon size="16" color="grey-lighten-1">mdi-chevron-right</v-icon>
-            <div class="step-item text-center">
-              <v-avatar color="green" size="28" class="mb-1">
-                <span class="text-caption font-weight-bold text-white">3</span>
-              </v-avatar>
-              <p class="text-caption font-weight-bold mb-0">自由に編集</p>
-            </div>
-          </div>
+          <StepFlow class="mb-3" :steps="claimSteps" />
 
           <v-btn
-            v-if="isLoggedIn"
             color="orange"
             variant="elevated"
             block
             class="text-white font-weight-bold"
+            rounded="lg"
             @click="onClaimClick"
           >
-            <v-icon start>mdi-swap-horizontal</v-icon>
-            このイベントを引き継ぐ
-          </v-btn>
-          <v-btn
-            v-else
-            color="orange"
-            variant="outlined"
-            block
-            class="font-weight-bold"
-            to="/prove-owner"
-          >
-            <v-icon start>mdi-account-check</v-icon>
-            代表者証明をして引き継ぐ
+            引き継ぎ申請へ進む
+            <v-icon class="position-absolute right-0 mx-2">mdi-chevron-right</v-icon>
           </v-btn>
         </v-card>
       </div>
 
-      <!-- Danger action -->
-      <EditDeleteForm v-if="canEdit" :event-id="eventId" :event="event" />
+      <!-- 編集・削除ボタン -->
+      <div v-if="canEdit" class="d-flex flex-column ga-3 px-5 pb-5">
+        <v-btn
+          color="grey-darken-3"
+          class="font-weight-bold"
+          variant="flat"
+          rounded="pill"
+          @click="editSheetOpen = true"
+        >
+          <v-icon start>mdi-pencil</v-icon>
+          このイベントを編集する
+        </v-btn>
+        <v-btn
+          color="red-lighten-1"
+          class="font-weight-bold"
+          variant="flat"
+          rounded="pill"
+          @click="deleteSheetOpen = true"
+        >
+          <v-icon start>mdi-delete</v-icon>
+          削除する
+        </v-btn>
+        <p class="text-caption text-grey text-center mb-0">
+          ※作成者本人、または団体の代表者のみ操作できます
+        </p>
+      </div>
     </v-card>
 
-    <v-card v-else rounded="lg" elevation="2" class="pa-6 text-center">
-      <v-progress-circular indeterminate color="orange" size="28" class="mr-2" />
-      読み込み中...
-    </v-card>
+    <LoadingState v-else message="読み込み中..." />
 
     <ClaimEventDialog
       v-model="claimDialogOpen"
@@ -206,6 +164,20 @@
       :event-organizer="event.organizerName || ''"
       :organization-id="event.organizationId || ''"
       @transferred="onTransferred"
+    />
+
+    <!-- イベントの編集シート -->
+    <BaseBottomSheet v-model="editSheetOpen" title="イベントの編集">
+      <EventForm v-if="editSheetOpen" :initial-event="event" @success="editSheetOpen = false" />
+    </BaseBottomSheet>
+
+    <!-- 削除の確認ダイアログ -->
+    <BaseDialog
+      v-model="deleteSheetOpen"
+      title="イベントの削除"
+      message="このイベントを削除します。本当によろしいですか？"
+      confirm-label="削除する"
+      @confirm="onDelete"
     />
   </v-container>
 </template>
@@ -219,14 +191,25 @@ import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { adminUserId } from '@/config/constants'
 import { hashValue } from '@/utils/crypto'
 import { isUserRepresentative } from '@/services/groupService'
-import EditDeleteForm from '@/components/event/EditDeleteForm.vue'
+import { useSnackbar } from '@/composables/useSnackbar'
+import { useProxyEvent } from '@/composables/useProxyEvent'
+import EventStatusChips from '@/components/event/EventStatusChips.vue'
+import StepFlow from '@/components/event/StepFlow.vue'
+import ErrorState from '@/components/common/ErrorState.vue'
+import LoadingState from '@/components/common/LoadingState.vue'
+import BaseBottomSheet from '@/components/common/BaseBottomSheet.vue'
+import BaseDialog from '@/components/common/BaseDialog.vue'
 import ClaimEventDialog from '@/components/event/ClaimEventDialog.vue'
+import EventForm from '@/components/event/EventForm.vue'
 
 const route = useRoute()
 const router = useRouter()
 const store = useStore()
+const { notifySuccess, notifyError } = useSnackbar()
 const fetchErrorMessage = ref('')
 const claimDialogOpen = ref(false)
+const editSheetOpen = ref(false)
+const deleteSheetOpen = ref(false)
 
 const event = computed(() => {
   return store.getters['event/event'] || {}
@@ -237,13 +220,13 @@ const eventId = computed(() => String(route.params.id || ''))
 const isLoggedIn = computed(() => !!store.getters['auth/userId'])
 const currentUserId = computed(() => store.getters['auth/userId'])
 
-const hashedAdminId = ref('')
 const hashedCurrentUserId = ref('')
 const isRepresentative = ref(false)
 
-/** ハッシュ化したIDをあらかじめ計算しておく */
+const { isProxyEvent: checkProxyEvent } = useProxyEvent()
+
+/** 作成者との照合のため、ログイン中のユーザー ID をハッシュ化しておく */
 onMounted(async () => {
-  hashedAdminId.value = await hashValue(adminUserId)
   if (currentUserId.value) {
     hashedCurrentUserId.value = await hashValue(currentUserId.value)
   }
@@ -270,14 +253,19 @@ watch(
 )
 
 /** イベントが運営による代理登録かどうかを判定する */
-const isProxyEvent = computed(() => {
-  return event.value.createdBy === hashedAdminId.value
-})
+const isProxyEvent = computed(() => checkProxyEvent(event.value))
+
+// 代理登録イベントを引き継ぐ流れ
+const claimSteps = [
+  { label: '引き継ぎ申請', color: 'orange' },
+  { label: '公式マーク付与', color: 'blue' },
+  { label: '自由に編集', color: 'green' },
+]
 
 /** 編集・削除権限があるかどうかを判定する (作成者本人 or 管理者 or 団体の代表者) */
 const canEdit = computed(() => {
   if (!isLoggedIn.value) return false
-  if (hashedCurrentUserId.value === hashedAdminId.value) return true // 運営は何でも消せる
+  if (currentUserId.value === adminUserId) return true // 運営は何でも消せる
 
   // 団体の代表者かつ公式イベントなら許可
   if (event.value.isOfficial && isRepresentative.value) return true
@@ -294,14 +282,36 @@ const handleBack = () => {
   router.back()
 }
 
+/** 引き継ぎボタンの遷移先を、代表者かどうかで振り分ける */
 const onClaimClick = () => {
   void logFirebaseAnalyticsEvent('event_detail_claim_click', { eventId: eventId.value })
-  claimDialogOpen.value = true
+  // 代表者はダイアログで引き継ぎを実行する。それ以外は代表者証明へ（未ログインはガードでログインへ）
+  if (isRepresentative.value) {
+    claimDialogOpen.value = true
+    return
+  }
+  router.push('/prove-owner')
 }
 
 const onTransferred = () => {
   // 引き継ぎ完了後にイベントデータを再取得して画面を更新
   store.dispatch('event/fetchEvent', eventId.value)
+}
+
+const onDelete = async () => {
+  try {
+    const currentUserId = store.getters['auth/userId']
+    void logFirebaseAnalyticsEvent('event_detail_delete_confirm', { eventId: eventId.value })
+    await store.dispatch('event/deleteEvent', { eventId: eventId.value, currentUserId })
+    notifySuccess('イベントが正常に削除されました。')
+    deleteSheetOpen.value = false
+    setTimeout(() => {
+      router.push('/eventcal')
+    }, 500)
+  } catch (error) {
+    deleteSheetOpen.value = false
+    notifyError(error)
+  }
 }
 
 onMounted(async () => {

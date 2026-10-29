@@ -18,8 +18,8 @@ export default defineConfig({
         theme_color: '#FF9900',
         icons: [
           {
-            src: '/icons/AppIcon500.png',
-            sizes: '500x500',
+            src: '/icons/AppIcon512-512.png',
+            sizes: '512x512',
             type: 'image/png', // 拡張子に合わせる
           },
         ],

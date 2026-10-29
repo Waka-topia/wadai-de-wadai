@@ -1,58 +1,50 @@
 <template>
   <div class="event-schedule">
     <!-- 空状態 -->
-    <div v-if="filteredEvents.length === 0" class="no-events-container">
-      <v-icon size="48" color="grey-lighten-1" class="mb-3">mdi-calendar-blank-outline</v-icon>
-      <p class="text-body-1 font-weight-bold text-grey-darken-1 mb-1">
-        この日のイベントはありません
-      </p>
-      <p class="text-caption text-grey">別の日をカレンダーから選択してください</p>
-    </div>
+    <EmptyState
+      v-if="displayEvents.length === 0 && props.events"
+      class="no-events-container"
+      icon="mdi-calendar-search"
+      title="該当するイベントはありません"
+      message="別のキーワードで試してみてください"
+    />
+    <EmptyState
+      v-else-if="displayEvents.length === 0"
+      class="no-events-container"
+      icon="mdi-calendar-blank-outline"
+      title="この日のイベントはありません"
+      message="別の日をカレンダーから選択してください"
+    />
 
     <!-- イベントカードリスト -->
     <div v-else class="d-flex flex-column ga-3">
       <v-card
-        v-for="event in filteredEvents"
+        v-for="event in displayEvents"
         :key="event.eventId"
         rounded="lg"
         elevation="1"
         class="event-card"
-        :class="{ 'proxy-event-card': isProxyEvent(event) }"
         @click="goToEventDetail(event.eventId)"
       >
-        <!-- 上部バッジエリア -->
-        <div v-if="event.isOfficial || isProxyEvent(event)" class="badge-area px-4 pt-3 pb-0">
-          <div class="d-flex ga-2 flex-wrap">
-            <v-chip
-              v-if="event.isOfficial"
-              size="small"
-              color="blue"
-              variant="flat"
-              class="font-weight-bold"
-              label
-            >
-              <v-icon start size="14">mdi-check-decagram</v-icon>
-              公式認定
-            </v-chip>
-            <v-chip
-              v-if="isProxyEvent(event)"
-              size="small"
-              color="orange"
-              variant="flat"
-              class="font-weight-bold text-white"
-              label
-            >
-              <v-icon start size="14">mdi-clipboard-text-outline</v-icon>
-              代理登録 — 引き継ぎ募集中
-            </v-chip>
-          </div>
-          <p
-            v-if="isProxyEvent(event)"
-            class="text-caption text-grey-darken-1 mt-2 mb-0 proxy-note"
-          >
-            <v-icon size="12" color="grey" class="mr-1">mdi-information-outline</v-icon>
-            Waka-topiaが大学公式情報を元に代理投稿しています。団体の代表者は詳細画面から引き継ぎが可能です。
-          </p>
+        <!-- 右上インフォボタン（代理登録のみ） -->
+        <div v-if="isProxyEvent(event)" class="info-btn-wrapper">
+          <v-menu location="bottom" :close-on-content-click="false" max-width="300">
+            <template #activator="{ props: activatorProps }">
+              <v-btn
+                v-bind="activatorProps"
+                icon="mdi-information-outline"
+                size="small"
+                variant="text"
+                color="grey-lighten-1"
+                @click.stop
+              />
+            </template>
+            <v-card rounded="lg" class="pa-3" max-width="300" @click.stop>
+              <p class="text-body-2 text-grey-darken-3 mb-0">
+                Waka-topiaが大学公式情報を元に代理投稿しています。団体の代表者は詳細画面から引き継ぎが可能です。
+              </p>
+            </v-card>
+          </v-menu>
         </div>
 
         <!-- メインコンテンツ -->
@@ -60,6 +52,9 @@
           <div class="d-flex align-start">
             <!-- 時間カラム -->
             <div class="time-column text-center mr-4 flex-shrink-0">
+              <div v-if="props.events" class="date-badge mb-1">
+                {{ formatDate(event.date) }}
+              </div>
               <p class="text-body-1 font-weight-bold text-orange mb-0">
                 {{ event.startTime }}
               </p>
@@ -74,73 +69,57 @@
 
             <!-- 情報カラム -->
             <div class="info-column flex-grow-1 overflow-hidden">
-              <p class="text-h6 font-weight-bold mb-1 text-truncate">
+              <!-- 右端の矢印（代理登録のときは右上のインフォボタン）と重ならないよう右に余白を取る -->
+              <p
+                class="text-h6 font-weight-bold mb-1 text-truncate"
+                :class="isProxyEvent(event) ? 'pr-8' : 'pr-6'"
+              >
                 {{ event.organizerName }}
               </p>
-              <p
-                v-if="event.description"
-                class="text-body-2 text-grey-darken-1 mb-2 description-text"
-              >
+              <!-- 概要は 1 行で、長いものは … で省略する。概要が無いときも 1 行分を確保して高さを揃える -->
+              <p class="text-body-2 text-grey-darken-1 mb-2 pr-6 description-text">
                 {{ event.description }}
               </p>
-              <div class="d-flex align-center">
-                <v-icon size="16" color="orange" class="mr-1">mdi-map-marker</v-icon>
-                <span class="text-body-2 font-weight-medium text-orange">
+              <!-- バッジ（small チップ）の有無で高さが変わらないよう、行の高さをチップに合わせて固定する -->
+              <div class="d-flex align-center ga-1 location-row">
+                <v-icon size="16" color="orange" class="flex-shrink-0">mdi-map-marker</v-icon>
+                <span class="text-body-2 font-weight-medium text-orange text-truncate flex-grow-1">
                   {{ event.location }}
                 </span>
+                <div class="d-flex ga-1 flex-shrink-0">
+                  <EventStatusChips
+                    :is-official="event.isOfficial"
+                    :is-proxy="isProxyEvent(event)"
+                  />
+                </div>
               </div>
             </div>
 
-            <!-- 詳細矢印 -->
-            <v-icon size="20" color="grey-lighten-1" class="align-self-center ml-2 flex-shrink-0">
+            <!-- 詳細矢印。場所の行がカードの右端まで使えるよう、レイアウトの外に重ねて置く -->
+            <v-icon size="20" color="grey-lighten-1" class="detail-chevron">
               mdi-chevron-right
             </v-icon>
           </div>
         </v-card-text>
-
-        <!-- 代理登録イベント用の引き継ぎCTA -->
-        <div v-if="isProxyEvent(event)" class="claim-cta px-4 pb-3">
-          <v-divider class="mb-3" />
-          <div class="d-flex align-center">
-            <v-icon size="18" color="orange" class="mr-2 pulse-icon"
-              >mdi-hand-pointing-right</v-icon
-            >
-            <span class="text-body-2 font-weight-bold text-orange">
-              タップして引き継ぎ → 公式マーク＆上位表示
-            </span>
-          </div>
-        </div>
       </v-card>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
+import { useProxyEvent } from '@/composables/useProxyEvent'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
-import { adminUserId } from '@/config/constants'
-import { hashValue } from '@/utils/crypto'
+import { formatShortDateWeekday, parseDateKey } from '@/utils/dateFormatter'
+import EmptyState from '@/components/common/EmptyState.vue'
+import EventStatusChips from '@/components/event/EventStatusChips.vue'
 
 const router = useRouter()
 const store = useStore()
 
-const hashedAdminUserId = ref('')
-
-onMounted(async () => {
-  hashedAdminUserId.value = await hashValue(adminUserId)
-})
-
-/**
- * イベントが運営による代理登録かどうかを判定する
- *
- * @param {object} event イベントデータ
- * @returns {boolean} 運営代理登録の場合true
- */
-const isProxyEvent = (event) => {
-  return event.createdBy === hashedAdminUserId.value
-}
+const { isProxyEvent } = useProxyEvent()
 
 const goToEventDetail = (eventId) => {
   void logFirebaseAnalyticsEvent('event_schedule_item_click', { eventId: String(eventId) })
@@ -148,15 +127,33 @@ const goToEventDetail = (eventId) => {
 }
 
 const props = defineProps({
+  /** 選択中の日付 (YYYY-MM-DD) */
   selectedDate: {
     type: String,
     default: '',
   },
+  /** 表示するイベントリスト (指定がない場合は selectedDate から取得) */
+  events: {
+    type: Array,
+    default: null,
+  },
 })
 
-const filteredEvents = computed(() => {
+/** 表示するイベント一覧（検索結果があればそれを、なければ選択日のイベントを使う） */
+const displayEvents = computed(() => {
+  if (props.events) {
+    return props.events
+  }
   return store.getters['event/sortedEventsByDate'](props.selectedDate)
 })
+
+/**
+ * 日付文字列を M/D(曜) 形式にフォーマットする
+ *
+ * @param {string} dateStr - YYYY-MM-DD 形式の日付文字列
+ * @returns {string} M/D(曜) 形式
+ */
+const formatDate = (dateStr) => (dateStr ? formatShortDateWeekday(parseDateKey(dateStr)) : '')
 </script>
 
 <style scoped>
@@ -179,10 +176,19 @@ const filteredEvents = computed(() => {
 /* --- イベントカード --- */
 .event-card {
   cursor: pointer;
+  position: relative;
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
   border: 1px solid #f0f0f0;
+}
+
+/* --- 代理登録インフォボタン --- */
+.info-btn-wrapper {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 1;
 }
 
 .event-card:hover {
@@ -194,18 +200,27 @@ const filteredEvents = computed(() => {
   transform: translateY(0);
 }
 
-/* --- 代理登録カード --- */
-.proxy-event-card {
-  border-left: 3px solid #ff9800;
-}
-
 /* --- 時間カラム --- */
 .time-column {
-  min-width: 52px;
+  min-width: 60px;
+}
+
+.date-badge {
+  display: inline-block;
+  background-color: #fff3e0;
+  color: #ff9900;
+  border: 1px solid #ffcc80;
+  padding: 0px 4px;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  line-height: 1.4;
 }
 
 /* --- 区切り線 --- */
+/* 組織名や概要が長いと flex で縮められて幅 0 になり消えるので、縮めない */
 .time-divider {
+  flex-shrink: 0;
   width: 2px;
   min-height: 48px;
   background: linear-gradient(180deg, #ff9800 0%, #ffe0b2 100%);
@@ -215,12 +230,23 @@ const filteredEvents = computed(() => {
 
 /* --- 概要テキスト --- */
 .description-text {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   line-height: 1.5;
+  min-height: 1.5em;
+}
+
+.location-row {
+  height: 24px;
+}
+
+/* --- 詳細矢印 --- */
+.detail-chevron {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
 }
 
 /* --- 引き継ぎCTAのパルスアニメーション --- */

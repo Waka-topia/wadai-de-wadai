@@ -1,5 +1,5 @@
 <template>
-  <v-card class="mt-4 mx-4 survey-banner" elevation="2" rounded="lg" @click="goSurvey">
+  <v-card class="survey-banner" elevation="2" rounded="lg" @click="goSurvey">
     <div class="survey-banner__inner d-flex align-center pa-4">
       <div class="survey-banner__time d-flex flex-column align-center justify-center mr-4">
         <span class="text-caption font-weight-bold text-white">所要時間</span>
@@ -17,11 +17,11 @@
 </template>
 
 <script setup>
-const surveyUrl =
-  'https://docs.google.com/forms/d/e/1FAIpQLScqjOjJ8B3XcSEH5d__94ucGD00FVqIbIJe2hq2MxUodczL7Q/viewform?usp=dialog'
+import { inquiryFormUrl } from '@/config/constants'
+import { openExternalLink } from '@/utils/externalLink'
 
 const goSurvey = () => {
-  window.open(surveyUrl, '_blank')
+  openExternalLink(inquiryFormUrl)
 }
 </script>
 

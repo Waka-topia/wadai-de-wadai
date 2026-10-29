@@ -21,26 +21,7 @@
           </v-btn>
         </div>
 
-        <div class="d-flex ga-3 mb-3 banner-steps">
-          <div class="banner-step">
-            <v-icon size="20" color="orange" class="mb-1">mdi-account-check</v-icon>
-            <p class="text-caption font-weight-bold mb-0">代表者証明</p>
-          </div>
-          <v-icon size="16" color="grey-lighten-1" class="align-self-center">
-            mdi-chevron-right
-          </v-icon>
-          <div class="banner-step">
-            <v-icon size="20" color="blue" class="mb-1">mdi-check-decagram</v-icon>
-            <p class="text-caption font-weight-bold mb-0">公式マーク</p>
-          </div>
-          <v-icon size="16" color="grey-lighten-1" class="align-self-center">
-            mdi-chevron-right
-          </v-icon>
-          <div class="banner-step">
-            <v-icon size="20" color="green" class="mb-1">mdi-arrow-up-bold-circle</v-icon>
-            <p class="text-caption font-weight-bold mb-0">上位表示</p>
-          </div>
-        </div>
+        <StepFlow class="mb-3" :steps="bannerSteps" />
 
         <v-btn
           color="orange"
@@ -56,44 +37,86 @@
       </v-card-text>
     </v-card>
 
-    <VueCal
-      class="vuecal"
-      :disable-views="['years', 'year', 'week', 'day']"
-      :events="events"
-      :max-date="maxDate"
-      :min-date="minDate"
-      :selected-date="selectedDate"
-      active-view="month"
-      hide-view-selector
-      locale="en"
-      start-week-on-sunday
-      @cell-click="onCellClick"
-    ></VueCal>
+    <!-- lg 以上では、左にカレンダー・右にその日のイベントの 2 列にする -->
+    <div class="eventcal-columns">
+      <div>
+        <!-- 検索バーエリア -->
+        <SearchField v-model="searchQuery" class="mx-4 mt-4" placeholder="団体名で検索" />
 
-    <v-divider class="my-4"></v-divider>
+        <!-- 検索情報の表示 -->
+        <div v-if="searchQuery" class="mx-4 mt-2">
+          <span class="text-caption font-weight-bold text-grey-darken-1">検索結果を表示中</span>
+        </div>
 
-    <v-btn class="font-weight-bold set-today-btn" rounded variant="outlined" @click="setToday">
-      <v-icon start size="18">mdi-calendar-today</v-icon>
-      今日の新歓イベント
-    </v-btn>
-
-    <!-- 改善された日付ナビゲーション -->
-    <div class="date-nav">
-      <v-btn icon variant="text" size="small" @click="changeDate(-1)">
-        <v-icon>mdi-chevron-left</v-icon>
-      </v-btn>
-      <div class="date-display">
-        <v-icon size="18" color="orange" class="mr-2">mdi-calendar</v-icon>
-        <span class="text-body-1 font-weight-bold">{{ formattedDate }}</span>
+        <VueCal
+          v-show="!searchQuery"
+          class="vuecal"
+          :disable-views="['years', 'year', 'week', 'day']"
+          :events="events"
+          :max-date="maxDate"
+          :min-date="minDate"
+          :selected-date="selectedDate"
+          active-view="month"
+          hide-view-selector
+          locale="en"
+          start-week-on-sunday
+          @cell-click="onCellClick"
+        ></VueCal>
       </div>
-      <v-btn icon variant="text" size="small" @click="changeDate(1)">
-        <v-icon>mdi-chevron-right</v-icon>
-      </v-btn>
+
+      <div class="eventcal-side">
+        <div v-show="!searchQuery">
+          <!-- 2 列のときは列の区切りがあるので、横線は不要 -->
+          <v-divider class="my-4 d-lg-none"></v-divider>
+
+          <!-- 日付ナビゲーション（前日・表示中の日付・翌日・今日へ戻る） -->
+          <div class="date-nav">
+            <v-btn icon variant="text" size="small" aria-label="前の日" @click="changeDate(-1)">
+              <v-icon>mdi-chevron-left</v-icon>
+            </v-btn>
+            <div class="date-display">
+              <span class="text-body-1 font-weight-bold text-no-wrap">{{ formattedDate }}</span>
+            </div>
+            <v-btn icon variant="text" size="small" aria-label="次の日" @click="changeDate(1)">
+              <v-icon>mdi-chevron-right</v-icon>
+            </v-btn>
+            <v-btn
+              size="small"
+              variant="tonal"
+              color="orange-darken-2"
+              rounded="pill"
+              class="font-weight-bold"
+              :disabled="isToday"
+              @click="setToday"
+            >
+              今日
+            </v-btn>
+          </div>
+        </div>
+
+        <EventSchedule v-model:selected-date="selectedDate" :events="searchedEvents" />
+      </div>
     </div>
 
-    <EventSchedule v-model:selected-date="selectedDate" />
-
-    <EditEventFormButton />
+    <!-- イベント追加フォーム -->
+    <BaseBottomSheet title="新歓イベントの登録">
+      <template #activator="{ props: activatorProps }">
+        <v-btn
+          v-bind="activatorProps"
+          class="text-white font-weight-bold fab-btn py-7 px-5 d-flex align-center justify-center"
+          color="orange"
+          variant="elevated"
+          elevation="4"
+          rounded="pill"
+          @click="logFirebaseAnalyticsEvent('event_edit_form_open', {})"
+        >
+          団体向けフォーム
+        </v-btn>
+      </template>
+      <template #default="{ close, isOpen }">
+        <EventForm v-if="isOpen" @success="close" />
+      </template>
+    </BaseBottomSheet>
   </div>
 </template>
 
@@ -102,12 +125,80 @@ import { ref, onMounted, computed, watch } from 'vue'
 import { useStore } from 'vuex'
 import VueCal from 'vue-cal'
 import 'vue-cal/dist/vuecal.css'
+import BaseBottomSheet from '@/components/common/BaseBottomSheet.vue'
+import SearchField from '@/components/common/SearchField.vue'
+import EventForm from '@/components/event/EventForm.vue'
 import EventSchedule from '@/components/event/EventSchedule.vue'
-import EditEventFormButton from '@/components/event/EditEventFormButton.vue'
+import StepFlow from '@/components/event/StepFlow.vue'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import { eventDateMax, eventDateMin } from '@/config/constants'
+import { formatMonthDayWeekday, parseDateKey, toDateKey } from '@/utils/dateFormatter'
 
 const store = useStore()
+
+// --- 検索機能 ---
+const searchQuery = ref('')
+
+// 検索対象の期間（今月から前後何か月分か）
+const searchMonthRange = 1
+
+/**
+ * 今月から月数をずらした月の 1 日を返す
+ *
+ * @param {number} offset - ずらす月数（負の値で過去）
+ * @returns {Date} その月の 1 日
+ */
+const getMonthStart = (offset) => {
+  const today = new Date()
+  return new Date(today.getFullYear(), today.getMonth() + offset, 1)
+}
+
+/**
+ * 検索結果を表示する期間（前月の 1 日〜翌月の末日）を返す
+ *
+ * @returns {{ start: string; end: string }} YYYY-MM-DD 形式の開始日と終了日
+ */
+const getSearchPeriod = () => ({
+  start: toDateKey(getMonthStart(-searchMonthRange)),
+  // 翌々月の 1 日の前日 = 翌月の末日
+  end: toDateKey(new Date(getMonthStart(searchMonthRange + 1).getTime() - 1)),
+})
+
+// イベントは月単位で読み込むため、検索を始めたら期間内の月をまとめて読み込む
+watch(
+  () => !!searchQuery.value,
+  (isSearching) => {
+    if (!isSearching) return
+    for (let offset = -searchMonthRange; offset <= searchMonthRange; offset++) {
+      const monthKey = toDateKey(getMonthStart(offset)).substring(0, 7)
+      store.dispatch('event/fetchEvents', { monthKey })
+    }
+  },
+)
+
+/** 検索ワードに基づいてイベントをフィルタリングする */
+const searchedEvents = computed(() => {
+  if (!searchQuery.value) return null
+  const query = searchQuery.value.toLowerCase()
+  const rawEvents = store.getters['event/allEvents']
+  const { start, end } = getSearchPeriod()
+
+  return rawEvents
+    .filter((event) => {
+      const isInPeriod = event.date >= start && event.date <= end
+      const matchesQuery =
+        event.organizerName?.toLowerCase().includes(query) ||
+        event.title?.toLowerCase().includes(query) ||
+        event.description?.toLowerCase().includes(query)
+      return isInPeriod && matchesQuery
+    })
+    .sort((a, b) => {
+      // 日付と開始時間でソート
+      if (a.date !== b.date) return a.date.localeCompare(b.date)
+      return a.startTime.localeCompare(b.startTime)
+    })
+})
 
 // --- 告知バナーの表示制御 ---
 const bannerDismissedKey = 'event_claim_banner_dismissed'
@@ -116,6 +207,13 @@ const bannerDismissed = ref(localStorage.getItem(bannerDismissedKey) === 'true')
 
 /** バナーを表示するかどうかの判定 ログイン済みかつ、バナーを閉じていない場合に表示 */
 const showClaimBanner = computed(() => isLoggedIn.value && !bannerDismissed.value)
+
+// 代表者証明をすると得られるメリットの流れ
+const bannerSteps = [
+  { label: '代表者証明', icon: 'mdi-account-check', color: 'orange' },
+  { label: '公式マーク', icon: 'mdi-check-decagram', color: 'blue' },
+  { label: '上位表示', icon: 'mdi-arrow-up-bold-circle', color: 'green' },
+]
 
 /** バナーを閉じてlocalStorageに記録する */
 const dismissBanner = () => {
@@ -129,15 +227,11 @@ const onBannerCtaClick = () => {
   void logFirebaseAnalyticsEvent('event_claim_banner_cta_click', {})
 }
 
-/** 選択中の日付を日本語フォーマットで表示する */
-const formattedDate = computed(() => {
-  const d = new Date(selectedDate.value)
-  const month = d.getMonth() + 1
-  const day = d.getDate()
-  const weekdays = ['日', '月', '火', '水', '木', '金', '土']
-  const weekday = weekdays[d.getDay()]
-  return `${month}月${day}日（${weekday}）の新歓イベント`
-})
+/** 選択中の日付を日本語フォーマットで表示する（狭い画面でも折り返さないよう日付だけにする） */
+const formattedDate = computed(() => formatMonthDayWeekday(parseDateKey(selectedDate.value)))
+
+/** 今日を選択中か（「今日」ボタンを押せなくするために使う） */
+const isToday = computed(() => selectedDate.value === toDateKey(new Date()))
 
 const events = computed(() => {
   const storeEvents = store.getters['event/allEvents']
@@ -154,14 +248,7 @@ const events = computed(() => {
   }))
 })
 
-const toDateString = (date) => {
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
-}
-
-const selectedDate = ref(toDateString(new Date()))
+const selectedDate = ref(toDateKey(new Date()))
 
 watch(selectedDate, (newDate) => {
   const monthKey = newDate.substring(0, 7)
@@ -172,11 +259,11 @@ useFirebasePageView('view_event_calendar', () => ({
   initialDate: selectedDate.value,
 }))
 
-const minDate = ref(new Date('2025-04-01'))
-const maxDate = ref(new Date('2026-05-31'))
+const minDate = ref(parseDateKey(eventDateMin))
+const maxDate = ref(parseDateKey(eventDateMax))
 
 const onCellClick = (date) => {
-  const dateString = toDateString(date)
+  const dateString = toDateKey(date)
   selectedDate.value = dateString
 
   logFirebaseAnalyticsEvent('calendar_date_click', {
@@ -185,7 +272,7 @@ const onCellClick = (date) => {
 }
 
 const setToday = () => {
-  const todayString = toDateString(new Date())
+  const todayString = toDateKey(new Date())
   selectedDate.value = todayString
 
   logFirebaseAnalyticsEvent('calendar_set_today', {
@@ -194,9 +281,9 @@ const setToday = () => {
 }
 
 const changeDate = (days) => {
-  const currentDate = new Date(selectedDate.value)
+  const currentDate = parseDateKey(selectedDate.value)
   currentDate.setDate(currentDate.getDate() + days)
-  const newDateString = toDateString(currentDate)
+  const newDateString = toDateKey(currentDate)
   selectedDate.value = newDateString
   void logFirebaseAnalyticsEvent('calendar_nav_click', {
     direction: days > 0 ? 'next' : 'prev',
@@ -216,24 +303,27 @@ onMounted(() => {
   height: 100%;
 }
 
+/* --- PC（lg 以上）の 2 列レイアウト --- */
+@media (min-width: 1280px) {
+  .eventcal-columns {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  /* 右列の先頭を、左列の検索バーと高さを揃える */
+  .eventcal-side {
+    padding-top: 16px;
+  }
+}
+
 /* --- バナーステップ --- */
-.banner-steps {
-  justify-content: center;
-}
-
-.banner-step {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 64px;
-}
-
 /* --- 日付ナビゲーション --- */
 .date-nav {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 4px;
   margin-bottom: 12px;
   padding: 0 16px;
 }
@@ -241,9 +331,7 @@ onMounted(() => {
 .date-display {
   display: flex;
   align-items: center;
-  background: #fff8e1;
-  border-radius: 20px;
-  padding: 6px 16px;
+  padding: 6px 12px;
 }
 
 /* --- VueCal コンテナ --- */
@@ -374,5 +462,21 @@ onMounted(() => {
 
 .vuecal__no-event {
   display: none;
+}
+
+/* --- FABボタン --- */
+.fab-btn {
+  position: fixed;
+  bottom: 100px;
+  right: 16px;
+  z-index: 1000;
+}
+
+/* PC では下部バーが無いので下へ寄せる。ただし高さ 40px のフッターに隠れないよう、その上に出す */
+@media (min-width: 960px) {
+  .fab-btn {
+    bottom: 56px;
+    right: 24px;
+  }
 }
 </style>

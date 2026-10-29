@@ -55,57 +55,86 @@
       </div>
     </header>
 
-    <section v-if="isAuthenticated && todayLectures.length > 0" class="today-section">
-      <div class="today-section-title">
-        <v-icon size="16" color="orange">mdi-calendar-today</v-icon>今日の授業<span
-          class="today-date"
-          >{{ todayDateLabel }}</span
-        >
-      </div>
-      <div class="today-cards">
-        <div
-          v-for="lecture in todayLectures"
-          :key="lecture.id"
-          class="today-card"
-          :style="getTodayCardStyle(lecture)"
-        >
-          <div class="today-card-period">{{ lecture.period }}限</div>
-          <div class="today-card-info">
-            <div class="today-card-name">{{ lecture.name }}</div>
-            <div class="today-card-meta">
-              <span v-if="lecture.room"
-                ><v-icon size="11" style="opacity: 0.7">mdi-map-marker</v-icon
-                >{{ lecture.room }}</span
-              >
-              <span v-if="lecture.teacher">{{ lecture.teacher }}</span>
-            </div>
-          </div>
-          <div class="today-card-time">{{ getPeriodStart(lecture.period) }}</div>
+    <!-- lg 以上では、左に時間割・右に今日の授業の 2 列にする -->
+    <div class="timetable-columns" :class="{ 'timetable-columns--split': isAuthenticated }">
+      <main class="page-content">
+        <TimetableGrid @cell-click="handleCellClick" />
+      </main>
+
+      <!-- 今日の授業が無い日、スマホでは何も出さず、PC では右の列に「ありません」と出す -->
+      <section
+        v-if="isAuthenticated"
+        class="today-section"
+        :class="{ 'today-section--empty': todayLectures.length === 0 }"
+      >
+        <div class="today-section-title">
+          <v-icon size="16" color="orange">mdi-calendar-today</v-icon>今日の授業<span
+            class="today-date"
+            >{{ todayDateLabel }}</span
+          >
         </div>
+        <div v-if="todayLectures.length > 0" class="today-cards">
+          <div
+            v-for="lecture in todayLectures"
+            :key="lecture.id"
+            class="today-card"
+            :style="getTodayCardStyle(lecture)"
+          >
+            <div class="today-card-period">{{ lecture.period }}限</div>
+            <div class="today-card-info">
+              <div class="today-card-name">{{ lecture.name }}</div>
+              <div class="today-card-meta">
+                <span v-if="lecture.room"
+                  ><v-icon size="11" style="opacity: 0.7">mdi-map-marker</v-icon
+                  >{{ lecture.room }}</span
+                >
+                <span v-if="lecture.teacher">{{ lecture.teacher }}</span>
+              </div>
+            </div>
+            <div class="today-card-time">{{ getPeriodStart(lecture.period) }}</div>
+          </div>
+        </div>
+        <p v-else class="text-caption text-grey mb-0">今日の授業はありません</p>
+      </section>
+    </div>
+
+    <!-- 時間割の入力方法の選択シート -->
+    <BaseBottomSheet v-model="isChoiceSheetOpen" :title="`${choiceCellLabel}に追加する方法`">
+      <div class="d-flex flex-column ga-3 pa-4 pb-6">
+        <v-btn
+          color="orange"
+          class="text-white font-weight-bold"
+          variant="flat"
+          size="large"
+          rounded="lg"
+          prepend-icon="mdi-book-search"
+          @click="handleChoiceSyllabus"
+        >
+          みんなのシラバスから検索
+        </v-btn>
+        <v-btn
+          color="orange"
+          class="text-orange font-weight-bold"
+          variant="outlined"
+          size="large"
+          rounded="lg"
+          prepend-icon="mdi-pencil"
+          @click="handleChoiceManual"
+        >
+          自分で入力する
+        </v-btn>
       </div>
-    </section>
+    </BaseBottomSheet>
 
-    <main class="page-content">
-      <TimetableGrid @cell-click="handleCellClick" />
-    </main>
-
-    <LectureEditorModal
-      v-model="showModal"
-      :selected-cell="selectedCell"
-      @saved="onLectureSaved"
-      @deleted="onLectureDeleted"
-    />
-
-    <v-snackbar
-      v-model="snackbarShow"
-      :color="snackbarColor"
-      location="bottom"
-      timeout="2500"
-      rounded="pill"
-    >
-      <v-icon class="mr-2" size="18">{{ snackbarIcon }}</v-icon
-      >{{ snackbarMessage }}
-    </v-snackbar>
+    <!-- 時間割の入力フォーム -->
+    <BaseBottomSheet v-model="isEditorSheetOpen" :title="editorSheetTitle" scrollable>
+      <LectureEditorModal
+        v-if="isEditorSheetOpen"
+        :selected-cell="activeCell"
+        @save="handleLectureSave"
+        @delete="handleLectureDelete"
+      />
+    </BaseBottomSheet>
   </div>
 </template>
 
@@ -114,36 +143,49 @@ import { ref, computed, watch, onActivated } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import { useSnackbar } from '@/composables/useSnackbar'
+import { dayLabels, lectureColorPalette, periodTimes, requiredColors } from '@/config/timetable'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
+import { formatMonthDayWeekday } from '@/utils/dateFormatter'
+import BaseBottomSheet from '@/components/common/BaseBottomSheet.vue'
 import TimetableHeaderControls from '@/components/timetable/TimetableHeaderControls.vue'
 import TimetableGrid from '@/components/timetable/TimetableGrid.vue'
 import LectureEditorModal from '@/components/timetable/LectureEditorModal.vue'
 
 const store = useStore()
 const router = useRouter()
+const { notifySuccess } = useSnackbar()
 
 useFirebasePageView('view_timetable', () => ({ loggedIn: store.getters['auth/isAuthenticated'] }))
-const showModal = ref(false)
-const selectedCell = ref(null)
+const sheetState = ref({
+  active: null, // null | 'choice' | 'editor'
+  cell: null, // { day, period, lectureId }
+})
 
-const snackbarShow = ref(false)
-const snackbarMessage = ref('')
-const snackbarColor = ref('green')
-const snackbarIcon = ref('mdi-check-circle')
+const isChoiceSheetOpen = computed({
+  get: () => sheetState.value.active === 'choice',
+  set: (val) => {
+    if (!val) sheetState.value.active = null
+  },
+})
 
-const showSnackbar = (message, color = 'green', icon = 'mdi-check-circle') => {
-  snackbarMessage.value = message
-  snackbarColor.value = color
-  snackbarIcon.value = icon
-  snackbarShow.value = true
-}
+const isEditorSheetOpen = computed({
+  get: () => sheetState.value.active === 'editor',
+  set: (val) => {
+    if (!val) sheetState.value.active = null
+  },
+})
 
-const onLectureSaved = (lectureName) => showSnackbar(`「${lectureName}」を保存しました`)
-const onLectureDeleted = () => showSnackbar('講義を削除しました', 'grey', 'mdi-trash-can-outline')
+const activeCell = computed(() => sheetState.value.cell)
+
+const editorSheetTitle = computed(() => {
+  if (!activeCell.value) return '講義を登録'
+  const { day, period } = activeCell.value
+  return `${dayLabels[day] || ''}曜 ${period}限`
+})
 
 const isAuthenticated = computed(() => store.getters['auth/isAuthenticated'])
 const todayLectures = computed(() => store.getters['timetable/todayLectures'])
-const currentTimetable = computed(() => store.getters['timetable/currentTimetable'])
 const totalCredits = computed(() => store.getters['timetable/totalCredits'])
 
 const currentSemester = computed(() => store.getters['timetable/semester'])
@@ -152,48 +194,19 @@ const activeQuarter = computed({
   set: (val) => store.commit('timetable/SET_DISPLAY_QUARTER', val),
 })
 
-const earnedCredits = computed(() => {
-  // 配列化されたためフラットにして計算
-  const arr = Object.values(currentTimetable.value || {}).flat()
-  return arr.reduce(
-    (sum, lec) => (lec.creditStatus === 'earned' ? sum + (Number(lec.credits) || 0) : sum),
-    0,
-  )
-})
-
-const failedCredits = computed(() => {
-  const arr = Object.values(currentTimetable.value || {}).flat()
-  return arr.reduce(
-    (sum, lec) => (lec.creditStatus === 'failed' ? sum + (Number(lec.credits) || 0) : sum),
-    0,
-  )
-})
+const earnedCredits = computed(() => store.getters['timetable/earnedCredits'])
+const failedCredits = computed(() => store.getters['timetable/failedCredits'])
 
 const userId = computed(() => store.getters['auth/userId'])
 
-const colorMap = {
-  orange: { bg: '#fff3e0', border: '#ff9800' },
-  red: { bg: '#fce4ec', border: '#e91e63' },
-  blue: { bg: '#e3f2fd', border: '#2196f3' },
-  green: { bg: '#e8f5e9', border: '#4caf50' },
-  purple: { bg: '#f3e5f5', border: '#9c27b0' },
-  teal: { bg: '#e0f2f1', border: '#009688' },
-  indigo: { bg: '#e8eaf6', border: '#3f51b5' },
-  brown: { bg: '#efebe9', border: '#795548' },
-}
 const getTodayCardStyle = (lecture) => {
-  const c = colorMap[lecture.color] || colorMap.orange
+  const c = lectureColorPalette[lecture.color] || lectureColorPalette.orange
   return { backgroundColor: c.bg, borderLeftColor: c.border }
 }
 
-const periodStartMap = { 1: '09:10', 2: '10:40', 3: '13:10', 4: '14:50', 5: '16:20', 6: '18:00' }
-const getPeriodStart = (period) => periodStartMap[period] || ''
+const getPeriodStart = (period) => periodTimes[period]?.start || ''
 
-const todayDateLabel = computed(() => {
-  const d = new Date()
-  const dayNames = ['日', '月', '火', '水', '木', '金', '土']
-  return `${d.getMonth() + 1}月${d.getDate()}日（${dayNames[d.getDay()]}）`
-})
+const todayDateLabel = computed(() => formatMonthDayWeekday(new Date()))
 
 watch(
   userId,
@@ -206,15 +219,46 @@ onActivated(() => {
   if (userId.value) store.dispatch('timetable/fetchTimetable')
 })
 
-// 引数に lectureId を追加
+const choiceCellLabel = computed(() => {
+  if (!activeCell.value) return ''
+  const { day, period } = activeCell.value
+  return `${dayLabels[day] || ''}曜日 ${period}限`
+})
+
 const handleCellClick = ({ day, period, lectureId }) => {
   if (!isAuthenticated.value) {
     void logFirebaseAnalyticsEvent('timetable_cell_click_guest', { day, period })
     router.push('/login')
     return
   }
-  selectedCell.value = { day, period, lectureId }
-  showModal.value = true
+  if (lectureId) {
+    sheetState.value = { active: 'editor', cell: { day, period, lectureId } }
+  } else {
+    sheetState.value = { active: 'choice', cell: { day, period, lectureId: null } }
+  }
+}
+
+const handleChoiceSyllabus = () => {
+  const { day, period } = activeCell.value
+  void logFirebaseAnalyticsEvent('lecture_add_choice_syllabus', { day, period })
+  sheetState.value.active = null
+  router.push({ path: '/syllabus-search', state: { targetDay: day, targetPeriod: period } })
+}
+
+const handleChoiceManual = () => {
+  sheetState.value = { active: 'editor', cell: activeCell.value }
+}
+
+const handleLectureSave = ({ day, periods, lecture }) => {
+  store.dispatch('timetable/saveLecture', { day, periods, lecture })
+  notifySuccess(`「${lecture.name}」を保存しました`)
+  sheetState.value.active = null
+}
+
+const handleLectureDelete = ({ day, periods, lectureId }) => {
+  store.dispatch('timetable/removeLecture', { day, periods, lectureId })
+  notifySuccess('講義を削除しました')
+  sheetState.value.active = null
 }
 </script>
 
@@ -228,6 +272,25 @@ const handleCellClick = ({ day, period, lectureId }) => {
 }
 .today-section {
   margin-bottom: 0.75rem;
+}
+
+/* スマホでは、今日の授業が無い日はセクションごと出さない（今までどおり） */
+.today-section--empty {
+  display: none;
+}
+
+/* --- PC（lg 以上）の 2 列レイアウト --- */
+@media (min-width: 1280px) {
+  .timetable-columns--split {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    column-gap: 24px;
+    align-items: start;
+  }
+
+  .today-section--empty {
+    display: block;
+  }
 }
 .today-section-title {
   font-size: 0.85rem;
@@ -322,10 +385,10 @@ const handleCellClick = ({ day, period, lectureId }) => {
   display: inline-block;
 }
 .legend-color.required {
-  background-color: #e53935;
+  background-color: v-bind('requiredColors.req');
 }
 .legend-color.semi-required {
-  background-color: #8e24aa;
+  background-color: v-bind('requiredColors.semi');
 }
 .legend-color.elective {
   background-color: #ff9800;

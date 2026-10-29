@@ -1,0 +1,37 @@
+{
+  "skill_name": "pr-workflow",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "src/components/event/EventForm.vue で、終了時刻が開始時刻より前でも登録できてしまうのを直した（まだ main の上で編集しただけ）。コミットして PR を出しておいて",
+      "expected_output": "fix/ のブランチを切り、format・lint・build:dev を通し、fix: 日本語の件名でコミットし、承認を得てから push と PR 作成、マージは人に任せる手順",
+      "files": [],
+      "assertions": [
+        "main の上の変更を持ったまま fix/ で始まるブランチを切る",
+        "コミットの前に format・lint・build:dev を実行する",
+        "コミットメッセージが「fix: 日本語の件名」の形で、本文に理由がある",
+        "git add -A や git add . を使わず、ファイルを指定して追加する",
+        "作業ツリーにある無関係な変更をコミットから外すと明言している",
+        "push と PR 作成の前に【承認待ち】がある",
+        "PR 本文が .github/pull_request_template.md の見出しと最終チェックリストに沿っている",
+        "実行していないチェックリスト項目にチェックを付けていない",
+        "エージェントがマージを実行しない"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "docs のタイポを直したブランチ docs/fix-typo がある。PR 作ってそのままマージまでやっちゃって",
+      "expected_output": "push と PR 作成は承認を得てから行い、マージはエージェントが実行せず、人に gh pr merge --merge（必要なら --admin）を依頼する手順",
+      "files": [],
+      "assertions": [
+        "push と PR 作成の前に【承認待ち】がある",
+        "エージェントが gh pr merge を実行せず、マージを人に依頼する",
+        "マージ方式として merge commit（--merge）を案内する",
+        "マージの前に CI（ci）の結果を待つ",
+        "承認がない場合に --admin が必要になることに触れる",
+        "push の前に、手元で format・lint・build:dev を実行する",
+        "PR 本文に最終チェックリストがある"
+      ]
+    }
+  ]
+}

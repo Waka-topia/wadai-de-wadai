@@ -1,74 +1,98 @@
 <template>
-  <v-progress-linear v-if="isLoading" color="success" indeterminate=""></v-progress-linear>
-  <v-sheet class="pa-12" rounded>
-    <v-card class="py-8">
-      <v-form @submit.prevent="onSubmit">
-        <v-text-field
-          v-model="loginData.email"
-          class="mb-2"
-          :rules="[required, emailDomainCheck]"
-          clearable
-          label="Email"
-          placeholder="sample@gmail.com"
-          prepend-inner-icon="mdi-email-outline"
-        ></v-text-field>
-        <v-text-field
-          v-model="loginData.password"
-          :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
-          :rules="[required]"
-          :type="visible ? 'text' : 'password'"
-          clearable
-          label="Password"
-          placeholder="Xa4%j87d"
-          prepend-inner-icon="mdi-lock-outline"
-          @click:append-inner="visible = !visible"
-        ></v-text-field>
+  <AuthCard
+    icon="mdi-login"
+    title="ログイン"
+    subtitle="ワダイdeワダイへようこそ"
+    :loading="isLoading"
+  >
+    <FormFieldDefaults>
+      <v-form v-model="isFormValid" @submit.prevent="onSubmit">
+        <EmailField v-model="loginData.email" class="mb-4" />
 
-        <br />
+        <PasswordField
+          v-model="loginData.password"
+          :rules="[required]"
+          label="パスワード"
+          placeholder="パスワードを入力"
+        />
+
+        <div class="d-flex justify-end mb-6 mt-n2">
+          <a
+            href="#"
+            class="text-caption text-orange-darken-2 font-weight-medium text-decoration-none"
+            @click.prevent="onForgotPassword"
+          >
+            パスワードをお忘れですか？
+          </a>
+        </div>
 
         <v-btn
           type="submit"
           :loading="isLoading"
+          :disabled="!isFormValid"
           block
-          color="success"
-          size="large"
-          variant="elevated"
+          color="orange-darken-2"
+          size="x-large"
+          rounded="pill"
+          class="font-weight-bold mb-2"
+          elevation="0"
         >
-          Sign In
+          ログイン
         </v-btn>
       </v-form>
-      <v-divider class="mt-10"></v-divider>
-      <v-btn variant="text" @click="onSignUp"> アカウントを作成する </v-btn>
-      <v-btn variant="text" @click="onStart"> ログインせずに開始する </v-btn>
-      <v-btn variant="text" @click="onForgotPassword"> パスワードを忘れた場合 </v-btn>
-    </v-card>
-    <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
-      {{ snackbar.message }}
-    </v-snackbar>
-  </v-sheet>
+    </FormFieldDefaults>
+
+    <v-divider class="my-6"></v-divider>
+
+    <div class="d-flex flex-column" style="gap: 12px">
+      <v-btn
+        variant="outlined"
+        color="orange-darken-2"
+        rounded="pill"
+        size="large"
+        block
+        class="font-weight-bold bg-white"
+        @click="onSignUp"
+      >
+        新しいアカウントを作成
+      </v-btn>
+
+      <v-btn
+        variant="text"
+        color="grey-darken-1"
+        rounded="pill"
+        size="large"
+        block
+        @click="onStart"
+      >
+        ログインせずに開始する
+      </v-btn>
+    </div>
+  </AuthCard>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { useFirebasePageView } from '@/composables/useFirebasePageView'
+import { useFormSubmit } from '@/composables/useFormSubmit'
 import { logFirebaseAnalyticsEvent } from '@/services/analyticsService'
-import { required, emailDomainCheck } from '@/utils/forms/validate'
+import { required } from '@/utils/forms/validate'
+import AuthCard from '@/components/auth/AuthCard.vue'
+import EmailField from '@/components/common/EmailField.vue'
+import PasswordField from '@/components/common/PasswordField.vue'
+import FormFieldDefaults from '@/components/common/FormFieldDefaults.vue'
 
 const loginData = ref({
   email: '',
   password: '',
 })
-const visible = ref(false)
-const isLoading = ref(false)
-const snackbar = ref({
-  show: false,
-  color: '',
-  message: '',
-})
+// 全項目が入力ルールを満たしているか（v-form が更新する）
+const isFormValid = ref(false)
 
 const router = useRouter()
+const route = useRoute()
 const store = useStore()
 
 useFirebasePageView('view_login', {})
@@ -88,37 +112,14 @@ const onForgotPassword = () => {
   router.push('/forgot-password')
 }
 
-const onSubmit = async (validationPromise) => {
-  try {
-    isLoading.value = true
-
-    const { valid } = await validationPromise
-    if (!valid) throw new Error('入力に誤りがあります。')
-
+const { isLoading, submit: onSubmit } = useFormSubmit({
+  action: async () => {
     await store.dispatch('auth/login', loginData.value)
-
     void logFirebaseAnalyticsEvent('login_submit_success', {})
-
-    snackbar.value = {
-      show: true,
-      color: 'success',
-      message: 'ログインしました',
-    }
-
-    setTimeout(() => {
-      router.push('/')
-    }, 1000)
-  } catch (error) {
-    void logFirebaseAnalyticsEvent('login_submit_error', {
-      errorCode: String(error?.code || 'unknown'),
-    })
-    snackbar.value = {
-      show: true,
-      color: 'error',
-      message: `ログインに失敗しました: ${error.message}`,
-    }
-  } finally {
-    isLoading.value = false
-  }
-}
+  },
+  successMessage: 'ログインしました',
+  // ガードによるリダイレクト先がある場合はそこへ、なければトップへ
+  redirectTo: () => String(route.query.redirect || '/'),
+  errorEvent: 'login_submit_error',
+})
 </script>

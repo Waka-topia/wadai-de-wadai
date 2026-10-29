@@ -1,0 +1,40 @@
+name: CI (dev)
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: jdx/mise-action@v5
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Prettier
+        run: npm run format
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run Build (dev)
+        run: npm run build:dev
+
+      - name: Check for changes
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "Error: Files were modified by formatter or linter"
+            git diff
+            exit 1
+          fi

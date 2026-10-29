@@ -1,0 +1,33 @@
+{
+  "skill_name": "deploy",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "今の main を dev に出して、画面で確認したい。デプロイお願い",
+      "expected_output": "main の最新を確かめ、承認を得てから npm run deploy:dev を実行し、verify-deploy.sh で確認して、人に画面確認を頼む手順",
+      "files": [],
+      "assertions": [
+        "デプロイのコマンドの前に【承認待ち】がある",
+        "デプロイに npm run deploy:dev を使う（firebase deploy を直接使わない）",
+        "デプロイの前に、作業ツリーの状態（git status）と、出すブランチが main であることを確かめる",
+        "デプロイの後に、配信先へ HTTP で確認する（verify-deploy.sh か同等のもの）",
+        ".env* を読む・表示するコマンドが含まれない"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "新しいシラバス検索を本番に出したい。リリースしてくれる？",
+      "expected_output": "main を直接本番に出さず、main → prod の PR を作り、CI とユーザーのマージを待ってから prod ブランチで npm run deploy:prod を実行する手順。ルールに差分があればルールも先に出す",
+      "files": [],
+      "assertions": [
+        "main を直接本番にデプロイせず、main から prod への PR を作る",
+        "PR の作成の前に【承認待ち】がある",
+        "PR のマージをエージェントが実行せず、人に任せる",
+        "マージ方式に merge commit を指定する（squash にしない）",
+        "prod ブランチに切り替えてから npm run deploy:prod を実行する（git worktree を使わない）",
+        "本番デプロイの前に【承認待ち】がある",
+        "prod と main の firestore.rules・firestore.indexes.json の差分を確かめ、差分があれば Hosting より先にルールも出す"
+      ]
+    }
+  ]
+}
